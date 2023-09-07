@@ -8,10 +8,10 @@ To open a new repo using this template, click the green `Use this template` butt
 
 ## This template contains
 - [x] An Apache 2.0 license
-  [x] Issue templates for bugs, feature requests, and scientific improvements
-- [] A pull request (PR) template
-- [] CI for linting and styling, following CFA's style guide for R, Python, and Java
-- [] A .gitignore template that covers R, Python, and Java
+- [ ] Issue templates for bugs, feature requests, and scientific improvements
+- [ ] A pull request (PR) template
+- [ ] CI for linting and styling, following CFA's style guide for R, Python, and Java
+- [ ] A .gitignore template that covers R, Python, and Java
 
 ## Reminder: how to open issues, branches, submit PRs, and review PRs  
 [TODO]
