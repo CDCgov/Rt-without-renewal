@@ -6,6 +6,8 @@ A template for new CFA repos
 ## How to use this template
 To open a new repo using this template, click the green `Use this template` button above and to the right. Then select `Create a new repository`.
 
+[Guidance about when clearance is needed and how to get it]
+
 ## This template contains
 - [x] An Apache 2.0 license
 - [ ] Issue templates for bugs, feature requests, and scientific improvements
