@@ -1,0 +1,2 @@
+# If the object usage linter is too aggressive - disable it by uncommenting:
+# linters: linters_with_defaults(object_usage_linter = NULL)
