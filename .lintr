@@ -1,0 +1,3 @@
+# Disable object usage linter iby default because of tidyverse false positives
+linters: linters_with_defaults(object_usage_linter = NULL)
+encoding: "UTF-8"
