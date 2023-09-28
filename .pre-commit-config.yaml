@@ -32,7 +32,7 @@ repos:
     rev: v0.3.2
     hooks:
     -   id: style-files
-    -   id: lintr # If too aggressive, see .lintr file instructions
+    -   id: lintr
 #####
 # Java
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
