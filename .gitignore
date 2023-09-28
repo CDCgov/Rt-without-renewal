@@ -13,6 +13,8 @@
 # Documents
 *.doc
 *.docx
+*.htm
+*.html
 *.ppt
 *.pptx
 *.pdf
