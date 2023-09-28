@@ -19,6 +19,6 @@ To open a new repo using this template, click the green `Use this template` butt
 [TODO]
 * Link to CFA's style guide
 * How to open issues, including naming conventions, template usage
-* How to open branhces, including naming conventions, template usage
+* How to create new branches, including naming conventions, template usage
 * How to submit a PR, including when, template usage
 * How to review a PR, including whose responsibility to merge
