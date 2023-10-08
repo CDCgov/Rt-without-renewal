@@ -42,10 +42,12 @@ repos:
     args: [--aosp,--autofix]
 #####
 # Julia
-- repo: https://github.com/domluna/JuliaFormatter.jl
-  rev: v1.0.39
-  hooks:
-  - id: julia-formatter
+# Due to lack of first-class Julia support, this needs Julia local install
+#   and JuliaFormatter.jl installed in the library
+# - repo: https://github.com/domluna/JuliaFormatter.jl
+#   rev: v1.0.39
+#   hooks:
+#   - id: julia-formatter
 #####
 # Secrets
 -   repo: https://github.com/Yelp/detect-secrets
