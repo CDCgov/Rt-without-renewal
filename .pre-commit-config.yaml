@@ -41,6 +41,12 @@ repos:
   - id: pretty-format-java
     args: [--aosp,--autofix]
 #####
+# Julia
+- repo: https://github.com/domluna/JuliaFormatter.jl
+  rev: v1.0.39
+  hooks:
+  - id: julia-formatter
+#####
 # Secrets
 -   repo: https://github.com/Yelp/detect-secrets
     rev: v1.4.0
