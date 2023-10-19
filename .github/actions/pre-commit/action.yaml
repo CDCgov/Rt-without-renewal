@@ -14,7 +14,9 @@ runs:
     shell: bash
   - uses: actions/cache@v3
     with:
-      path: ~/.cache/pre-commit
+      path: |
+        ~/.cache/pre-commit
+        ~/.cache/R/renv
       key: pre-commit-3|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
   - run: pre-commit run --show-diff-on-failure --color=always ${{ inputs.extra_args }}
     shell: bash
