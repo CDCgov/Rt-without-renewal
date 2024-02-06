@@ -39,7 +39,7 @@ end
     transform_function = exp,
     pos_shift = 1e-6,
     α = missing,
-    I_0 = missing,
+    _I_0 = missing,
 ) where {T}
 
     I_t = Vector{T}(undef, gen_length)
@@ -74,7 +74,7 @@ end
     transform_function = exp,
     pos_shift = 1e-6,
     α = missing,
-    I_0 = missing,
+    _I_0 = missing,
 ) where {T}
 
     I_t = Vector{T}(undef, gen_length)
