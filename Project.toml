@@ -1,10 +1,20 @@
 name = "RtWithoutRenewal"
 uuid = "b2eeebe4-5992-4301-9193-7ebc9f62c855"
-authors = ["Samuel Abbott <azw1@cdc.gov>","Samuel Brand <usi1@cdc.gov>","Zachary Susswein <utb2@cdc.gov>"]
+authors = ["Samuel Abbott <azw1@cdc.gov>", "Samuel Brand <usi1@cdc.gov>", "Zachary Susswein <utb2@cdc.gov>"]
 version = "0.1.0-DEV"
 
+[deps]
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+LogExpFunctions = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
+Optim = "429524aa-4258-5aef-a3af-852621145aeb"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+ReverseDiff = "37e2e3b7-166d-5795-8a7a-e32c996b4267"
+SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
+
 [compat]
-julia = "1.10"
+julia = "1.9,1.10"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
