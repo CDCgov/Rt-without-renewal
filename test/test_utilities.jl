@@ -31,26 +31,26 @@ end
     # Test case 1: Testing with a non-negative distribution
     @testset "Test case 1" begin
         dist = Normal()
-        @test_throws AssertionError create_discrete_pmf(dist, Δd=1.0, D=3.0)
+        @test_throws AssertionError create_discrete_pmf(dist, Δd = 1.0, D = 3.0)
     end
 
     # Test case 2: Testing with Δd = 0.0
     @testset "Test case 2" begin
         dist = Exponential(1.0)
-        @test_throws AssertionError create_discrete_pmf(dist, Δd=0.0, D=3.0)
+        @test_throws AssertionError create_discrete_pmf(dist, Δd = 0.0, D = 3.0)
     end
 
     @testset "Test case 3" begin
         dist = Exponential(1.0)
-        @test_throws AssertionError create_discrete_pmf(dist, Δd=3.0, D=1.0)
+        @test_throws AssertionError create_discrete_pmf(dist, Δd = 3.0, D = 1.0)
     end
 
     # Test case 4: Testing output against expected PMF
     @testset "Test case 4" begin
         dist = Exponential(1.0)
-        expected_pmf = [(exp(-(t-1)) - exp(-t)) / (1 - exp(-5)) for t = 1:5]
-        pmf = create_discrete_pmf(dist, Δd=1.0, D=5.0)
-        @test pmf ≈ expected_pmf atol=1e-15
+        expected_pmf = [(exp(-(t - 1)) - exp(-t)) / (1 - exp(-5)) for t = 1:5]
+        pmf = create_discrete_pmf(dist, Δd = 1.0, D = 5.0)
+        @test pmf ≈ expected_pmf atol = 1e-15
     end
 
 end
@@ -62,7 +62,7 @@ end
         w = ones(5) |> x -> x ./ sum(x)
         expected_ratio = 1
         ratio = growth_rate_to_reproductive_ratio(r, w)
-        @test ratio ≈ expected_ratio atol=1e-15
+        @test ratio ≈ expected_ratio atol = 1e-15
     end
 
     #Test MethodError when w is not a vector
