@@ -20,11 +20,20 @@ This module provides functionality for calculating Rt (effective reproduction nu
 module RtWithoutRenewal
 
 using Distributions,
-    Turing, LogExpFunctions, LinearAlgebra, SparseArrays, Random, ReverseDiff, Optim
+    Turing,
+    LogExpFunctions,
+    LinearAlgebra,
+    SparseArrays,
+    Random,
+    ReverseDiff,
+    Optim,
+    Parameters
 
-export scan, create_discrete_pmf, growth_rate_to_reproductive_ratio, EpiModel
+export scan,
+    create_discrete_pmf, growth_rate_to_reproductive_ratio, EpiModel, log_daily_infections
 
 include("utilities.jl")
+include("epimodel.jl")
 include("models.jl")
 
 end
