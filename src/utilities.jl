@@ -45,7 +45,7 @@ Raises:
 - `AssertionError` if `Δd` is not positive.
 - `AssertionError` if `D` is not greater than `Δd`.
 """
-function create_discrete_pmf(dist; Δd = 1.0, D)
+function create_discrete_pmf(dist::Distribution; Δd = 1.0, D)
     @assert minimum(dist) >= 0.0 "Distribution must be non-negative"
     @assert Δd > 0.0 "Δd must be positive"
     @assert D > Δd "D must be greater than Δd"
@@ -55,3 +55,19 @@ function create_discrete_pmf(dist; Δd = 1.0, D)
     ts .|> (t -> cdf(dist, t)) |> diff |> p -> p ./ sum(p)
 end
 
+"""
+    growth_rate_to_reproductive_ratio(r, w)
+
+Compute the reproductive ratio given exponential growth rate `r` 
+    and discretized generation interval `w`.
+
+# Arguments
+- `r`: The exponential growth rate.
+- `w`: discretized generation interval.
+
+# Returns
+- The reproductive ratio.
+"""
+function growth_rate_to_reproductive_ratio(r, w::AbstractVector)
+    return 1 / sum([w[i] * exp(-r * i) for i = 1:length(w)])
+end

@@ -22,8 +22,8 @@ module RtWithoutRenewal
 using Distributions,
     Turing, LogExpFunctions, LinearAlgebra, SparseArrays, Random, ReverseDiff, Optim
 
-export scan, create_discrete_pmf
-    
+export scan, create_discrete_pmf, growth_rate_to_reproductive_ratio
+
 include("utilities.jl")
 
 end

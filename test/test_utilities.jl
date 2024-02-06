@@ -52,4 +52,24 @@ end
         pmf = create_discrete_pmf(dist, Δd=1.0, D=5.0)
         @test pmf ≈ expected_pmf atol=1e-15
     end
+
+end
+
+@testset "Testing growth_rate_to_reproductive_ratio function" begin
+    #Test that zero exp growth rate imples R0 = 1
+    @testset "Test case 1" begin
+        r = 0
+        w = ones(5) |> x -> x ./ sum(x)
+        expected_ratio = 1
+        ratio = growth_rate_to_reproductive_ratio(r, w)
+        @test ratio ≈ expected_ratio atol=1e-15
+    end
+
+    #Test MethodError when w is not a vector
+    @testset "Test case 2" begin
+        r = 0
+        w = 1
+        @test_throws MethodError growth_rate_to_reproductive_ratio(r, w)
+    end
+
 end
