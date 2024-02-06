@@ -29,39 +29,27 @@ end
 
 @testset "Testing create_discrete_pmf function" begin
     # Test case 1: Testing with a non-negative distribution
-    # function test_create_discrete_pmf_1()
-    #     dist = Normal()
-    #     pmf = create_discrete_pmf(dist, Δd=1.0, D=3.0)
-    #     @test pmf ≈ expected_pmf
-    # end
-    # @testset "Test case 1" begin
-    #     @test_throws AssertionError test_create_discrete_pmf_1()
-    # end
+    @testset "Test case 1" begin
+        dist = Normal()
+        @test_throws AssertionError create_discrete_pmf(dist, Δd=1.0, D=3.0)
+    end
 
-    # # Test case 2: Testing with a negative distribution
-    # function test_create_discrete_pmf_2()
-    #     dist = [-0.2, 0.3, 0.5]
-    #     @test_throws AssertionError create_discrete_pmf(dist, Δd=1.0, D=3.0)
-    # end
-    # @testset "Test case 2" begin
-    #     @test_throws AssertionError test_create_discrete_pmf_2()
-    # end
+    # Test case 2: Testing with Δd = 0.0
+    @testset "Test case 2" begin
+        dist = Exponential(1.0)
+        @test_throws AssertionError create_discrete_pmf(dist, Δd=0.0, D=3.0)
+    end
 
-    # # Test case 3: Testing with Δd = 0.0
-    # function test_create_discrete_pmf_3()
-    #     dist = [0.2, 0.3, 0.5]
-    #     @test_throws AssertionError create_discrete_pmf(dist, Δd=0.0, D=3.0)
-    # end
-    # @testset "Test case 3" begin
-    #     @test_throws AssertionError test_create_discrete_pmf_3()
-    # end
+    @testset "Test case 3" begin
+        dist = Exponential(1.0)
+        @test_throws AssertionError create_discrete_pmf(dist, Δd=3.0, D=1.0)
+    end
 
-    # # Test case 4: Testing with D <= Δd
-    # function test_create_discrete_pmf_4()
-    #     dist = [0.2, 0.3, 0.5]
-    #     @test_throws AssertionError create_discrete_pmf(dist, Δd=3.0, D=2.0)
-    # end
-    # @testset "Test case 4" begin
-    #     @test_throws AssertionError test_create_discrete_pmf_4()
-    # end
+    # Test case 4: Testing output against expected PMF
+    @testset "Test case 4" begin
+        dist = Exponential(1.0)
+        expected_pmf = [(exp(-(t-1)) - exp(-t)) / (1 - exp(-5)) for t = 1:5]
+        pmf = create_discrete_pmf(dist, Δd=1.0, D=5.0)
+        @test pmf ≈ expected_pmf atol=1e-15
+    end
 end
