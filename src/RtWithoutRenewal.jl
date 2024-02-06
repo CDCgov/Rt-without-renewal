@@ -22,5 +22,8 @@ module RtWithoutRenewal
 using Distributions,
     Turing, LogExpFunctions, LinearAlgebra, SparseArrays, Random, ReverseDiff, Optim
 
+export scan
+    
+include("utilities.jl")
 
 end
