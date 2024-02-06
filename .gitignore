@@ -381,3 +381,4 @@ docs/site/
 #Manifest.toml
 /Manifest.toml
 .DS_Store
+.vscode/settings.json
