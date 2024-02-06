@@ -71,3 +71,23 @@ Compute the reproductive ratio given exponential growth rate `r`
 function growth_rate_to_reproductive_ratio(r, w::AbstractVector)
     return 1 / sum([w[i] * exp(-r * i) for i = 1:length(w)])
 end
+
+
+"""
+    mean_cc_neg_bin(μ, α)
+
+Compute the mean-cluster factor negative binomial distribution.
+
+# Arguments
+- `μ`: The mean of the distribution.
+- `α`: The clustering factor parameter.
+
+# Returns
+A `NegativeBinomial` distribution object.
+"""
+function mean_cc_neg_bin(μ, α)
+    ex_σ² = α * μ^2
+    p = μ / (μ + ex_σ² + 1e-6)
+    r = μ^2 / ex_σ²
+    return NegativeBinomial(r, p)
+end
