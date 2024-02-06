@@ -12,7 +12,7 @@
     mean_case_preds = Vector{T}(undef, gen_length)
     data_length = length(y_t)
 
-    α ~ Gamma(3, 0.05/3)
+    α ~ Gamma(3, 0.05 / 3)
 
     #Latent process
     @submodel _I_t, latent_process_parameters = latent_process()
@@ -46,8 +46,8 @@ end
     mean_case_preds = Vector{T}(undef, gen_length)
     data_length = length(y_t)
 
-    α ~ Gamma(3, 0.05/3)
-    _I_0 ~ Normal(0., 1.0)
+    α ~ Gamma(3, 0.05 / 3)
+    _I_0 ~ Normal(0.0, 1.0)
 
     #Latent process
     @submodel rt, latent_process_parameters = latent_process()
@@ -81,9 +81,9 @@ end
     mean_case_preds = Vector{T}(undef, gen_length)
     data_length = length(y_t)
 
-    α ~ Gamma(3, 0.05/3)
+    α ~ Gamma(3, 0.05 / 3)
     _I_0 ~ MvNormal(ones(epimodel.len_gen_int)) #<-- need longer initial for renewal
-    
+
     #Latent process
     @submodel Rt, latent_process_parameters = latent_process()
 
