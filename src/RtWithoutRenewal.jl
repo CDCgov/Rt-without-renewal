@@ -1,7 +1,7 @@
 """
     RtWithoutRenewal
 
-This module provides functionality for calculating Rt (effective reproduction number) with and without 
+This module provides functionality for calculating Rt (effective reproduction number) with and without
     considering renewal processes.
 
 # Dependencies
@@ -30,10 +30,15 @@ using Distributions,
     Parameters
 
 export scan,
-    create_discrete_pmf, growth_rate_to_reproductive_ratio, EpiModel, log_daily_infections
+    create_discrete_pmf,
+    growth_rate_to_reproductive_ratio,
+    EpiModel,
+    log_daily_infections,
+    random_walk
 
 include("utilities.jl")
 include("epimodel.jl")
 include("models.jl")
+include("latent-processes.jl")
 
 end
