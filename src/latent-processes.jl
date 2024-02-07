@@ -25,19 +25,3 @@ Constructs a random walk model.
     rw .= cumsum(σ_RW * ϵ_t)
     return rw, (; σ_RW)
 end
-
-# @model function cubic_spline_basis(
-#     n,
-#     ϵ_t = missing,
-#     ::Type{T} = Float64;
-#     latent_process_priors = (intercept_dist = Normal(),
-#                                 slope_dist = Normal(),
-#                                 σ_basis_dist = truncated(Normal(0.0, 0.05), 0.0, Inf),),
-# ) where {T <: Real}
-#     rw = Vector{T}(undef, n)
-#     ϵ_t ~ MvNormal(ones(n))
-#     σ_RW ~ latent_process_priors.σ_RW_dist
-#     rw .= cumsum(σ_RW * ϵ_t)
-#     return rw, (; σ_RW)
-# end
-
