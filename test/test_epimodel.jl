@@ -42,9 +42,10 @@ end
 @testset "EpiModel function" begin
     recent_incidence = [10, 20, 30]
     Rt = 1.5
-    
+
     expected_new_incidence = Rt * dot(recent_incidence, [0.2, 0.3, 0.5])
-    expected_output = [expected_new_incidence; recent_incidence[1:2]], expected_new_incidence
+    expected_output =
+        [expected_new_incidence; recent_incidence[1:2]], expected_new_incidence
 
     model = EpiModel([0.2, 0.3, 0.5], [0.1, 0.4, 0.5], 0.8, 10)
 
