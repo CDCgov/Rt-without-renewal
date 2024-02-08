@@ -1,5 +1,5 @@
 """
-    RtWithoutRenewal
+    EpiAware
 
 This module provides functionality for calculating Rt (effective reproduction number) with and without
     considering renewal processes.
@@ -17,7 +17,7 @@ This module provides functionality for calculating Rt (effective reproduction nu
 - Zygote: for automatic differentiation.
 
 """
-module RtWithoutRenewal
+module EpiAware
 
 using Distributions,
     Turing,

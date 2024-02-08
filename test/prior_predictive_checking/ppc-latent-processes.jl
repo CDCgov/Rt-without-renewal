@@ -8,7 +8,7 @@ Plotted as a spaghetti plot against theoretical 3 sigma spread (solved using law
 
 using Turing, Distributions, StatsPlots, Random
 using Plots.PlotMeasures
-using RtWithoutRenewal
+using EpiAware
 Random.seed!(0)
 n = 30
 latent_process_priors = (var_RW_dist = truncated(Normal(0.0, 0.5), 0.0, Inf),)

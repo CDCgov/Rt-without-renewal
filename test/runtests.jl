@@ -1,5 +1,5 @@
 using Test
-using RtWithoutRenewal
+using EpiAware
 using Distributions
 using LinearAlgebra
 using Turing, DynamicPPL
