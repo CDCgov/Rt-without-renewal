@@ -27,7 +27,8 @@ using Distributions,
     Random,
     ReverseDiff,
     Optim,
-    Parameters
+    Parameters,
+    QuadGK
 
 export scan,
     create_discrete_pmf,

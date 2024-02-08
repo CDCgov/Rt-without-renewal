@@ -10,7 +10,7 @@
         samples_day_5 =
             sample(fixed_model, Prior(), n_samples) |>
             chn -> mapreduce(vcat, generated_quantities(fixed_model, chn)) do gen
-                gen[1][5]
+                gen[1][5] #Extracting day 5 samples
             end
         #Check statistics are within 5 sigma
         #Theoretically, after 5 steps distribution is N(0, var = 5)
@@ -19,8 +19,6 @@
               mean(samples_day_5) > -5 * theoretical_std_of_empiral_mean
 
         #Theoretically, after 5 steps distribution is N(0, var = 5)
-
-
 
         theoretical_std_of_empiral_var = std(Chisq(5)) / sqrt(n_samples)
         @test (var(samples_day_5) - 5) < 5 * theoretical_std_of_empiral_var &&

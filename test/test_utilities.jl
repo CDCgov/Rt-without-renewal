@@ -45,16 +45,15 @@ end
         @test_throws AssertionError create_discrete_pmf(dist, Δd = 3.0, D = 1.0)
     end
 
-    # Test case 4: Testing output against expected PMF
+    # Test case 4: Testing output against expected PMF basic version
     @testset "Test case 4" begin
         dist = Exponential(1.0)
         expected_pmf = [(exp(-(t - 1)) - exp(-t)) / (1 - exp(-5)) for t = 1:5]
-        pmf = create_discrete_pmf(dist, Δd = 1.0, D = 5.0)
+        pmf = create_discrete_pmf(dist, Val(:basic); Δd = 1.0, D = 5.0)
         @test pmf ≈ expected_pmf atol = 1e-15
     end
 
 end
-
 @testset "Testing growth_rate_to_reproductive_ratio function" begin
     #Test that zero exp growth rate imples R0 = 1
     @testset "Test case 1" begin
