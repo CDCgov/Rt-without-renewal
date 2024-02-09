@@ -66,6 +66,11 @@ end
         @test expected_pmf ≈ pmf atol = 1e-15
     end
 
+    @testset "Test case 6" begin
+        dist = Exponential(1.0)
+        @test_throws AssertionError create_discrete_pmf(dist, Δd = 1.0, D = 3.5)
+    end
+
 end
 @testset "Testing growth_rate_to_reproductive_ratio function" begin
     #Test that zero exp growth rate imples R0 = 1

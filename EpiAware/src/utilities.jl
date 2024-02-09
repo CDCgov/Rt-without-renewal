@@ -82,12 +82,13 @@ Raises:
 - `AssertionError` if `D` is not greater than `Δd`.
 """
 function create_discrete_pmf(dist::Distribution; Δd = 1.0, D)
-    @assert minimum(dist) >= 0.0 "Distribution must be non-negative"
-    @assert Δd > 0.0 "Δd must be positive"
-    @assert D > Δd "D must be greater than Δd"
+    @assert minimum(dist) >= 0.0 "Distribution must be non-negative."
+    @assert Δd > 0.0 "Δd must be positive."
+    @assert D > Δd "D must be greater than Δd."
 
     ts = 0.0:Δd:D |> collect
-    ts[end] != D && append!(ts, D)
+    
+    @assert ts[end] == D "D must be a multiple of Δd."
 
     ∫F(dist, t, Δd) = quadgk(u -> cdf(dist, t - u) / Δd, 0.0, Δd)[1]
 
