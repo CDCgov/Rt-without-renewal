@@ -17,7 +17,7 @@ Constructs a random walk model.
     ϵ_t = missing,
     ::Type{T} = Float64;
     latent_process_priors = (var_RW_dist = truncated(Normal(0.0, 0.05), 0.0, Inf),),
-) where {T <: Real}
+) where {T<:Real}
     rw = Vector{T}(undef, n)
     ϵ_t ~ MvNormal(ones(n))
     σ²_RW ~ latent_process_priors.var_RW_dist
