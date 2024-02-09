@@ -2,9 +2,9 @@
     scan(f, init, xs)
 
 Apply a function `f` to each element of `xs` along with an accumulator hidden state with intial
-value `init`. The function `f` takes the current accumulator value and the current element of `xs` as 
-arguments, and returns a new accumulator value and a result value. The function `scan` returns a tuple 
-`(ys, carry)`, where `ys` is an array containing the result values and `carry` is the final accumulator 
+value `init`. The function `f` takes the current accumulator value and the current element of `xs` as
+arguments, and returns a new accumulator value and a result value. The function `scan` returns a tuple
+`(ys, carry)`, where `ys` is an array containing the result values and `carry` is the final accumulator
 value. This is similar to the JAX function `jax.lax.scan`.
 
 # Arguments
@@ -58,7 +58,7 @@ end
 """
     growth_rate_to_reproductive_ratio(r, w)
 
-Compute the reproductive ratio given exponential growth rate `r` 
+Compute the reproductive ratio given exponential growth rate `r`
     and discretized generation interval `w`.
 
 # Arguments
