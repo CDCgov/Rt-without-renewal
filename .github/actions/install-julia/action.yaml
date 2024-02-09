@@ -8,7 +8,17 @@ inputs:
 runs:
   using: composite
   steps:
-    - run: |
+    - name: Cache Julia binary
+      id: cache-julia
+      uses: actions/cache@v3
+      with:
+        path: ~/julia
+        key: julia-binary-${{ inputs.version }}
+        restore-keys: |
+          julia-binary-${{ inputs.version }}
+    - name: Install Julia
+      if: steps.cache-julia.outputs.cache-hit != 'true'
+      run: |
         mkdir -p ~/julia
         version=$(echo ${{ inputs.version }} | cut -d. -f1,2)
         wget https://julialang-s3.julialang.org/bin/linux/x64/$version/julia-${{ inputs.version }}-linux-x86_64.tar.gz -O ~/julia/julia.tar.gz
