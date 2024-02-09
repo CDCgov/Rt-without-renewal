@@ -9,7 +9,7 @@ The `EpiModel` struct represents a basic renewal model.
 # Fields
 - `gen_int::Vector{T}`: Discrete generation distribution.
 - `delay_int::Vector{T}`: Discrete delay distribution.
-- `delay_kernel::SparseMatrixCSC{T,Integer}`: Sparse matrix representing the action of convoluting 
+- `delay_kernel::SparseMatrixCSC{T,Integer}`: Sparse matrix representing the action of convoluting
     a series of infections with observation delay.
 - `cluster_coeff::T`: Cluster coefficient for negative binomial distribution of observations.
 - `len_gen_int::Integer`: Length of `gen_int` vector.

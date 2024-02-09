@@ -1,0 +1,35 @@
+name: Install Julia
+description: Installs a user-specified version of Julia
+inputs:
+  version:
+    description: 'The version of Julia to install (e.g., 1.10.0)'
+    required: true
+    default: '1.10.0'
+runs:
+  using: composite
+  steps:
+    - name: Cache Julia binary
+      id: cache-julia
+      uses: actions/cache@v3
+      with:
+        path: ~/julia
+        key: julia-binary-${{ inputs.version }}
+        restore-keys: |
+          julia-binary-${{ inputs.version }}
+    - name: Install Julia
+      if: steps.cache-julia.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p ~/julia
+        version=$(echo ${{ inputs.version }} | cut -d. -f1,2)
+        wget https://julialang-s3.julialang.org/bin/linux/x64/$version/julia-${{ inputs.version }}-linux-x86_64.tar.gz -O ~/julia/julia.tar.gz
+      shell: bash
+    - run: tar -xzf ~/julia/julia.tar.gz -C ~/julia --strip-components=1
+      shell: bash
+    - run: echo "$HOME/julia/bin" >> $GITHUB_PATH
+      shell: bash
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.julia
+          ~/.cache/julia
+        key: julia-${{ inputs.version }}-${{ hashFiles('**/*.toml') }}
