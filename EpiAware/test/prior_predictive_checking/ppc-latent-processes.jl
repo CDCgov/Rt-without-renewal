@@ -19,7 +19,7 @@ prior_chn = sample(model, Prior(), n_samples)
 sampled_walks = prior_chn |> chn -> mapreduce(hcat, generated_quantities(model, chn)) do gen
     gen[1]
 end
-## From law of total variance and known mean of HalfNormal distribution    
+## From law of total variance and known mean of HalfNormal distribution
 theoretical_std =
     [
         t * latent_process_priors.var_RW_dist.untruncated.σ * sqrt(2) / sqrt(π) for t = 1:n

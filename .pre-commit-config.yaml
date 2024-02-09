@@ -11,37 +11,6 @@ repos:
     -   id: mixed-line-ending
     -   id: trailing-whitespace
 #####
-# Python
--   repo: https://github.com/psf/black
-    rev: 23.10.0
-    hooks:
-    -   id: black
-        args: ['--line-length', '79']
--   repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
-    hooks:
-    -   id: isort
-        args: ['--profile', 'black',
-               '--line-length', '79']
-- repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.1.0
-  hooks:
-    - id: ruff
-#####
-# R
--   repo: https://github.com/lorenzwalthert/precommit
-    rev: v0.3.2.9023
-    hooks:
-    -   id: style-files
-    -   id: lintr
-#####
-# Java
-- repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-  rev: v2.11.0
-  hooks:
-  - id: pretty-format-java
-    args: [--aosp,--autofix]
-#####
 # Julia
 # Due to lack of first-class Julia support, this needs Julia local install
 #  and JuliaFormatter.jl installed in the library
@@ -56,4 +25,4 @@ repos:
     hooks:
     -   id: detect-secrets
         args: ['--baseline', '.secrets.baseline']
-        exclude: package.lock.json
+        exclude: EpiAware/Manifest.toml
