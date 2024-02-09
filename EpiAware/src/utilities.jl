@@ -89,9 +89,9 @@ function create_discrete_pmf(dist::Distribution; Δd = 1.0, D)
     ts = 0.0:Δd:D |> collect
     ts[end] != D && append!(ts, D)
 
-    quad_cdf(t, dist, Δd) = quadgk(u -> cdf(dist, t - u) / Δd, 0.0, Δd)[1]
+    ∫F(dist, t, Δd) = quadgk(u -> cdf(dist, t - u) / Δd, 0.0, Δd)[1]
 
-    ts .|> (t -> quad_cdf(t, dist, Δd)) |> diff |> p -> p ./ sum(p)
+    ts .|> (t -> ∫F(dist, t, Δd)) |> diff |> p -> p ./ sum(p)
 end
 
 """
