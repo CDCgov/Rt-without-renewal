@@ -2,9 +2,9 @@
     scan(f, init, xs)
 
 Apply a function `f` to each element of `xs` along with an accumulator hidden state with intial
-value `init`. The function `f` takes the current accumulator value and the current element of `xs` as 
-arguments, and returns a new accumulator value and a result value. The function `scan` returns a tuple 
-`(ys, carry)`, where `ys` is an array containing the result values and `carry` is the final accumulator 
+value `init`. The function `f` takes the current accumulator value and the current element of `xs` as
+arguments, and returns a new accumulator value and a result value. The function `scan` returns a tuple
+`(ys, carry)`, where `ys` is an array containing the result values and `carry` is the final accumulator
 value. This is similar to the JAX function `jax.lax.scan`.
 
 # Arguments
@@ -32,14 +32,14 @@ end
 
 Create a discrete probability mass function (PMF) from a given distribution, assuming that the
 primary event happens at `primary_approximation_point * Δd` within an intial censoring interval. Common
-single-censoring approximations are `primary_approximation_point = 0` (left-hand approximation), 
+single-censoring approximations are `primary_approximation_point = 0` (left-hand approximation),
 `primary_approximation_point = 1` (right-hand) and `primary_approximation_point = 0.5` (midpoint).
 
 Arguments:
 - `dist`: The distribution from which to create the PMF.
 - ::Val{:single_censored}: A dummy argument to dispatch to this method. The purpose of the `Val`
 type argument is that to use `single-censored` approximation is an active decision.
-- `primary_approximation_point`: A approximation point for the primary time in its censoring interval. 
+- `primary_approximation_point`: A approximation point for the primary time in its censoring interval.
 Default is 0.5 for midpoint approximation.
 - `Δd`: The step size for discretizing the domain. Default is 1.0.
 - `D`: The upper bound of the domain. Must be greater than `Δd`.
@@ -75,9 +75,9 @@ end
     create_discrete_pmf(dist::Distribution; Δd = 1.0, D)
 
 Create a discrete probability mass function (PMF) from a given distribution, assuming
-a uniform distribution over primary event times with censoring intervals of width `Δd` for 
+a uniform distribution over primary event times with censoring intervals of width `Δd` for
 both primary and secondary events. The CDF for the time from the left edge of the interval
-containing the primary event to the secondary event is created by direct numerical integration 
+containing the primary event to the secondary event is created by direct numerical integration
 of the convolution of the CDF of `dist` with the uniform density on `[0,Δd)`, the discrete PMF
 for double censored delays is then found using simple differencing on the CDF.
 
@@ -112,7 +112,7 @@ end
 """
     growth_rate_to_reproductive_ratio(r, w)
 
-Compute the reproductive ratio given exponential growth rate `r` 
+Compute the reproductive ratio given exponential growth rate `r`
     and discretized generation interval `w`.
 
 # Arguments

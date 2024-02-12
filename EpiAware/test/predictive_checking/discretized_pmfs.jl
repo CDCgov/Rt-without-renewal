@@ -3,8 +3,8 @@
 
 ## Analytical PMF for the Exponential distribution
 
-For unit testing it is useful to have an analytically solvable example of double interval censoring. Easiest distribution we 
-could solve analytically but was also not completely trivial was $X \sim \text{Exp}(1)$ day delay with daily interval censoring. 
+For unit testing it is useful to have an analytically solvable example of double interval censoring. Easiest distribution we
+could solve analytically but was also not completely trivial was $X \sim \text{Exp}(1)$ day delay with daily interval censoring.
 W.l.o.g. Primary censored obs time is $t = 0$, and we go from the double-censored interval with uniform on interval primary
 approximation as per [here](https://www.medrxiv.org/content/10.1101/2024.01.12.24301247v1).
 
@@ -30,7 +30,7 @@ _NB: the density is zero for negative values._
 P_S(s) = \int_0^1 \int_s^{s+1} \exp(-(y - x)) dy dx = (1 - \exp(-1)) (\exp(1) - 1) \exp(-s).
 ```
 
-we can directly check that the above is a discrete prob distribution. First, non-negativity is obvious. Second, 
+we can directly check that the above is a discrete prob distribution. First, non-negativity is obvious. Second,
 normalisation to 1 can be directly calculated,
 
 ```math
@@ -48,18 +48,18 @@ Therefore,
 
 ## Predictive checking for the `create_discrete_pmf` function
 
-This predictive checking shows the difference between the two methods of the `create_discrete_pmf` function 
+This predictive checking shows the difference between the two methods of the `create_discrete_pmf` function
 for creating a discrete PMF from a continuous distribution with a given discretization interval `Δd` and upper bound `D`.
 
 The default method is double censoring based on censoring intervals of width `Δd`. The basic method is based on the
 same but with the assumption that the primary event happens at the edge of the censoring interval. The left edge implies that
-the discrete PMF starts at `0`, the right edge implies that the discrete PMF starts at `Δd`. 
+the discrete PMF starts at `0`, the right edge implies that the discrete PMF starts at `Δd`.
 =#
 using EpiAware
 using StatsPlots
 using Distributions
 
-# Example distribution is a Gamma distribution with shape 2 and scale 3/2 (mean = 3 days, std = √4.5 days) with an upper bound of 21 days. 
+# Example distribution is a Gamma distribution with shape 2 and scale 3/2 (mean = 3 days, std = √4.5 days) with an upper bound of 21 days.
 
 cont_dist = Gamma(2, 3.0 / 2)
 D = 21.0
