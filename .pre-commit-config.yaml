@@ -25,4 +25,4 @@ repos:
     hooks:
     -   id: detect-secrets
         args: ['--baseline', '.secrets.baseline']
-        exclude: EpiAware/Manifest.toml
+        exclude: '.*/Manifest\.toml$'

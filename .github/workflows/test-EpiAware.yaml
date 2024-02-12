@@ -1,0 +1,17 @@
+name: Test EpiAware
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test-EpiAware:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/install-julia
+      with:
+        version: '1.10.0'
+    - name: Run unit tests for EpiAware
+      run: julia --project=EpiAware -e 'using Pkg; Pkg.test()'
