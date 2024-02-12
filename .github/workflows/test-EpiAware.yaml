@@ -14,4 +14,4 @@ jobs:
       with:
         version: '1.10.0'
     - name: Run unit tests for EpiAware
-      run: julia --project=EpiAware -e 'using Pkg; Pkg.test()'
+      run: julia --project=EpiAware -e 'using Pkg; Pkg.test(coverage = true)'
