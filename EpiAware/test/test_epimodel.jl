@@ -32,7 +32,7 @@ end
 
     @test model(recent_incidence, Rt) == expected_output
 end
-@testset "EpiModel constructor" begin
+@testitem "EpiModel constructor" begin
     gen_int = [0.2, 0.3, 0.5]
     delay_int = [0.1, 0.4, 0.5]
     cluster_coeff = 0.8
@@ -52,7 +52,8 @@ end
     @test size(model.delay_kernel) == (time_horizon, time_horizon)
 end
 
-@testset "EpiModel function" begin
+@testitem "EpiModel function" begin
+    using LinearAlgebra
     recent_incidence = [10, 20, 30]
     Rt = 1.5
 
@@ -65,7 +66,7 @@ end
     @test model(recent_incidence, Rt) == expected_output
 end
 
-@testset "EpiModel constructor with distributions" begin
+@testitem "EpiModel constructor with distributions" begin
     using Distributions
 
     gen_distribution = Uniform(0.0, 10.0)
