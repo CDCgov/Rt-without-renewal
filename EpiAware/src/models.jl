@@ -10,20 +10,19 @@
     neg_bin_cluster_factor_prior = Gamma(3, 0.05 / 3),
 )
     #Prior
-
-    neg_bin_cluster_factor ~ Gamma(3, 0.05 / 3)
+    neg_bin_cluster_factor ~ neg_bin_cluster_factor_prior
 
     #Latent process
     time_steps = length(y_t) + n_generate_ahead
-
-    @submodel _I_t, latent_process_parameters = latent_process(data_length; latent_process_priors=latent_process_priors)
+    @submodel _I_t, latent_process_parameters =
+        latent_process(data_length; latent_process_priors = latent_process_priors)
 
     #Transform into infections
     I_t = transform_function.(_I_t)
 
     #Predictive distribution
-    mean_case_preds = epimodel.delay_kernel * I_t
-    case_pred_dists = mean_case_preds .+ pos_shift .|> μ -> mean_cc_neg_bin(μ, α)
+    case_pred_dists =
+        (epimodel.delay_kernel * I_t) .+ pos_shift .|> μ -> mean_cc_neg_bin(μ, α)
 
     #Likelihood
     y_t ~ arraydist(case_pred_dists)
