@@ -33,6 +33,7 @@ using Distributions,
 export scan,
     create_discrete_pmf,
     growth_rate_to_reproductive_ratio,
+    generate_observation_kernel,
     EpiModel,
     log_daily_infections,
     random_walk
