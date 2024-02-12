@@ -1,3 +1,5 @@
+const STANDARD_RW_PRIORS = (var_RW_dist = truncated(Normal(0.0, 0.05), 0.0, Inf),)
+
 """
     random_walk(n, ϵ_t = missing; latent_process_priors = (var_RW_dist = truncated(Normal(0., 0.05), 0., Inf),), ::Type{T} = Float64) where {T <: Real}
 
@@ -16,7 +18,7 @@ Constructs a random walk model.
     n,
     ϵ_t = missing,
     ::Type{T} = Float64;
-    latent_process_priors = (var_RW_dist = truncated(Normal(0.0, 0.05), 0.0, Inf),),
+    latent_process_priors = STANDARD_RW_PRIORS,
 ) where {T<:Real}
     rw = Vector{T}(undef, n)
     ϵ_t ~ MvNormal(ones(n))
