@@ -36,7 +36,7 @@ struct EpiModel{T<:Real} <: AbstractEpiModel
         @assert all(delay_int .>= 0) "Delay interval must be non-negative"
         @assert sum(gen_int) ≈ 1 "Generation interval must sum to 1"
         @assert sum(delay_int) ≈ 1 "Delay interval must sum to 1"
-        #construct observation delay kernel
+
         K = generate_observation_kernel(delay_int, time_horizon)
 
         new{eltype(gen_int)}(
@@ -64,8 +64,6 @@ struct EpiModel{T<:Real} <: AbstractEpiModel
             p -> p[2:end] ./ sum(p[2:end])
         delay_int = create_discrete_pmf(delay_distribution, Δd = Δd, D = D_delay)
 
-        #construct observation delay kernel
-        #Recall first element is zero delay
         K = generate_observation_kernel(delay_int, time_horizon)
 
         new{eltype(gen_int)}(
