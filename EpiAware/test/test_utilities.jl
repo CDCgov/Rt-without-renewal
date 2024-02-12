@@ -46,11 +46,11 @@ end
     end
 
     # Test case 4: Testing output against expected PMF basic version - single
-    # interval censoring
+    # interval censoring with left hand approx.
     @testset "Test case 4" begin
         dist = Exponential(1.0)
         expected_pmf = [(exp(-(t - 1)) - exp(-t)) / (1 - exp(-5)) for t = 1:5]
-        pmf = create_discrete_pmf(dist, Val(:basic); Δd = 1.0, D = 5.0)
+        pmf = create_discrete_pmf(dist, Val(:single_censored); primary_approximation_point = 0., Δd = 1.0, D = 5.0)
         @test pmf ≈ expected_pmf atol = 1e-15
     end
 
