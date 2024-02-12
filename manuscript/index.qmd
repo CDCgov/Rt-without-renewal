@@ -1,0 +1,157 @@
+---
+title: "Evaluating the role of the infection generating process for situational awareness of infections diseases: Should we be using the renewal process?"
+author:
+keywords:
+abstract: |
+plain-language-summary: |
+key-points:
+date: last-modified
+bibliography: references.bib
+citation:
+  container-title: Earth and Space Science
+number-sections: true
+jupyter: python3
+---
+
+## Introduction
+
+There are a range of measures that are often used for situational awareness both during outbreaks of infectious diseases and for more routine measures. The most popular are short-term forecasts of available metrics, estimates of the instantaneous reproduction number, estimates of the growth rate of infections, and estimates of the number of infections themselves.
+
+Often modellers implicitly assume that the generating process for infections should be specific to their target measure but in reality, these are decoupled, as highlighted by the use of renewal process models for forecasting. This means that there is a question as to whether different infection-generating processes have different characteristics concerning the target measures of interest.
+
+For example, it has been argued that it is more efficient to estimate the growth rate directly and then estimate the effective reproduction number as a postprocessing step. However, little evaluation of this has been done and what work has been done has not explored the wider context.
+
+We aim to explore the performance characteristics for situational awareness of different commonly used infection-generating processes within a commonly used discrete convolution framework. We do this by first defining a generic model framework, set of output measures, and candidate infection-generating processes and then evaluate these both in simulated scenarios and in a range of case studies.
+
+## Methods
+
+### Modelling
+
+#### Generic model structure
+
+We use the commonly implemented discrete convolution framework of `EpiNow2`, `epidemia`, `epinowcast`
+
+We assume:
+
+- Discrete doubly censored generation intervals and a single delay distribution as input
+- A negative binomial observation model
+- Partial ascertainment
+- A fixed growth rate initialisation process
+
+#### Latent infection-generating process
+
+- Infection-generating process
+	- Renewal process
+	- Epidemic growth rate
+	- Log of incidence
+- Prior models
+   - Random walk
+   - AR(1) process
+   - Differenced AR(1) process
+
+### Simulation model
+
+We use the generic model structure described above with a renewal process. To simulate noise in the infection process we assume additional Brownian noise for the effective reproduction number of XX.
+
+### Simulations
+
+We test the following general scenarios:
+- Piecewise constant Rt in an epidemic setting
+      - Generation time:
+- An endemic setting with smoothly varying Rt
+- An outbreak setting with changes in Rt comparable to that observed due to susceptible depletion
+- A mixed outbreak setting with both smooth changes and piecewise changes in Rt
+
+We assume a delay distribution of ** motivated by **.
+
+We explore the following misspecification scenarios for the generation interval:
+
+- Correct
+- Too short
+- Too long
+
+### Case studies
+
+- [ ] 2014-2016 Sierra Leone Ebola virus disease outbreak
+- [ ] 2022 US Mpox outbreak
+- [ ] US COVID-19 from September 2021 to Feburary 2022
+
+### Validation
+
+- Prior predictive checks for all models (SI)
+
+### Evaluation
+
+#### Posterior prediction
+
+- We fit each model to each day for each time-series being evaluated
+- We visualise posterior predictions of all measures.
+- We assess coverage, the CRPS, and CRPS of log-transformed data for all observables.
+- We scale all metrics where possible by the performance of the renewal process infection-generating model and stratify by the target measure.
+- As well as reporting overall metrics we also report performance by horizon aggregated by week for the following horizons (-4, -2, -1, 0, 1, 2) and over time.
+- We report performance both overall and by scenario and case study
+
+#### Inference efficiency
+
+- We report the algorithm settings required to maintain reasonable performance in our simulated scenarios
+- We also report any diagnostics issues models may have had appropriately stratified to highlight problem areas
+- As an overall measure of efficiency we also report the effective sample size per second relative to the renewal process model.
+
+### Implementation
+
+All code was implemented using a pull request-driven development process.
+
+This work is implemented as:
+- [ ] A standalone Julia package for the modelling components
+- [ ] A standalone Julia module for the pipeline components
+- [ ] A standalone Julia module for the analysis of specific components
+- [ ] A R package for postprocessing and figure creation for the analysis
+
+For Julia we use:
+- [ ] `Documenter.jl` for producing rendered documentation
+- [ ] `doctests` for basic unit testing
+- [ ] Models are implemented as structs that inherit from a generic model class.
+- [ ] `Pipelines.jl` to manage our analysis pipeline
+
+For inference we:
+- Use NUTS via `Turing.jl` initialised using `pathfinder`
+- Use a standard warmup of 1000 samples and 1000 samples post warmup over 4 parallel chains
+- For each model we adjust the probability of acceptance and maximum tree depth so that the models run with as few diagnostics issues as possible over our simulated case studies.
+
+## Results
+
+### Validation
+
+Say if it looked okay and reference SI
+
+### Overall
+
+- Overall summary figure of posterior prediction performance and comment
+- Sub panel looking at performance by horizon
+- Overall summary figure looking at inference efficiency
+
+### Simulated scenarios
+
+- By scenario summary of posterior prediction performance repeated for all scenarios
+- By scenario summary of inference efficiency performance
+### Case studies
+
+## Discussion
+
+### Limitations & further work
+
+- We do not explore the impact of different delay distributions
+- We do not explore stochastic or approximately stochastic inference models
+- We do not explore attempting to make the latent infection-generating processes mathematically equivalent in order to highlight the impact of different posterior geometries
+- Aside from misspecification we do not explore the impact of uncertainty in the generation interval within inference models
+- We do not explore the impact of right truncation which is often present in real-time analysis
+- Our set of scenarios and case studies does not give complete coverage over all potential scenarios
+- We do not explore more complex prior models such as splines and gaussian processes
+- We focus our efforts on situational awareness and hence real-time performance. This means we do not focus on retrospective performance which may have different characteristics.
+- We did not perform full simulation-based calibration.
+- Our simulations are produced by a model that is similar to the renewal process inference method and so represents a "best" case for this method. Potential future work could explore other versions of the infection generation process backing the simulations but we feel this choice makes sense given that the renewal process best reflects our mechanistic understanding of how transmission works of the models we explore here.
+
+## References {.unnumbered}
+
+::: {#refs}
+:::
