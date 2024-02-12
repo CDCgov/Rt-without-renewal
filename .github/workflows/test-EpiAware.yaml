@@ -1,4 +1,4 @@
-name: pre-commit
+name: Test EpiAware
 
 on:
   pull_request:
@@ -6,13 +6,12 @@ on:
     branches: [main]
 
 jobs:
-  pre-commit:
+  test-EpiAware:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-python@v3
     - uses: ./.github/actions/install-julia
       with:
         version: '1.10.0'
-    - run: julia -e 'using Pkg; Pkg.add("JuliaFormatter")'
-    - uses: ./.github/actions/pre-commit
+    - name: Run unit tests for EpiAware
+      run: julia --project=EpiAware -e 'using Pkg; Pkg.test()'
