@@ -28,6 +28,7 @@ struct EpiModel{T<:Real} <: AbstractEpiModel
     cluster_coeff::T
     len_gen_int::Integer #length(gen_int) just to save recalc
     len_delay_int::Integer #length(delay_int) just to save recalc
+    time_horizon::Integer
 
     #Inner constructors for EpiModel object
     function EpiModel(gen_int, delay_int, cluster_coeff, time_horizon)
