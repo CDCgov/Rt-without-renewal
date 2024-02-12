@@ -1,4 +1,4 @@
-@testset "Testing scan function with addition" begin
+@testitem "Testing scan function with addition" begin
     # Test case 1: Testing with addition function
     function add(a, b)
         return a + b, a + b
@@ -12,7 +12,7 @@
     @test carry == expected_carry
 end
 
-@testset "Testing scan function with multiplication" begin
+@testitem "Testing scan function with multiplication" begin
     # Test case 2: Testing with multiplication function
     function multiply(a, b)
         return a * b, a * b
@@ -27,7 +27,8 @@ end
     @test carry == expected_carry
 end
 
-@testset "Testing create_discrete_pmf function" begin
+@testitem "Testing create_discrete_pmf function" begin
+    using Distributions
     # Test case 1: Testing with a non-negative distribution
     @testset "Test case 1" begin
         dist = Normal()
@@ -79,7 +80,8 @@ end
     end
 
 end
-@testset "Testing growth_rate_to_reproductive_ratio function" begin
+
+@testitem "Testing growth_rate_to_reproductive_ratio function" begin
     #Test that zero exp growth rate imples R0 = 1
     @testset "Test case 1" begin
         r = 0
@@ -94,6 +96,26 @@ end
         r = 0
         w = 1
         @test_throws MethodError growth_rate_to_reproductive_ratio(r, w)
+    end
+
+end
+
+@testitem "Testing generate_observation_kernel function" begin
+    using SparseArrays
+    @testset "Test case 1" begin
+        delay_int = [0.2, 0.5, 0.3]
+        time_horizon = 5
+        expected_K = SparseMatrixCSC(
+            [
+                0.2 0 0 0 0
+                0.5 0.2 0 0 0
+                0.3 0.5 0.2 0 0
+                0 0.3 0.5 0.2 0
+                0 0 0.3 0.5 0.2
+            ],
+        )
+        K = generate_observation_kernel(delay_int, time_horizon)
+        @test K == expected_K
     end
 
 end

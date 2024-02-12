@@ -37,13 +37,7 @@ struct EpiModel{T<:Real} <: AbstractEpiModel
         @assert sum(gen_int) ≈ 1 "Generation interval must sum to 1"
         @assert sum(delay_int) ≈ 1 "Delay interval must sum to 1"
         #construct observation delay kernel
-        K = zeros(time_horizon, time_horizon) |> SparseMatrixCSC
-        for i = 1:time_horizon, j = 1:time_horizon
-            m = i - j
-            if m >= 0 && m <= (length(delay_int) - 1)
-                K[i, j] = delay_int[m+1]
-            end
-        end
+        K = generate_observation_kernel(delay_int, time_horizon)
 
         new{eltype(gen_int)}(
             gen_int,
@@ -72,13 +66,7 @@ struct EpiModel{T<:Real} <: AbstractEpiModel
 
         #construct observation delay kernel
         #Recall first element is zero delay
-        K = zeros(time_horizon, time_horizon) |> SparseMatrixCSC
-        for i = 1:time_horizon, j = 1:time_horizon
-            m = i - j
-            if m >= 0 && m <= (length(delay_int) - 1)
-                K[i, j] = delay_int[m+1]
-            end
-        end
+        K = generate_observation_kernel(delay_int, time_horizon)
 
         new{eltype(gen_int)}(
             gen_int,
