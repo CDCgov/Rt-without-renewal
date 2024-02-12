@@ -31,11 +31,16 @@ end
     create_discrete_pmf(dist::Distribution, ::Val{:basic}; Δd = 1.0, D)
 
 Create a discrete probability mass function (PMF) from a given distribution, assuming that the
-primary event happens at edge of an censoring inteval.
+primary event happens at `primary_approximation_point * Δd` within an intial censoring interval. Common
+single-censoring approximations are `primary_approximation_point = 0` (left-hand approximation), 
+`primary_approximation_point = 1` (right-hand) and `primary_approximation_point = 0.5` (midpoint).
 
 Arguments:
 - `dist`: The distribution from which to create the PMF.
-- ::Val{:basic}: A dummy argument to dispatch to this method.
+- ::Val{:single_censored}: A dummy argument to dispatch to this method. The purpose of the `Val`
+type argument is that to use `single-censored` approximation is an active decision.
+- `primary_approximation_point`: A approximation point for the primary time in its censoring interval. 
+Default is 0.5 for midpoint approximation.
 - `Δd`: The step size for discretizing the domain. Default is 1.0.
 - `D`: The upper bound of the domain. Must be greater than `Δd`.
 
@@ -47,12 +52,15 @@ Raises:
 - `AssertionError` if `Δd` is not positive.
 - `AssertionError` if `D` is not greater than `Δd`.
 """
-function create_discrete_pmf(dist::Distribution, ::Val{:basic}; Δd = 1.0, D)
+function create_discrete_pmf(dist::Distribution, ::Val{:single_censored}; primary_approximation_point = 0.5, Δd = 1.0, D)
     @assert minimum(dist) >= 0.0 "Distribution must be non-negative"
     @assert Δd > 0.0 "Δd must be positive"
     @assert D > Δd "D must be greater than Δd"
-    ts = 0.0:Δd:D |> collect
-    ts[end] != D && append!(ts, D)
+    @assert primary_approximation_point >= 0. && primary_approximation_point <= 1. "`primary_approximation_point` must be in [0,1]."
+
+    ts = Δd:Δd:D |> collect
+    @assert ts[end] == D "D must be a multiple of Δd."
+    ts = [primary_approximation_point * Δd; ts] #This covers situation where primary_approximation_point == 1
 
     ts .|> (t -> cdf(dist, t)) |> diff |> p -> p ./ sum(p)
 end
