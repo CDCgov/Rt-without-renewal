@@ -88,7 +88,7 @@ savefig(plt1, joinpath(@__DIR__(), "assets/", "discrete_pmf_daily.png"))
 # For hourly censoring the difference is not noticable.
 
 plt2 = let
-    Δd = 1/24
+    Δd = 1 / 24
     ts = (0.0:Δd:(D-Δd)) |> collect
     pmf1 = create_discrete_pmf(cont_dist, Val(:single_censored); Δd = Δd, D = D)
     pmf2 = create_discrete_pmf(cont_dist; Δd = Δd, D = D)

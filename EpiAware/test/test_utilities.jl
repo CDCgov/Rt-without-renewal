@@ -50,7 +50,13 @@ end
     @testset "Test case 4" begin
         dist = Exponential(1.0)
         expected_pmf = [(exp(-(t - 1)) - exp(-t)) / (1 - exp(-5)) for t = 1:5]
-        pmf = create_discrete_pmf(dist, Val(:single_censored); primary_approximation_point = 0., Δd = 1.0, D = 5.0)
+        pmf = create_discrete_pmf(
+            dist,
+            Val(:single_censored);
+            primary_approximation_point = 0.0,
+            Δd = 1.0,
+            D = 5.0,
+        )
         @test pmf ≈ expected_pmf atol = 1e-15
     end
 
@@ -58,10 +64,11 @@ end
     # interval censoring
     @testset "Test case 5" begin
         dist = Exponential(1.0)
-        expected_pmf_uncond = [exp(-1);
-                        [(1 - exp(-1)) * (exp(1) - 1) * exp(-s) for s = 1:9]
-                        ]
-        expected_pmf = expected_pmf_uncond ./ sum(expected_pmf_uncond)                       
+        expected_pmf_uncond = [
+            exp(-1)
+            [(1 - exp(-1)) * (exp(1) - 1) * exp(-s) for s = 1:9]
+        ]
+        expected_pmf = expected_pmf_uncond ./ sum(expected_pmf_uncond)
         pmf = create_discrete_pmf(dist; Δd = 1.0, D = 10.0)
         @test expected_pmf ≈ pmf atol = 1e-15
     end

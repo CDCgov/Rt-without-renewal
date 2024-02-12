@@ -52,11 +52,17 @@ Raises:
 - `AssertionError` if `Δd` is not positive.
 - `AssertionError` if `D` is not greater than `Δd`.
 """
-function create_discrete_pmf(dist::Distribution, ::Val{:single_censored}; primary_approximation_point = 0.5, Δd = 1.0, D)
+function create_discrete_pmf(
+    dist::Distribution,
+    ::Val{:single_censored};
+    primary_approximation_point = 0.5,
+    Δd = 1.0,
+    D,
+)
     @assert minimum(dist) >= 0.0 "Distribution must be non-negative"
     @assert Δd > 0.0 "Δd must be positive"
     @assert D > Δd "D must be greater than Δd"
-    @assert primary_approximation_point >= 0. && primary_approximation_point <= 1. "`primary_approximation_point` must be in [0,1]."
+    @assert primary_approximation_point >= 0.0 && primary_approximation_point <= 1.0 "`primary_approximation_point` must be in [0,1]."
 
     ts = Δd:Δd:D |> collect
     @assert ts[end] == D "D must be a multiple of Δd."
@@ -95,7 +101,7 @@ function create_discrete_pmf(dist::Distribution; Δd = 1.0, D)
     @assert D > Δd "D must be greater than Δd."
 
     ts = 0.0:Δd:D |> collect
-    
+
     @assert ts[end] == D "D must be a multiple of Δd."
 
     ∫F(dist, t, Δd) = quadgk(u -> cdf(dist, t - u) / Δd, 0.0, Δd)[1]
