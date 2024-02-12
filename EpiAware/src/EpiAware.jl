@@ -30,13 +30,11 @@ using Distributions,
     Parameters,
     QuadGK
 
+# Exported utilities
 export scan,
-    create_discrete_pmf,
-    growth_rate_to_reproductive_ratio,
-    generate_observation_kernel,
-    EpiModel,
-    log_daily_infections,
-    random_walk
+    create_discrete_pmf, growth_rate_to_reproductive_ratio, generate_observation_kernel
+
+export EpiModel, log_infections, random_walk
 
 include("utilities.jl")
 include("epimodel.jl")
