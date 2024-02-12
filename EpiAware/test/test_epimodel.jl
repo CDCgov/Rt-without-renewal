@@ -53,6 +53,7 @@ end
 end
 
 @testitem "EpiModel function" begin
+    using LinearAlgebra
     recent_incidence = [10, 20, 30]
     Rt = 1.5
 
@@ -65,7 +66,7 @@ end
     @test model(recent_incidence, Rt) == expected_output
 end
 
-@testset "EpiModel constructor with distributions" begin
+@testitem "EpiModel constructor with distributions" begin
     using Distributions
 
     gen_distribution = Uniform(0.0, 10.0)
