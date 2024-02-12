@@ -1,5 +1,5 @@
 
-@testset "EpiModel constructor" begin
+@testitem "EpiModel constructor" begin
     gen_int = [0.2, 0.3, 0.5]
     delay_int = [0.1, 0.4, 0.5]
     cluster_coeff = 0.8
@@ -19,27 +19,8 @@
     @test size(model.delay_kernel) == (time_horizon, time_horizon)
 end
 
-@testset "EpiModel constructor" begin
-    gen_int = [0.2, 0.3, 0.5]
-    delay_int = [0.1, 0.4, 0.5]
-    cluster_coeff = 0.8
-    time_horizon = 10
-
-    model = EpiModel(gen_int, delay_int, cluster_coeff, time_horizon)
-
-    @test length(model.gen_int) == 3
-    @test length(model.delay_int) == 3
-    @test model.cluster_coeff == 0.8
-    @test model.len_gen_int == 3
-    @test model.len_delay_int == 3
-
-    @test sum(model.gen_int) ≈ 1
-    @test sum(model.delay_int) ≈ 1
-
-    @test size(model.delay_kernel) == (time_horizon, time_horizon)
-end
-
-@testset "EpiModel function" begin
+@testitem "EpiModel function" begin
+    using LinearAlgebra
     recent_incidence = [10, 20, 30]
     Rt = 1.5
 
