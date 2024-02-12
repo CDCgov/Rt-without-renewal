@@ -34,7 +34,6 @@ A named tuple containing the generated quantities `I_t` and `latent_process_para
     latent_process;
     latent_process_priors,
     transform_function = exp,
-    n_generate_ahead = 0,
     pos_shift = 1e-6,
     neg_bin_cluster_factor = missing,
     neg_bin_cluster_factor_prior = Gamma(3, 0.05 / 3),
@@ -43,7 +42,7 @@ A named tuple containing the generated quantities `I_t` and `latent_process_para
     neg_bin_cluster_factor ~ neg_bin_cluster_factor_prior
 
     #Latent process
-    time_steps = length(y_t) + n_generate_ahead
+    time_steps = epimodel.time_horizon
     @submodel _I_t, latent_process_parameters =
         latent_process(time_steps; latent_process_priors = latent_process_priors)
 
@@ -52,7 +51,8 @@ A named tuple containing the generated quantities `I_t` and `latent_process_para
 
     #Predictive distribution
     case_pred_dists =
-        (epimodel.delay_kernel * I_t) .+ pos_shift .|> μ -> mean_cc_neg_bin(μ, α)
+        (epimodel.delay_kernel * I_t) .+ pos_shift .|>
+        μ -> mean_cc_neg_bin(μ, neg_bin_cluster_factor)
 
     #Likelihood
     y_t ~ arraydist(case_pred_dists)
