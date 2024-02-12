@@ -106,7 +106,13 @@ end
         delay_int = [0.2, 0.5, 0.3]
         time_horizon = 5
         expected_K = SparseMatrixCSC(
-            [0.2 0 0 0 0 0.5 0.2 0 0 0 0.3 0.5 0.2 0 0 0 0.3 0.5 0.2 0 0 0 0.3 0.5 0.2],
+            [
+                0.2 0 0 0 0
+                0.5 0.2 0 0 0
+                0.3 0.5 0.2 0 0
+                0 0.3 0.5 0.2 0
+                0 0 0.3 0.5 0.2
+            ],
         )
         K = generate_observation_kernel(delay_int, time_horizon)
         @test K == expected_K
