@@ -32,4 +32,4 @@ runs:
         path: |
           ~/.julia
           ~/.cache/julia
-        key: julia-${{ inputs.version }}-${{ hashFiles('**/*.toml') }}
+        key: julia-${{ inputs.version }}-${{ github.workflow }}-${{ hashFiles('**/*.toml') }}
