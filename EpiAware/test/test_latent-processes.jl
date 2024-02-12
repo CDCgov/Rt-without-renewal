@@ -21,6 +21,8 @@
         #Theoretically, after 5 steps distribution is N(0, var = 5)
 
         theoretical_std_of_empiral_var = std(Chisq(5)) / sqrt(n_samples)
+
+        @info "var = $(var(samples_day_5)); theoretical_std_of_empiral_var = $(theoretical_std_of_empiral_var)"
         @test (var(samples_day_5) - 5) < 5 * theoretical_std_of_empiral_var &&
               (var(samples_day_5) - 5) > -5 * theoretical_std_of_empiral_var
 
