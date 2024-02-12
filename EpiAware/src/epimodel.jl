@@ -29,20 +29,42 @@ struct EpiModel{T<:Real} <: AbstractEpiModel
     len_gen_int::Integer #length(gen_int) just to save recalc
     len_delay_int::Integer #length(delay_int) just to save recalc
 
-    #Inner constructor for EpiModel object
+    #Inner constructors for EpiModel object
     function EpiModel(gen_int, delay_int, cluster_coeff, time_horizon)
         @assert all(gen_int .>= 0) "Generation interval must be non-negative"
         @assert all(delay_int .>= 0) "Delay interval must be non-negative"
         @assert sum(gen_int) ≈ 1 "Generation interval must sum to 1"
         @assert sum(delay_int) ≈ 1 "Delay interval must sum to 1"
         #construct observation delay kernel
-        K = zeros(time_horizon, time_horizon) |> SparseMatrixCSC
-        for i = 1:time_horizon, j = 1:time_horizon
-            m = (i - 1) - (j - 1)
-            if m >= 1 && m <= length(delay_int)
-                K[i, j] = delay_int[m]
-            end
-        end
+        K = generate_observation_kernel(delay_int, time_horizon)
+
+        new{eltype(gen_int)}(
+            gen_int,
+            delay_int,
+            K,
+            cluster_coeff,
+            length(gen_int),
+            length(delay_int),
+        )
+    end
+
+    function EpiModel(
+        gen_distribution::ContinuousDistribution,
+        delay_distribution::ContinuousDistribution,
+        cluster_coeff,
+        time_horizon;
+        Δd = 1.0,
+        D_gen,
+        D_delay,
+    )
+        gen_int =
+            create_discrete_pmf(gen_distribution, Δd = Δd, D = D_gen) |>
+            p -> p[2:end] ./ sum(p[2:end])
+        delay_int = create_discrete_pmf(delay_distribution, Δd = Δd, D = D_delay)
+
+        #construct observation delay kernel
+        #Recall first element is zero delay
+        K = generate_observation_kernel(delay_int, time_horizon)
 
         new{eltype(gen_int)}(
             gen_int,
