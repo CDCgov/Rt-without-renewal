@@ -105,3 +105,5 @@ plt2 = let
     )
 end
 savefig(plt2, joinpath(@__DIR__(), "assets/", "discrete_pmf_hourly.png"))
+
+printLn("this works")
