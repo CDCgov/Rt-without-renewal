@@ -51,24 +51,51 @@ We assume:
 
 ### Simulation model
 
-We use the generic model structure described above with a renewal process. To simulate noise in the infection process we assume additional Brownian noise for the effective reproduction number of XX.
+We use the generic model structure described above with a renewal process for reasons of convenience. The renewal equation is quite flexibie and makes minimal assumptions about the underlying infectious disease process. Although using the renewal equation to generate the data could be construed as leading to more favorable inference, all threee latent processes are able to generate the simulated data.
+
+We simulate from the renewal process through the following procedure:
+1. Take a fixed timeseries of Rt for 160 days (7 days x 8 weeks + 7 days x 15 weeks less one day). See the next subsection for more description of these scenarios.
+2. Add noise to the fixed Rt estimates draws from a N(0, 0.1) with a fixed seed of `12345`.
+3. Simulate daily incidence starting from $I_0 = 10$ cases and a fixed generation interval. See the next subsection for more detail.
+4. Convolve the true incidence timeseries through a double-censored Exp(1/5) PMF with a maximum of 15 which has ~95% of the probability density. This PMF allows for some-day observation. Note that this choice of delay is arbitrary and does not correspond to any particular delay.
+5. Simulate additional negative binomial observation noise on the delayed cases drawn with mean of the true cases and overdispersion of 10.
+
+We do not add a day-of-week effect.
+
+### Generation intervals
+
+We use two generation intervals, corresponding to pathogens with long and short GIs. We use descretized, double-censored versions of the GI PMFs.
+1. *Short:* We use a Gamma(shape = 2, scale = 1), corresponding to a pathogen with a quite short generation interval. Vaguely corresponds to flu A in Wallinga & Lipsitch, 2006
+3. *Medium:* We use a Gamma(shape = 2, scale = 5, corresponding to lots of
+2. *Long:* We use a Gamma(shape = 2, scale = 10), corresponding to a pathogen with a moderately long generation interval (Smallpox? I don't know if we need to ground this in anything real and if we do we could drop this down to 15 days and use varicella?)
+
+We don't test a longer GI because it would be impractical in the testing framework and we do not believe we would see substantially different behavior.
+
+We produce the simulations described in the next section for both of these GIs.
 
 ### Simulations
 
-We test the following general scenarios:
-- Piecewise constant Rt in an epidemic setting
-      - Generation time:
-- An endemic setting with smoothly varying Rt
-- An outbreak setting with changes in Rt comparable to that observed due to susceptible depletion
-- A mixed outbreak setting with both smooth changes and piecewise changes in Rt
+We test the following scenario:
+- Piecewise constant Rt
+    - 1.1 for two weeks
+    - 2 for two weeks
+    - 0.5 for two weeks
+    - 1.5 for two weeks
+    - 0.75 for two weeks
+    - 1.1 for six weeks
+    - sine curve centered at 1 with amplitude of 0.3 afterwards
 
-We assume a delay distribution of ** motivated by **.
+We simulate out of this scenario for the GIs described in the previous section.
 
-We explore the following misspecification scenarios for the generation interval:
+This scenario provides both sharp changes at the start of the timeseries and more gradual transitions towards the end. The rolling windows allow for exploration of both of these situations in a single case study. The longer fit to the entire timeseries tests the ability to flexibily handle both of these paradigms in a single fit.
 
-- Correct
-- Too short
-- Too long
+### Fitting to simulated data
+
+We fit the Rt estimation models with 8 week rolling windows as well as one global fit over the entire timeseries. We evaluate metrics both including the first week of the fit and dropping the first week. We also seperately evaluate the forecast over the two week horizon.
+
+We fit to the simulated data using both the correct GIs as well as the misspecified GIs. For the misspecified scenarios, we evaluate both the quality of the fit as well as the quality of the sampling.
+
+I'm picturing figure 1A here as something that echoes the Sherratt 2023 Figure 2. One of the classic fit/forecast quality but for Rt.
 
 ### Case studies
 
@@ -149,7 +176,7 @@ Say if it looked okay and reference SI
 - We do not explore more complex prior models such as splines and gaussian processes
 - We focus our efforts on situational awareness and hence real-time performance. This means we do not focus on retrospective performance which may have different characteristics.
 - We did not perform full simulation-based calibration.
-- Our simulations are produced by a model that is similar to the renewal process inference method and so represents a "best" case for this method. Potential future work could explore other versions of the infection generation process backing the simulations but we feel this choice makes sense given that the renewal process best reflects our mechanistic understanding of how transmission works of the models we explore here.
+- Our simulations are produced by a model that is similar to the renewal process inference method and so represents a "best" case for this method. It would be potentially be stronger to simulate from an SEIR process directly.
 
 ## References {.unnumbered}
 
