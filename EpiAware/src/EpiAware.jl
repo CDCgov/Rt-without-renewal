@@ -34,7 +34,11 @@ using Distributions,
 export scan,
     create_discrete_pmf, growth_rate_to_reproductive_ratio, generate_observation_kernel
 
-export EpiModel, log_infections, random_walk
+# Exported types
+export EpiData, Renewal, ExpGrowthRate, DirectInfections
+
+# Exported Turing models
+export epi_inference, random_walk
 
 include("utilities.jl")
 include("epimodel.jl")
