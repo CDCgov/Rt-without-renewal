@@ -35,7 +35,7 @@ export scan,
     growth_rate_to_reproductive_ratio,
     generate_observation_kernel,
     EpiModel,
-    log_daily_infections,
+    log_infections,
     random_walk
 
 include("utilities.jl")
