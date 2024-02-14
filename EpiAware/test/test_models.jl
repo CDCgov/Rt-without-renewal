@@ -4,7 +4,7 @@
     # Define test inputs
     y_t = missing # Data will be generated from the model
     data = EpiData([0.2, 0.3, 0.5], [0.1, 0.4, 0.5], 0.8, 10, exp)
-    latent_process_priors = EpiAware.STANDARD_RW_PRIORS
+    latent_process_priors = default_rw_priors()
     transform_function = exp
     n_generate_ahead = 0
     pos_shift = 1e-6
@@ -14,7 +14,7 @@
     epimodel = DirectInfections(data)
 
     # Call the function
-    test_mdl = epi_inference(
+    test_mdl = make_epi_inference_model(
         y_t,
         epimodel,
         random_walk;
