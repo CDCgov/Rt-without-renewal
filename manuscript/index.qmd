@@ -65,11 +65,10 @@ We do not add a day-of-week effect.
 ### Generation intervals
 
 We use two generation intervals, corresponding to pathogens with long and short GIs. We use descretized, double-censored versions of the GI PMFs.
-1. *Short:* We use a Gamma(shape = 2, scale = 1), corresponding to a pathogen with a quite short generation interval. Vaguely corresponds to flu A in Wallinga & Lipsitch, 2006
+1. *Short:* We use a Gamma(shape = 2, scale = 1), corresponding to a pathogen with a relatively short generation interval. Vaguely corresponds to flu A in Wallinga & Lipsitch, 2006
 3. *Medium:* We use a Gamma(shape = 2, scale = 5, corresponding to lots of
 2. *Long:* We use a Gamma(shape = 2, scale = 10), corresponding to a pathogen with a moderately long generation interval (Smallpox? I don't know if we need to ground this in anything real and if we do we could drop this down to 15 days and use varicella?)
 
-We don't test a longer GI because it would be impractical in the testing framework and we do not believe we would see substantially different behavior.
 
 We produce the simulations described in the next section for both of these GIs.
 
@@ -91,9 +90,9 @@ This scenario provides both sharp changes at the start of the timeseries and mor
 
 ### Fitting to simulated data
 
-We fit the Rt estimation models with 8 week rolling windows as well as one global fit over the entire timeseries. We evaluate metrics both including the first week of the fit and dropping the first week. We also seperately evaluate the forecast over the two week horizon.
+We fit the Rt estimation models with 8 week rolling windows as well as one global fit over the entire timeseries.
 
-We fit to the simulated data using both the correct GIs as well as the misspecified GIs. For the misspecified scenarios, we evaluate both the quality of the fit as well as the quality of the sampling.
+We fit to the simulated data using both the correct GIs as well as the misspecified GIs. 
 
 I'm picturing figure 1A here as something that echoes the Sherratt 2023 Figure 2. One of the classic fit/forecast quality but for Rt.
 
