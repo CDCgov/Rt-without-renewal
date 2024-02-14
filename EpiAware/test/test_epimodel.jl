@@ -88,10 +88,11 @@ end
     rt = log(2) / 7.0 # doubling time of 7 days
 
     expected_new_incidence = recent_incidence[end] * exp(rt)
-    expected_output = expected_new_incidence, expected_new_incidence
+    expected_output = log(expected_new_incidence), expected_new_incidence
 
 
-    @test rt_model(recent_incidence[end], rt) == expected_output
+    @test rt_model(log(recent_incidence[end]), rt)[1] ≈ expected_output[1]
+    @test rt_model(log(recent_incidence[end]), rt)[2] ≈ expected_output[2]
 end
 
 @testitem "DirectInfections function" begin

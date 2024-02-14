@@ -60,17 +60,17 @@ struct DirectInfections <: AbstractEpiModel
     data::EpiData
 end
 
-function (epi_model::DirectInfections)(recent_incidence, _I_t)
-    nothing, epi_model.data.transformation(_I_t)
+function (epi_model::DirectInfections)(recent_incidence, unc_I_t)
+    nothing, epi_model.data.transformation(unc_I_t)
 end
 
 struct ExpGrowthRate <: AbstractEpiModel
     data::EpiData
 end
 
-function (epi_model::ExpGrowthRate)(recent_incidence, rt)
-    new_incidence = recent_incidence * exp(rt)
-    new_incidence, new_incidence
+function (epi_model::ExpGrowthRate)(unc_recent_incidence, rt)
+    new_unc_recent_incidence = unc_recent_incidence + rt
+    new_unc_recent_incidence, epi_model.data.transformation(new_unc_recent_incidence)
 end
 
 struct Renewal <: AbstractEpiModel
