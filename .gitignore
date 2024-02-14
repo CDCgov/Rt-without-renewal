@@ -1,6 +1,9 @@
 #####
 # Exclude many data and output file types by default
 
+# Julia
+**/Manifest.toml
+
 # Data
 *.csv
 *.tsv

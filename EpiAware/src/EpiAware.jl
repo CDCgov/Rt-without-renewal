@@ -30,7 +30,6 @@ using Distributions,
     Parameters,
     QuadGK
 
-# Exported utilities
 export scan,
     create_discrete_pmf, growth_rate_to_reproductive_ratio, generate_observation_kernel
 
