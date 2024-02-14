@@ -1,4 +1,4 @@
-@model function epi_inference(
+@model function make_epi_inference_model(
     y_t,
     epimodel::AbstractEpiModel,
     latent_process;
