@@ -12,11 +12,11 @@
 
     #Latent process
     time_steps = epimodel.data.time_horizon
-    @submodel latent_process, latent_process_parameters =
+    @submodel latent_process, latent_process_aux =
         latent_process(time_steps; latent_process_priors = latent_process_priors)
 
     #Transform into infections
-    I_t, _ = scan(epimodel, latent_process_parameters.init, latent_process)
+    I_t = epimodel(latent_process, latent_process_aux)
 
     #Predictive distribution
     case_pred_dists =
@@ -27,5 +27,5 @@
     y_t ~ arraydist(case_pred_dists)
 
     #Generate quantities
-    return (; I_t, latent_process_parameters)
+    return (; I_t, latent_process, latent_process_aux)
 end

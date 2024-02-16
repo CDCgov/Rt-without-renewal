@@ -52,7 +52,7 @@ end
 end
 
 
-@testitem "Renewal function" begin
+@testitem "Renewal function: internal generate infs" begin
     using LinearAlgebra
     gen_int = [0.2, 0.3, 0.5]
     delay_int = [0.1, 0.4, 0.5]
@@ -61,7 +61,12 @@ end
     transformation = exp
 
     data = EpiData(gen_int, delay_int, cluster_coeff, time_horizon, transformation)
-    renewal_model = Renewal(data)
+    epimodel = Renewal(data)
+
+    function generate_infs(recent_incidence, Rt)
+        new_incidence = Rt * dot(recent_incidence, epimodel.data.gen_int)
+        [new_incidence; recent_incidence[1:(epimodel.data.len_gen_int-1)]], new_incidence
+    end
 
     recent_incidence = [10, 20, 30]
     Rt = 1.5
@@ -71,7 +76,7 @@ end
         [expected_new_incidence; recent_incidence[1:2]], expected_new_incidence
 
 
-    @test renewal_model(recent_incidence, Rt) == expected_output
+    @test generate_infs(recent_incidence, Rt) == expected_output
 end
 
 @testitem "ExpGrowthRate function" begin
@@ -84,15 +89,11 @@ end
     data = EpiData(gen_int, delay_int, cluster_coeff, time_horizon, transformation)
     rt_model = ExpGrowthRate(data)
 
-    recent_incidence = [10, 20, 30]
-    rt = log(2) / 7.0 # doubling time of 7 days
+    recent_incidence = [10.0, 20.0, 30.0]
+    log_init = log(5.0)
+    rt = [log(recent_incidence[1]) - log_init; diff(log.(recent_incidence))]
 
-    expected_new_incidence = recent_incidence[end] * exp(rt)
-    expected_output = log(expected_new_incidence), expected_new_incidence
-
-
-    @test rt_model(log(recent_incidence[end]), rt)[1] ≈ expected_output[1]
-    @test rt_model(log(recent_incidence[end]), rt)[2] ≈ expected_output[2]
+    @test rt_model(rt, (init = log_init,)) ≈ recent_incidence
 end
 
 @testitem "DirectInfections function" begin
@@ -105,11 +106,9 @@ end
     data = EpiData(gen_int, delay_int, cluster_coeff, time_horizon, transformation)
     direct_inf_model = DirectInfections(data)
 
-    recent_log_incidence = [10, 20, 30] .|> log
+    log_incidence = [10, 20, 30] .|> log
 
-    expected_new_incidence = exp(recent_log_incidence[end])
-    expected_output = nothing, expected_new_incidence
+    expected_incidence = exp.(log_incidence)
 
-
-    @test direct_inf_model(nothing, recent_log_incidence[end]) == expected_output
+    @test direct_inf_model(log_incidence, nothing) ≈ expected_incidence
 end

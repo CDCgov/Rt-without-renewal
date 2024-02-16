@@ -60,24 +60,34 @@ struct DirectInfections <: AbstractEpiModel
     data::EpiData
 end
 
-function (epi_model::DirectInfections)(recent_incidence, unc_I_t)
-    nothing, epi_model.data.transformation(unc_I_t)
+function (epimodel::DirectInfections)(_It, latent_process_aux)
+    epimodel.data.transformation.(_It)
 end
 
 struct ExpGrowthRate <: AbstractEpiModel
     data::EpiData
 end
 
-function (epi_model::ExpGrowthRate)(unc_recent_incidence, rt)
-    new_unc_recent_incidence = unc_recent_incidence + rt
-    new_unc_recent_incidence, epi_model.data.transformation(new_unc_recent_incidence)
+function (epimodel::ExpGrowthRate)(rt, latent_process_aux)
+    latent_process_aux.init .+ cumsum(rt) .|> exp
 end
 
 struct Renewal <: AbstractEpiModel
     data::EpiData
 end
 
-function (epi_model::Renewal)(recent_incidence, Rt)
-    new_incidence = Rt * dot(recent_incidence, epi_model.data.gen_int)
-    [new_incidence; recent_incidence[1:(epi_model.data.len_gen_int-1)]], new_incidence
+function (epimodel::Renewal)(_Rt, latent_process_aux)
+    I₀ = epimodel.data.transformation(latent_process_aux.init)
+    Rt = epimodel.data.transformation.(_Rt)
+
+    r_approx = fast_R_to_r_approx(Rt[1], epimodel)
+    init = I₀ * [exp(-r_approx * t) for t = 0:(epimodel.data.len_gen_int-1)]
+
+    function generate_infs(recent_incidence, Rt)
+        new_incidence = Rt * dot(recent_incidence, epimodel.data.gen_int)
+        [new_incidence; recent_incidence[1:(epimodel.data.len_gen_int-1)]], new_incidence
+    end
+
+    I_t, _ = scan(generate_infs, init, Rt)
+    return I_t
 end

@@ -35,16 +35,19 @@ export scan,
     create_discrete_pmf,
     growth_rate_to_reproductive_ratio,
     generate_observation_kernel,
-    default_rw_priors
+    default_rw_priors,
+    neg_MGF,
+    dneg_MGF_dr,
+    fast_R_to_r_approx
 
 # Exported types
-export EpiData, Renewal, ExpGrowthRate, DirectInfections
+export EpiData, Renewal, ExpGrowthRate, DirectInfections, AbstractEpiModel
 
 # Exported Turing model constructors
 export make_epi_inference_model, random_walk
 
-include("utilities.jl")
 include("epimodel.jl")
+include("utilities.jl")
 include("models.jl")
 include("latent-processes.jl")
 

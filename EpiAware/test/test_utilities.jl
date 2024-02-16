@@ -82,6 +82,7 @@ end
 end
 
 @testitem "Testing growth_rate_to_reproductive_ratio function" begin
+    using EpiAware
     #Test that zero exp growth rate imples R0 = 1
     @testset "Test case 1" begin
         r = 0
@@ -116,6 +117,54 @@ end
         )
         K = generate_observation_kernel(delay_int, time_horizon)
         @test K == expected_K
+    end
+
+end
+@testitem "Testing neg_MGF function" begin
+    # Test case 1: Testing with positive r and non-empty weight vector
+    @testset "Test case 1" begin
+        r = 0.5
+        w = [0.2, 0.3, 0.5]
+        expected_result = 0.2 * exp(-0.5 * 1) + 0.3 * exp(-0.5 * 2) + 0.5 * exp(-0.5 * 3)
+        result = neg_MGF(r, w)
+        @test result ≈ expected_result atol = 1e-15
+    end
+
+    # Test case 2: Testing with zero r and non-empty weight vector
+    @testset "Test case 2" begin
+        r = 0
+        w = [0.1, 0.2, 0.3, 0.4]
+        expected_result =
+            0.1 * exp(-0 * 1) + 0.2 * exp(-0 * 2) + 0.3 * exp(-0 * 3) + 0.4 * exp(-0 * 4)
+        result = neg_MGF(r, w)
+        @test result ≈ expected_result atol = 1e-15
+    end
+
+end
+
+@testitem "Testing dneg_MGF_dr function" begin
+    # Test case 1: Testing with positive r and non-empty weight vector
+    @testset "Test case 1" begin
+        r = 0.5
+        w = [0.2, 0.3, 0.5]
+        expected_result =
+            -(0.2 * 1 * exp(-0.5 * 1) + 0.3 * 2 * exp(-0.5 * 2) + 0.5 * 3 * exp(-0.5 * 3))
+        result = dneg_MGF_dr(r, w)
+        @test result ≈ expected_result atol = 1e-15
+    end
+
+    # Test case 2: Testing with zero r and non-empty weight vector
+    @testset "Test case 2" begin
+        r = 0
+        w = [0.1, 0.2, 0.3, 0.4]
+        expected_result = -(
+            0.1 * 1 * exp(-0 * 1) +
+            0.2 * 2 * exp(-0 * 2) +
+            0.3 * 3 * exp(-0 * 3) +
+            0.4 * 4 * exp(-0 * 4)
+        )
+        result = dneg_MGF_dr(r, w)
+        @test result ≈ expected_result atol = 1e-15
     end
 
 end
