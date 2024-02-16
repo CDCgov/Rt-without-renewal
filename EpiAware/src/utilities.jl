@@ -136,14 +136,12 @@ function fast_R_to_r_approx(R₀, w::Vector{T}; newton_steps = 1) where {T<:Abst
     r_approx = (R₀ - 1) / (R₀ * mean_gen_time)
     # Newton's method
     for _ = 1:newton_steps
-        r_approx +=
-            (1 - R₀ * neg_MGF(r_approx, w)) * neg_MGF(r_approx, w) /
-            dneg_MGF_dr(r_approx, w)
+        r_approx -= (R₀ * neg_MGF(r_approx, w) - 1) / (R₀ * dneg_MGF_dr(r_approx, w))
     end
     return r_approx
 end
 
-function fast_R_to_r_approx(R₀, epimodel::AbstractEpiModel; newton_steps = 3)
+function fast_R_to_r_approx(R₀, epimodel::AbstractEpiModel; newton_steps = 4)
     fast_R_to_r_approx(R₀, epimodel.data.gen_int; newton_steps = newton_steps)
 end
 

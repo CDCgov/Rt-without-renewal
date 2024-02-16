@@ -8,7 +8,7 @@ G(r) = \sum_{i=1}^{\infty} w_i e^{-r i}.
 ```
 and
 ```math
-f(r, \mathcal{R}_0) = {1 \over G(r)} - \mathcal{R}_0.
+f(r, \mathcal{R}_0) = \mathcal{R}_0 G(r) - 1.
 ```
 then the connection between `R₀` and `r` is given by
 ```math
@@ -24,14 +24,9 @@ r_0 = { \mathcal{R}_0 - 1 \over  \mathcal{R}_0 \langle W \rangle }.
 ```
 where $\langle W \rangle$ is the mean of the generation interval.
 
-Note that
+To rapidly improve the estimate for `r` we use Newton steps given by
 ```math
-\partial_r G(r, \mathcal{R}_0) = - {G'(r) \over G(r)^2} }
-```
-
-Therefore, each Newton step is given by
-```math
-r_{n+1} = r_n + {(1 - \mathcal{R}_0 G(r)) G(r) \over G'(r)}.
+r_{n+1} = r_n - {\mathcal{R}_0 G(r) - 1\over \mathcal{R}_0 G'(r)}.
 ```
 
 =#
