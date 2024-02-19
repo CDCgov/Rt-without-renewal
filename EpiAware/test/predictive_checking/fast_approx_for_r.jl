@@ -55,7 +55,7 @@ errors = mapreduce(hcat, doubling_times) do T_2
     R0 = growth_rate_to_reproductive_ratio(true_r, w)
 
     return map(idxs) do ns
-        @time r = fast_R_to_r_approx(R0, w, newton_steps = ns)
+        @time r = R_to_r(R0, w, newton_steps = ns)
         abs(r - true_r) + jitter
     end
 end

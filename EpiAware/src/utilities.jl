@@ -131,7 +131,7 @@ function dneg_MGF_dr(r, w::AbstractVector)
 end
 
 """
-    fast_R_to_r_approx(R₀, w::Vector{T}; newton_steps = 2, Δd = 1.0)
+    R_to_r(R₀, w::Vector{T}; newton_steps = 2, Δd = 1.0)
 
 This function computes an approximation to the exponential growth rate `r`
 given the reproductive ratio `R₀` and the discretized generation interval `w` with
@@ -156,12 +156,7 @@ The two step approximation is based on:
 Returns:
 - The approximate value of `r`.
 """
-function fast_R_to_r_approx(
-    R₀,
-    w::Vector{T};
-    newton_steps = 2,
-    Δd = 1.0,
-) where {T<:AbstractFloat}
+function R_to_r(R₀, w::Vector{T}; newton_steps = 2, Δd = 1.0) where {T<:AbstractFloat}
     mean_gen_time = dot(w, 1:length(w)) * Δd
     # Small r approximation as initial guess
     r_approx = (R₀ - 1) / (R₀ * mean_gen_time)
@@ -172,8 +167,8 @@ function fast_R_to_r_approx(
     return r_approx
 end
 
-function fast_R_to_r_approx(R₀, epimodel::AbstractEpiModel; newton_steps = 2, Δd = 1.0)
-    fast_R_to_r_approx(R₀, epimodel.data.gen_int; newton_steps = newton_steps, Δd = Δd)
+function R_to_r(R₀, epimodel::AbstractEpiModel; newton_steps = 2, Δd = 1.0)
+    R_to_r(R₀, epimodel.data.gen_int; newton_steps = newton_steps, Δd = Δd)
 end
 
 

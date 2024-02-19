@@ -38,7 +38,7 @@ export scan,
     default_rw_priors,
     neg_MGF,
     dneg_MGF_dr,
-    fast_R_to_r_approx
+    R_to_r
 
 # Exported types
 export EpiData, Renewal, ExpGrowthRate, DirectInfections, AbstractEpiModel
