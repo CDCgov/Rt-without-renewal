@@ -51,7 +51,7 @@ We assume:
 
 ### Simulation model
 
-We use the generic model structure described above with a renewal process for reasons of convenience. The renewal equation is quite flexibie and makes minimal assumptions about the underlying infectious disease process. Although using the renewal equation to generate the data could be construed as leading to more favorable inference, all threee latent processes are able to generate the simulated data.
+We use the generic model structure described above with a renewal process as it represents (in its equivalence to an SEIR compartmental model) domain understanding of a model that can capture known infectious dynamics.
 
 We simulate from the renewal process through the following procedure:
 1. Take a fixed timeseries of Rt for 160 days (7 days x 8 weeks + 7 days x 15 weeks less one day). See the next subsection for more description of these scenarios.
