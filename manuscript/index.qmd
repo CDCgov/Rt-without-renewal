@@ -57,7 +57,7 @@ We simulate from the renewal process through the following procedure:
 1. Take a fixed timeseries of Rt for 160 days. See the next subsection for more description of these scenarios.
 2. Add noise to the fixed Rt estimates draws from a N(0, 0.1) with a fixed seed of `12345`.
 3. Simulate daily incidence starting from $I_0 = 10$ cases and a fixed generation interval. See the next subsection for more detail.
-4. Convolve the true incidence timeseries through a double-censored Exp(1/5) PMF with a maximum of 15 which has ~95% of the probability density. This PMF allows for some-day observation. Note that this choice of delay is arbitrary and does not correspond to any particular delay.
+4. The delay between infection and case ascertainment is represented as a convolution on the true incidence timeseries, as is standard in the literature **CITATIONS**. For any given infected person the delay between infection and ascertainment is distributed **SOME GAMMA/LOGNORMAL**; this is mapped to our discrete time forward simulations using double interval censoring of both the time of infection and the time of ascertainment **CITE SWP + OTHERS**.
 5. Simulate additional negative binomial observation noise on the delayed cases drawn with mean of the true cases and overdispersion of 10.
 
 We do not add a day-of-week effect.
