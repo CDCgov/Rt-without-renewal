@@ -30,17 +30,19 @@ using Distributions,
     Parameters,
     QuadGK
 
-export scan,
-    create_discrete_pmf,
-    growth_rate_to_reproductive_ratio,
-    generate_observation_kernel,
-    EpiModel,
-    log_infections,
-    random_walk
+# Exported utilities
+export create_discrete_pmf, default_rw_priors, default_delay_obs_priors
 
-include("utilities.jl")
+# Exported types
+export EpiData, Renewal, ExpGrowthRate, DirectInfections
+
+# Exported Turing model constructors
+export make_epi_inference_model, random_walk, delay_observations
+
 include("epimodel.jl")
+include("utilities.jl")
 include("models.jl")
 include("latent-processes.jl")
+include("observation-processes.jl")
 
 end

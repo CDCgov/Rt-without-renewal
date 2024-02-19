@@ -1,37 +1,23 @@
 abstract type AbstractEpiModel end
 
-
-
-"""
-    struct EpiModel{T<:Real} <: AbstractEpiModel
-
-EpiModel represents an epidemiological model with generation intervals, delay intervals, and observation delay kernel.
-
-# Fields
-- `gen_int::Vector{T}`: Discrete generation inteval, runs from 1, 2, ... to the end of the vector.
-- `delay_int::Vector{T}`: Discrete delay distribution runs from 0, 1, ... to the end of the vector less 1.
-- `delay_kernel::SparseMatrixCSC{T,Integer}`: Sparse matrix representing the observation delay kernel.
-- `cluster_coeff::T`: Cluster coefficient for negative binomial observations.
-- `len_gen_int::Integer`: Length of `gen_int`.
-- `len_delay_int::Integer`: Length of `delay_int`.
-- `time_horizon::Integer`: Length of the generated data.
-
-# Constructors
-- `EpiModel(gen_int, delay_int, cluster_coeff, time_horizon::Integer)`: Constructs an EpiModel object with given generation intervals, delay intervals, cluster coefficient, and time horizon.
-- `EpiModel(gen_distribution::ContinuousDistribution, delay_distribution::ContinuousDistribution, cluster_coeff, time_horizon::Integer; Δd = 1.0, D_gen, D_delay)`: Constructs an EpiModel object with generation and delay distributions, cluster coefficient, time horizon, and optional parameters.
-
-"""
-struct EpiModel{T<:Real} <: AbstractEpiModel
+struct EpiData{T<:Real,F<:Function}
     gen_int::Vector{T}
     delay_int::Vector{T}
     delay_kernel::SparseMatrixCSC{T,Integer}
     cluster_coeff::T
-    len_gen_int::Integer #length(gen_int) just to save recalc
-    len_delay_int::Integer #length(delay_int) just to save recalc
+    len_gen_int::Integer
+    len_delay_int::Integer
     time_horizon::Integer
+    transformation::F
 
-    #Inner constructors for EpiModel object
-    function EpiModel(gen_int, delay_int, cluster_coeff, time_horizon::Integer)
+    #Inner constructors for EpiData object
+    function EpiData(
+        gen_int,
+        delay_int,
+        cluster_coeff,
+        time_horizon::Integer,
+        transformation::Function,
+    )
         @assert all(gen_int .>= 0) "Generation interval must be non-negative"
         @assert all(delay_int .>= 0) "Delay interval must be non-negative"
         @assert sum(gen_int) ≈ 1 "Generation interval must sum to 1"
@@ -39,7 +25,7 @@ struct EpiModel{T<:Real} <: AbstractEpiModel
 
         K = generate_observation_kernel(delay_int, time_horizon)
 
-        new{eltype(gen_int)}(
+        new{eltype(gen_int),typeof(transformation)}(
             gen_int,
             delay_int,
             K,
@@ -47,50 +33,61 @@ struct EpiModel{T<:Real} <: AbstractEpiModel
             length(gen_int),
             length(delay_int),
             time_horizon,
+            transformation,
         )
     end
 
-    function EpiModel(
+    function EpiData(
         gen_distribution::ContinuousDistribution,
         delay_distribution::ContinuousDistribution,
         cluster_coeff,
         time_horizon::Integer;
-        Δd = 1.0,
         D_gen,
         D_delay,
+        Δd = 1.0,
+        transformation::Function = exp,
     )
         gen_int =
             create_discrete_pmf(gen_distribution, Δd = Δd, D = D_gen) |>
             p -> p[2:end] ./ sum(p[2:end])
         delay_int = create_discrete_pmf(delay_distribution, Δd = Δd, D = D_delay)
 
-        K = generate_observation_kernel(delay_int, time_horizon)
-
-        new{eltype(gen_int)}(
-            gen_int,
-            delay_int,
-            K,
-            cluster_coeff,
-            length(gen_int),
-            length(delay_int),
-            time_horizon,
-        )
+        return EpiData(gen_int, delay_int, cluster_coeff, time_horizon, transformation)
     end
 end
 
-"""
-    (epi_model::EpiModel)(recent_incidence, Rt)
+struct DirectInfections <: AbstractEpiModel
+    data::EpiData
+end
 
-Apply the EpiModel to calculate new incidence based on recent incidence and Rt.
+function (epimodel::DirectInfections)(_It, latent_process_aux)
+    epimodel.data.transformation.(_It)
+end
 
-# Arguments
-- `recent_incidence`: Array of recent incidence values.
-- `Rt`: Reproduction number.
+struct ExpGrowthRate <: AbstractEpiModel
+    data::EpiData
+end
 
-# Returns
-- `new_incidence`: Array of new incidence values.
-"""
-function (epi_model::EpiModel)(recent_incidence, Rt)
-    new_incidence = Rt * dot(recent_incidence, epi_model.gen_int)
-    [new_incidence; recent_incidence[1:(epi_model.len_gen_int-1)]], new_incidence
+function (epimodel::ExpGrowthRate)(rt, latent_process_aux)
+    latent_process_aux.init .+ cumsum(rt) .|> exp
+end
+
+struct Renewal <: AbstractEpiModel
+    data::EpiData
+end
+
+function (epimodel::Renewal)(_Rt, latent_process_aux)
+    I₀ = epimodel.data.transformation(latent_process_aux.init)
+    Rt = epimodel.data.transformation.(_Rt)
+
+    r_approx = R_to_r(Rt[1], epimodel)
+    init = I₀ * [exp(-r_approx * t) for t = 0:(epimodel.data.len_gen_int-1)]
+
+    function generate_infs(recent_incidence, Rt)
+        new_incidence = Rt * dot(recent_incidence, epimodel.data.gen_int)
+        [new_incidence; recent_incidence[1:(epimodel.data.len_gen_int-1)]], new_incidence
+    end
+
+    I_t, _ = scan(generate_infs, init, Rt)
+    return I_t
 end
