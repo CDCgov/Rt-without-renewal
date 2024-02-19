@@ -59,7 +59,7 @@ doubling_times = [1.0, 3.5, 7.0, 14.0]
 
 errors = mapreduce(hcat, doubling_times) do T_2
     true_r = log(2) / T_2 # 7 day doubling time
-    R0 = EpiAware.growth_rate_to_reproductive_ratio(true_r, w)
+    R0 = EpiAware.r_to_R(true_r, w)
 
     return map(idxs) do ns
         @time r = EpiAware.R_to_r(R0, w, newton_steps = ns)

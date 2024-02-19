@@ -81,13 +81,13 @@ end
 
 end
 
-@testitem "Testing growth_rate_to_reproductive_ratio function" begin
+@testitem "Testing r_to_R function" begin
     #Test that zero exp growth rate imples R0 = 1
     @testset "Test case 1" begin
         r = 0
         w = ones(5) |> x -> x ./ sum(x)
         expected_ratio = 1
-        ratio = EpiAware.growth_rate_to_reproductive_ratio(r, w)
+        ratio = EpiAware.r_to_R(r, w)
         @test ratio ≈ expected_ratio atol = 1e-15
     end
 
@@ -95,7 +95,7 @@ end
     @testset "Test case 2" begin
         r = 0
         w = 1
-        @test_throws MethodError EpiAware.growth_rate_to_reproductive_ratio(r, w)
+        @test_throws MethodError EpiAware.r_to_R(r, w)
     end
 
 end
