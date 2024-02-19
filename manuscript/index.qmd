@@ -175,7 +175,7 @@ Say if it looked okay and reference SI
 - We do not explore more complex prior models such as splines and gaussian processes
 - We focus our efforts on situational awareness and hence real-time performance. This means we do not focus on retrospective performance which may have different characteristics.
 - We did not perform full simulation-based calibration.
-- Our simulations are produced by a model that is similar to the renewal process inference method and so represents a "best" case for this method. It would be potentially be stronger to simulate from an SEIR process directly.
+- Our simulations are produced by a model that is similar to the renewal process inference method and so represents a "best" case for this method.
 
 ## References {.unnumbered}
 
