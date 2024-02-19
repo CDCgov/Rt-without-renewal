@@ -31,18 +31,10 @@ using Distributions,
     QuadGK
 
 # Exported utilities
-export scan,
-    create_discrete_pmf,
-    growth_rate_to_reproductive_ratio,
-    generate_observation_kernel,
-    default_rw_priors,
-    default_delay_obs_priors,
-    neg_MGF,
-    dneg_MGF_dr,
-    R_to_r
+export create_discrete_pmf, default_rw_priors, default_delay_obs_priors
 
 # Exported types
-export EpiData, Renewal, ExpGrowthRate, DirectInfections, AbstractEpiModel
+export EpiData, Renewal, ExpGrowthRate, DirectInfections
 
 # Exported Turing model constructors
 export make_epi_inference_model, random_walk, delay_observations
