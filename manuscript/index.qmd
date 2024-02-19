@@ -92,7 +92,7 @@ We simulate out of this scenario for the GIs described in the previous section.
 
 This scenario provides both sharp changes at the start of the timeseries and more gradual transitions towards the end. The rolling windows allow for exploration of both of these situations in a single case study. The longer fit to the entire timeseries tests the ability to flexibily handle both of these paradigms in a single fit.
 
-#### Inference scenarios
+##### Inference scenarios
 We explore the following misspecification scenarios for the generation interval:
 
 - Correct
