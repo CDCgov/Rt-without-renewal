@@ -49,7 +49,9 @@ We assume:
    - AR(1) process
    - Differenced AR(1) process
 
-### Simulation model
+### Simulations
+
+#### Observation-generating process
 
 We use the generic model structure described above with a renewal process as it represents (in its equivalence to an SEIR compartmental model) domain understanding of a model that can capture known infectious dynamics.
 
@@ -62,7 +64,7 @@ We simulate from the renewal process through the following procedure:
 
 We do not add a day-of-week effect.
 
-### Generation intervals
+#### Generation intervals
 
 We use two generation intervals, corresponding to pathogens with long and short GIs. We use descretized, double-censored versions of the GI PMFs.
 1. *Short:* We use a Gamma(shape = 2, scale = 1), corresponding to a pathogen with a relatively short generation interval. Vaguely corresponds to flu A in Wallinga & Lipsitch, 2006
@@ -72,7 +74,9 @@ We use two generation intervals, corresponding to pathogens with long and short 
 
 We produce the simulations described in the next section for both of these GIs.
 
-### Simulations
+#### Scenarios
+
+##### Reproduction number scenarios
 
 We test the following scenario:
 - Piecewise constant Rt
@@ -88,13 +92,14 @@ We simulate out of this scenario for the GIs described in the previous section.
 
 This scenario provides both sharp changes at the start of the timeseries and more gradual transitions towards the end. The rolling windows allow for exploration of both of these situations in a single case study. The longer fit to the entire timeseries tests the ability to flexibily handle both of these paradigms in a single fit.
 
-### Fitting to simulated data
+#### Inference scenarios
+We explore the following misspecification scenarios for the generation interval:
 
-We fit the Rt estimation models with 8 week rolling windows as well as one global fit over the entire timeseries.
+- Correct
+- Too short
+- Too long
 
-We fit to the simulated data using both the correct GIs as well as the misspecified GIs. 
-
-I'm picturing figure 1A here as something that echoes the Sherratt 2023 Figure 2. One of the classic fit/forecast quality but for Rt.
+For each simulated scenario we fit to 12 weeks of data or as much as possible if the scenario is shorter than 12 weeks.
 
 ### Case studies
 
@@ -175,7 +180,7 @@ Say if it looked okay and reference SI
 - We do not explore more complex prior models such as splines and gaussian processes
 - We focus our efforts on situational awareness and hence real-time performance. This means we do not focus on retrospective performance which may have different characteristics.
 - We did not perform full simulation-based calibration.
-- Our simulations are produced by a model that is similar to the renewal process inference method and so represents a "best" case for this method.
+- Our simulations are produced by a model that is similar to the renewal process inference method and so represents a "best" case for this method. Potential future work could explore other versions of the infection generation process backing the simulations but we feel this choice makes sense given that the renewal process best reflects our mechanistic understanding of how transmission works of the models we explore here.
 
 ## References {.unnumbered}
 
