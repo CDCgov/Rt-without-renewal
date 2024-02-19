@@ -36,6 +36,7 @@ export scan,
     growth_rate_to_reproductive_ratio,
     generate_observation_kernel,
     default_rw_priors,
+    default_delay_obs_priors,
     neg_MGF,
     dneg_MGF_dr,
     fast_R_to_r_approx
@@ -44,11 +45,12 @@ export scan,
 export EpiData, Renewal, ExpGrowthRate, DirectInfections, AbstractEpiModel
 
 # Exported Turing model constructors
-export make_epi_inference_model, random_walk
+export make_epi_inference_model, random_walk, delay_observations
 
 include("epimodel.jl")
 include("utilities.jl")
 include("models.jl")
 include("latent-processes.jl")
+include("observation-processes.jl")
 
 end

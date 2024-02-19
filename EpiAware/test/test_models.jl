@@ -4,12 +4,9 @@
     # Define test inputs
     y_t = missing # Data will be generated from the model
     data = EpiData([0.2, 0.3, 0.5], [0.1, 0.4, 0.5], 0.8, 10, exp)
-    latent_process_priors = default_rw_priors()
-    transform_function = exp
-    n_generate_ahead = 0
+    latent_process_priors = merge(default_rw_priors(), default_delay_obs_priors())
     pos_shift = 1e-6
-    neg_bin_cluster_factor = 0.5
-    neg_bin_cluster_factor_prior = Gamma(3, 0.05 / 3)
+
 
     epimodel = DirectInfections(data)
 
@@ -17,11 +14,10 @@
     test_mdl = make_epi_inference_model(
         y_t,
         epimodel,
-        random_walk;
+        random_walk,
+        delay_observations;
         latent_process_priors,
         pos_shift,
-        neg_bin_cluster_factor,
-        neg_bin_cluster_factor_prior,
     )
 
     # Define expected outputs for a conditional model
@@ -43,12 +39,8 @@ end
     # Define test inputs
     y_t = missing # Data will be generated from the model
     data = EpiData([0.2, 0.3, 0.5], [0.1, 0.4, 0.5], 0.8, 10, exp)
-    latent_process_priors = default_rw_priors()
-    transform_function = exp
-    n_generate_ahead = 0
+    latent_process_priors = merge(default_rw_priors(), default_delay_obs_priors())
     pos_shift = 1e-6
-    neg_bin_cluster_factor = 0.5
-    neg_bin_cluster_factor_prior = Gamma(3, 0.05 / 3)
 
     epimodel = ExpGrowthRate(data)
 
@@ -56,11 +48,10 @@ end
     test_mdl = make_epi_inference_model(
         y_t,
         epimodel,
-        random_walk;
+        random_walk,
+        delay_observations;
         latent_process_priors,
         pos_shift,
-        neg_bin_cluster_factor,
-        neg_bin_cluster_factor_prior,
     )
 
     # Define expected outputs for a conditional model
@@ -82,12 +73,8 @@ end
     # Define test inputs
     y_t = missing # Data will be generated from the model
     data = EpiData([0.2, 0.3, 0.5], [0.1, 0.4, 0.5], 0.8, 10, exp)
-    latent_process_priors = default_rw_priors()
-    transform_function = exp
-    n_generate_ahead = 0
+    latent_process_priors = merge(default_rw_priors(), default_delay_obs_priors())
     pos_shift = 1e-6
-    neg_bin_cluster_factor = 0.5
-    neg_bin_cluster_factor_prior = Gamma(3, 0.05 / 3)
 
     epimodel = Renewal(data)
 
@@ -95,11 +82,10 @@ end
     test_mdl = make_epi_inference_model(
         y_t,
         epimodel,
-        random_walk;
+        random_walk,
+        delay_observations;
         latent_process_priors,
         pos_shift,
-        neg_bin_cluster_factor,
-        neg_bin_cluster_factor_prior,
     )
 
     # Define expected outputs for a conditional model
