@@ -110,5 +110,5 @@ end
 
     expected_incidence = exp.(log_incidence)
 
-    @test direct_inf_model(log_incidence, nothing) ≈ expected_incidence
+    @test direct_inf_model(log_incidence, (init = 0.0,)) ≈ expected_incidence
 end

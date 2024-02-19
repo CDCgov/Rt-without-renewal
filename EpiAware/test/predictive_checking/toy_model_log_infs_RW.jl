@@ -50,19 +50,22 @@ r &\sim \text{Gamma}(3, 0.05/3).
 
 This script should be run from the root folder of `EpiAware` and with the active environment.
 
-=#
+NB: This script is intended to be run in the test environment.
 
-
-
+```julia
 using TestEnv # Run in Test environment mode
 TestEnv.activate()
-
+```
+=#
+# using TestEnv # Run in Test environment mode
+# TestEnv.activate()
 using EpiAware
 using Turing
 using Distributions
 using StatsPlots
 using Random
 using DynamicPPL
+using Statistics
 Random.seed!(0)
 
 #=
@@ -109,20 +112,20 @@ log_infs_model = make_epi_inference_model(
     pos_shift = 1e-6,
 )
 
-
-
 #=
 ## Sample from the model
-I define a fixed version of the model with initial infections set to 10 and variance of the random walk process set to 0.1.
+I define a fixed version of the model with initial infections set to 100 and variance of the random walk process set to 0.1.
 We can sample from the model using the `rand` function, and plot the generated infections against generated cases.
-=#
-# We can get the generated infections using `generated_quantities` function. Because the observed
-# cases are "defined" with a `~` operator they can be accessed directly from the randomly sampled
-# process.
 
-cond_toy = fix(log_infs_model, (init_rw_value = log(10.0), σ²_RW = 0.1))
+We can get the generated infections using `generated_quantities` function. Because the observed
+cases are "defined" with a `~` operator they can be accessed directly from the randomly sampled
+process.
+=#
+
+cond_toy = fix(log_infs_model, (init = log(100.0), σ²_RW = 0.1))
 random_epidemic = rand(cond_toy)
 gen = generated_quantities(cond_toy, random_epidemic)
+
 plot(
     gen.I_t,
     label = "I_t",
@@ -131,3 +134,59 @@ plot(
     title = "Generated Infections",
 )
 scatter!(random_epidemic.y_t, lab = "generated cases")
+
+#=
+## Inference
+=#
+
+truth_data = random_epidemic.y_t
+
+model = make_epi_inference_model(
+    truth_data,
+    toy_log_infs,
+    random_walk,
+    delay_observations;
+    latent_process_priors = merge(default_rw_priors(), default_delay_obs_priors()),
+    pos_shift = 1e-6,
+)
+
+@time chn = sample(
+    model,
+    NUTS(0.8; adtype = AutoReverseDiff(true)),
+    MCMCThreads(),
+    250,
+    4;
+    drop_warmup = true,
+    n_adapts = 1000,
+)
+
+## Postior predictive checking
+
+
+
+predicted_y_t =
+    mapreduce(hcat, generated_quantities(log_infs_model, chn)) do gen
+        gen.generated_y_t
+    end |> plot(predicted_y_t, c = :grey, alpha = 0.05, lab = "")
+scatter!(
+    truth_data,
+    lab = "Observed cases",
+    xlabel = "Time",
+    ylabel = "Cases",
+    title = "Posterior Predictive Checking",
+)
+
+##
+
+predicted_I_t = mapreduce(hcat, generated_quantities(log_infs_model, chn)) do gen
+    gen.I_t
+end
+
+plot(predicted_I_t, c = :grey, alpha = 0.05, lab = "")
+scatter!(
+    gen.I_t,
+    lab = "Actual infections",
+    xlabel = "Time",
+    ylabel = "Cases",
+    title = "Posterior Predictive Checking",
+)

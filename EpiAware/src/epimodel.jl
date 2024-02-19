@@ -61,7 +61,7 @@ struct DirectInfections <: AbstractEpiModel
 end
 
 function (epimodel::DirectInfections)(_It, latent_process_aux)
-    epimodel.data.transformation.(_It)
+    epimodel.data.transformation.(latent_process_aux.init .+ _It)
 end
 
 struct ExpGrowthRate <: AbstractEpiModel
