@@ -80,7 +80,7 @@ function (epimodel::Renewal)(_Rt, latent_process_aux)
     I₀ = epimodel.data.transformation(latent_process_aux.init)
     Rt = epimodel.data.transformation.(_Rt)
 
-    r_approx = fast_R_to_r_approx(Rt[1], epimodel)
+    r_approx = R_to_r(Rt[1], epimodel)
     init = I₀ * [exp(-r_approx * t) for t = 0:(epimodel.data.len_gen_int-1)]
 
     function generate_infs(recent_incidence, Rt)

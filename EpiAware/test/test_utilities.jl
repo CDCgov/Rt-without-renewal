@@ -82,7 +82,6 @@ end
 end
 
 @testitem "Testing growth_rate_to_reproductive_ratio function" begin
-    using EpiAware
     #Test that zero exp growth rate imples R0 = 1
     @testset "Test case 1" begin
         r = 0
@@ -120,6 +119,7 @@ end
     end
 
 end
+
 @testitem "Testing neg_MGF function" begin
     # Test case 1: Testing with positive r and non-empty weight vector
     @testset "Test case 1" begin
