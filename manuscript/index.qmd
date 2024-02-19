@@ -54,7 +54,7 @@ We assume:
 We use the generic model structure described above with a renewal process as it represents (in its equivalence to an SEIR compartmental model) domain understanding of a model that can capture known infectious dynamics.
 
 We simulate from the renewal process through the following procedure:
-1. Take a fixed timeseries of Rt for 160 days (7 days x 8 weeks + 7 days x 15 weeks less one day). See the next subsection for more description of these scenarios.
+1. Take a fixed timeseries of Rt for 160 days. See the next subsection for more description of these scenarios.
 2. Add noise to the fixed Rt estimates draws from a N(0, 0.1) with a fixed seed of `12345`.
 3. Simulate daily incidence starting from $I_0 = 10$ cases and a fixed generation interval. See the next subsection for more detail.
 4. Convolve the true incidence timeseries through a double-censored Exp(1/5) PMF with a maximum of 15 which has ~95% of the probability density. This PMF allows for some-day observation. Note that this choice of delay is arbitrary and does not correspond to any particular delay.
