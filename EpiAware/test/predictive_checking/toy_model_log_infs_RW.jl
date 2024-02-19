@@ -104,10 +104,9 @@ log_infs_model = make_epi_inference_model(
     missing,
     toy_log_infs,
     random_walk,
-    latent_process_priors = default_rw_priors(),
+    delay_observations;
+    latent_process_priors = merge(default_rw_priors(), default_delay_obs_priors()),
     pos_shift = 1e-6,
-    neg_bin_cluster_factor = 0.5,
-    neg_bin_cluster_factor_prior = Gamma(3, 0.05 / 3),
 )
 
 
