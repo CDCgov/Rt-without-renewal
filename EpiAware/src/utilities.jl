@@ -138,13 +138,13 @@ given the reproductive ratio `R₀` and the discretized generation interval `w` 
 discretized interval width `Δd`. This is based on the implicit solution of
 
 ```math
-G(r) - {1 \over R_0} = 0.
+G(r) - {1 \\over R_0} = 0.
 ```
 
 where
 
 ```math
-G(r) = \sum_{i=1}^n w_i e^{-r i}.
+G(r) = \\sum_{i=1}^n w_i e^{-r i}.
 ```
 
 is the negative moment generating function (MGF) of the generation interval distribution.
