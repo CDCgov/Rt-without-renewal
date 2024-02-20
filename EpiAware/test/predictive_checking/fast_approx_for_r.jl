@@ -29,10 +29,17 @@ To rapidly improve the estimate for `r` we use Newton steps given by
 r_{n+1} = r_n - {\mathcal{R}_0 G(r) - 1\over \mathcal{R}_0 G'(r)}.
 ```
 
-=#
+### Test mode
 
+Run this script in Test environment mode. If not, run the following command:
+
+```julia
 using TestEnv
 TestEnv.activate()
+```
+=#
+
+
 using EpiAware
 using Distributions
 using StatsPlots
@@ -52,10 +59,10 @@ doubling_times = [1.0, 3.5, 7.0, 14.0]
 
 errors = mapreduce(hcat, doubling_times) do T_2
     true_r = log(2) / T_2 # 7 day doubling time
-    R0 = growth_rate_to_reproductive_ratio(true_r, w)
+    R0 = EpiAware.r_to_R(true_r, w)
 
     return map(idxs) do ns
-        @time r = R_to_r(R0, w, newton_steps = ns)
+        @time r = EpiAware.R_to_r(R0, w, newton_steps = ns)
         abs(r - true_r) + jitter
     end
 end

@@ -49,26 +49,57 @@ We assume:
    - AR(1) process
    - Differenced AR(1) process
 
-### Simulation model
-
-We use the generic model structure described above with a renewal process. To simulate noise in the infection process we assume additional Brownian noise for the effective reproduction number of XX.
-
 ### Simulations
 
-We test the following general scenarios:
-- Piecewise constant Rt in an epidemic setting
-      - Generation time:
-- An endemic setting with smoothly varying Rt
-- An outbreak setting with changes in Rt comparable to that observed due to susceptible depletion
-- A mixed outbreak setting with both smooth changes and piecewise changes in Rt
+#### Observation-generating process
 
-We assume a delay distribution of ** motivated by **.
+We use the generic model structure described above with a renewal process as it represents (in its equivalence to an SEIR compartmental model) domain understanding of a model that can capture known infectious dynamics.
 
+We simulate from the renewal process through the following procedure:
+1. Take a fixed timeseries of Rt for 160 days. See the next subsection for more description of these scenarios.
+2. Add noise to the fixed Rt estimates draws from a N(0, 0.1) with a fixed seed of `12345`.
+3. Simulate daily incidence starting from $I_0 = 10$ cases and a fixed generation interval. See the next subsection for more detail.
+4. The delay between infection and case ascertainment is represented as a convolution on the true incidence timeseries, as is standard in the literature **CITATIONS**. For any given infected person the delay between infection and ascertainment is distributed **SOME GAMMA/LOGNORMAL**; this is mapped to our discrete time forward simulations using double interval censoring of both the time of infection and the time of ascertainment **CITE SWP + OTHERS**.
+5. Simulate additional negative binomial observation noise on the delayed cases drawn with mean of the true cases and overdispersion of 10.
+
+We do not add a day-of-week effect.
+
+#### Generation intervals
+
+We use two generation intervals, corresponding to pathogens with long and short GIs. We use descretized, double-censored versions of the GI PMFs.
+1. *Short:* We use a Gamma(shape = 2, scale = 1), corresponding to a pathogen with a relatively short generation interval. Vaguely corresponds to flu A in Wallinga & Lipsitch, 2006
+3. *Medium:* We use a Gamma(shape = 2, scale = 5, corresponding to lots of
+2. *Long:* We use a Gamma(shape = 2, scale = 10), corresponding to a pathogen with a moderately long generation interval (Smallpox? I don't know if we need to ground this in anything real and if we do we could drop this down to 15 days and use varicella?)
+
+
+We produce the simulations described in the next section for both of these GIs.
+
+#### Scenarios
+
+##### Reproduction number scenarios
+
+We test the following scenario:
+- Piecewise constant Rt
+    - 1.1 for two weeks
+    - 2 for two weeks
+    - 0.5 for two weeks
+    - 1.5 for two weeks
+    - 0.75 for two weeks
+    - 1.1 for six weeks
+    - sine curve centered at 1 with amplitude of 0.3 afterwards
+
+We simulate out of this scenario for the GIs described in the previous section.
+
+This scenario provides both sharp changes at the start of the timeseries and more gradual transitions towards the end. The rolling windows allow for exploration of both of these situations in a single case study. The longer fit to the entire timeseries tests the ability to flexibily handle both of these paradigms in a single fit.
+
+##### Inference scenarios
 We explore the following misspecification scenarios for the generation interval:
 
 - Correct
 - Too short
 - Too long
+
+For each simulated scenario we fit to 12 weeks of data or as much as possible if the scenario is shorter than 12 weeks.
 
 ### Case studies
 

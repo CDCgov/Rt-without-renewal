@@ -48,17 +48,18 @@ r &\sim \text{Gamma}(3, 0.05/3).
 
 ## Load dependencies
 
-This script should be run from the root folder of `EpiAware` and with the active environment.
-
-NB: This script is intended to be run in the test environment.
+This script should be run from Test environment mode. If not, run the following command:
 
 ```julia
 using TestEnv # Run in Test environment mode
 TestEnv.activate()
 ```
+
 =#
+
 # using TestEnv # Run in Test environment mode
 # TestEnv.activate()
+
 using EpiAware
 using Turing
 using Distributions

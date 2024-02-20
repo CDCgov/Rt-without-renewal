@@ -173,7 +173,7 @@ end
 
 
 """
-    growth_rate_to_reproductive_ratio(r, w)
+    r_to_R(r, w)
 
 Compute the reproductive ratio given exponential growth rate `r`
     and discretized generation interval `w`.
@@ -185,7 +185,7 @@ Compute the reproductive ratio given exponential growth rate `r`
 # Returns
 - The reproductive ratio.
 """
-function growth_rate_to_reproductive_ratio(r, w::AbstractVector)
+function r_to_R(r, w::AbstractVector)
     return 1 / neg_MGF(r, w::AbstractVector)
 end
 
