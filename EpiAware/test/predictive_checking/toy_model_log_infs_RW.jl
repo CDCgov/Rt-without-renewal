@@ -114,7 +114,7 @@ log_infs_model = make_epi_inference_model(
 
 #=
 ## Sample from the model
-I define a fixed version of the model with initial infections set to 100 and variance of the random walk process set to 0.1.
+I define a fixed version of the model with initial infections set to 1 and variance of the random walk process set to 0.1.
 We can sample from the model using the `rand` function, and plot the generated infections against generated cases.
 
 We can get the generated infections using `generated_quantities` function. Because the observed
@@ -122,7 +122,7 @@ cases are "defined" with a `~` operator they can be accessed directly from the r
 process.
 =#
 
-cond_toy = fix(log_infs_model, (init = log(100.0), σ²_RW = 0.1))
+cond_toy = fix(log_infs_model, (init = log(1.0), σ²_RW = 0.1))
 random_epidemic = rand(cond_toy)
 gen = generated_quantities(cond_toy, random_epidemic)
 
@@ -137,6 +137,8 @@ scatter!(random_epidemic.y_t, lab = "generated cases")
 
 #=
 ## Inference
+
+We treat the generated data as observed data and attempt to infer underlying infections.
 =#
 
 truth_data = random_epidemic.y_t
@@ -152,22 +154,24 @@ model = make_epi_inference_model(
 
 @time chn = sample(
     model,
-    NUTS(0.8; adtype = AutoReverseDiff(true)),
+    NUTS(; adtype = AutoReverseDiff(true)),
     MCMCThreads(),
     250,
     4;
     drop_warmup = true,
-    n_adapts = 1000,
 )
 
+#=
 ## Postior predictive checking
 
+We check the posterior predictive checking by plotting the predicted cases against the observed cases.
+=#
 
+predicted_y_t = mapreduce(hcat, generated_quantities(log_infs_model, chn)) do gen
+    gen.generated_y_t
+end
 
-predicted_y_t =
-    mapreduce(hcat, generated_quantities(log_infs_model, chn)) do gen
-        gen.generated_y_t
-    end |> plot(predicted_y_t, c = :grey, alpha = 0.05, lab = "")
+plot(predicted_y_t, c = :grey, alpha = 0.05, lab = "")
 scatter!(
     truth_data,
     lab = "Observed cases",
@@ -176,7 +180,9 @@ scatter!(
     title = "Posterior Predictive Checking",
 )
 
-##
+#=
+## Underlying inferred infections
+=#
 
 predicted_I_t = mapreduce(hcat, generated_quantities(log_infs_model, chn)) do gen
     gen.I_t
