@@ -28,7 +28,7 @@ X(0) &\sim \mathcal{N}(0, 1) \\
 The log-infections model is defined by a Turing model `log_infections` that takes the observed data `y_t` (or `missing` value),
 an `EpiModel` object `epimodel`, and a `latent_process` model. In this case the latent process is a random walk model.
 
-It also accepts optional arguments for the `latent_process_priors`, `transform_function`, `pos_shift`, `neg_bin_cluster_factor`, and `neg_bin_cluster_factor_prior`.
+It also accepts optional arguments for the `process_priors`, `transform_function`, `pos_shift`, `neg_bin_cluster_factor`, and `neg_bin_cluster_factor_prior`.
 
 ```math
 \log I_t = \exp(X(t)).
@@ -108,7 +108,7 @@ log_infs_model = make_epi_inference_model(
     toy_log_infs,
     random_walk,
     delay_observations;
-    latent_process_priors = merge(default_rw_priors(), default_delay_obs_priors()),
+    process_priors = merge(default_rw_priors(), default_delay_obs_priors()),
     pos_shift = 1e-6,
 )
 
@@ -148,7 +148,7 @@ model = make_epi_inference_model(
     toy_log_infs,
     random_walk,
     delay_observations;
-    latent_process_priors = merge(default_rw_priors(), default_delay_obs_priors()),
+    process_priors = merge(default_rw_priors(), default_delay_obs_priors()),
     pos_shift = 1e-6,
 )
 

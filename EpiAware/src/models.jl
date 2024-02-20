@@ -3,12 +3,13 @@
     epimodel::AbstractEpiModel,
     latent_process,
     observation_process;
-    latent_process_priors,
+    process_priors,
     pos_shift = 1e-6,
 )
     #Latent process
     time_steps = epimodel.data.time_horizon
-    @submodel latent_process, latent_process_aux = latent_process(time_steps)
+    @submodel latent_process, latent_process_aux =
+        latent_process(time_steps; latent_process_priors = process_priors)
 
     #Transform into infections
     I_t = epimodel(latent_process, latent_process_aux)
@@ -18,7 +19,7 @@
         y_t,
         I_t,
         epimodel::AbstractEpiModel;
-        observation_process_priors = latent_process_priors,
+        observation_process_priors = process_priors,
         pos_shift = pos_shift,
     )
 
