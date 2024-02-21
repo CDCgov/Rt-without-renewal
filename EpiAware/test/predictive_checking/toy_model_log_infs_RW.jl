@@ -57,7 +57,7 @@ TestEnv.activate()
 
 =#
 
-# using TestEnv # Run in Test environment mode
+## using TestEnv # Run in Test environment mode
 # TestEnv.activate()
 
 using EpiAware
@@ -67,6 +67,9 @@ using StatsPlots
 using Random
 using DynamicPPL
 using Statistics
+using DataFramesMeta
+using CSV # For outputting the MCMC chain
+
 Random.seed!(0)
 
 #=
@@ -179,6 +182,7 @@ scatter!(
     xlabel = "Time",
     ylabel = "Cases",
     title = "Posterior Predictive Checking",
+    ylims = (-0.5, maximum(truth_data) * 2.5),
 )
 
 #=
@@ -196,4 +200,14 @@ scatter!(
     xlabel = "Time",
     ylabel = "Cases",
     title = "Posterior Predictive Checking",
+    ylims = (-0.5, maximum(gen.I_t) * 1.5),
 )
+
+#=
+## Outputing the MCMC chain
+We can use `spread_draws` to convert the MCMC chain into a tidybayes format.
+=#
+
+df_chn = spread_draws(chn)
+save_path = joinpath(@__DIR__, "assets/toy_model_log_infs_RW_draws.csv")
+CSV.write(save_path, df_chn)
