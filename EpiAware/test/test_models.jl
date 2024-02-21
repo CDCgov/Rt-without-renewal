@@ -4,21 +4,14 @@
     # Define test inputs
     y_t = missing # Data will be generated from the model
     data = EpiData([0.2, 0.3, 0.5], [0.1, 0.4, 0.5], 0.8, 10, exp)
-    process_priors = merge(default_rw_priors(), default_delay_obs_priors())
     pos_shift = 1e-6
 
 
     epimodel = DirectInfections(data)
-    rwp = EpiAware.random_walk_process()
+    rwp = random_walk_process()
+    obs_mdl = delay_observations_model()
     # Call the function
-    test_mdl = make_epi_inference_model(
-        y_t,
-        epimodel,
-        rwp,
-        delay_observations;
-        process_priors,
-        pos_shift,
-    )
+    test_mdl = make_epi_inference_model(y_t, epimodel, rwp, obs_mdl; pos_shift)
 
     # Define expected outputs for a conditional model
     # Underlying log-infections are const value 1 for all time steps and
@@ -39,21 +32,14 @@ end
     # Define test inputs
     y_t = missing # Data will be generated from the model
     data = EpiData([0.2, 0.3, 0.5], [0.1, 0.4, 0.5], 0.8, 10, exp)
-    process_priors = merge(default_rw_priors(), default_delay_obs_priors())
     pos_shift = 1e-6
 
     epimodel = ExpGrowthRate(data)
-    rwp = EpiAware.random_walk_process()
+    rwp = random_walk_process()
+    obs_mdl = delay_observations_model()
 
     # Call the function
-    test_mdl = make_epi_inference_model(
-        y_t,
-        epimodel,
-        rwp,
-        delay_observations;
-        process_priors,
-        pos_shift,
-    )
+    test_mdl = make_epi_inference_model(y_t, epimodel, rwp, obs_mdl; pos_shift)
 
     # Define expected outputs for a conditional model
     # Underlying log-infections are const value 1 for all time steps and
@@ -78,17 +64,10 @@ end
     pos_shift = 1e-6
 
     epimodel = Renewal(data)
-    rwp = EpiAware.random_walk_process()
-
+    rwp = random_walk_process()
+    obs_mdl = delay_observations_model()
     # Call the function
-    test_mdl = make_epi_inference_model(
-        y_t,
-        epimodel,
-        rwp,
-        delay_observations;
-        process_priors,
-        pos_shift,
-    )
+    test_mdl = make_epi_inference_model(y_t, epimodel, rwp, obs_mdl; pos_shift)
 
     # Define expected outputs for a conditional model
     # Underlying log-infections are const value 1 for all time steps and

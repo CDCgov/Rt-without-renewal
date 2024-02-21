@@ -25,7 +25,7 @@ end
 A struct representing a latent process with its priors.
 
 # Fields
-- `latent_process`: The latent process function.
+- `latent_process`: The latent process function for a `Turing` model.
 - `latent_process_priors`: NamedTuple containing the priors for the latent process.
 
 """

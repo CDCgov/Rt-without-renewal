@@ -38,7 +38,7 @@ export create_discrete_pmf, default_rw_priors, default_delay_obs_priors, spread_
 export EpiData, Renewal, ExpGrowthRate, DirectInfections
 
 # Exported Turing model constructors
-export make_epi_inference_model, delay_observations, random_walk_process
+export make_epi_inference_model, delay_observations_model, random_walk_process
 
 include("epimodel.jl")
 include("utilities.jl")

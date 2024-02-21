@@ -2,8 +2,7 @@
     y_t,
     epimodel::AbstractEpiModel,
     latent_process_obj::LatentProcess,
-    observation_process;
-    process_priors,
+    observation_process_obj::ObservationModel;
     pos_shift = 1e-6,
 )
     #Latent process
@@ -17,11 +16,11 @@
     I_t = epimodel(latent_process, init)
 
     #Predictive distribution of ascerted cases
-    @submodel generated_y_t, generated_y_t_aux = observation_process(
+    @submodel generated_y_t, generated_y_t_aux = observation_process_obj.observation_model(
         y_t,
         I_t,
         epimodel::AbstractEpiModel;
-        observation_process_priors = process_priors,
+        observation_process_priors = observation_process_obj.observation_model_priors,
         pos_shift = pos_shift,
     )
 
