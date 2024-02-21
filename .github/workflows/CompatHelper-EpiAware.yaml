@@ -1,0 +1,27 @@
+name: Compatibility Helper
+
+on:
+  schedule:
+    - cron: '00 * * * *'
+  issues:
+    types: [opened, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  compatibility:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./EpiAware
+    steps:
+      - uses: actions/checkout@v4
+        working-directory: ./EpiAware
+      - uses: julia-actions/setup-julia@v
+      - name: Pkg.add("CompatHelper")
+        run: julia -e 'using Pkg; Pkg.add("CompatHelper")'
+      - name: CompatHelper.main()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: julia -e 'using CompatHelper; CompatHelper.main()'
