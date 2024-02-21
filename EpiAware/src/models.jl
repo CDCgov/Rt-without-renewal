@@ -1,15 +1,17 @@
 @model function make_epi_inference_model(
     y_t,
     epimodel::AbstractEpiModel,
-    latent_process,
+    latent_process_obj::LatentProcess,
     observation_process;
     process_priors,
     pos_shift = 1e-6,
 )
     #Latent process
     time_steps = epimodel.data.time_horizon
-    @submodel latent_process, init, latent_process_aux =
-        latent_process(time_steps; latent_process_priors = process_priors)
+    @submodel latent_process, init, latent_process_aux = latent_process_obj.latent_process(
+        time_steps;
+        latent_process_priors = latent_process_obj.latent_process_priors,
+    )
 
     #Transform into infections
     I_t = epimodel(latent_process, init)

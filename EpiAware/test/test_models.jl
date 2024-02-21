@@ -9,12 +9,12 @@
 
 
     epimodel = DirectInfections(data)
-
+    rwp = EpiAware.random_walk_process()
     # Call the function
     test_mdl = make_epi_inference_model(
         y_t,
         epimodel,
-        random_walk,
+        rwp,
         delay_observations;
         process_priors,
         pos_shift,
@@ -43,12 +43,13 @@ end
     pos_shift = 1e-6
 
     epimodel = ExpGrowthRate(data)
+    rwp = EpiAware.random_walk_process()
 
     # Call the function
     test_mdl = make_epi_inference_model(
         y_t,
         epimodel,
-        random_walk,
+        rwp,
         delay_observations;
         process_priors,
         pos_shift,
@@ -77,12 +78,13 @@ end
     pos_shift = 1e-6
 
     epimodel = Renewal(data)
+    rwp = EpiAware.random_walk_process()
 
     # Call the function
     test_mdl = make_epi_inference_model(
         y_t,
         epimodel,
-        random_walk,
+        rwp,
         delay_observations;
         process_priors,
         pos_shift,
