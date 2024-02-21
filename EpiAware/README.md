@@ -33,12 +33,16 @@ G[Posterior draws]
 H[Posterior checking]
 I[Post-processing]
 DataW[Data wrangling and QC]
+J["Observation Model
+---------------------
+delay_observations"]
 
-    A --> EpiModel
-    B --> EpiModel
-    EpiModel -->E
-    C-->E
-    D-->|random_walk| E
+A --> EpiModel
+B --> EpiModel
+EpiModel -->E
+C-->E
+D-->|random_walk| E
+J-->E
 F-->|default_rw_priors|E
 E-->|sample...NUTS...| G
 G-.->H
