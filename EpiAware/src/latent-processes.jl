@@ -12,7 +12,6 @@ end
     σ_RW = sqrt(σ²_RW)
     rw = Vector{eltype(ϵ_t)}(undef, n)
 
-    # rw = σ_RW * cumsum(ϵ_t)
     rw[1] = σ_RW * ϵ_t[1]
     for t = 2:n
         rw[t] = rw[t-1] + σ_RW * ϵ_t[t]
