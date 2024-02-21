@@ -17,7 +17,6 @@ jobs:
         working-directory: ./EpiAware
     steps:
       - uses: actions/checkout@v4
-        working-directory: ./EpiAware
       - uses: julia-actions/setup-julia@v1
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
