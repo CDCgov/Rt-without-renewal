@@ -11,7 +11,7 @@
     observation_process_priors = default_delay_obs_priors()
 
     # Call the function
-    mdl = delay_observations(
+    mdl = EpiAware.delay_observations(
         missing,
         I_t,
         epimodel;
