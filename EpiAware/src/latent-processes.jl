@@ -16,5 +16,5 @@ end
     for t = 2:n
         rw[t] = rw[t-1] + σ_RW * ϵ_t[t]
     end
-    return rw, (; σ_RW, init)
+    return rw, init, (; σ_RW,)
 end
