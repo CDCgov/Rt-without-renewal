@@ -16,7 +16,7 @@
         random_walk,
         delay_observations;
         process_priors,
-        pos_shift,
+        pos_shift
     )
 
     # Define expected outputs for a conditional model
@@ -49,13 +49,8 @@ end
         epimodel,
         random_walk,
         delay_observations;
-<<<<<<< HEAD
         process_priors,
-        pos_shift,
-=======
-        latent_process_priors,
         pos_shift
->>>>>>> 0f07c73 (get pre-commit working on standard julia actions and explicitly start to use sciml style)
     )
 
     # Define expected outputs for a conditional model
@@ -88,13 +83,8 @@ end
         epimodel,
         random_walk,
         delay_observations;
-<<<<<<< HEAD
         process_priors,
-        pos_shift,
-=======
-        latent_process_priors,
         pos_shift
->>>>>>> 0f07c73 (get pre-commit working on standard julia actions and explicitly start to use sciml style)
     )
 
     # Define expected outputs for a conditional model

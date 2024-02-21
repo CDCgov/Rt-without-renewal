@@ -113,7 +113,7 @@ log_infs_model = make_epi_inference_model(
     random_walk,
     delay_observations;
     process_priors = merge(default_rw_priors(), default_delay_obs_priors()),
-    pos_shift = 1e-6,
+    pos_shift = 1e-6
 )
 
 #=
@@ -153,7 +153,7 @@ model = make_epi_inference_model(
     random_walk,
     delay_observations;
     process_priors = merge(default_rw_priors(), default_delay_obs_priors()),
-    pos_shift = 1e-6,
+    pos_shift = 1e-6
 )
 
 @time chn = sample(
@@ -162,7 +162,7 @@ model = make_epi_inference_model(
     MCMCThreads(),
     250,
     4;
-    drop_warmup = true,
+    drop_warmup = true
 )
 
 #=
@@ -182,7 +182,7 @@ scatter!(
     xlabel = "Time",
     ylabel = "Cases",
     title = "Posterior Predictive Checking",
-    ylims = (-0.5, maximum(truth_data) * 2.5),
+    ylims = (-0.5, maximum(truth_data) * 2.5)
 )
 
 #=
@@ -200,7 +200,7 @@ scatter!(
     xlabel = "Time",
     ylabel = "Unobserved Infections",
     title = "Posterior Predictive Checking",
-    ylims = (-0.5, maximum(gen.I_t) * 1.5),
+    ylims = (-0.5, maximum(gen.I_t) * 1.5)
 )
 
 #=
