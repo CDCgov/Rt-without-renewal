@@ -20,13 +20,11 @@ sampled_walks = prior_chn |> chn -> mapreduce(hcat, generated_quantities(model, 
     gen[1]
 end
 ## From law of total variance and known mean of HalfNormal distribution
-theoretical_std =
-    [
-        t * latent_process_priors.var_RW_dist.untruncated.σ * sqrt(2) / sqrt(π) for t = 1:n
-    ] .|> sqrt
+theoretical_std = [t * latent_process_priors.var_RW_dist.untruncated.σ * sqrt(2) / sqrt(π)
+                   for t in 1:n] .|> sqrt
 
-plt_ppc_rw =
-    plot(sampled_walks, lab = "", ylabel = "RW", xlabel = "t", c = :grey, alpha = 0.1)
+plt_ppc_rw = plot(
+    sampled_walks, lab = "", ylabel = "RW", xlabel = "t", c = :grey, alpha = 0.1)
 plot!(
     plt_ppc_rw,
     zeros(n),
@@ -34,7 +32,7 @@ plot!(
     c = :red,
     lab = "Theoretical 3 sigma spread",
     ribbon = 3 * theoretical_std,
-    fillalpha = 0.2,
+    fillalpha = 0.2
 )
 
 σ_hist = histogram(
@@ -44,7 +42,7 @@ plot!(
     ylabel = "Density",
     xlabel = "σ²_RW",
     c = :grey,
-    alpha = 0.5,
+    alpha = 0.5
 )
 plot!(
     σ_hist,
@@ -53,7 +51,7 @@ plot!(
     c = :red,
     alpha = 0.5,
     lab = "Prior",
-    bins = 100,
+    bins = 100
 )
 
 plt_rw = plot(
@@ -62,6 +60,6 @@ plt_rw = plot(
     layout = (1, 2),
     size = (800, 400),
     left_margin = 3mm,
-    bottom_margin = 3mm,
+    bottom_margin = 3mm
 )
 savefig(plt_rw, joinpath(@__DIR__(), "assets", "ppc_rw.png"))

@@ -68,7 +68,7 @@ D = 21.0
 
 plt1 = let
     Δd = 1
-    ts = (0.0:Δd:(D-Δd)) |> collect
+    ts = (0.0:Δd:(D - Δd)) |> collect
     pmf1 = create_discrete_pmf(cont_dist, Val(:single_censored); Δd = Δd, D = D)
     pmf2 = create_discrete_pmf(cont_dist; Δd = Δd, D = D)
 
@@ -80,7 +80,7 @@ plt1 = let
         title = "Discrete PMF with Δd = 1 day",
         label = ["Single censoring (midpoint primary)" "Double Censoring"],
         xlabel = "Days",
-        ylabel = "Probability",
+        ylabel = "Probability"
     )
 end
 savefig(plt1, joinpath(@__DIR__(), "assets/", "discrete_pmf_daily.png"))
@@ -89,7 +89,7 @@ savefig(plt1, joinpath(@__DIR__(), "assets/", "discrete_pmf_daily.png"))
 
 plt2 = let
     Δd = 1 / 24
-    ts = (0.0:Δd:(D-Δd)) |> collect
+    ts = (0.0:Δd:(D - Δd)) |> collect
     pmf1 = create_discrete_pmf(cont_dist, Val(:single_censored); Δd = Δd, D = D)
     pmf2 = create_discrete_pmf(cont_dist; Δd = Δd, D = D)
 
@@ -101,7 +101,7 @@ plt2 = let
         title = "Discrete PMF with Δd = 1 hour",
         label = ["Single censoring (midpoint primary)" "Double Censoring"],
         xlabel = "Days",
-        ylabel = "Probability",
+        ylabel = "Probability"
     )
 end
 savefig(plt2, joinpath(@__DIR__(), "assets/", "discrete_pmf_hourly.png"))

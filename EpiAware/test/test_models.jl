@@ -6,7 +6,6 @@
     data = EpiData([0.2, 0.3, 0.5], [0.1, 0.4, 0.5], 0.8, 10, exp)
     pos_shift = 1e-6
 
-
     epimodel = DirectInfections(data)
     rwp = random_walk_process()
     obs_mdl = delay_observations_model()
@@ -17,10 +16,10 @@
     # Underlying log-infections are const value 1 for all time steps and
     # any other unfixed parameters
 
-    fixed_test_mdl =
-        fix(test_mdl, (init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05))
+    fixed_test_mdl = fix(
+        test_mdl, (init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05))
     X = rand(fixed_test_mdl)
-    expected_I_t = [1.0 for _ = 1:epimodel.data.time_horizon]
+    expected_I_t = [1.0 for _ in 1:(epimodel.data.time_horizon)]
     gen = generated_quantities(fixed_test_mdl, rand(fixed_test_mdl))
 
     # Perform tests
@@ -45,10 +44,10 @@ end
     # Underlying log-infections are const value 1 for all time steps and
     # any other unfixed parameters
 
-    fixed_test_mdl =
-        fix(test_mdl, (init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05))
+    fixed_test_mdl = fix(
+        test_mdl, (init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05))
     X = rand(fixed_test_mdl)
-    expected_I_t = [1.0 for _ = 1:epimodel.data.time_horizon]
+    expected_I_t = [1.0 for _ in 1:(epimodel.data.time_horizon)]
     gen = generated_quantities(fixed_test_mdl, rand(fixed_test_mdl))
 
     # # Perform tests
@@ -73,10 +72,10 @@ end
     # Underlying log-infections are const value 1 for all time steps and
     # any other unfixed parameters
 
-    fixed_test_mdl =
-        fix(test_mdl, (init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05))
+    fixed_test_mdl = fix(
+        test_mdl, (init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05))
     X = rand(fixed_test_mdl)
-    expected_I_t = [1.0 for _ = 1:epimodel.data.time_horizon]
+    expected_I_t = [1.0 for _ in 1:(epimodel.data.time_horizon)]
     gen = generated_quantities(fixed_test_mdl, rand(fixed_test_mdl))
 
     # # Perform tests

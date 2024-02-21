@@ -91,7 +91,7 @@ model_data = EpiData(
     neg_bin_cluster_factor,
     time_horizon,
     D_gen = 10.0,
-    D_delay = 10.0,
+    D_delay = 10.0
 )
 
 #=
@@ -109,8 +109,8 @@ obs_mdl = delay_observations_model()
 We don't have observed data, so we use `missing` value for `y_t`.
 =#
 
-log_infs_model =
-    make_epi_inference_model(missing, toy_log_infs, rwp, obs_mdl; pos_shift = 1e-6)
+log_infs_model = make_epi_inference_model(
+    missing, toy_log_infs, rwp, obs_mdl; pos_shift = 1e-6)
 
 #=
 ## Sample from the model
@@ -131,7 +131,7 @@ plot(
     label = "I_t",
     xlabel = "Time",
     ylabel = "Infections",
-    title = "Generated Infections",
+    title = "Generated Infections"
 )
 scatter!(random_epidemic.y_t, lab = "generated cases")
 
@@ -151,7 +151,7 @@ model = make_epi_inference_model(truth_data, toy_log_infs, rwp, obs_mdl; pos_shi
     MCMCThreads(),
     250,
     4;
-    drop_warmup = true,
+    drop_warmup = true
 )
 
 #=
@@ -171,7 +171,7 @@ scatter!(
     xlabel = "Time",
     ylabel = "Cases",
     title = "Posterior Predictive Checking",
-    ylims = (-0.5, maximum(truth_data) * 2.5),
+    ylims = (-0.5, maximum(truth_data) * 2.5)
 )
 
 #=
@@ -189,7 +189,7 @@ scatter!(
     xlabel = "Time",
     ylabel = "Unobserved Infections",
     title = "Posterior Predictive Checking",
-    ylims = (-0.5, maximum(gen.I_t) * 1.5),
+    ylims = (-0.5, maximum(gen.I_t) * 1.5)
 )
 
 #=

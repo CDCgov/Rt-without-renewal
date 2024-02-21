@@ -15,17 +15,16 @@
         missing,
         I_t,
         epimodel;
-        observation_process_priors = observation_process_priors,
+        observation_process_priors = observation_process_priors
     )
     fix_mdl = fix(mdl, neg_bin_cluster_factor = 0.00001) # Effectively Poisson sampling
 
     n_samples = 1000
-    mean_first_obs =
-        sample(fix_mdl, Prior(), n_samples) |>
-        chn -> generated_quantities(fix_mdl, chn) .|> (gen -> gen[1][1]) |> mean
+    mean_first_obs = sample(fix_mdl, Prior(), n_samples) |>
+                     chn -> generated_quantities(fix_mdl, chn) .|> (gen -> gen[1][1]) |>
+                            mean
 
     theoretical_std_of_empiral_mean = sqrt(I_t[1]) / sqrt(n_samples)
     @test mean(mean_first_obs) - I_t[1] < 5 * theoretical_std_of_empiral_mean &&
           mean(mean_first_obs) - I_t[1] > -5 * theoretical_std_of_empiral_mean
-
 end
