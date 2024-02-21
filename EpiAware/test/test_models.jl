@@ -4,7 +4,7 @@
     # Define test inputs
     y_t = missing # Data will be generated from the model
     data = EpiData([0.2, 0.3, 0.5], [0.1, 0.4, 0.5], 0.8, 10, exp)
-    latent_process_priors = merge(default_rw_priors(), default_delay_obs_priors())
+    process_priors = merge(default_rw_priors(), default_delay_obs_priors())
     pos_shift = 1e-6
 
 
@@ -16,7 +16,7 @@
         epimodel,
         random_walk,
         delay_observations;
-        latent_process_priors,
+        process_priors,
         pos_shift,
     )
 
@@ -39,7 +39,7 @@ end
     # Define test inputs
     y_t = missing # Data will be generated from the model
     data = EpiData([0.2, 0.3, 0.5], [0.1, 0.4, 0.5], 0.8, 10, exp)
-    latent_process_priors = merge(default_rw_priors(), default_delay_obs_priors())
+    process_priors = merge(default_rw_priors(), default_delay_obs_priors())
     pos_shift = 1e-6
 
     epimodel = ExpGrowthRate(data)
@@ -50,7 +50,7 @@ end
         epimodel,
         random_walk,
         delay_observations;
-        latent_process_priors,
+        process_priors,
         pos_shift,
     )
 
@@ -73,7 +73,7 @@ end
     # Define test inputs
     y_t = missing # Data will be generated from the model
     data = EpiData([0.2, 0.3, 0.5], [0.1, 0.4, 0.5], 0.8, 10, exp)
-    latent_process_priors = merge(default_rw_priors(), default_delay_obs_priors())
+    process_priors = merge(default_rw_priors(), default_delay_obs_priors())
     pos_shift = 1e-6
 
     epimodel = Renewal(data)
@@ -84,7 +84,7 @@ end
         epimodel,
         random_walk,
         delay_observations;
-        latent_process_priors,
+        process_priors,
         pos_shift,
     )
 

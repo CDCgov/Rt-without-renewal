@@ -28,10 +28,11 @@ using Distributions,
     ReverseDiff,
     Optim,
     Parameters,
-    QuadGK
+    QuadGK,
+    DataFramesMeta
 
 # Exported utilities
-export create_discrete_pmf, default_rw_priors, default_delay_obs_priors
+export create_discrete_pmf, default_rw_priors, default_delay_obs_priors, spread_draws
 
 # Exported types
 export EpiData, Renewal, ExpGrowthRate, DirectInfections

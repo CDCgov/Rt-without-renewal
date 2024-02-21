@@ -60,24 +60,24 @@ struct DirectInfections <: AbstractEpiModel
     data::EpiData
 end
 
-function (epimodel::DirectInfections)(_It, latent_process_aux)
-    epimodel.data.transformation.(_It)
+function (epimodel::DirectInfections)(_It, init)
+    epimodel.data.transformation.(init .+ _It)
 end
 
 struct ExpGrowthRate <: AbstractEpiModel
     data::EpiData
 end
 
-function (epimodel::ExpGrowthRate)(rt, latent_process_aux)
-    latent_process_aux.init .+ cumsum(rt) .|> exp
+function (epimodel::ExpGrowthRate)(rt, init)
+    init .+ cumsum(rt) .|> exp
 end
 
 struct Renewal <: AbstractEpiModel
     data::EpiData
 end
 
-function (epimodel::Renewal)(_Rt, latent_process_aux)
-    I₀ = epimodel.data.transformation(latent_process_aux.init)
+function (epimodel::Renewal)(_Rt, init)
+    I₀ = epimodel.data.transformation(init)
     Rt = epimodel.data.transformation.(_Rt)
 
     r_approx = R_to_r(Rt[1], epimodel)

@@ -93,7 +93,7 @@ end
     log_init = log(5.0)
     rt = [log(recent_incidence[1]) - log_init; diff(log.(recent_incidence))]
 
-    @test rt_model(rt, (init = log_init,)) ≈ recent_incidence
+    @test rt_model(rt, log_init) ≈ recent_incidence
 end
 
 @testitem "DirectInfections function" begin
@@ -110,5 +110,5 @@ end
 
     expected_incidence = exp.(log_incidence)
 
-    @test direct_inf_model(log_incidence, nothing) ≈ expected_incidence
+    @test direct_inf_model(log_incidence, 0.0) ≈ expected_incidence
 end

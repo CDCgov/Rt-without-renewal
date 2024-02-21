@@ -4,6 +4,7 @@ authors = ["Samuel Abbott <azw1@cdc.gov>", "Samuel Brand <usi1@cdc.gov>", "Zacha
 version = "0.1.0-DEV"
 
 [deps]
+DataFramesMeta = "1313f7d8-7da2-5740-9ea0-a2ca25f37964"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 LogExpFunctions = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
@@ -26,4 +27,5 @@ Random = "1.9"
 ReverseDiff = "1.15"
 SparseArrays = "1.10"
 Turing = "0.30"
+DataFramesMeta = "0.14"
 julia = "1.9"
