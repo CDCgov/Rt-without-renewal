@@ -18,3 +18,34 @@ end
     end
     return rw, init, (; σ_RW,)
 end
+
+"""
+    struct LatentProcess{F<:Function}
+
+A struct representing a latent process with its priors.
+
+# Fields
+- `latent_process`: The latent process function for a `Turing` model.
+- `latent_process_priors`: NamedTuple containing the priors for the latent process.
+
+"""
+struct LatentProcess{F <: Function}
+    latent_process::F
+    latent_process_priors::NamedTuple
+end
+
+"""
+    random_walk_process(; latent_process_priors = default_rw_priors())
+
+Create a `LatentProcess` struct reflecting a random walk process with optional priors.
+
+# Arguments
+- `latent_process_priors`: Optional priors for the random walk process.
+
+# Returns
+- `LatentProcess`: A random walk process.
+
+"""
+function random_walk_process(; latent_process_priors = default_rw_priors())
+    LatentProcess(random_walk, latent_process_priors)
+end

@@ -101,6 +101,8 @@ In this case we use the `DirectInfections` model.
 =#
 
 toy_log_infs = DirectInfections(model_data)
+rwp = random_walk_process()
+obs_mdl = delay_observations_model()
 
 #=
 ## Generate a `Turing` `Model`
@@ -108,13 +110,7 @@ We don't have observed data, so we use `missing` value for `y_t`.
 =#
 
 log_infs_model = make_epi_inference_model(
-    missing,
-    toy_log_infs,
-    random_walk,
-    delay_observations;
-    process_priors = merge(default_rw_priors(), default_delay_obs_priors()),
-    pos_shift = 1e-6
-)
+    missing, toy_log_infs, rwp, obs_mdl; pos_shift = 1e-6)
 
 #=
 ## Sample from the model
@@ -147,14 +143,7 @@ We treat the generated data as observed data and attempt to infer underlying inf
 
 truth_data = random_epidemic.y_t
 
-model = make_epi_inference_model(
-    truth_data,
-    toy_log_infs,
-    random_walk,
-    delay_observations;
-    process_priors = merge(default_rw_priors(), default_delay_obs_priors()),
-    pos_shift = 1e-6
-)
+model = make_epi_inference_model(truth_data, toy_log_infs, rwp, obs_mdl; pos_shift = 1e-6)
 
 @time chn = sample(
     model,
