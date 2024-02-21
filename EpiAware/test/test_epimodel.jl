@@ -38,7 +38,7 @@ end
         cluster_coeff,
         time_horizon;
         D_gen = 10.0,
-        D_delay = 10.0,
+        D_delay = 10.0
     )
 
     @test data.cluster_coeff == 0.8
@@ -50,7 +50,6 @@ end
 
     @test size(data.delay_kernel) == (time_horizon, time_horizon)
 end
-
 
 @testitem "Renewal function: internal generate infs" begin
     using LinearAlgebra
@@ -65,16 +64,15 @@ end
 
     function generate_infs(recent_incidence, Rt)
         new_incidence = Rt * dot(recent_incidence, epimodel.data.gen_int)
-        [new_incidence; recent_incidence[1:(epimodel.data.len_gen_int-1)]], new_incidence
+        [new_incidence; recent_incidence[1:(epimodel.data.len_gen_int - 1)]], new_incidence
     end
 
     recent_incidence = [10, 20, 30]
     Rt = 1.5
 
     expected_new_incidence = Rt * dot(recent_incidence, [0.2, 0.3, 0.5])
-    expected_output =
-        [expected_new_incidence; recent_incidence[1:2]], expected_new_incidence
-
+    expected_output = [expected_new_incidence; recent_incidence[1:2]],
+    expected_new_incidence
 
     @test generate_infs(recent_incidence, Rt) == expected_output
 end

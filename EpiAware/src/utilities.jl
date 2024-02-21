@@ -17,7 +17,7 @@ value. This is similar to the JAX function `jax.lax.scan`.
 - `ys`: An array containing the result values of applying `f` to each element of `xs`.
 - `carry`: The final accumulator value.
 """
-function scan(f::Function, init, xs::Vector{T}) where {T<:Union{Integer,AbstractFloat}}
+function scan(f::Function, init, xs::Vector{T}) where {T <: Union{Integer, AbstractFloat}}
     carry = init
     ys = similar(xs)
     for (i, x) in enumerate(xs)
@@ -53,19 +53,19 @@ Raises:
 - `AssertionError` if `D` is not greater than `Δd`.
 """
 function create_discrete_pmf(
-    dist::Distribution,
-    ::Val{:single_censored};
-    primary_approximation_point = 0.5,
-    Δd = 1.0,
-    D,
+        dist::Distribution,
+        ::Val{:single_censored};
+        primary_approximation_point = 0.5,
+        Δd = 1.0,
+        D
 )
-    @assert minimum(dist) >= 0.0 "Distribution must be non-negative"
-    @assert Δd > 0.0 "Δd must be positive"
-    @assert D > Δd "D must be greater than Δd"
-    @assert primary_approximation_point >= 0.0 && primary_approximation_point <= 1.0 "`primary_approximation_point` must be in [0,1]."
+    @assert minimum(dist)>=0.0 "Distribution must be non-negative"
+    @assert Δd>0.0 "Δd must be positive"
+    @assert D>Δd "D must be greater than Δd"
+    @assert primary_approximation_point >= 0.0&&primary_approximation_point <= 1.0 "`primary_approximation_point` must be in [0,1]."
 
     ts = Δd:Δd:D |> collect
-    @assert ts[end] == D "D must be a multiple of Δd."
+    @assert ts[end]==D "D must be a multiple of Δd."
     ts = [primary_approximation_point * Δd; ts] #This covers situation where primary_approximation_point == 1
 
     ts .|> (t -> cdf(dist, t)) |> diff |> p -> p ./ sum(p)
@@ -96,13 +96,13 @@ Raises:
 - `AssertionError` if `D` is not greater than `Δd`.
 """
 function create_discrete_pmf(dist::Distribution; Δd = 1.0, D)
-    @assert minimum(dist) >= 0.0 "Distribution must be non-negative."
-    @assert Δd > 0.0 "Δd must be positive."
-    @assert D > Δd "D must be greater than Δd."
+    @assert minimum(dist)>=0.0 "Distribution must be non-negative."
+    @assert Δd>0.0 "Δd must be positive."
+    @assert D>Δd "D must be greater than Δd."
 
     ts = 0.0:Δd:D |> collect
 
-    @assert ts[end] == D "D must be a multiple of Δd."
+    @assert ts[end]==D "D must be a multiple of Δd."
 
     ∫F(dist, t, Δd) = quadgk(u -> cdf(dist, t - u) / Δd, 0.0, Δd)[1]
 
@@ -123,11 +123,11 @@ The value of the negative MGF.
 
 """
 function neg_MGF(r, w::AbstractVector)
-    return sum([w[i] * exp(-r * i) for i = 1:length(w)])
+    return sum([w[i] * exp(-r * i) for i in 1:length(w)])
 end
 
 function dneg_MGF_dr(r, w::AbstractVector)
-    return -sum([w[i] * i * exp(-r * i) for i = 1:length(w)])
+    return -sum([w[i] * i * exp(-r * i) for i in 1:length(w)])
 end
 
 """
@@ -156,12 +156,12 @@ The two step approximation is based on:
 Returns:
 - The approximate value of `r`.
 """
-function R_to_r(R₀, w::Vector{T}; newton_steps = 2, Δd = 1.0) where {T<:AbstractFloat}
+function R_to_r(R₀, w::Vector{T}; newton_steps = 2, Δd = 1.0) where {T <: AbstractFloat}
     mean_gen_time = dot(w, 1:length(w)) * Δd
     # Small r approximation as initial guess
     r_approx = (R₀ - 1) / (R₀ * mean_gen_time)
     # Newton's method
-    for _ = 1:newton_steps
+    for _ in 1:newton_steps
         r_approx -= (R₀ * neg_MGF(r_approx, w) - 1) / (R₀ * dneg_MGF_dr(r_approx, w))
     end
     return r_approx
@@ -170,7 +170,6 @@ end
 function R_to_r(R₀, epimodel::AbstractEpiModel; newton_steps = 2, Δd = 1.0)
     R_to_r(R₀, epimodel.data.gen_int; newton_steps = newton_steps, Δd = Δd)
 end
-
 
 """
     r_to_R(r, w)
@@ -188,7 +187,6 @@ Compute the reproductive ratio given exponential growth rate `r`
 function r_to_R(r, w::AbstractVector)
     return 1 / neg_MGF(r, w::AbstractVector)
 end
-
 
 """
     mean_cc_neg_bin(μ, α)
@@ -209,7 +207,6 @@ function mean_cc_neg_bin(μ, α)
     return NegativeBinomial(r, p)
 end
 
-
 """
     generate_observation_kernel(delay_int, time_horizon)
 
@@ -224,10 +221,10 @@ Generate an observation kernel matrix based on the given delay interval and time
 """
 function generate_observation_kernel(delay_int, time_horizon)
     K = zeros(eltype(delay_int), time_horizon, time_horizon) |> SparseMatrixCSC
-    for i = 1:time_horizon, j = 1:time_horizon
+    for i in 1:time_horizon, j in 1:time_horizon
         m = i - j
         if m >= 0 && m <= (length(delay_int) - 1)
-            K[i, j] = delay_int[m+1]
+            K[i, j] = delay_int[m + 1]
         end
     end
     return K
@@ -247,9 +244,9 @@ Converts a `Chains` object into a DataFrame in `tidybayes` format.
 function spread_draws(chn::Chains)
     df = DataFrame(chn)
     df = hcat(DataFrame(draw = 1:size(df, 1)), df)
-    @rename!(df, $(".draw") = :draw)
-    @rename!(df, $(".chain") = :chain)
-    @rename!(df, $(".iteration") = :iteration)
+    @rename!(df, $(".draw")=:draw)
+    @rename!(df, $(".chain")=:chain)
+    @rename!(df, $(".iteration")=:iteration)
 
     return df
 end

@@ -1,7 +1,7 @@
 function default_rw_priors()
     return (
         var_RW_dist = truncated(Normal(0.0, 0.05), 0.0, Inf),
-        init_rw_value_dist = Normal(),
+        init_rw_value_dist = Normal()
     )
 end
 
@@ -13,8 +13,8 @@ end
     rw = Vector{eltype(ϵ_t)}(undef, n)
 
     rw[1] = σ_RW * ϵ_t[1]
-    for t = 2:n
-        rw[t] = rw[t-1] + σ_RW * ϵ_t[t]
+    for t in 2:n
+        rw[t] = rw[t - 1] + σ_RW * ϵ_t[t]
     end
     return rw, init, (; σ_RW,)
 end

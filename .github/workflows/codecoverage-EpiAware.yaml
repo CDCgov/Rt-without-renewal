@@ -1,4 +1,4 @@
-name: Test EpiAware
+name: Code coverage
 
 on:
   push:
@@ -11,13 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: true
-      matrix:
-        julia-version: ['1']
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+  coverage:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -26,8 +21,14 @@ jobs:
       - name: Move EpiAware to root
         run: mv EpiAware/* .
       - uses: julia-actions/setup-julia@v1
-        with:
-          version: ${{ matrix.julia-version }}
       - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
+        with:
+          annotate: true
+      - uses: julia-actions/julia-processcoverage@v1
+      - uses: codecov/codecov-action@v4
+        with:
+          file: lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
