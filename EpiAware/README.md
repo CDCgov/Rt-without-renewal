@@ -6,8 +6,9 @@
 - Solid lines indicate implemented features/analysis.
 - Dashed lines indicate planned features/analysis.
 
+## Proposed `EpiAware` model diagram
 ```mermaid
-flowchart TD
+flowchart LR
 
     A["Underlying dists.
 and specify length of sims
@@ -26,24 +27,40 @@ C["Observational Data
 Obs. cases y_t"]
 D["Latent processes
 ---------------------
-Random Walk"]
-E[Turing model constructor]
-F["Latent Process priors"]
+random_walk"]
+E["Turing model constructor
+---------------------
+make_epi_inference_model"]
+F["Latent Process priors
+---------------------
+default_rw_priors"]
 G[Posterior draws]
 H[Posterior checking]
 I[Post-processing]
 DataW[Data wrangling and QC]
-J["Observation Model
+J["Observation models
 ---------------------
 delay_observations"]
+K["Observation model priors
+---------------------
+default_delay_obs_priors"]
+ObservationModel["ObservationModel
+---------------------
+delay_observations_model"]
+LatentProcess["LatentProcess
+---------------------
+random_walk_process"]
 
 A --> EpiModel
 B --> EpiModel
 EpiModel -->E
 C-->E
-D-->|random_walk| E
-J-->E
-F-->|default_rw_priors|E
+D-->LatentProcess
+F-->LatentProcess
+J-->ObservationModel
+K-->ObservationModel
+LatentProcess-->E
+ObservationModel-->E
 E-->|sample...NUTS...| G
 G-.->H
 H-.->I
