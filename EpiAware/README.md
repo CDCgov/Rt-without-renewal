@@ -14,7 +14,7 @@ and specify length of sims
 ---------------------
 EpiData"]
 
-    B["Choice of target 
+    B["Choice of target
 for latent process
 ---------------------
 DirectInfections
@@ -26,7 +26,7 @@ C["Observational Data
 Obs. cases y_t"]
 D["Latent processes
 ---------------------
-Random Walk"] 
+Random Walk"]
 E[Turing model constructor]
 F["Latent Process priors"]
 G[Posterior draws]
