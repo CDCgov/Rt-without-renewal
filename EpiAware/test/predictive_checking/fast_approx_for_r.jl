@@ -39,7 +39,6 @@ TestEnv.activate()
 ```
 =#
 
-
 using EpiAware
 using Distributions
 using StatsPlots
@@ -47,8 +46,7 @@ using StatsPlots
 # Create a discrete probability mass function (PMF) for a negative binomial distribution
 # with left truncation at 1.
 
-w =
-    create_discrete_pmf(NegativeBinomial(2, 0.5), D = 20.0) |>
+w = create_discrete_pmf(NegativeBinomial(2, 0.5), D = 20.0) |>
     p -> p[2:end] ./ sum(p[2:end])
 
 ##
@@ -76,5 +74,5 @@ plot(
     title = "Fast approximation for r",
     lab = ["T_2 = 1.0" "T_2 = 3.5" "T_2 = 7.0" "T_2 = 14.0"],
     yticks = [0.0, 1e-15, 1e-10, 1e-5, 1e0] |> x -> (x .+ jitter, string.(x)),
-    xticks = 0:2:10,
+    xticks = 0:2:10
 )

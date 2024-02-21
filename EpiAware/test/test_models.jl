@@ -7,7 +7,6 @@
     process_priors = merge(default_rw_priors(), default_delay_obs_priors())
     pos_shift = 1e-6
 
-
     epimodel = DirectInfections(data)
 
     # Call the function
@@ -24,10 +23,10 @@
     # Underlying log-infections are const value 1 for all time steps and
     # any other unfixed parameters
 
-    fixed_test_mdl =
-        fix(test_mdl, (init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05))
+    fixed_test_mdl = fix(
+        test_mdl, (init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05))
     X = rand(fixed_test_mdl)
-    expected_I_t = [1.0 for _ = 1:epimodel.data.time_horizon]
+    expected_I_t = [1.0 for _ in 1:(epimodel.data.time_horizon)]
     gen = generated_quantities(fixed_test_mdl, rand(fixed_test_mdl))
 
     # Perform tests
@@ -50,18 +49,23 @@ end
         epimodel,
         random_walk,
         delay_observations;
+<<<<<<< HEAD
         process_priors,
         pos_shift,
+=======
+        latent_process_priors,
+        pos_shift
+>>>>>>> 0f07c73 (get pre-commit working on standard julia actions and explicitly start to use sciml style)
     )
 
     # Define expected outputs for a conditional model
     # Underlying log-infections are const value 1 for all time steps and
     # any other unfixed parameters
 
-    fixed_test_mdl =
-        fix(test_mdl, (init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05))
+    fixed_test_mdl = fix(
+        test_mdl, (init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05))
     X = rand(fixed_test_mdl)
-    expected_I_t = [1.0 for _ = 1:epimodel.data.time_horizon]
+    expected_I_t = [1.0 for _ in 1:(epimodel.data.time_horizon)]
     gen = generated_quantities(fixed_test_mdl, rand(fixed_test_mdl))
 
     # # Perform tests
@@ -84,18 +88,23 @@ end
         epimodel,
         random_walk,
         delay_observations;
+<<<<<<< HEAD
         process_priors,
         pos_shift,
+=======
+        latent_process_priors,
+        pos_shift
+>>>>>>> 0f07c73 (get pre-commit working on standard julia actions and explicitly start to use sciml style)
     )
 
     # Define expected outputs for a conditional model
     # Underlying log-infections are const value 1 for all time steps and
     # any other unfixed parameters
 
-    fixed_test_mdl =
-        fix(test_mdl, (init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05))
+    fixed_test_mdl = fix(
+        test_mdl, (init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05))
     X = rand(fixed_test_mdl)
-    expected_I_t = [1.0 for _ = 1:epimodel.data.time_horizon]
+    expected_I_t = [1.0 for _ in 1:(epimodel.data.time_horizon)]
     gen = generated_quantities(fixed_test_mdl, rand(fixed_test_mdl))
 
     # # Perform tests

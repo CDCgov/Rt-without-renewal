@@ -50,35 +50,32 @@ end
     # interval censoring with left hand approx.
     @testset "Test case 4" begin
         dist = Exponential(1.0)
-        expected_pmf = [(exp(-(t - 1)) - exp(-t)) / (1 - exp(-5)) for t = 1:5]
+        expected_pmf = [(exp(-(t - 1)) - exp(-t)) / (1 - exp(-5)) for t in 1:5]
         pmf = create_discrete_pmf(
             dist,
             Val(:single_censored);
             primary_approximation_point = 0.0,
             Δd = 1.0,
-            D = 5.0,
+            D = 5.0
         )
-        @test pmf ≈ expected_pmf atol = 1e-15
+        @test pmf≈expected_pmf atol=1e-15
     end
 
     # Test case 5: Testing output against expected PMF basic version - double
     # interval censoring
     @testset "Test case 5" begin
         dist = Exponential(1.0)
-        expected_pmf_uncond = [
-            exp(-1)
-            [(1 - exp(-1)) * (exp(1) - 1) * exp(-s) for s = 1:9]
-        ]
+        expected_pmf_uncond = [exp(-1)
+                               [(1 - exp(-1)) * (exp(1) - 1) * exp(-s) for s in 1:9]]
         expected_pmf = expected_pmf_uncond ./ sum(expected_pmf_uncond)
         pmf = create_discrete_pmf(dist; Δd = 1.0, D = 10.0)
-        @test expected_pmf ≈ pmf atol = 1e-15
+        @test expected_pmf≈pmf atol=1e-15
     end
 
     @testset "Test case 6" begin
         dist = Exponential(1.0)
         @test_throws AssertionError create_discrete_pmf(dist, Δd = 1.0, D = 3.5)
     end
-
 end
 
 @testitem "Testing r_to_R function" begin
@@ -88,7 +85,7 @@ end
         w = ones(5) |> x -> x ./ sum(x)
         expected_ratio = 1
         ratio = EpiAware.r_to_R(r, w)
-        @test ratio ≈ expected_ratio atol = 1e-15
+        @test ratio≈expected_ratio atol=1e-15
     end
 
     #Test MethodError when w is not a vector
@@ -97,7 +94,6 @@ end
         w = 1
         @test_throws MethodError EpiAware.r_to_R(r, w)
     end
-
 end
 
 @testitem "Testing generate_observation_kernel function" begin
@@ -106,18 +102,15 @@ end
         delay_int = [0.2, 0.5, 0.3]
         time_horizon = 5
         expected_K = SparseMatrixCSC(
-            [
-                0.2 0 0 0 0
-                0.5 0.2 0 0 0
-                0.3 0.5 0.2 0 0
-                0 0.3 0.5 0.2 0
-                0 0 0.3 0.5 0.2
-            ],
+            [0.2 0 0 0 0
+             0.5 0.2 0 0 0
+             0.3 0.5 0.2 0 0
+             0 0.3 0.5 0.2 0
+             0 0 0.3 0.5 0.2],
         )
         K = EpiAware.generate_observation_kernel(delay_int, time_horizon)
         @test K == expected_K
     end
-
 end
 
 @testitem "Testing neg_MGF function" begin
@@ -127,19 +120,18 @@ end
         w = [0.2, 0.3, 0.5]
         expected_result = 0.2 * exp(-0.5 * 1) + 0.3 * exp(-0.5 * 2) + 0.5 * exp(-0.5 * 3)
         result = EpiAware.neg_MGF(r, w)
-        @test result ≈ expected_result atol = 1e-15
+        @test result≈expected_result atol=1e-15
     end
 
     # Test case 2: Testing with zero r and non-empty weight vector
     @testset "Test case 2" begin
         r = 0
         w = [0.1, 0.2, 0.3, 0.4]
-        expected_result =
-            0.1 * exp(-0 * 1) + 0.2 * exp(-0 * 2) + 0.3 * exp(-0 * 3) + 0.4 * exp(-0 * 4)
+        expected_result = 0.1 * exp(-0 * 1) + 0.2 * exp(-0 * 2) + 0.3 * exp(-0 * 3) +
+                          0.4 * exp(-0 * 4)
         result = EpiAware.neg_MGF(r, w)
-        @test result ≈ expected_result atol = 1e-15
+        @test result≈expected_result atol=1e-15
     end
-
 end
 
 @testitem "Testing dneg_MGF_dr function" begin
@@ -148,10 +140,10 @@ end
     @testset "Test case 1" begin
         r = 0.5
         w = [0.2, 0.3, 0.5]
-        expected_result =
-            -(0.2 * 1 * exp(-0.5 * 1) + 0.3 * 2 * exp(-0.5 * 2) + 0.5 * 3 * exp(-0.5 * 3))
+        expected_result = -(0.2 * 1 * exp(-0.5 * 1) + 0.3 * 2 * exp(-0.5 * 2) +
+                            0.5 * 3 * exp(-0.5 * 3))
         result = EpiAware.dneg_MGF_dr(r, w)
-        @test result ≈ expected_result atol = 1e-15
+        @test result≈expected_result atol=1e-15
     end
 
     # Test case 2: Testing with zero r and non-empty weight vector
@@ -165,9 +157,8 @@ end
             0.4 * 4 * exp(-0 * 4)
         )
         result = EpiAware.dneg_MGF_dr(r, w)
-        @test result ≈ expected_result atol = 1e-15
+        @test result≈expected_result atol=1e-15
     end
-
 end
 @testitem "Testing spread_draws function" begin
     using DataFramesMeta, Turing

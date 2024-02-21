@@ -91,7 +91,7 @@ model_data = EpiData(
     neg_bin_cluster_factor,
     time_horizon,
     D_gen = 10.0,
-    D_delay = 10.0,
+    D_delay = 10.0
 )
 
 #=
@@ -135,7 +135,7 @@ plot(
     label = "I_t",
     xlabel = "Time",
     ylabel = "Infections",
-    title = "Generated Infections",
+    title = "Generated Infections"
 )
 scatter!(random_epidemic.y_t, lab = "generated cases")
 
