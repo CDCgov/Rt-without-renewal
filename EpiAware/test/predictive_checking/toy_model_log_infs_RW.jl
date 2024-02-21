@@ -57,7 +57,7 @@ TestEnv.activate()
 
 =#
 
-## using TestEnv # Run in Test environment mode
+# using TestEnv # Run in Test environment mode
 # TestEnv.activate()
 
 using EpiAware
@@ -198,7 +198,7 @@ scatter!(
     gen.I_t,
     lab = "Actual infections",
     xlabel = "Time",
-    ylabel = "Cases",
+    ylabel = "Unobserved Infections",
     title = "Posterior Predictive Checking",
     ylims = (-0.5, maximum(gen.I_t) * 1.5),
 )
