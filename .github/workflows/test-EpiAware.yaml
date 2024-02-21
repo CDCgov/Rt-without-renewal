@@ -17,11 +17,11 @@ jobs:
       matrix:
         julia-version: ['1']
         os: [ubuntu-latest, windows-latest, macOS-latest]
-    defaults:
-      run:
-        working-directory: ./EpiAware
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: EpiAware
+          sparse-checkout-cone-mode: true
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.julia-version }}

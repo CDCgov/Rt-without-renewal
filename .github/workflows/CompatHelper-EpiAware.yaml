@@ -12,12 +12,13 @@ concurrency:
 jobs:
   compatibility:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./EpiAware
     steps:
       - uses: actions/checkout@v4
-      - uses: julia-actions/setup-julia@v
+        with:
+          sparse-checkout: EpiAware
+          sparse-checkout-cone-mode: true
+      - uses: julia-actions/setup-julia@v1
+      - uses: julia-actions/cache@v1
       - name: Pkg.add("CompatHelper")
         run: julia -e 'using Pkg; Pkg.add("CompatHelper")'
       - name: CompatHelper.main()

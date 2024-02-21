@@ -12,12 +12,13 @@ concurrency:
 jobs:
   coverage:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./EpiAware
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: EpiAware
+          sparse-checkout-cone-mode: true
       - uses: julia-actions/setup-julia@v1
+      - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
         with:
