@@ -1,14 +1,14 @@
 function default_rw_priors()
     return (
-        var_RW_dist = truncated(Normal(0.0, 0.05), 0.0, Inf),
-        init_rw_value_dist = Normal()
+        var_RW_prior = truncated(Normal(0.0, 0.05), 0.0, Inf),
+        init_rw_value_prior = Normal()
     )
 end
 
-@model function random_walk(n; var_RW_dist, init_rw_value_dist)
+@model function random_walk(n; var_RW_prior, init_rw_value_prior)
     ϵ_t ~ MvNormal(ones(n))
-    σ²_RW ~ var_RW_dist
-    init ~ init_rw_value_dist
+    σ²_RW ~ var_RW_prior
+    init ~ init_rw_value_prior
     σ_RW = sqrt(σ²_RW)
     rw = Vector{eltype(ϵ_t)}(undef, n)
 
