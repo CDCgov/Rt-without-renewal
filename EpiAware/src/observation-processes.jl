@@ -6,11 +6,11 @@ end
         y_t,
         I_t,
         epimodel::AbstractEpiModel;
-        observation_process_priors = default_delay_obs_priors(),
-        pos_shift = 1e-6
+        neg_bin_cluster_factor_prior,
+        pos_shift
 )
     #Parameters
-    neg_bin_cluster_factor ~ observation_process_priors.neg_bin_cluster_factor_prior
+    neg_bin_cluster_factor ~ neg_bin_cluster_factor_prior
 
     #Predictive distribution
     case_pred_dists = (epimodel.data.delay_kernel * I_t) .+ pos_shift .|>

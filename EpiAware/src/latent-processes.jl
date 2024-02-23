@@ -5,10 +5,10 @@ function default_rw_priors()
     )
 end
 
-@model function random_walk(n; latent_process_priors = default_rw_priors())
+@model function random_walk(n; var_RW_dist, init_rw_value_dist)
     ϵ_t ~ MvNormal(ones(n))
-    σ²_RW ~ latent_process_priors.var_RW_dist
-    init ~ latent_process_priors.init_rw_value_dist
+    σ²_RW ~ var_RW_dist
+    init ~ init_rw_value_dist
     σ_RW = sqrt(σ²_RW)
     rw = Vector{eltype(ϵ_t)}(undef, n)
 
