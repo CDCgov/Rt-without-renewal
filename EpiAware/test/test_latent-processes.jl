@@ -25,15 +25,15 @@
           (var(samples_day_5) - 5) > -5 * theoretical_std_of_empiral_var
 end
 @testitem "Testing default_rw_priors" begin
-    @testset "var_RW_dist" begin
+    @testset "var_RW_prior" begin
         priors = default_rw_priors()
-        var_RW = rand(priors.var_RW_dist)
+        var_RW = rand(priors.var_RW_prior)
         @test var_RW >= 0.0
     end
 
-    @testset "init_rw_value_dist" begin
+    @testset "init_rw_value_prior" begin
         priors = default_rw_priors()
-        init_rw_value = rand(priors.init_rw_value_dist)
+        init_rw_value = rand(priors.init_rw_value_prior)
         @test typeof(init_rw_value) == Float64
     end
 end

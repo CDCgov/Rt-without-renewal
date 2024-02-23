@@ -11,7 +11,7 @@ using Plots.PlotMeasures
 using EpiAware
 Random.seed!(0)
 n = 30
-latent_process_priors = (var_RW_dist = truncated(Normal(0.0, 0.5), 0.0, Inf),)
+latent_process_priors = (var_RW_prior = truncated(Normal(0.0, 0.5), 0.0, Inf),)
 
 model = random_walk(n; latent_process_priors = latent_process_priors)
 n_samples = 2000
@@ -20,7 +20,7 @@ sampled_walks = prior_chn |> chn -> mapreduce(hcat, generated_quantities(model, 
     gen[1]
 end
 ## From law of total variance and known mean of HalfNormal distribution
-theoretical_std = [t * latent_process_priors.var_RW_dist.untruncated.σ * sqrt(2) / sqrt(π)
+theoretical_std = [t * latent_process_priors.var_RW_prior.untruncated.σ * sqrt(2) / sqrt(π)
                    for t in 1:n] .|> sqrt
 
 plt_ppc_rw = plot(
@@ -46,7 +46,7 @@ plot!(
 )
 plot!(
     σ_hist,
-    latent_process_priors.var_RW_dist,
+    latent_process_priors.var_RW_prior,
     lw = 2,
     c = :red,
     alpha = 0.5,
