@@ -9,7 +9,7 @@
     time_steps = epimodel.data.time_horizon
     @submodel latent_process, init, latent_process_aux = latent_process_obj.latent_process(
         time_steps;
-        latent_process_priors = latent_process_obj.latent_process_priors
+        latent_process_obj.latent_process_priors...
     )
 
     #Transform into infections
@@ -20,8 +20,8 @@
         y_t,
         I_t,
         epimodel::AbstractEpiModel;
-        observation_process_priors = observation_process_obj.observation_model_priors,
-        pos_shift = pos_shift
+        pos_shift = pos_shift,
+        observation_process_obj.observation_model_priors...
     )
 
     #Generate quantities

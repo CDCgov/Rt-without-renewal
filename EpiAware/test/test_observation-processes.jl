@@ -8,14 +8,15 @@
     data = EpiData([0.2, 0.3, 0.5], [1.0], 0.8, 3, exp)
     epimodel = DirectInfections(data)
     # Set up priors
-    observation_process_priors = default_delay_obs_priors()
+    priors = default_delay_obs_priors()
 
     # Call the function
     mdl = EpiAware.delay_observations(
         missing,
         I_t,
         epimodel;
-        observation_process_priors = observation_process_priors
+        pos_shift = 1e-6,
+        priors...
     )
     fix_mdl = fix(mdl, neg_bin_cluster_factor = 0.00001) # Effectively Poisson sampling
 
