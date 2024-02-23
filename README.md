@@ -1,3 +1,5 @@
+https://github.com/CDCgov/Rt-without-renewal/actions/workflows/test-EpiAware.yaml/badge.svg
+
 # cfa-repo-template
 A template for new CFA repos
 
