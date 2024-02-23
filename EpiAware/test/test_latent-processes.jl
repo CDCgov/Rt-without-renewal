@@ -1,6 +1,8 @@
 
 @testitem "Testing random_walk against theoretical properties" begin
     using DynamicPPL, Turing
+    using HypothesisTests: ExactOneSampleKSTest, pvalue
+
     n = 5
     priors = EpiAware.default_rw_priors()
     model = EpiAware.random_walk(n; priors...)
@@ -10,19 +12,9 @@
                     chn -> mapreduce(vcat, generated_quantities(fixed_model, chn)) do gen
         gen[1][5] #Extracting day 5 samples
     end
-    #Check statistics are within 5 sigma
-    #Theoretically, after 5 steps distribution is N(0, var = 5)
-    theoretical_std_of_empiral_mean = sqrt(5 / n_samples)
-    @test mean(samples_day_5) < 5 * theoretical_std_of_empiral_mean &&
-          mean(samples_day_5) > -5 * theoretical_std_of_empiral_mean
-
-    #Theoretically, after 5 steps distribution is N(0, var = 5)
-
-    theoretical_std_of_empiral_var = std(Chisq(5)) / sqrt(n_samples - 1)
-
-    @info "var = $(var(samples_day_5)); theoretical_std_of_empiral_var = $(theoretical_std_of_empiral_var)"
-    @test (var(samples_day_5) - 5) < 5 * theoretical_std_of_empiral_var &&
-          (var(samples_day_5) - 5) > -5 * theoretical_std_of_empiral_var
+    #Check that the samples are drawn from the correct distribution which is Normal(mean = 0, var = 5)
+    ks_test_pval = ExactOneSampleKSTest(samples_day_5, Normal(0.0, sqrt(5))) |> pvalue
+    @test ks_test_pval > 1e-6 #Very unlikely to fail if the model is correctly implemented
 end
 @testitem "Testing default_rw_priors" begin
     @testset "var_RW_prior" begin
