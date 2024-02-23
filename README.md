@@ -1,4 +1,6 @@
-https://github.com/CDCgov/Rt-without-renewal/actions/workflows/test-EpiAware.yaml/badge.svg
+![Test](https://github.com/CDCgov/Rt-without-renewal/actions/workflows/test-EpiAware.yaml/badge.svg) 
+![CodeCov](https://github.com/CDCgov/Rt-without-renewal/actions/workflows/codecoverage-EpiAware.yaml/badge.svg) 
+![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)
 
 # cfa-repo-template
 A template for new CFA repos
