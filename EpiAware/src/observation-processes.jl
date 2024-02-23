@@ -6,13 +6,14 @@ end
         y_t,
         I_t,
         epimodel::AbstractEpiModel;
-        kwargs...
+        neg_bin_cluster_factor_prior,
+        pos_shift
 )
     #Parameters
-    neg_bin_cluster_factor ~ kwargs[:neg_bin_cluster_factor_prior]
+    neg_bin_cluster_factor ~ neg_bin_cluster_factor_prior
 
     #Predictive distribution
-    case_pred_dists = (epimodel.data.delay_kernel * I_t) .+ kwargs[:pos_shift] .|>
+    case_pred_dists = (epimodel.data.delay_kernel * I_t) .+ pos_shift .|>
                       μ -> mean_cc_neg_bin(μ, neg_bin_cluster_factor)
 
     #Likelihood

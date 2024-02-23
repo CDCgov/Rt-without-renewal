@@ -5,10 +5,10 @@ function default_rw_priors()
     )
 end
 
-@model function random_walk(n; kwargs...)
+@model function random_walk(n; var_RW_dist, init_rw_value_dist)
     ϵ_t ~ MvNormal(ones(n))
-    σ²_RW ~ kwargs[:var_RW_dist]
-    init ~ kwargs[:init_rw_value_dist]
+    σ²_RW ~ var_RW_dist
+    init ~ init_rw_value_dist
     σ_RW = sqrt(σ²_RW)
     rw = Vector{eltype(ϵ_t)}(undef, n)
 
