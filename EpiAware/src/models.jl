@@ -1,27 +1,30 @@
 @model function make_epi_inference_model(
         y_t,
+        time_steps;
         epimodel::AbstractEpiModel,
-        latent_process_mdl::AbstractLatentProcess,
-        observation_process_obj::AbstractObservationModel;
+        initialisation_model::AbstractInitialisation,
+        latent_process_model::AbstractLatentProcess,
+        observation_model::AbstractObservationModel,
         pos_shift = 1e-6
 )
     #Latent process
-    time_steps = epimodel.data.time_horizon
     @submodel latent_process, latent_process_aux = generate_latent_process(
-        latent_process_mdl,
+        latent_process_model,
         time_steps
     )
 
+    #Initialisation
+    @submodel _I0, initialisation_aux = generate_initialisation(initialisation_model)
+
     #Transform into infections
-    I_t = generate_latent_infs(epimodel, latent_process, log(1.0))
+    I_t = generate_latent_infs(epimodel, latent_process, _I0)
 
     #Predictive distribution of ascerted cases
-    @submodel generated_y_t, generated_y_t_aux = observation_process_obj.observation_model(
+    @submodel generated_y_t, generated_y_t_aux = generate_observations(
+        observation_model,
         y_t,
-        I_t,
-        epimodel::AbstractEpiModel;
-        pos_shift = pos_shift,
-        observation_process_obj.observation_model_priors...
+        I_t;
+        pos_shift = pos_shift
     )
 
     #Generate quantities
