@@ -12,7 +12,7 @@ function default_rw_priors()
     ) |> Dict
 end
 
-@model function generate_latent_process(latent_process::AbstractLatentProcess, n; kwargs...)
+function generate_latent_process(latent_process::AbstractLatentProcess, n; kwargs...)
     @info "No concrete implementation for generate_latent_process is defined."
     return nothing
 end
