@@ -8,8 +8,8 @@
 
     epimodel = DirectInfections(data)
     priors = EpiAware.default_rw_priors()
-    rwp = EpiAware.RandomWalkLatentProcess(
-        Normal(0.0, 1.0), truncated(Normal(0.0, 0.05), 0.0, Inf))
+    rwp = EpiAware.RandomWalkLatentProcess(Normal(0.0, 1.0),
+        truncated(Normal(0.0, 0.05), 0.0, Inf))
     obs_mdl = delay_observations_model()
     # Call the function
     test_mdl = make_epi_inference_model(y_t, epimodel, rwp, obs_mdl; pos_shift)
@@ -18,9 +18,8 @@
     # Underlying log-infections are const value 1 for all time steps and
     # any other unfixed parameters
 
-    fixed_test_mdl = fix(
-        test_mdl, (
-            init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05, rw_init = 0.0))
+    fixed_test_mdl = fix(test_mdl,
+        (init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05, rw_init = 0.0))
     X = rand(fixed_test_mdl)
     expected_I_t = [1.0 for _ in 1:(epimodel.data.time_horizon)]
     gen = generated_quantities(fixed_test_mdl, rand(fixed_test_mdl))
@@ -38,8 +37,8 @@ end
 
     epimodel = ExpGrowthRate(data)
     priors = EpiAware.default_rw_priors()
-    rwp = EpiAware.RandomWalkLatentProcess(
-        Normal(0.0, 1.0), truncated(Normal(0.0, 0.05), 0.0, Inf))
+    rwp = EpiAware.RandomWalkLatentProcess(Normal(0.0, 1.0),
+        truncated(Normal(0.0, 0.05), 0.0, Inf))
     obs_mdl = delay_observations_model()
 
     # Call the function
@@ -49,9 +48,8 @@ end
     # Underlying log-infections are const value 1 for all time steps and
     # any other unfixed parameters
 
-    fixed_test_mdl = fix(
-        test_mdl, (
-            init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05, rw_init = 0.0))
+    fixed_test_mdl = fix(test_mdl,
+        (init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05, rw_init = 0.0))
     X = rand(fixed_test_mdl)
     expected_I_t = [1.0 for _ in 1:(epimodel.data.time_horizon)]
     gen = generated_quantities(fixed_test_mdl, rand(fixed_test_mdl))
@@ -69,8 +67,8 @@ end
 
     epimodel = Renewal(data)
     priors = EpiAware.default_rw_priors()
-    rwp = EpiAware.RandomWalkLatentProcess(
-        Normal(0.0, 1.0), truncated(Normal(0.0, 0.05), 0.0, Inf))
+    rwp = EpiAware.RandomWalkLatentProcess(Normal(0.0, 1.0),
+        truncated(Normal(0.0, 0.05), 0.0, Inf))
     obs_mdl = delay_observations_model()
     # Call the function
     test_mdl = make_epi_inference_model(y_t, epimodel, rwp, obs_mdl; pos_shift)
@@ -79,9 +77,8 @@ end
     # Underlying log-infections are const value 1 for all time steps and
     # any other unfixed parameters
 
-    fixed_test_mdl = fix(
-        test_mdl, (
-            init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05, rw_init = 0.0))
+    fixed_test_mdl = fix(test_mdl,
+        (init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05, rw_init = 0.0))
     X = rand(fixed_test_mdl)
     expected_I_t = [1.0 for _ in 1:(epimodel.data.time_horizon)]
     gen = generated_quantities(fixed_test_mdl, rand(fixed_test_mdl))

@@ -6,26 +6,20 @@ struct EpiData{T <: Real, F <: Function}
     transformation::F
 
     #Inner constructors for EpiData object
-    function EpiData(
-            gen_int,
-            transformation::Function
-    )
+    function EpiData(gen_int,
+            transformation::Function)
         @assert all(gen_int .>= 0) "Generation interval must be non-negative"
         @assert sum(gen_int)≈1 "Generation interval must sum to 1"
 
-        new{eltype(gen_int), typeof(transformation)}(
-            gen_int,
+        new{eltype(gen_int), typeof(transformation)}(gen_int,
             length(gen_int),
-            transformation
-        )
+            transformation)
     end
 
-    function EpiData(
-            gen_distribution::ContinuousDistribution;
+    function EpiData(gen_distribution::ContinuousDistribution;
             D_gen,
             Δd = 1.0,
-            transformation::Function = exp
-    )
+            transformation::Function = exp)
         gen_int = create_discrete_pmf(gen_distribution, Δd = Δd, D = D_gen) |>
                   p -> p[2:end] ./ sum(p[2:end])
 
@@ -33,32 +27,38 @@ struct EpiData{T <: Real, F <: Function}
     end
 end
 
-struct DirectInfections <: AbstractEpiModel
+struct DirectInfections{S <: Sampleable} <: AbstractEpiModel
     data::EpiData
+    initialisation_prior::S
 end
 
-struct ExpGrowthRate <: AbstractEpiModel
+struct ExpGrowthRate{S <: Sampleable} <: AbstractEpiModel
     data::EpiData
+    initialisation_prior::S
 end
 
-struct Renewal <: AbstractEpiModel
+struct Renewal{S <: Sampleable} <: AbstractEpiModel
     data::EpiData
+    initialisation_prior::S
 end
 
-function generate_latent_infs(epimodel::AbstractEpiModel, latent_process, init_incidence)
+function generate_latent_infs(epimodel::AbstractEpiModel, latent_process)
     @info "No concrete implementation for generate_latent_infs is defined."
     return nothing
 end
 
-function generate_latent_infs(epimodel::DirectInfections, _It, init_incidence)
-    epimodel.data.transformation.(init_incidence .+ _It)
+@model function generate_latent_infs(epimodel::DirectInfections, _It)
+    init_incidence ~ epimodel.initialisation_prior
+    return epimodel.data.transformation.(init_incidence .+ _It)
 end
 
-function generate_latent_infs(epimodel::ExpGrowthRate, rt, init_incidence)
-    init_incidence .+ cumsum(rt) .|> exp
+@model function generate_latent_infs(epimodel::ExpGrowthRate, rt)
+    init_incidence ~ epimodel.initialisation_prior
+    return init_incidence .+ cumsum(rt) .|> exp
 end
 
-function generate_latent_infs(epimodel::Renewal, _Rt, init_incidence)
+@model function generate_latent_infs(epimodel::Renewal, _Rt)
+    init_incidence ~ epimodel.initialisation_prior
     I₀ = epimodel.data.transformation(init_incidence)
     Rt = epimodel.data.transformation.(_Rt)
 

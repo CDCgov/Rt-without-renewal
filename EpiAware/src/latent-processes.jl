@@ -6,10 +6,8 @@ struct RandomWalkLatentProcess{D <: Sampleable, S <: Sampleable} <: AbstractLate
 end
 
 function default_rw_priors()
-    return (
-        :var_RW_prior => truncated(Normal(0.0, 0.05), 0.0, Inf),
-        :init_rw_value_prior => Normal()
-    ) |> Dict
+    return (:var_RW_prior => truncated(Normal(0.0, 0.05), 0.0, Inf),
+        :init_rw_value_prior => Normal()) |> Dict
 end
 
 function generate_latent_process(latent_process::AbstractLatentProcess, n; kwargs...)
