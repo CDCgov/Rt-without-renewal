@@ -1,5 +1,5 @@
 function default_delay_obs_priors()
-    return (neg_bin_cluster_factor_prior = Gamma(3, 0.05 / 3),)
+    return (:neg_bin_cluster_factor_prior => Gamma(3, 0.05 / 3),) |> Dict
 end
 
 @model function delay_observations(
@@ -23,18 +23,18 @@ end
 end
 
 """
-    struct ObservationModel{F<:Function}
+    struct ObservationModel{F <: Function, D<:Distribution}
 
-A struct representing an observation model with its priors.
+A struct representing an observation model.
 
 # Fields
-- `observation_model`: The observation model function for a `Turing` model.
-- `observation_model_priors`: NamedTuple containing the priors for the observation model.
+- `observation_model`: The observation model function.
+- `observation_model_priors`: A dictionary of prior distributions for the observation model parameters.
 
 """
-struct ObservationModel{F <: Function}
+struct ObservationModel{F <: Function, D <: Distribution}
     observation_model::F
-    observation_model_priors::NamedTuple
+    observation_model_priors::Dict{Symbol, D}
 end
 
 """
