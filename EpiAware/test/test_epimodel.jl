@@ -91,7 +91,7 @@ end
     log_init = log(5.0)
     rt = [log(recent_incidence[1]) - log_init; diff(log.(recent_incidence))]
 
-    @test rt_model(rt, log_init) ≈ recent_incidence
+    @test EpiAware.generate_latent_infs(rt_model, rt, log_init) ≈ recent_incidence
 end
 
 @testitem "DirectInfections function" begin
@@ -108,5 +108,16 @@ end
 
     expected_incidence = exp.(log_incidence)
 
-    @test direct_inf_model(log_incidence, 0.0) ≈ expected_incidence
+    @test EpiAware.generate_latent_infs(direct_inf_model, log_incidence, 0.0) ≈
+          expected_incidence
+end
+@testitem "generate_latent_infs function: default" begin
+    latent_process = [0.1, 0.2, 0.3]
+    init_incidence = 10.0
+
+    struct TestEpiModel <: EpiAware.AbstractEpiModel
+    end
+
+    @test isnothing(EpiAware.generate_latent_infs(
+        TestEpiModel(), latent_process, init_incidence))
 end

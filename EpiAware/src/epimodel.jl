@@ -59,24 +59,29 @@ struct DirectInfections <: AbstractEpiModel
     data::EpiData
 end
 
-function (epimodel::DirectInfections)(_It, init)
-    epimodel.data.transformation.(init .+ _It)
-end
-
 struct ExpGrowthRate <: AbstractEpiModel
     data::EpiData
-end
-
-function (epimodel::ExpGrowthRate)(rt, init)
-    init .+ cumsum(rt) .|> exp
 end
 
 struct Renewal <: AbstractEpiModel
     data::EpiData
 end
 
-function (epimodel::Renewal)(_Rt, init)
-    I₀ = epimodel.data.transformation(init)
+function generate_latent_infs(epimodel::AbstractEpiModel, latent_process, init_incidence)
+    @info "No concrete implementation for generate_latent_infs is defined."
+    return nothing
+end
+
+function generate_latent_infs(epimodel::DirectInfections, _It, init_incidence)
+    epimodel.data.transformation.(init_incidence .+ _It)
+end
+
+function generate_latent_infs(epimodel::ExpGrowthRate, rt, init_incidence)
+    init_incidence .+ cumsum(rt) .|> exp
+end
+
+function generate_latent_infs(epimodel::Renewal, _Rt, init_incidence)
+    I₀ = epimodel.data.transformation(init_incidence)
     Rt = epimodel.data.transformation.(_Rt)
 
     r_approx = R_to_r(Rt[1], epimodel)

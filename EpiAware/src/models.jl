@@ -13,7 +13,7 @@
     )
 
     #Transform into infections
-    I_t = epimodel(latent_process, init)
+    I_t = generate_latent_infs(epimodel, latent_process, init)
 
     #Predictive distribution of ascerted cases
     @submodel generated_y_t, generated_y_t_aux = observation_process_obj.observation_model(
