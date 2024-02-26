@@ -1,8 +1,8 @@
 function default_rw_priors()
     return (
-        var_RW_prior = truncated(Normal(0.0, 0.05), 0.0, Inf),
-        init_rw_value_prior = Normal()
-    )
+        :var_RW_prior => truncated(Normal(0.0, 0.05), 0.0, Inf),
+        :init_rw_value_prior => Normal()
+    ) |> Dict
 end
 
 @model function random_walk(n; var_RW_prior, init_rw_value_prior)
@@ -29,9 +29,9 @@ A struct representing a latent process with its priors.
 - `latent_process_priors`: NamedTuple containing the priors for the latent process.
 
 """
-struct LatentProcess{F <: Function}
+struct LatentProcess{F <: Function, D <: Distribution}
     latent_process::F
-    latent_process_priors::NamedTuple
+    latent_process_priors::Dict{Symbol, D}
 end
 
 """
