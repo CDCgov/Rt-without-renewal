@@ -1,30 +1,22 @@
-"""
-    default_initialisation_prior()
+abstract type AbstractInitialisation end
 
-Constructs a default initialisation prior for the model.
-
-# Returns
-`NamedTuple` with the following fields:
-- `I0_prior`: A standard normal distribution representing the prior for the initial infected population.
-
-"""
-function default_initialisation_prior()
-    (; I0_prior = Normal(),)
+struct SimpleInitialisation{D <: Sampleable, S <: Sampleable} <: AbstractInitialisation
+    mean_I0_prior::D
+    var_I0_prior::S
 end
 
-"""
-    initialize_incidence(; I0_prior)
+function default_initialisation_prior()
+    (:mean_prior => Normal(), :var_prior => truncated(Normal(0.0, 0.05), 0.0, Inf)) |> Dict
+end
 
-Initialize the incidence of the disease in unconstrained domain.
+function generate_initialisation(initialisation_model::AbstractInitialisation)
+    @info "No concrete implementation for generate_initialisation is defined."
+    return nothing
+end
 
-# Arguments
-- `I0_prior::Distribution`: Prior distribution for the initial incidence.
-
-# Returns
-- `_I0`: Unconstrained initial incidence value.
-
-"""
-@model function initialize_incidence(; I0_prior::Distribution)
-    _I0 ~ I0_prior
-    return _I0
+@model function generate_initialisation(initialisation_model::SimpleInitialisation)
+    _I0 ~ Normal()
+    μ_I0 ~ initialisation_model.mean_I0_prior
+    σ²_I0 ~ initialisation_model.var_I0_prior
+    return μ_I0 + _I0 * sqrt(σ²_I0), (; μ_I0, σ²_I0)
 end
