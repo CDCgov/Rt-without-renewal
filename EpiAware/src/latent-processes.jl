@@ -1,3 +1,10 @@
+abstract type AbstractLatentProcess end
+
+struct RandomWalkLatentProcess{D <: Sampleable, S <: Sampleable} <: AbstractLatentProcess
+    init_prior::D
+    var_prior::S
+end
+
 function default_rw_priors()
     return (
         :var_RW_prior => truncated(Normal(0.0, 0.05), 0.0, Inf),
@@ -5,47 +12,24 @@ function default_rw_priors()
     ) |> Dict
 end
 
-@model function random_walk(n; var_RW_prior, init_rw_value_prior)
+@model function generate_latent_process(latent_process::AbstractLatentProcess, n; kwargs...)
+    @info "No concrete implementation for generate_latent_process is defined."
+end
+
+@model function generate_latent_process(latent_process::RandomWalkLatentProcess, n)
     ϵ_t ~ MvNormal(ones(n))
-    σ²_RW ~ var_RW_prior
-    init ~ init_rw_value_prior
+    σ²_RW ~ latent_process.var_prior
+    rw_init ~ latent_process.init_prior
     σ_RW = sqrt(σ²_RW)
     rw = Vector{eltype(ϵ_t)}(undef, n)
 
-    rw[1] = σ_RW * ϵ_t[1]
+    rw[1] = rw_init + σ_RW * ϵ_t[1]
     for t in 2:n
         rw[t] = rw[t - 1] + σ_RW * ϵ_t[t]
     end
-    return rw, init, (; σ_RW,)
+    return rw, (; σ_RW, rw_init)
 end
 
-"""
-    struct LatentProcess{F<:Function}
-
-A struct representing a latent process with its priors.
-
-# Fields
-- `latent_process`: The latent process function for a `Turing` model.
-- `latent_process_priors`: NamedTuple containing the priors for the latent process.
-
-"""
-struct LatentProcess{F <: Function, D <: Distribution}
-    latent_process::F
-    latent_process_priors::Dict{Symbol, D}
-end
-
-"""
-    random_walk_process(; latent_process_priors = default_rw_priors())
-
-Create a `LatentProcess` struct reflecting a random walk process with optional priors.
-
-# Arguments
-- `latent_process_priors`: Optional priors for the random walk process.
-
-# Returns
-- `LatentProcess`: A random walk process.
-
-"""
-function random_walk_process(; latent_process_priors = default_rw_priors())
-    LatentProcess(random_walk, latent_process_priors)
-end
+# function random_walk_process(; latent_process_priors = default_rw_priors())
+#     LatentProcess(random_walk, latent_process_priors)
+# end

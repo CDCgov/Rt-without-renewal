@@ -1,19 +1,19 @@
 @model function make_epi_inference_model(
         y_t,
         epimodel::AbstractEpiModel,
-        latent_process_obj::LatentProcess,
+        latent_process_mdl::AbstractLatentProcess,
         observation_process_obj::ObservationModel;
         pos_shift = 1e-6
 )
     #Latent process
     time_steps = epimodel.data.time_horizon
-    @submodel latent_process, init, latent_process_aux = latent_process_obj.latent_process(
-        time_steps;
-        latent_process_obj.latent_process_priors...
+    @submodel latent_process, latent_process_aux = generate_latent_process(
+        latent_process_mdl,
+        time_steps
     )
 
     #Transform into infections
-    I_t = generate_latent_infs(epimodel, latent_process, init)
+    I_t = generate_latent_infs(epimodel, latent_process, log(1.0))
 
     #Predictive distribution of ascerted cases
     @submodel generated_y_t, generated_y_t_aux = observation_process_obj.observation_model(

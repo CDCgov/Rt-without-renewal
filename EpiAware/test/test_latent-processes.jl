@@ -5,7 +5,9 @@
 
     n = 5
     priors = EpiAware.default_rw_priors()
-    model = EpiAware.random_walk(n; priors...)
+    rw_process = EpiAware.RandomWalkLatentProcess(
+        Normal(0.0, 1.0), truncated(Normal(0.0, 0.05), 0.0, Inf))
+    model = EpiAware.generate_latent_process(rw_process, n)
     fixed_model = fix(model, (σ²_RW = 1.0, init_rw_value = 0.0)) #Fixing the standard deviation of the random walk process
     n_samples = 1000
     samples_day_5 = sample(fixed_model, Prior(), n_samples) |>
