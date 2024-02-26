@@ -2,7 +2,7 @@
         y_t,
         epimodel::AbstractEpiModel,
         latent_process_mdl::AbstractLatentProcess,
-        observation_process_obj::ObservationModel;
+        observation_process_obj::AbstractObservationModel;
         pos_shift = 1e-6
 )
     #Latent process

@@ -31,3 +31,10 @@ end
         @test typeof(init_rw_value) == Float64
     end
 end
+@testset "Testing RandomWalkLatentProcess constructor" begin
+    init_prior = Normal(0.0, 1.0)
+    var_prior = truncated(Normal(0.0, 0.05), 0.0, Inf)
+    rw_process = RandomWalkLatentProcess(init_prior, var_prior)
+    @test rw_process.init_prior == init_prior
+    @test rw_process.var_prior == var_prior
+end
