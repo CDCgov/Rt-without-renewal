@@ -1,24 +1,41 @@
 abstract type AbstractLatentProcess end
+abstract type AbstractLatentProcessArg end
 
 struct RandomWalkLatentProcess{D <: Sampleable, S <: Sampleable} <: AbstractLatentProcess
     init_prior::D
     var_prior::S
 end
 
+struct RandomWalkLatentProcessArg <: AbstractLatentProcessArg end
+
 function default_rw_priors()
     return (:var_RW_prior => truncated(Normal(0.0, 0.05), 0.0, Inf),
         :init_rw_value_prior => Normal()) |> Dict
 end
 
-function generate_latent_process(latent_process::AbstractLatentProcess, n; kwargs...)
-    @info "No concrete implementation for generate_latent_process is defined."
+function latent_process(lp::AbstractLatentProcess, n;
+        kwargs...)
+    return latent_process(
+        AbstractLatentProcessArg(), n; var_prior = lp.var_prior, init_prior = lp.init_prior)
+end
+
+function latent_process(lp::AbstractLatentProcess, n; kwargs...)
+    @info "No concrete implementation for latent_process is defined."
     return nothing
 end
 
-@model function generate_latent_process(latent_process::RandomWalkLatentProcess, n)
+function latent_process(lp::RandomWalkLatentProcess, n)
+    return latent_process(
+        RandomWalkLatentProcessArg(), n; var_prior = lp.var_prior,
+        init_prior = lp.init_prior
+    )
+end
+
+@model function latent_process(lp::RandomWalkLatentProcessArg, n;
+        var_prior::ContinuousDistribution, init_prior::ContinuousDistribution)
     ϵ_t ~ MvNormal(ones(n))
-    σ²_RW ~ latent_process.var_prior
-    rw_init ~ latent_process.init_prior
+    σ²_RW ~ var_prior
+    rw_init ~ init_prior
     σ_RW = sqrt(σ²_RW)
     rw = Vector{eltype(ϵ_t)}(undef, n)
 
@@ -28,7 +45,3 @@ end
     end
     return rw, (; σ_RW, rw_init)
 end
-
-# function random_walk_process(; latent_process_priors = default_rw_priors())
-#     LatentProcess(random_walk, latent_process_priors)
-# end
