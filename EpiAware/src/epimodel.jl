@@ -84,7 +84,7 @@ end
 
 @model function generate_latent_infs(epimodel::ExpGrowthRate, rt)
     init_incidence ~ epimodel.initialisation_prior
-    return init_incidence .+ cumsum(rt) .|> exp
+    return exp.(init_incidence .+ cumsum(rt))
 end
 
 """

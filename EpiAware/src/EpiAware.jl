@@ -47,7 +47,6 @@ include("epimodel.jl")
 include("utilities.jl")
 include("latent-processes.jl")
 include("observation-processes.jl")
-# include("initialisation.jl")
 include("models.jl")
 
 end

@@ -55,7 +55,6 @@ end
     # Test case 2
     delay_distribution = Uniform(0.0, 20.0)
     time_horizon = 365
-    neg_bin_cluster_factor_prior = 0.05
     D_delay = 10.0
     Δd = 1.0
 

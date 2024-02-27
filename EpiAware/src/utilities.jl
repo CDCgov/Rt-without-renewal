@@ -199,7 +199,7 @@ Compute the mean-cluster factor negative binomial distribution.
 A `NegativeBinomial` distribution object.
 """
 function mean_cc_neg_bin(μ, α)
-    ex_σ² = α * μ^2
+    ex_σ² = (α * μ^2) + 1e-6
     p = μ / (μ + ex_σ² + 1e-6)
     r = μ^2 / ex_σ²
     return NegativeBinomial(r, p)
