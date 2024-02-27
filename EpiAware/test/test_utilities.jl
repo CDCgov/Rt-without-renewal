@@ -51,13 +51,11 @@ end
     @testset "Test case 4" begin
         dist = Exponential(1.0)
         expected_pmf = [(exp(-(t - 1)) - exp(-t)) / (1 - exp(-5)) for t in 1:5]
-        pmf = create_discrete_pmf(
-            dist,
+        pmf = create_discrete_pmf(dist,
             Val(:single_censored);
             primary_approximation_point = 0.0,
             Δd = 1.0,
-            D = 5.0
-        )
+            D = 5.0)
         @test pmf≈expected_pmf atol=1e-15
     end
 
@@ -101,13 +99,11 @@ end
     @testset "Test case 1" begin
         delay_int = [0.2, 0.5, 0.3]
         time_horizon = 5
-        expected_K = SparseMatrixCSC(
-            [0.2 0 0 0 0
-             0.5 0.2 0 0 0
-             0.3 0.5 0.2 0 0
-             0 0.3 0.5 0.2 0
-             0 0 0.3 0.5 0.2],
-        )
+        expected_K = SparseMatrixCSC([0.2 0 0 0 0
+                                      0.5 0.2 0 0 0
+                                      0.3 0.5 0.2 0 0
+                                      0 0.3 0.5 0.2 0
+                                      0 0 0.3 0.5 0.2])
         K = EpiAware.generate_observation_kernel(delay_int, time_horizon)
         @test K == expected_K
     end
@@ -150,12 +146,10 @@ end
     @testset "Test case 2" begin
         r = 0
         w = [0.1, 0.2, 0.3, 0.4]
-        expected_result = -(
-            0.1 * 1 * exp(-0 * 1) +
-            0.2 * 2 * exp(-0 * 2) +
-            0.3 * 3 * exp(-0 * 3) +
-            0.4 * 4 * exp(-0 * 4)
-        )
+        expected_result = -(0.1 * 1 * exp(-0 * 1) +
+                            0.2 * 2 * exp(-0 * 2) +
+                            0.3 * 3 * exp(-0 * 3) +
+                            0.4 * 4 * exp(-0 * 4))
         result = EpiAware.dneg_MGF_dr(r, w)
         @test result≈expected_result atol=1e-15
     end

@@ -9,63 +9,68 @@
 - Solid lines indicate implemented features/analysis.
 - Dashed lines indicate planned features/analysis.
 
-## Proposed `EpiAware` model diagram
+## Current `EpiAware` model diagram
 ```mermaid
 flowchart LR
 
-    A["Underlying dists.
-and specify length of sims
----------------------
-EpiData"]
+A["Underlying GI
+Bijector"]
 
-    B["Choice of target
-for latent process
----------------------
+EpiModel["AbstractEpiModel
+----------------------
+Choice of target
+for latent process:
+
 DirectInfections
     ExpGrowthRate
     Renewal"]
 
-C["Observational Data
+InitModel["Priors for
+initial scale of incidence"]
+
+DataW[Data wrangling and QC]
+
+
+ObsData["Observational Data
 ---------------------
 Obs. cases y_t"]
-D["Latent processes
+
+LatentProcPriors["Latent process priors"]
+
+LatentProc["AbstractLatentProcess
 ---------------------
-random_walk"]
+RandomWalkLatentProcess"]
+
+ObsModelPriors["Observation model priors
+choice of delayed obs. model"]
+
+ObsModel["AbstractObservationModel
+---------------------
+DelayObservations"]
+
 E["Turing model constructor
 ---------------------
 make_epi_inference_model"]
-F["Latent Process priors
----------------------
-default_rw_priors"]
+
 G[Posterior draws]
 H[Posterior checking]
 I[Post-processing]
-DataW[Data wrangling and QC]
-J["Observation models
----------------------
-delay_observations"]
-K["Observation model priors
----------------------
-default_delay_obs_priors"]
-ObservationModel["ObservationModel
----------------------
-delay_observations_model"]
-LatentProcess["LatentProcess
----------------------
-random_walk_process"]
 
-A --> EpiModel
-B --> EpiModel
+
+
+A --> EpiData
+EpiData --> EpiModel
+InitModel --> EpiModel
 EpiModel -->E
-C-->E
-D-->LatentProcess
-F-->LatentProcess
-J-->ObservationModel
-K-->ObservationModel
-LatentProcess-->E
-ObservationModel-->E
+ObsData-->E
+DataW-.->ObsData
+LatentProcPriors-->LatentProc
+LatentProc-->E
+ObsModelPriors-->ObsModel
+ObsModel-->E
+
+
 E-->|sample...NUTS...| G
 G-.->H
 H-.->I
-DataW-.->C
 ```

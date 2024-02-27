@@ -72,16 +72,14 @@ plt1 = let
     pmf1 = create_discrete_pmf(cont_dist, Val(:single_censored); Δd = Δd, D = D)
     pmf2 = create_discrete_pmf(cont_dist; Δd = Δd, D = D)
 
-    bar(
-        ts,
+    bar(ts,
         [pmf1;; pmf2],
         fillalpha = 0.5,
         lw = 0,
         title = "Discrete PMF with Δd = 1 day",
         label = ["Single censoring (midpoint primary)" "Double Censoring"],
         xlabel = "Days",
-        ylabel = "Probability"
-    )
+        ylabel = "Probability")
 end
 savefig(plt1, joinpath(@__DIR__(), "assets/", "discrete_pmf_daily.png"))
 
@@ -93,15 +91,13 @@ plt2 = let
     pmf1 = create_discrete_pmf(cont_dist, Val(:single_censored); Δd = Δd, D = D)
     pmf2 = create_discrete_pmf(cont_dist; Δd = Δd, D = D)
 
-    bar(
-        ts,
+    bar(ts,
         [pmf1;; pmf2],
         fillalpha = 0.5,
         lw = 0,
         title = "Discrete PMF with Δd = 1 hour",
         label = ["Single censoring (midpoint primary)" "Double Censoring"],
         xlabel = "Days",
-        ylabel = "Probability"
-    )
+        ylabel = "Probability")
 end
 savefig(plt2, joinpath(@__DIR__(), "assets/", "discrete_pmf_hourly.png"))

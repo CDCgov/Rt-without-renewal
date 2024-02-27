@@ -32,21 +32,18 @@ using Distributions,
       DataFramesMeta
 
 # Exported utilities
-export create_discrete_pmf, default_rw_priors, default_delay_obs_priors,
-       default_initialisation_prior, spread_draws
+export create_discrete_pmf, spread_draws
 
 # Exported types
 export EpiData, Renewal, ExpGrowthRate, DirectInfections
 
 # Exported Turing model constructors
-export make_epi_inference_model, delay_observations_model, random_walk_process,
-       initialize_incidence
+export make_epi_inference_model
 
 include("epimodel.jl")
 include("utilities.jl")
 include("latent-processes.jl")
 include("observation-processes.jl")
-include("initialisation.jl")
 include("models.jl")
 
 end

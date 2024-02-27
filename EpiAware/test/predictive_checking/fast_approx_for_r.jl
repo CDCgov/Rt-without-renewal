@@ -65,8 +65,7 @@ errors = mapreduce(hcat, doubling_times) do T_2
     end
 end
 
-plot(
-    idxs,
+plot(idxs,
     errors,
     yscale = :log10,
     xlabel = "Newton steps",
@@ -74,5 +73,4 @@ plot(
     title = "Fast approximation for r",
     lab = ["T_2 = 1.0" "T_2 = 3.5" "T_2 = 7.0" "T_2 = 14.0"],
     yticks = [0.0, 1e-15, 1e-10, 1e-5, 1e0] |> x -> (x .+ jitter, string.(x)),
-    xticks = 0:2:10
-)
+    xticks = 0:2:10)

@@ -77,22 +77,14 @@ Random.seed!(0)
 
 - Medium length generation interval distribution.
 - Median 2 day, std 4.3 day delay distribution.
-- 100 days of simulations
 =#
 
 truth_GI = Gamma(2, 5)
-truth_delay = LogNormal(2.0, 1.0)
-neg_bin_cluster_factor = 0.05
-time_horizon = 100
+model_data = EpiData(truth_GI,
+    D_gen = 10.0)
 
-model_data = EpiData(
-    truth_GI,
-    truth_delay,
-    neg_bin_cluster_factor,
-    time_horizon,
-    D_gen = 10.0,
-    D_delay = 10.0
-)
+log_I0_prior = Normal(0.0, 1.0)
+epimodel = DirectInfections(model_data, log_I0_prior)
 
 #=
 ## Define the data generating process
@@ -100,17 +92,24 @@ model_data = EpiData(
 In this case we use the `DirectInfections` model.
 =#
 
-toy_log_infs = DirectInfections(model_data)
-rwp = random_walk_process()
+rwp = EpiAware.RandomWalkLatentProcess(Normal(),
+    truncated(Normal(0.0, 0.01), 0.0, 0.5))
 obs_mdl = delay_observations_model()
+
+#Define the observation model - no delay model
+time_horizon = 100
+obs_model = EpiAware.DelayObservations([1.0],
+    time_horizon,
+    truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0))
 
 #=
 ## Generate a `Turing` `Model`
 We don't have observed data, so we use `missing` value for `y_t`.
 =#
 
-log_infs_model = make_epi_inference_model(
-    missing, toy_log_infs, rwp, obs_mdl; pos_shift = 1e-6)
+log_infs_model = make_epi_inference_model(missing, time_horizon, ; epimodel = epimodel,
+    latent_process_model = rwp, observation_model = obs_model,
+    pos_shift = 1e-6)
 
 #=
 ## Sample from the model
@@ -126,13 +125,11 @@ cond_toy = fix(log_infs_model, (init = log(1.0), σ²_RW = 0.1))
 random_epidemic = rand(cond_toy)
 gen = generated_quantities(cond_toy, random_epidemic)
 
-plot(
-    gen.I_t,
+plot(gen.I_t,
     label = "I_t",
     xlabel = "Time",
     ylabel = "Infections",
-    title = "Generated Infections"
-)
+    title = "Generated Infections")
 scatter!(random_epidemic.y_t, lab = "generated cases")
 
 #=
@@ -143,16 +140,15 @@ We treat the generated data as observed data and attempt to infer underlying inf
 
 truth_data = random_epidemic.y_t
 
-model = make_epi_inference_model(truth_data, toy_log_infs, rwp, obs_mdl; pos_shift = 1e-6)
-
-@time chn = sample(
-    model,
+model = make_epi_inference_model(truth_data, time_horizon, ; epimodel = epimodel,
+    latent_process_model = rwp, observation_model = obs_model,
+    pos_shift = 1e-6)
+@time chn = sample(model,
     NUTS(; adtype = AutoReverseDiff(true)),
     MCMCThreads(),
     250,
     4;
-    drop_warmup = true
-)
+    drop_warmup = true)
 
 #=
 ## Postior predictive checking
@@ -165,14 +161,12 @@ predicted_y_t = mapreduce(hcat, generated_quantities(log_infs_model, chn)) do ge
 end
 
 plot(predicted_y_t, c = :grey, alpha = 0.05, lab = "")
-scatter!(
-    truth_data,
+scatter!(truth_data,
     lab = "Observed cases",
     xlabel = "Time",
     ylabel = "Cases",
     title = "Posterior Predictive Checking",
-    ylims = (-0.5, maximum(truth_data) * 2.5)
-)
+    ylims = (-0.5, maximum(truth_data) * 2.5))
 
 #=
 ## Underlying inferred infections
@@ -183,14 +177,12 @@ predicted_I_t = mapreduce(hcat, generated_quantities(log_infs_model, chn)) do ge
 end
 
 plot(predicted_I_t, c = :grey, alpha = 0.05, lab = "")
-scatter!(
-    gen.I_t,
+scatter!(gen.I_t,
     lab = "Actual infections",
     xlabel = "Time",
     ylabel = "Unobserved Infections",
     title = "Posterior Predictive Checking",
-    ylims = (-0.5, maximum(gen.I_t) * 1.5)
-)
+    ylims = (-0.5, maximum(gen.I_t) * 1.5))
 
 #=
 ## Outputing the MCMC chain

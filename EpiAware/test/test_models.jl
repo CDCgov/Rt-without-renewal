@@ -1,82 +1,116 @@
 
-@testitem "direct infections with RW latent process" begin
+@testitem "`make_epi_inference_model` with direct infections and RW latent process runs" begin
     using Distributions, Turing, DynamicPPL
     # Define test inputs
     y_t = missing # Data will be generated from the model
-    data = EpiData([0.2, 0.3, 0.5], [0.1, 0.4, 0.5], 0.8, 10, exp)
+    data = EpiData([0.2, 0.3, 0.5], exp)
     pos_shift = 1e-6
 
-    epimodel = DirectInfections(data)
-    rwp = random_walk_process()
-    obs_mdl = delay_observations_model()
-    # Call the function
-    test_mdl = make_epi_inference_model(y_t, epimodel, rwp, obs_mdl; pos_shift)
+    #Define the epimodel
+    epimodel = DirectInfections(data, Normal())
 
-    # Define expected outputs for a conditional model
-    # Underlying log-infections are const value 1 for all time steps and
-    # any other unfixed parameters
+    #Define the latent process model
+    rwp = EpiAware.RandomWalkLatentProcess(Normal(0.0, 1.0),
+        truncated(Normal(0.0, 0.05), 0.0, Inf))
 
-    fixed_test_mdl = fix(
-        test_mdl, (init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05))
-    X = rand(fixed_test_mdl)
-    expected_I_t = [1.0 for _ in 1:(epimodel.data.time_horizon)]
-    gen = generated_quantities(fixed_test_mdl, rand(fixed_test_mdl))
+    #Define the observation model
+    delay_distribution = Gamma(2.0, 5 / 2)
+    time_horizon = 365
+    D_delay = 14.0
+    Δd = 1.0
 
-    # Perform tests
-    @test gen.I_t ≈ expected_I_t
+    obs_model = EpiAware.DelayObservations(delay_distribution = delay_distribution,
+        time_horizon = time_horizon,
+        neg_bin_cluster_factor_prior = Gamma(5, 0.05 / 5),
+        D_delay = D_delay,
+        Δd = Δd)
+
+    # Create full epi model and sample from it
+    test_mdl = make_epi_inference_model(y_t, time_horizon; epimodel = epimodel,
+        latent_process_model = rwp,
+        observation_model = obs_model, pos_shift)
+    gen = generated_quantities(test_mdl, rand(test_mdl))
+
+    #Check model sampled
+    @test eltype(gen.generated_y_t) <: Integer
+    @test eltype(gen.I_t) <: AbstractFloat
+    @test length(gen.I_t) == time_horizon
 end
 
-@testitem "exp growth with RW latent process" begin
+@testitem "`make_epi_inference_model` with Exp growth rate and RW latent process runs" begin
     using Distributions, Turing, DynamicPPL
     # Define test inputs
-    y_t = missing # Data will be generated from the model
-    data = EpiData([0.2, 0.3, 0.5], [0.1, 0.4, 0.5], 0.8, 10, exp)
+    y_t = missing# rand(1:10, 365) # Data will be generated from the model
+    data = EpiData([0.2, 0.3, 0.5], exp)
     pos_shift = 1e-6
 
-    epimodel = ExpGrowthRate(data)
-    rwp = random_walk_process()
-    obs_mdl = delay_observations_model()
+    #Define the epimodel
+    epimodel = EpiAware.ExpGrowthRate(data, Normal())
 
-    # Call the function
-    test_mdl = make_epi_inference_model(y_t, epimodel, rwp, obs_mdl; pos_shift)
+    #Define the latent process model
+    r_3 = log(2) / 3.0
+    rwp = EpiAware.RandomWalkLatentProcess(
+        truncated(Normal(0.0, r_3 / 3), -r_3, r_3), # 3 day doubling time at 3 sigmas in prior
+        truncated(Normal(0.0, 0.01), 0.0, 0.1))
 
-    # Define expected outputs for a conditional model
-    # Underlying log-infections are const value 1 for all time steps and
-    # any other unfixed parameters
+    #Define the observation model - no delay model
+    time_horizon = 5
+    obs_model = EpiAware.DelayObservations([1.0],
+        time_horizon,
+        truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0))
 
-    fixed_test_mdl = fix(
-        test_mdl, (init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05))
-    X = rand(fixed_test_mdl)
-    expected_I_t = [1.0 for _ in 1:(epimodel.data.time_horizon)]
-    gen = generated_quantities(fixed_test_mdl, rand(fixed_test_mdl))
+    # Create full epi model and sample from it
+    test_mdl = make_epi_inference_model(y_t,
+        time_horizon;
+        epimodel = epimodel,
+        latent_process_model = rwp,
+        observation_model = obs_model,
+        pos_shift)
 
-    # # Perform tests
-    @test gen.I_t ≈ expected_I_t
+    chn = sample(test_mdl, Prior(), 1000)
+    gens = generated_quantities(test_mdl, chn)
+
+    #Check model sampled
+    @test eltype(gens[1].generated_y_t) <: Integer
+    @test eltype(gens[1].I_t) <: AbstractFloat
+    @test length(gens[1].I_t) == time_horizon
 end
 
-@testitem "Renewal with RW latent process" begin
+@testitem "`make_epi_inference_model` with Renewal and RW latent process runs" begin
     using Distributions, Turing, DynamicPPL
     # Define test inputs
-    y_t = missing # Data will be generated from the model
-    data = EpiData([0.2, 0.3, 0.5], [0.1, 0.4, 0.5], 0.8, 10, exp)
+    y_t = missing# rand(1:10, 365) # Data will be generated from the model
+    data = EpiData([0.2, 0.3, 0.5], exp)
     pos_shift = 1e-6
 
-    epimodel = Renewal(data)
-    rwp = random_walk_process()
-    obs_mdl = delay_observations_model()
-    # Call the function
-    test_mdl = make_epi_inference_model(y_t, epimodel, rwp, obs_mdl; pos_shift)
+    #Define the epimodel
+    epimodel = EpiAware.Renewal(data, Normal())
 
-    # Define expected outputs for a conditional model
-    # Underlying log-infections are const value 1 for all time steps and
-    # any other unfixed parameters
+    #Define the latent process model
+    r_3 = log(2) / 3.0
+    rwp = EpiAware.RandomWalkLatentProcess(
+        truncated(Normal(0.0, r_3 / 3), -r_3, r_3), # 3 day doubling time at 3 sigmas in prior
+        truncated(Normal(0.0, 0.01), 0.0, 0.1))
 
-    fixed_test_mdl = fix(
-        test_mdl, (init = log(1.0), σ²_RW = 0.0, neg_bin_cluster_factor = 0.05))
-    X = rand(fixed_test_mdl)
-    expected_I_t = [1.0 for _ in 1:(epimodel.data.time_horizon)]
-    gen = generated_quantities(fixed_test_mdl, rand(fixed_test_mdl))
+    #Define the observation model - no delay model
+    time_horizon = 5
+    obs_model = EpiAware.DelayObservations([1.0],
+        time_horizon,
+        truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0))
 
-    # # Perform tests
-    @test gen.I_t ≈ expected_I_t
+    # Create full epi model and sample from it
+    test_mdl = make_epi_inference_model(y_t,
+        time_horizon;
+        epimodel = epimodel,
+        latent_process_model = rwp,
+        observation_model = obs_model,
+        pos_shift)
+
+    chn = sample(test_mdl, Prior(), 1000)
+    gens = generated_quantities(test_mdl, chn)
+
+    #Check model sampled
+    @test eltype(gens[1].generated_y_t) <: Integer
+    @test eltype(gens[1].I_t) <: AbstractFloat
+    @test length(gens[1].I_t) == time_horizon
 end

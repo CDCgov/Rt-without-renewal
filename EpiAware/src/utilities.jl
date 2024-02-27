@@ -17,7 +17,7 @@ value. This is similar to the JAX function `jax.lax.scan`.
 - `ys`: An array containing the result values of applying `f` to each element of `xs`.
 - `carry`: The final accumulator value.
 """
-function scan(f::Function, init, xs::Vector{T}) where {T <: Union{Integer, AbstractFloat}}
+function scan(f, init, xs::Vector{T}) where {T <: Union{Integer, AbstractFloat}}
     carry = init
     ys = similar(xs)
     for (i, x) in enumerate(xs)
@@ -52,13 +52,11 @@ Raises:
 - `AssertionError` if `Δd` is not positive.
 - `AssertionError` if `D` is not greater than `Δd`.
 """
-function create_discrete_pmf(
-        dist::Distribution,
+function create_discrete_pmf(dist::Distribution,
         ::Val{:single_censored};
         primary_approximation_point = 0.5,
         Δd = 1.0,
-        D
-)
+        D)
     @assert minimum(dist)>=0.0 "Distribution must be non-negative"
     @assert Δd>0.0 "Δd must be positive"
     @assert D>Δd "D must be greater than Δd"
@@ -201,7 +199,7 @@ Compute the mean-cluster factor negative binomial distribution.
 A `NegativeBinomial` distribution object.
 """
 function mean_cc_neg_bin(μ, α)
-    ex_σ² = α * μ^2
+    ex_σ² = (α * μ^2) + 1e-6
     p = μ / (μ + ex_σ² + 1e-6)
     r = μ^2 / ex_σ²
     return NegativeBinomial(r, p)
