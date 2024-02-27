@@ -42,8 +42,38 @@ struct Renewal{S <: Sampleable} <: AbstractEpiModel
     initialisation_prior::S
 end
 
+"""
+    function (epimodel::Renewal)(recent_incidence, Rt)
+
+Compute new incidence based on recent incidence and Rt.
+
+This is a callable function on `Renewal` structs, that encodes new incidence prediction
+given recent incidence and Rt according to basic renewal process.
+
+```math
+I_t = R_t \\sum_{i=1}^{n-1} I_{t-i} g_i
+```
+
+where `I_t` is the new incidence, `R_t` is the reproduction number, `I_{t-i}` is the recent incidence
+and `g_i` is the generation interval.
+
+
+# Arguments
+- `recent_incidence`: Array of recent incidence values.
+- `Rt`: Reproduction number.
+
+# Returns
+- Tuple containing the updated incidence array and the new incidence value.
+
+"""
+function (epimodel::Renewal)(recent_incidence, Rt)
+    new_incidence = Rt * dot(recent_incidence, epimodel.data.gen_int)
+    return (
+        [new_incidence; recent_incidence[1:(epimodel.data.len_gen_int - 1)]], new_incidence)
+end
+
 function generate_latent_infs(epimodel::AbstractEpiModel, latent_process)
-    @info "No concrete implementation for generate_latent_infs is defined."
+    @info "No concrete implementation for `generate_latent_infs` is defined."
     return nothing
 end
 
@@ -57,6 +87,24 @@ end
     return init_incidence .+ cumsum(rt) .|> exp
 end
 
+"""
+    generate_latent_infs(epimodel::Renewal, _Rt)
+
+`Turing` model constructor for latent infections using the `Renewal` object `epimodel` and time-varying unconstrained reproduction number `_Rt`.
+
+`generate_latent_infs` creates a `Turing` model for sampling latent infections with given unconstrainted
+reproduction number `_Rt` but random initial incidence scale. The initial incidence pre-time one is given as
+a scale on top of an exponential growing process with exponential growth rate given by `R_to_r`applied to the
+first value of `Rt`.
+
+# Arguments
+- `epimodel::Renewal`: The epidemiological model.
+- `_Rt`: Time-varying unconstrained (e.g. log-) reproduction number.
+
+# Returns
+- `I_t`: Array of latent infections over time.
+
+"""
 @model function generate_latent_infs(epimodel::Renewal, _Rt)
     init_incidence ~ epimodel.initialisation_prior
     I₀ = epimodel.data.transformation(init_incidence)
@@ -65,11 +113,6 @@ end
     r_approx = R_to_r(Rt[1], epimodel)
     init = I₀ * [exp(-r_approx * t) for t in 0:(epimodel.data.len_gen_int - 1)]
 
-    function generate_infs(recent_incidence, Rt)
-        new_incidence = Rt * dot(recent_incidence, epimodel.data.gen_int)
-        [new_incidence; recent_incidence[1:(epimodel.data.len_gen_int - 1)]], new_incidence
-    end
-
-    I_t, _ = scan(generate_infs, init, Rt)
+    I_t, _ = scan(epimodel, init, Rt)
     return I_t
 end

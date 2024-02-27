@@ -3,10 +3,10 @@
     using Distributions, Turing, DynamicPPL
     # Define test inputs
     y_t = missing # Data will be generated from the model
-    data = EpiData([0.2, 0.3, 0.5], [0.1, 0.4, 0.5], 0.8, 10, exp)
+    data = EpiData([0.2, 0.3, 0.5], exp)
     pos_shift = 1e-6
 
-    epimodel = DirectInfections(data)
+    epimodel = DirectInfections(data, Normal())
     priors = EpiAware.default_rw_priors()
     rwp = EpiAware.RandomWalkLatentProcess(Normal(0.0, 1.0),
         truncated(Normal(0.0, 0.05), 0.0, Inf))

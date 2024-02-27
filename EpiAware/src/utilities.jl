@@ -17,7 +17,7 @@ value. This is similar to the JAX function `jax.lax.scan`.
 - `ys`: An array containing the result values of applying `f` to each element of `xs`.
 - `carry`: The final accumulator value.
 """
-function scan(f::Function, init, xs::Vector{T}) where {T <: Union{Integer, AbstractFloat}}
+function scan(f, init, xs::Vector{T}) where {T <: Union{Integer, AbstractFloat}}
     carry = init
     ys = similar(xs)
     for (i, x) in enumerate(xs)
