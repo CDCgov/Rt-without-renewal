@@ -78,8 +78,8 @@ end
     @test ks_test_pval > 1e-6 #Very unlikely to fail if the model is correctly implemented
 
     #Check that the generated incidence is correct given correct initialisation
-    mdl_incidence = generated_quantities(
-        EpiAware.generate_latent_infs(rt_model, rt), (init_incidence = log_init,))
+    mdl_incidence = generated_quantities(EpiAware.generate_latent_infs(rt_model, rt),
+        (init_incidence = log_init,))
     @test mdl_incidence ≈ recent_incidence
 end
 
@@ -98,8 +98,8 @@ end
     expected_incidence = exp.(log_init_scale .+ log_incidence)
 
     #Check log_init is sampled from the correct distribution
-    sample_init_inc = sample(
-        EpiAware.generate_latent_infs(direct_inf_model, log_incidence), Prior(), 1000) |>
+    sample_init_inc = sample(EpiAware.generate_latent_infs(direct_inf_model, log_incidence),
+        Prior(), 1000) |>
                       chn -> chn[:init_incidence] |>
                              Array |>
                              vec
@@ -108,8 +108,8 @@ end
     @test ks_test_pval > 1e-6 #Very unlikely to fail if the model is correctly implemented
 
     #Check that the generated incidence is correct given correct initialisation
-    mdl_incidence = generated_quantities(
-        EpiAware.generate_latent_infs(direct_inf_model, log_incidence),
+    mdl_incidence = generated_quantities(EpiAware.generate_latent_infs(direct_inf_model,
+            log_incidence),
         (init_incidence = log_init_scale,))
 
     @test mdl_incidence ≈ expected_incidence
@@ -139,8 +139,8 @@ end
     initial_incidence = [1.0, 1.0, 1.0]#aligns with initial exp growth rate of 0.
 
     #Check log_init is sampled from the correct distribution
-    @time sample_init_inc = sample(
-        EpiAware.generate_latent_infs(renewal_model, log_Rt), Prior(), 1000) |>
+    @time sample_init_inc = sample(EpiAware.generate_latent_infs(renewal_model, log_Rt),
+        Prior(), 1000) |>
                             chn -> chn[:init_incidence] |>
                                    Array |>
                                    vec
@@ -150,8 +150,8 @@ end
 
     #Check that the generated incidence is correct given correct initialisation
     #Check first three days "by hand"
-    mdl_incidence = generated_quantities(
-        EpiAware.generate_latent_infs(renewal_model, log_Rt), (init_incidence = 0.0,))
+    mdl_incidence = generated_quantities(EpiAware.generate_latent_infs(renewal_model,
+            log_Rt), (init_incidence = 0.0,))
 
     day1_incidence = dot(initial_incidence, gen_int) * Rt[1]
     day2_incidence = dot(initial_incidence, gen_int) * Rt[2]

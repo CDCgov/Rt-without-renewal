@@ -26,8 +26,8 @@
         Δd = Δd)
 
     # Create full epi model and sample from it
-    test_mdl = make_epi_inference_model(
-        y_t, time_horizon; epimodel = epimodel, latent_process_model = rwp,
+    test_mdl = make_epi_inference_model(y_t, time_horizon; epimodel = epimodel,
+        latent_process_model = rwp,
         observation_model = obs_model, pos_shift)
     gen = generated_quantities(test_mdl, rand(test_mdl))
 

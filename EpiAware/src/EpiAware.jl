@@ -20,16 +20,16 @@ This module provides functionality for calculating Rt (effective reproduction nu
 module EpiAware
 
 using Distributions,
-      Turing,
-      LogExpFunctions,
-      LinearAlgebra,
-      SparseArrays,
-      Random,
-      ReverseDiff,
-      Optim,
-      Parameters,
-      QuadGK,
-      DataFramesMeta
+    Turing,
+    LogExpFunctions,
+    LinearAlgebra,
+    SparseArrays,
+    Random,
+    ReverseDiff,
+    Optim,
+    Parameters,
+    QuadGK,
+    DataFramesMeta
 
 # Exported utilities
 export create_discrete_pmf, spread_draws

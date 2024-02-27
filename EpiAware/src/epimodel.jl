@@ -68,8 +68,8 @@ and `g_i` is the generation interval.
 """
 function (epimodel::Renewal)(recent_incidence, Rt)
     new_incidence = Rt * dot(recent_incidence, epimodel.data.gen_int)
-    return (
-        [new_incidence; recent_incidence[1:(epimodel.data.len_gen_int - 1)]], new_incidence)
+    return ([new_incidence; recent_incidence[1:(epimodel.data.len_gen_int - 1)]],
+        new_incidence)
 end
 
 function generate_latent_infs(epimodel::AbstractEpiModel, latent_process)
