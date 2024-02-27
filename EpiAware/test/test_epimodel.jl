@@ -98,7 +98,8 @@ end
     expected_incidence = exp.(log_init_scale .+ log_incidence)
 
     #Check log_init is sampled from the correct distribution
-    sample_init_inc = sample(EpiAware.generate_latent_infs(direct_inf_model, log_incidence),
+    sample_init_inc = sample(
+        EpiAware.generate_latent_infs(direct_inf_model, log_incidence),
         Prior(), 1000) |>
                       chn -> chn[:init_incidence] |>
                              Array |>
@@ -108,7 +109,8 @@ end
     @test ks_test_pval > 1e-6 #Very unlikely to fail if the model is correctly implemented
 
     #Check that the generated incidence is correct given correct initialisation
-    mdl_incidence = generated_quantities(EpiAware.generate_latent_infs(direct_inf_model,
+    mdl_incidence = generated_quantities(
+        EpiAware.generate_latent_infs(direct_inf_model,
             log_incidence),
         (init_incidence = log_init_scale,))
 
@@ -150,7 +152,8 @@ end
 
     #Check that the generated incidence is correct given correct initialisation
     #Check first three days "by hand"
-    mdl_incidence = generated_quantities(EpiAware.generate_latent_infs(renewal_model,
+    mdl_incidence = generated_quantities(
+        EpiAware.generate_latent_infs(renewal_model,
             log_Rt), (init_incidence = 0.0,))
 
     day1_incidence = dot(initial_incidence, gen_int) * Rt[1]

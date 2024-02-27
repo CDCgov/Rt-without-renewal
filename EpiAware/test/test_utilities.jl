@@ -64,7 +64,7 @@ end
     @testset "Test case 5" begin
         dist = Exponential(1.0)
         expected_pmf_uncond = [exp(-1)
-            [(1 - exp(-1)) * (exp(1) - 1) * exp(-s) for s in 1:9]]
+                               [(1 - exp(-1)) * (exp(1) - 1) * exp(-s) for s in 1:9]]
         expected_pmf = expected_pmf_uncond ./ sum(expected_pmf_uncond)
         pmf = create_discrete_pmf(dist; Δd = 1.0, D = 10.0)
         @test expected_pmf≈pmf atol=1e-15
@@ -100,10 +100,10 @@ end
         delay_int = [0.2, 0.5, 0.3]
         time_horizon = 5
         expected_K = SparseMatrixCSC([0.2 0 0 0 0
-            0.5 0.2 0 0 0
-            0.3 0.5 0.2 0 0
-            0 0.3 0.5 0.2 0
-            0 0 0.3 0.5 0.2])
+                                      0.5 0.2 0 0 0
+                                      0.3 0.5 0.2 0 0
+                                      0 0.3 0.5 0.2 0
+                                      0 0 0.3 0.5 0.2])
         K = EpiAware.generate_observation_kernel(delay_int, time_horizon)
         @test K == expected_K
     end

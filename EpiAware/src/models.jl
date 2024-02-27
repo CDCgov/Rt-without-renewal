@@ -5,7 +5,8 @@
         observation_model::AbstractObservationModel,
         pos_shift = 1e-6)
     #Latent process
-    @submodel latent_process, latent_process_aux = generate_latent_process(latent_process_model,
+    @submodel latent_process, latent_process_aux = generate_latent_process(
+        latent_process_model,
         time_steps)
 
     #Transform into infections
