@@ -77,20 +77,14 @@ Random.seed!(0)
 
 - Medium length generation interval distribution.
 - Median 2 day, std 4.3 day delay distribution.
-- 100 days of simulations
 =#
 
 truth_GI = Gamma(2, 5)
-truth_delay = LogNormal(2.0, 1.0)
-neg_bin_cluster_factor = 0.05
-time_horizon = 100
-
 model_data = EpiData(truth_GI,
-    truth_delay,
-    neg_bin_cluster_factor,
-    time_horizon,
-    D_gen = 10.0,
-    D_delay = 10.0)
+    D_gen = 10.0)
+
+log_I0_prior = Normal(0.0, 1.0)
+epimodel = DirectInfections(model_data, log_I0_prior)
 
 #=
 ## Define the data generating process
@@ -98,16 +92,23 @@ model_data = EpiData(truth_GI,
 In this case we use the `DirectInfections` model.
 =#
 
-toy_log_infs = DirectInfections(model_data)
-rwp = random_walk_process()
+rwp = EpiAware.RandomWalkLatentProcess(Normal(),
+    truncated(Normal(0.0, 0.01), 0.0, 0.5))
 obs_mdl = delay_observations_model()
+
+#Define the observation model - no delay model
+time_horizon = 100
+obs_model = EpiAware.DelayObservations([1.0],
+    time_horizon,
+    truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0))
 
 #=
 ## Generate a `Turing` `Model`
 We don't have observed data, so we use `missing` value for `y_t`.
 =#
 
-log_infs_model = make_epi_inference_model(missing, toy_log_infs, rwp, obs_mdl;
+log_infs_model = make_epi_inference_model(missing, time_horizon, ; epimodel = epimodel,
+    latent_process_model = rwp, observation_model = obs_model,
     pos_shift = 1e-6)
 
 #=
