@@ -10,7 +10,7 @@ function default_rw_priors()
         :init_rw_value_prior => Normal()) |> Dict
 end
 
-function generate_latent_process(latent_process::AbstractLatentProcess, n; kwargs...)
+function generate_latent_process(latent_process::AbstractLatentProcess, n)
     @info "No concrete implementation for generate_latent_process is defined."
     return nothing
 end
@@ -28,7 +28,3 @@ end
     end
     return rw, (; σ_RW, rw_init)
 end
-
-# function random_walk_process(; latent_process_priors = default_rw_priors())
-#     LatentProcess(random_walk, latent_process_priors)
-# end

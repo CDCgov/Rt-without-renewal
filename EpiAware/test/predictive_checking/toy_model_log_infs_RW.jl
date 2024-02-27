@@ -140,8 +140,9 @@ We treat the generated data as observed data and attempt to infer underlying inf
 
 truth_data = random_epidemic.y_t
 
-model = make_epi_inference_model(truth_data, toy_log_infs, rwp, obs_mdl; pos_shift = 1e-6)
-
+model = make_epi_inference_model(truth_data, time_horizon, ; epimodel = epimodel,
+    latent_process_model = rwp, observation_model = obs_model,
+    pos_shift = 1e-6)
 @time chn = sample(model,
     NUTS(; adtype = AutoReverseDiff(true)),
     MCMCThreads(),
