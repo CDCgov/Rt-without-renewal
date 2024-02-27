@@ -49,8 +49,9 @@ end
 
     #Define the latent process model
     r_3 = log(2) / 3.0
-    rwp = EpiAware.RandomWalkLatentProcess(Normal(0.0, r_3 / 3), # 3 day doubling time at 3 sigmas in prior
-        truncated(Normal(0.0, 0.01), 0.0, 0.5))
+    rwp = EpiAware.RandomWalkLatentProcess(
+        truncated(Normal(0.0, r_3 / 3), -r_3, r_3), # 3 day doubling time at 3 sigmas in prior
+        truncated(Normal(0.0, 0.01), 0.0, 0.1))
 
     #Define the observation model - no delay model
     time_horizon = 30
@@ -87,8 +88,9 @@ end
 
     #Define the latent process model
     r_3 = log(2) / 3.0
-    rwp = EpiAware.RandomWalkLatentProcess(Normal(0.0, r_3 / 3), # 3 day doubling time at 3 sigmas in prior
-        truncated(Normal(0.0, 0.01), 0.0, 0.5))
+    rwp = EpiAware.RandomWalkLatentProcess(
+        truncated(Normal(0.0, r_3 / 3), -r_3, r_3), # 3 day doubling time at 3 sigmas in prior
+        truncated(Normal(0.0, 0.01), 0.0, 0.1))
 
     #Define the observation model - no delay model
     time_horizon = 30
