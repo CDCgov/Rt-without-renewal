@@ -54,7 +54,7 @@ end
         truncated(Normal(0.0, 0.01), 0.0, 0.1))
 
     #Define the observation model - no delay model
-    time_horizon = 30
+    time_horizon = 5
     obs_model = EpiAware.DelayObservations([1.0],
         time_horizon,
         truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0))
@@ -93,7 +93,7 @@ end
         truncated(Normal(0.0, 0.01), 0.0, 0.1))
 
     #Define the observation model - no delay model
-    time_horizon = 30
+    time_horizon = 5
     obs_model = EpiAware.DelayObservations([1.0],
         time_horizon,
         truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0))
