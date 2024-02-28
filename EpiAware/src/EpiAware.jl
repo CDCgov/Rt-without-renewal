@@ -32,10 +32,10 @@ using Distributions,
       DataFramesMeta
 
 # Exported utilities
-export create_discrete_pmf, spread_draws
+export create_discrete_pmf, spread_draws, scan
 
 # Exported types
-export EpiData, Renewal, ExpGrowthRate, DirectInfections
+export EpiData, Renewal, ExpGrowthRate, DirectInfections, AbstractEpiModel
 
 # Exported Turing model constructors
 export make_epi_inference_model
