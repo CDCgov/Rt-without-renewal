@@ -5,7 +5,7 @@
         observation_model::AbstractObservationModel,
         pos_shift = 1e-6)
     #Latent process
-    @submodel latent_model, latent_model_aux = generate_latent_model(
+    @submodel latent_model, latent_model_aux = generate_latent(
         latent_model_model,
         time_steps)
 

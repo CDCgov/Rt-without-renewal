@@ -10,7 +10,7 @@
     epi_model = DirectInfections(data, Normal())
 
     #Define the latent process model
-    rwp = EpiAware.RandomWalkLatentModel(Normal(0.0, 1.0),
+    rwp = EpiAware.RandomWalk(Normal(0.0, 1.0),
         truncated(Normal(0.0, 0.05), 0.0, Inf))
 
     #Define the observation model
@@ -49,7 +49,7 @@ end
 
     #Define the latent process model
     r_3 = log(2) / 3.0
-    rwp = EpiAware.RandomWalkLatentModel(
+    rwp = EpiAware.RandomWalk(
         truncated(Normal(0.0, r_3 / 3), -r_3, r_3), # 3 day doubling time at 3 sigmas in prior
         truncated(Normal(0.0, 0.01), 0.0, 0.1))
 
@@ -88,7 +88,7 @@ end
 
     #Define the latent process model
     r_3 = log(2) / 3.0
-    rwp = EpiAware.RandomWalkLatentModel(
+    rwp = EpiAware.RandomWalk(
         truncated(Normal(0.0, r_3 / 3), -r_3, r_3), # 3 day doubling time at 3 sigmas in prior
         truncated(Normal(0.0, 0.01), 0.0, 0.1))
 

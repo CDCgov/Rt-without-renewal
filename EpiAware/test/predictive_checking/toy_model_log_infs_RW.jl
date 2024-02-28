@@ -92,7 +92,7 @@ epi_model = DirectInfections(model_data, log_I0_prior)
 In this case we use the `DirectInfections` model.
 =#
 
-rwp = EpiAware.RandomWalkLatentModel(Normal(),
+rwp = EpiAware.RandomWalk(Normal(),
     truncated(Normal(0.0, 0.01), 0.0, 0.5))
 obs_mdl = delay_observations_model()
 
