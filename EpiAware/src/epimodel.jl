@@ -1,11 +1,41 @@
+"""
+    $(TYPEDEF)
+
+Abstract type for models that define the latent infection process.
+"""
 abstract type AbstractEpiModel end
 
-struct EpiData{T <: Real, F <: Function}
+"""
+    $(TYPEDEF)
+
+Immutable struct for storing fixed parameters of the latent infection process.
+
+$(TYPEDFIELDS)
+"""
+struct EpiData{T <: AbstractFloat, F <: Function}
+    """
+    Discrete time generation interval. First element is probability of infectee on time
+        step after infection time step.
+    """
     gen_int::Vector{T}
+    "length of generation interval vector."
     len_gen_int::Integer
+    "Bijector/link/transformation function for unconstrained latent infections."
     transformation::F
 
-    #Inner constructors for EpiData object
+    @doc """
+        function EpiData(gen_int, transformation::Function)
+
+    Constructor function for an immutable struct for storing fixed parameters of the latent
+        infection process.
+
+    # Arguments
+    - `gen_int`: Discrete time generation interval. First element is probability of infectee on
+        time step after infection time step.
+    - `transformation`: Bijector/link/transformation function for unconstrained latent
+        infections.
+
+    """
     function EpiData(gen_int,
             transformation::Function)
         @assert all(gen_int .>= 0) "Generation interval must be non-negative"
@@ -16,6 +46,25 @@ struct EpiData{T <: Real, F <: Function}
             transformation)
     end
 
+    @doc """
+        function EpiData(gen_distribution::ContinuousDistribution;
+            D_gen,
+            Δd = 1.0,
+            transformation::Function = exp)
+
+    Constructor function for an immutable struct for storing fixed parameters of the latent
+        infection process.
+
+    # Arguments
+    - `gen_distribution::ContinuousDistribution`: Continuous generation interval distribution.
+        This is converted to a discrete distribution using `create_discrete_pmf`, and then left
+        truncated to condition on zero infectees on the same time step as the infector.
+    - `D_gen`: Right truncation of the generation interval distribution.
+    - `Δd`: Time step size for discretisation of the generation interval distribution.
+    - `transformation`: Bijector/link/transformation function for unconstrained latent
+        infections.
+
+    """
     function EpiData(gen_distribution::ContinuousDistribution;
             D_gen,
             Δd = 1.0,
@@ -27,45 +76,77 @@ struct EpiData{T <: Real, F <: Function}
     end
 end
 
+"""
+    $(TYPEDEF)
+
+A struct representing a direct infections model for latent infections.
+
+# Fields
+$(TYPEDFIELDS)
+"""
 struct DirectInfections{S <: Sampleable} <: AbstractEpiModel
+    "Latent infection process data as an `EpiData` object."
     data::EpiData
+    "The prior distribution for initial infections"
     initialisation_prior::S
 end
 
+"""
+    $(TYPEDEF)
+
+A struct representing an exponetial growth rate model for latent infections.
+
+# Fields
+$(TYPEDFIELDS)
+"""
 struct ExpGrowthRate{S <: Sampleable} <: AbstractEpiModel
+    "Latent infection process data as an `EpiData` object."
     data::EpiData
+    "The prior distribution for initial infections"
     initialisation_prior::S
 end
 
+"""
+    $(TYPEDEF)
+
+A struct representing a renewal model for latent infections.
+
+# Fields
+$(TYPEDFIELDS)
+"""
 struct Renewal{S <: Sampleable} <: AbstractEpiModel
     data::EpiData
     initialisation_prior::S
 end
 
-"""
-    function (epimodel::Renewal)(recent_incidence, Rt)
+renewal_eqn::String = raw"""
+    ```math
+    I_t = R_t \sum_{i=1}^{n-1} I_{t-i} g_i
+    ```
+    """
+
+@doc """
+    $(TYPEDEF)
 
 Compute new incidence based on recent incidence and Rt.
 
 This is a callable function on `Renewal` structs, that encodes new incidence prediction
 given recent incidence and Rt according to basic renewal process.
+"""*renewal_eqn*
+     """
 
-```math
-I_t = R_t \\sum_{i=1}^{n-1} I_{t-i} g_i
-```
-
-where `I_t` is the new incidence, `R_t` is the reproduction number, `I_{t-i}` is the recent incidence
-and `g_i` is the generation interval.
+     where `I_t` is the new incidence, `R_t` is the reproduction number, `I_{t-i}` is the recent incidence
+     and `g_i` is the generation interval.
 
 
-# Arguments
-- `recent_incidence`: Array of recent incidence values.
-- `Rt`: Reproduction number.
+     # Arguments
+     - `recent_incidence`: Array of recent incidence values.
+     - `Rt`: Reproduction number.
 
-# Returns
-- Tuple containing the updated incidence array and the new incidence value.
+     # Returns
+     - Tuple containing the updated incidence array and the new incidence value.
 
-"""
+     """
 function (epimodel::Renewal)(recent_incidence, Rt)
     new_incidence = Rt * dot(recent_incidence, epimodel.data.gen_int)
     return ([new_incidence; recent_incidence[1:(epimodel.data.len_gen_int - 1)]],
