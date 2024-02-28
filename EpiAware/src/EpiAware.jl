@@ -41,7 +41,7 @@ export EpiData, Renewal, ExpGrowthRate, DirectInfections, AbstractEpiModel,
 # Exported Turing model constructors
 export make_epi_inference_model
 
-include("epi-model.jl")
+include("epi-models.jl")
 include("utilities.jl")
 include("latent-processes.jl")
 include("observation-processes.jl")
