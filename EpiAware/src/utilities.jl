@@ -1,6 +1,6 @@
 
 """
-    scan(f::F, init, xs) where {F <: AbstractEpiModel}
+    scan(f::F, init, xs) where {F <: AbstractModel}
 
 Apply `f` to each element of `xs` and accumulate the results.
 
@@ -8,7 +8,7 @@ Apply `f` to each element of `xs` and accumulate the results.
     on a sub-type of `AbstractEpiModel`.
 
 ### Design note
-`scan` is being restricted to `AbstractEpiModel` sub-types to ensure:
+`scan` is being restricted to `AbstractModel` sub-types to ensure:
     1. That compiler specialization is [activated](https://docs.julialang.org/en/v1/manual/performance-tips/#Be-aware-of-when-Julia-avoids-specializing)
     2. Also avoids potential compiler [overhead](https://docs.julialang.org/en/v1/devdocs/functions/#compiler-efficiency-issues)
     from specialisation on `f<: Function`.
@@ -26,7 +26,7 @@ Apply `f` to each element of `xs` and accumulate the results.
 - `carry`: The final value of the `carry` variable after processing all elements of `xs`.
 
 """
-function scan(f::F, init, xs) where {F <: AbstractEpiModel}
+function scan(f::F, init, xs) where {F <: AbstractModel}
     carry = init
     ys = similar(xs)
     for (i, x) in enumerate(xs)
