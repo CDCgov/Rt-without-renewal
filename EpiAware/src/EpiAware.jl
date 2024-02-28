@@ -43,8 +43,8 @@ export make_epi_inference_model
 
 include("epi-models.jl")
 include("utilities.jl")
-include("latent-processes.jl")
-include("observation-processes.jl")
+include("latent-models.jl")
+include("observation-models.jl")
 include("models.jl")
 
 end
