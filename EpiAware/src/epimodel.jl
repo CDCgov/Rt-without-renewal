@@ -125,28 +125,6 @@ renewal_eqn::String = raw"""
     ```
     """
 
-@doc """
-    $(TYPEDEF)
-
-Compute new incidence based on recent incidence and Rt.
-
-This is a callable function on `Renewal` structs, that encodes new incidence prediction
-given recent incidence and Rt according to basic renewal process.
-"""*renewal_eqn*
-     """
-
-     where `I_t` is the new incidence, `R_t` is the reproduction number, `I_{t-i}` is the recent incidence
-     and `g_i` is the generation interval.
-
-
-     # Arguments
-     - `recent_incidence`: Array of recent incidence values.
-     - `Rt`: Reproduction number.
-
-     # Returns
-     - Tuple containing the updated incidence array and the new incidence value.
-
-     """
 function (epimodel::Renewal)(recent_incidence, Rt)
     new_incidence = Rt * dot(recent_incidence, epimodel.data.gen_int)
     return ([new_incidence; recent_incidence[1:(epimodel.data.len_gen_int - 1)]],
