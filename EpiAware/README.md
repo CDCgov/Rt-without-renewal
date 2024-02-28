@@ -37,9 +37,9 @@ Obs. cases y_t"]
 
 LatentProcPriors["Latent process priors"]
 
-LatentProc["AbstractLatentProcess
+LatentProc["AbstractLatentModel
 ---------------------
-RandomWalkLatentProcess"]
+RandomWalkLatentModel"]
 
 ObsModelPriors["Observation model priors
 choice of delayed obs. model"]

@@ -36,7 +36,7 @@ export create_discrete_pmf, spread_draws, scan
 
 # Exported types
 export EpiData, Renewal, ExpGrowthRate, DirectInfections, AbstractEpiModel,
-       AbstractLatentProcess, AbstractObservationModel
+       AbstractLatentModel, AbstractObservationModel
 
 # Exported Turing model constructors
 export make_epi_inference_model
