@@ -5,7 +5,7 @@
 Apply `f` to each element of `xs` and accumulate the results.
 
 `f` must be a [callable](https://docs.julialang.org/en/v1/manual/methods/#Function-like-objects)
-    on a sub-type of `AbstractEpiModel`.
+    on a sub-type of `AbstractModel`.
 
 ### Design note
 `scan` is being restricted to `AbstractModel` sub-types to ensure:
