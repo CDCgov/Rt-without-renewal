@@ -6,8 +6,8 @@
     data = EpiData([0.2, 0.3, 0.5], exp)
     pos_shift = 1e-6
 
-    #Define the epimodel
-    epimodel = DirectInfections(data, Normal())
+    #Define the epi_model
+    epi_model = DirectInfections(data, Normal())
 
     #Define the latent process model
     rwp = EpiAware.RandomWalkLatentProcess(Normal(0.0, 1.0),
@@ -26,7 +26,7 @@
         Δd = Δd)
 
     # Create full epi model and sample from it
-    test_mdl = make_epi_inference_model(y_t, time_horizon; epimodel = epimodel,
+    test_mdl = make_epi_inference_model(y_t, time_horizon; epi_model = epi_model,
         latent_process_model = rwp,
         observation_model = obs_model, pos_shift)
     gen = generated_quantities(test_mdl, rand(test_mdl))
@@ -44,8 +44,8 @@ end
     data = EpiData([0.2, 0.3, 0.5], exp)
     pos_shift = 1e-6
 
-    #Define the epimodel
-    epimodel = EpiAware.ExpGrowthRate(data, Normal())
+    #Define the epi_model
+    epi_model = EpiAware.ExpGrowthRate(data, Normal())
 
     #Define the latent process model
     r_3 = log(2) / 3.0
@@ -62,7 +62,7 @@ end
     # Create full epi model and sample from it
     test_mdl = make_epi_inference_model(y_t,
         time_horizon;
-        epimodel = epimodel,
+        epi_model = epi_model,
         latent_process_model = rwp,
         observation_model = obs_model,
         pos_shift)
@@ -83,8 +83,8 @@ end
     data = EpiData([0.2, 0.3, 0.5], exp)
     pos_shift = 1e-6
 
-    #Define the epimodel
-    epimodel = EpiAware.Renewal(data, Normal())
+    #Define the epi_model
+    epi_model = EpiAware.Renewal(data, Normal())
 
     #Define the latent process model
     r_3 = log(2) / 3.0
@@ -101,7 +101,7 @@ end
     # Create full epi model and sample from it
     test_mdl = make_epi_inference_model(y_t,
         time_horizon;
-        epimodel = epimodel,
+        epi_model = epi_model,
         latent_process_model = rwp,
         observation_model = obs_model,
         pos_shift)

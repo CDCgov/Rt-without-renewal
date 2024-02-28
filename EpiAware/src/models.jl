@@ -1,6 +1,6 @@
 @model function make_epi_inference_model(y_t,
         time_steps;
-        epimodel::AbstractEpiModel,
+        epi_model::AbstractEpiModel,
         latent_process_model::AbstractLatentProcess,
         observation_model::AbstractObservationModel,
         pos_shift = 1e-6)
@@ -10,7 +10,7 @@
         time_steps)
 
     #Transform into infections
-    @submodel I_t = generate_latent_infs(epimodel, latent_process)
+    @submodel I_t = generate_latent_infs(epi_model, latent_process)
 
     #Predictive distribution of ascerted cases
     @submodel generated_y_t, generated_y_t_aux = generate_observations(observation_model,

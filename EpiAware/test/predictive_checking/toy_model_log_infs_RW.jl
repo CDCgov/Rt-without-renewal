@@ -26,7 +26,7 @@ X(0) &\sim \mathcal{N}(0, 1) \\
 ### Log-Infections Model
 
 The log-infections model is defined by a Turing model `log_infections` that takes the observed data `y_t` (or `missing` value),
-an `EpiModel` object `epimodel`, and a `latent_process` model. In this case the latent process is a random walk model.
+an `EpiModel` object `epi_model`, and a `latent_process` model. In this case the latent process is a random walk model.
 
 It also accepts optional arguments for the `process_priors`, `transform_function`, `pos_shift`, `neg_bin_cluster_factor`, and `neg_bin_cluster_factor_prior`.
 
@@ -84,7 +84,7 @@ model_data = EpiData(truth_GI,
     D_gen = 10.0)
 
 log_I0_prior = Normal(0.0, 1.0)
-epimodel = DirectInfections(model_data, log_I0_prior)
+epi_model = DirectInfections(model_data, log_I0_prior)
 
 #=
 ## Define the data generating process
@@ -107,7 +107,7 @@ obs_model = EpiAware.DelayObservations([1.0],
 We don't have observed data, so we use `missing` value for `y_t`.
 =#
 
-log_infs_model = make_epi_inference_model(missing, time_horizon, ; epimodel = epimodel,
+log_infs_model = make_epi_inference_model(missing, time_horizon, ; epi_model = epi_model,
     latent_process_model = rwp, observation_model = obs_model,
     pos_shift = 1e-6)
 
@@ -140,7 +140,7 @@ We treat the generated data as observed data and attempt to infer underlying inf
 
 truth_data = random_epidemic.y_t
 
-model = make_epi_inference_model(truth_data, time_horizon, ; epimodel = epimodel,
+model = make_epi_inference_model(truth_data, time_horizon, ; epi_model = epi_model,
     latent_process_model = rwp, observation_model = obs_model,
     pos_shift = 1e-6)
 @time chn = sample(model,

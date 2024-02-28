@@ -174,8 +174,8 @@ function R_to_r(R₀, w::Vector{T}; newton_steps = 2, Δd = 1.0) where {T <: Abs
     return r_approx
 end
 
-function R_to_r(R₀, epimodel::AbstractEpiModel; newton_steps = 2, Δd = 1.0)
-    R_to_r(R₀, epimodel.data.gen_int; newton_steps = newton_steps, Δd = Δd)
+function R_to_r(R₀, epi_model::AbstractEpiModel; newton_steps = 2, Δd = 1.0)
+    R_to_r(R₀, epi_model.data.gen_int; newton_steps = newton_steps, Δd = Δd)
 end
 
 """
