@@ -1,23 +1,5 @@
-"""
-    scan(f, init, xs)
 
-Apply a function `f` to each element of `xs` along with an accumulator hidden state with intial
-value `init`. The function `f` takes the current accumulator value and the current element of `xs` as
-arguments, and returns a new accumulator value and a result value. The function `scan` returns a tuple
-`(ys, carry)`, where `ys` is an array containing the result values and `carry` is the final accumulator
-value. This is similar to the JAX function `jax.lax.scan`.
-
-# Arguments
-- `f`: A function that takes an accumulator value and an element of `xs` as arguments and returns a new
-    hidden state.
-- `init`: The initial accumulator value.
-- `xs`: An iterable collection of elements.
-
-# Returns
-- `ys`: An array containing the result values of applying `f` to each element of `xs`.
-- `carry`: The final accumulator value.
-"""
-function scan(f, init, xs::Vector{T}) where {T <: Union{Integer, AbstractFloat}}
+function scan(f::F, init, xs) where {F}
     carry = init
     ys = similar(xs)
     for (i, x) in enumerate(xs)
