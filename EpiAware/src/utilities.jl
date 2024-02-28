@@ -1,23 +1,32 @@
-"""
-    scan(f, init, xs)
 
-Apply a function `f` to each element of `xs` along with an accumulator hidden state with intial
-value `init`. The function `f` takes the current accumulator value and the current element of `xs` as
-arguments, and returns a new accumulator value and a result value. The function `scan` returns a tuple
-`(ys, carry)`, where `ys` is an array containing the result values and `carry` is the final accumulator
-value. This is similar to the JAX function `jax.lax.scan`.
+"""
+    scan(f::F, init, xs) where {F <: AbstractEpiModel}
+
+Apply `f` to each element of `xs` and accumulate the results.
+
+`f` must be a [callable](https://docs.julialang.org/en/v1/manual/methods/#Function-like-objects)
+    on a sub-type of `AbstractEpiModel`.
+
+### Design note
+`scan` is being restricted to `AbstractEpiModel` sub-types to ensure:
+    1. That compiler specialization is [activated](https://docs.julialang.org/en/v1/manual/performance-tips/#Be-aware-of-when-Julia-avoids-specializing)
+    2. Also avoids potential compiler [overhead](https://docs.julialang.org/en/v1/devdocs/functions/#compiler-efficiency-issues)
+    from specialisation on `f<: Function`.
+
+
 
 # Arguments
-- `f`: A function that takes an accumulator value and an element of `xs` as arguments and returns a new
-    hidden state.
-- `init`: The initial accumulator value.
+- `f`: A callable/functor that takes two arguments, `carry` and `x`, and returns a new
+    `carry` and a result `y`.
+- `init`: The initial value for the `carry` variable.
 - `xs`: An iterable collection of elements.
 
 # Returns
-- `ys`: An array containing the result values of applying `f` to each element of `xs`.
-- `carry`: The final accumulator value.
+- `ys`: An array containing the results of applying `f` to each element of `xs`.
+- `carry`: The final value of the `carry` variable after processing all elements of `xs`.
+
 """
-function scan(f, init, xs::Vector{T}) where {T <: Union{Integer, AbstractFloat}}
+function scan(f::F, init, xs) where {F <: AbstractEpiModel}
     carry = init
     ys = similar(xs)
     for (i, x) in enumerate(xs)

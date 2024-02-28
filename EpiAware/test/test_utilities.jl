@@ -7,7 +7,19 @@
     xs = [1, 2, 3, 4, 5]
     expected_ys = [1, 3, 6, 10, 15]
     expected_carry = 15
-    ys, carry = EpiAware.scan(add, 0, xs)
+
+    # Check that a generic function CAN'T be used
+    @test_throws MethodError EpiAware.scan(add, 0, xs)
+
+    # Check that a callable subtype of `AbstractEpiModel` CAN be used
+    struct TestEpiModelAdd <: AbstractEpiModel
+    end
+    function (epimodel::TestEpiModelAdd)(a, b)
+        return a + b, a + b
+    end
+
+    ys, carry = EpiAware.scan(TestEpiModelAdd(), 0, xs)
+
     @test ys == expected_ys
     @test carry == expected_carry
 end
@@ -22,7 +34,19 @@ end
     expected_ys = [1, 2, 6, 24, 120]
     expected_carry = 120
 
-    ys, carry = EpiAware.scan(multiply, 1, xs)
+    # Check that a generic function CAN'T be used
+    @test_throws MethodError ys, carry=EpiAware.scan(multiply, 1, xs)
+
+    # Check that a callable subtype of `AbstractEpiModel` CAN be used
+    struct TestEpiModelMult <: AbstractEpiModel
+    end
+
+    function (epimodel::TestEpiModelMult)(a, b)
+        return a * b, a * b
+    end
+
+    ys, carry = EpiAware.scan(TestEpiModelMult(), 1, xs)
+
     @test ys == expected_ys
     @test carry == expected_carry
 end
