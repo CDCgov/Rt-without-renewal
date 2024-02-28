@@ -1,4 +1,4 @@
-@model function make_epi_inference_model(y_t,
+@model function make_epi_aware(y_t,
         time_steps;
         epi_model::AbstractEpiModel,
         latent_model_model::AbstractLatentModel,

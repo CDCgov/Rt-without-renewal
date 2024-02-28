@@ -1,5 +1,5 @@
 
-@testitem "`make_epi_inference_model` with direct infections and RW latent process runs" begin
+@testitem "`make_epi_aware` with direct infections and RW latent process runs" begin
     using Distributions, Turing, DynamicPPL
     # Define test inputs
     y_t = missing # Data will be generated from the model
@@ -26,7 +26,7 @@
         Δd = Δd)
 
     # Create full epi model and sample from it
-    test_mdl = make_epi_inference_model(y_t, time_horizon; epi_model = epi_model,
+    test_mdl = make_epi_aware(y_t, time_horizon; epi_model = epi_model,
         latent_model_model = rwp,
         observation_model = obs_model, pos_shift)
     gen = generated_quantities(test_mdl, rand(test_mdl))
@@ -37,7 +37,7 @@
     @test length(gen.I_t) == time_horizon
 end
 
-@testitem "`make_epi_inference_model` with Exp growth rate and RW latent process runs" begin
+@testitem "`make_epi_aware` with Exp growth rate and RW latent process runs" begin
     using Distributions, Turing, DynamicPPL
     # Define test inputs
     y_t = missing# rand(1:10, 365) # Data will be generated from the model
@@ -60,7 +60,7 @@ end
         truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0))
 
     # Create full epi model and sample from it
-    test_mdl = make_epi_inference_model(y_t,
+    test_mdl = make_epi_aware(y_t,
         time_horizon;
         epi_model = epi_model,
         latent_model_model = rwp,
@@ -76,7 +76,7 @@ end
     @test length(gens[1].I_t) == time_horizon
 end
 
-@testitem "`make_epi_inference_model` with Renewal and RW latent process runs" begin
+@testitem "`make_epi_aware` with Renewal and RW latent process runs" begin
     using Distributions, Turing, DynamicPPL
     # Define test inputs
     y_t = missing# rand(1:10, 365) # Data will be generated from the model
@@ -99,7 +99,7 @@ end
         truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0))
 
     # Create full epi model and sample from it
-    test_mdl = make_epi_inference_model(y_t,
+    test_mdl = make_epi_aware(y_t,
         time_horizon;
         epi_model = epi_model,
         latent_model_model = rwp,

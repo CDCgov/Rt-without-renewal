@@ -107,7 +107,7 @@ obs_model = EpiAware.DelayObservations([1.0],
 We don't have observed data, so we use `missing` value for `y_t`.
 =#
 
-log_infs_model = make_epi_inference_model(missing, time_horizon, ; epi_model = epi_model,
+log_infs_model = make_epi_aware(missing, time_horizon, ; epi_model = epi_model,
     latent_model_model = rwp, observation_model = obs_model,
     pos_shift = 1e-6)
 
@@ -140,7 +140,7 @@ We treat the generated data as observed data and attempt to infer underlying inf
 
 truth_data = random_epidemic.y_t
 
-model = make_epi_inference_model(truth_data, time_horizon, ; epi_model = epi_model,
+model = make_epi_aware(truth_data, time_horizon, ; epi_model = epi_model,
     latent_model_model = rwp, observation_model = obs_model,
     pos_shift = 1e-6)
 @time chn = sample(model,

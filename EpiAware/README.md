@@ -50,7 +50,7 @@ DelayObservations"]
 
 E["Turing model constructor
 ---------------------
-make_epi_inference_model"]
+make_epi_aware"]
 
 G[Posterior draws]
 H[Posterior checking]
