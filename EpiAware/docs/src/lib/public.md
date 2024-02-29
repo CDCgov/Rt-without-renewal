@@ -18,8 +18,3 @@ Pages = ["public.md"]
 ```
 
 ## Public API
-<!--
-```@autodocs
-Modules = [EpiAware]
-Private = false
-``` -->
