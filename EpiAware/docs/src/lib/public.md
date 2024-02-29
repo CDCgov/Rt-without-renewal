@@ -16,36 +16,10 @@ Depth = 2:2
 ```@index
 Pages = ["public.md"]
 ```
-## Modules
 
-```@docs
-EpiAware
-```
+## Public API
 
-## Abstract types
-
-```@docs
-AbstractModel
-AbstractEpiModel
-AbstractLatentModel
-AbstractObservationModel
-```
-
-## Types
-
-```@docs
-EpiData
-Renewal
-ExpGrowthRate
-DirectInfections
-RandomWalk
-```
-
-## Functions
-
-```@docs
-make_epi_aware
-create_discrete_pmf
-spread_draws
-scan
+```@autodocs
+Modules = [EpiAware]
+Private = false
 ```

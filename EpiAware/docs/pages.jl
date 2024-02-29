@@ -12,10 +12,7 @@ pages = [
     "Developers" => [
         "contributing.md",
         "checklists.md",
-        "Internals" => map(
-            s -> "lib/internals/$(s)",
-            sort(readdir(joinpath(@__DIR__, "src/lib/internals")))
-        )
+        "Internals" => "lib/internals.md"
     ],
     "release-notes.md"
 ]
