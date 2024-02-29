@@ -22,7 +22,7 @@ An epidemiological model in `EpiAware` consists of composable structs with core 
         direct infections.
 2. `AbstractLatentProcess`: Subtypes of this abstract type represent different latent
      processes that can be used in an epidemiological model. Implemented concrete subtype:
-    - `RandomWalkLatentProcess`: A random walk latent process.
+    - `RandomWalk`: A random walk latent process.
 3. `AbstractObservationProcess`: Subtypes of this abstract type represent different
     observation processes that can be used in an epidemiological model.
     Implemented concrete subtypes:
