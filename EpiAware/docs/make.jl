@@ -9,4 +9,8 @@ makedocs(; sitename = "EpiAware.jl",
     clean = true, doctest = true, linkcheck = true,
     warnonly = [:docs_block, :missing_docs],
     modules = [EpiAware],
-    pages = pages)
+    pages = pages,
+    format = Documenter.HTML(
+        prettyurls = get(ENV, "CI", nothing) == "true"
+    )
+)
