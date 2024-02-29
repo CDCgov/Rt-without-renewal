@@ -1,4 +1,6 @@
 # Generate a Documenter-friendly changelog from CHANGELOG.md
+using Changelog
+
 Changelog.generate(
     Changelog.Documenter(),
     joinpath(@__DIR__, "..", "CHANGELOG.md"),
