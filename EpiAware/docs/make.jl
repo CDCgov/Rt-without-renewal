@@ -14,3 +14,9 @@ makedocs(; sitename = "EpiAware.jl",
         prettyurls = get(ENV, "CI", nothing) == "true"
     )
 )
+
+deploydocs(
+    repo = "github.com/CDCgov/Rt-without-renewal.git",
+    target = "build",
+    push_preview = true
+)
