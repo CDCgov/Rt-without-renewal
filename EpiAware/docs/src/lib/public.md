@@ -38,6 +38,7 @@ EpiData
 Renewal
 ExpGrowthRate
 DirectInfections
+RandomWalk
 ```
 
 ## Functions
