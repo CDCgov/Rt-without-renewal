@@ -1,3 +1,7 @@
+#Load current `EpiAware` code
+using Pkg;
+Pkg.develop(path = "..");
+
 using Documenter, Changelog
 using EpiAware
 
