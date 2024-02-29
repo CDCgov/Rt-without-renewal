@@ -25,6 +25,10 @@ jobs:
         run: mv EpiAware/*
       - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
+      - name: dev EpiAware
+        run: julia --project=docs -e 'using Pkg; Pkg.develop(path="..")'
       - uses: julia-actions/julia-docdeploy@v1
+        with:
+          install-package: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
