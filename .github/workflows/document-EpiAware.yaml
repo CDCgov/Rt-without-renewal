@@ -26,7 +26,7 @@ jobs:
       - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
       - name: dev EpiAware
-        run: julia --project=docs -e 'using Pkg; Pkg.develop(path=joinpath(pwd(), "EpiAware"))'
+        run: julia --project=docs -e 'using Pkg; Pkg.develop(path="./EpiAware")'
       - uses: julia-actions/julia-docdeploy@v1
         with:
           install-package: false
