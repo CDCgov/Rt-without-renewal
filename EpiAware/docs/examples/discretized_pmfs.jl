@@ -81,7 +81,7 @@ plt1 = let
         xlabel = "Days",
         ylabel = "Probability")
 end
-savefig(plt1, joinpath(@__DIR__(), "assets/", "discrete_pmf_daily.png"))
+## savefig(plt1, joinpath(@__DIR__(), "assets/", "discrete_pmf_daily.png"))
 
 # For hourly censoring the difference is not noticable.
 
@@ -100,4 +100,4 @@ plt2 = let
         xlabel = "Days",
         ylabel = "Probability")
 end
-savefig(plt2, joinpath(@__DIR__(), "assets/", "discrete_pmf_hourly.png"))
+## savefig(plt2, joinpath(@__DIR__(), "assets/", "discrete_pmf_hourly.png"))

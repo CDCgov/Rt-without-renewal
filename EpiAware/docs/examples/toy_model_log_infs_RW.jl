@@ -68,7 +68,6 @@ using Random
 using DynamicPPL
 using Statistics
 using DataFramesMeta
-using CSV # For outputting the MCMC chain
 
 Random.seed!(0)
 
@@ -94,7 +93,6 @@ In this case we use the `DirectInfections` model.
 
 rwp = EpiAware.RandomWalk(Normal(),
     truncated(Normal(0.0, 0.01), 0.0, 0.5))
-obs_mdl = delay_observations_model()
 
 #Define the observation model - no delay model
 time_horizon = 100
@@ -143,7 +141,8 @@ truth_data = random_epidemic.y_t
 model = make_epi_aware(truth_data, time_horizon, ; epi_model = epi_model,
     latent_model_model = rwp, observation_model = obs_model,
     pos_shift = 1e-6)
-@time chn = sample(model,
+
+chn = sample(model,
     NUTS(; adtype = AutoReverseDiff(true)),
     MCMCThreads(),
     250,
@@ -190,5 +189,4 @@ We can use `spread_draws` to convert the MCMC chain into a tidybayes format.
 =#
 
 df_chn = spread_draws(chn)
-save_path = joinpath(@__DIR__, "assets/toy_model_log_infs_RW_draws.csv")
-CSV.write(save_path, df_chn)
+first(df_chn, 10)
