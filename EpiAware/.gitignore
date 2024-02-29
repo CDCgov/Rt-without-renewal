@@ -5,7 +5,7 @@
 # applications that require a static environment.
 **/Manifest.toml
 docs/build
-!docs/lib
+!docs/lib/*
 
 # Data
 *.csv
