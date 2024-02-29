@@ -37,11 +37,11 @@ end
     transformation = exp
 
     data = EpiData(gen_int, transformation)
-    epimodel = Renewal(data, Normal())
+    epi_model = Renewal(data, Normal())
 
     function generate_infs(recent_incidence, Rt)
-        new_incidence = Rt * dot(recent_incidence, epimodel.data.gen_int)
-        [new_incidence; recent_incidence[1:(epimodel.data.len_gen_int - 1)]], new_incidence
+        new_incidence = Rt * dot(recent_incidence, epi_model.data.gen_int)
+        [new_incidence; recent_incidence[1:(epi_model.data.len_gen_int - 1)]], new_incidence
     end
 
     recent_incidence = [10, 20, 30]
@@ -117,13 +117,13 @@ end
     @test mdl_incidence ≈ expected_incidence
 end
 @testitem "generate_latent_infs function: default" begin
-    latent_process = [0.1, 0.2, 0.3]
+    latent_model = [0.1, 0.2, 0.3]
     init_incidence = 10.0
 
     struct TestEpiModel <: EpiAware.AbstractEpiModel
     end
 
-    @test isnothing(EpiAware.generate_latent_infs(TestEpiModel(), latent_process))
+    @test isnothing(EpiAware.generate_latent_infs(TestEpiModel(), latent_model))
 end
 @testitem "generate_latent_infs dispatched on Renewal" begin
     using Distributions, Turing, HypothesisTests, DynamicPPL, LinearAlgebra

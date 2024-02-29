@@ -5,9 +5,9 @@
 
     n = 5
     priors = EpiAware.default_rw_priors()
-    rw_process = EpiAware.RandomWalkLatentProcess(Normal(0.0, 1.0),
+    rw_process = EpiAware.RandomWalk(Normal(0.0, 1.0),
         truncated(Normal(0.0, 0.05), 0.0, Inf))
-    model = EpiAware.generate_latent_process(rw_process, n)
+    model = EpiAware.generate_latent(rw_process, n)
     fixed_model = fix(model, (σ²_RW = 1.0, init_rw_value = 0.0)) #Fixing the standard deviation of the random walk process
     n_samples = 1000
     samples_day_5 = sample(fixed_model, Prior(), n_samples) |>
@@ -31,10 +31,10 @@ end
         @test typeof(init_rw_value) == Float64
     end
 end
-@testset "Testing RandomWalkLatentProcess constructor" begin
+@testset "Testing RandomWalk constructor" begin
     init_prior = Normal(0.0, 1.0)
     var_prior = truncated(Normal(0.0, 0.05), 0.0, Inf)
-    rw_process = RandomWalkLatentProcess(init_prior, var_prior)
+    rw_process = RandomWalk(init_prior, var_prior)
     @test rw_process.init_prior == init_prior
     @test rw_process.var_prior == var_prior
 end

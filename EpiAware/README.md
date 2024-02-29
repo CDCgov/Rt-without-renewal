@@ -37,9 +37,9 @@ Obs. cases y_t"]
 
 LatentProcPriors["Latent process priors"]
 
-LatentProc["AbstractLatentProcess
+LatentProc["AbstractLatentModel
 ---------------------
-RandomWalkLatentProcess"]
+RandomWalk"]
 
 ObsModelPriors["Observation model priors
 choice of delayed obs. model"]
@@ -50,7 +50,7 @@ DelayObservations"]
 
 E["Turing model constructor
 ---------------------
-make_epi_inference_model"]
+make_epi_aware"]
 
 G[Posterior draws]
 H[Posterior checking]

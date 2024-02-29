@@ -1,5 +1,3 @@
-abstract type AbstractObservationModel end
-
 struct DelayObservations{T <: AbstractFloat, S <: Sampleable} <: AbstractObservationModel
     delay_kernel::SparseMatrixCSC{T, Integer}
     neg_bin_cluster_factor_prior::S
