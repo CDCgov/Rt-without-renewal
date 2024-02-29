@@ -13,7 +13,7 @@ An epidemiological model in `EpiAware` consists of composable structs with core 
 ``
 2. `AbstractEpiModel`: Subtypes of this abstract type represent different models for the
      spread of an infectious disease. Each model type has a corresponding
-     `make_epi_inference_model` function that constructs a `Turing` model for fitting the
+     `make_epi_aware` function that constructs a `Turing` model for fitting the
          model to data. Implemented concrete subtypes:
     - `Renewal`: A renewal process model for the spread of an infectious disease.
     - `ExpGrowthRate`: An exponential growth rate model for the spread of an infectious
