@@ -1,4 +1,3 @@
-
 using Documenter, Changelog
 using EpiAware
 
