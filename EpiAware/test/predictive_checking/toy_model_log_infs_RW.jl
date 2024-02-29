@@ -94,7 +94,6 @@ In this case we use the `DirectInfections` model.
 
 rwp = EpiAware.RandomWalk(Normal(),
     truncated(Normal(0.0, 0.01), 0.0, 0.5))
-obs_mdl = delay_observations_model()
 
 #Define the observation model - no delay model
 time_horizon = 100
