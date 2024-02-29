@@ -22,7 +22,7 @@ jobs:
           sparse-checkout: EpiAware
           sparse-checkout-cone-mode: false
       - name: Move EpiAware to root
-        run: mv EpiAware/*
+        run: mv EpiAware/* .
       - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-docdeploy@v1
