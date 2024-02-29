@@ -3,7 +3,7 @@
 
 # Julia
 **/Manifest.toml
-
+**/*_files
 # Data
 *.csv
 *.tsv

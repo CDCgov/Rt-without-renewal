@@ -1,15 +1,8 @@
 using Documenter
 using EpiAware
 
+include("changelog.jl")
 include("pages.jl")
-
-# Generate a Documenter-friendly changelog from CHANGELOG.md
-Changelog.generate(
-    Changelog.Documenter(),
-    joinpath(@__DIR__, "..", "CHANGELOG.md"),
-    joinpath(@__DIR__, "src", "release-notes.md");
-    repo = "JuliaDocs/Documenter.jl"
-)
 
 makedocs(; sitename = "EpiAware.jl",
     authors = "Samuel Brand, Zachary Susswein, Sam Abbott, and contributors",
