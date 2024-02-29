@@ -36,15 +36,16 @@ export create_discrete_pmf, spread_draws, scan
 
 # Exported types
 export EpiData, Renewal, ExpGrowthRate, DirectInfections, AbstractEpiModel,
-       AbstractLatentProcess, AbstractObservationModel
+       AbstractLatentModel, AbstractObservationModel
 
 # Exported Turing model constructors
-export make_epi_inference_model
+export make_epi_aware
 
-include("epimodel.jl")
+include("abstract-types.jl")
+include("epi-models.jl")
 include("utilities.jl")
-include("latent-processes.jl")
-include("observation-processes.jl")
+include("latent-models.jl")
+include("observation-models.jl")
 include("models.jl")
 
 end

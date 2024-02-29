@@ -14,7 +14,7 @@
     # Check that a callable subtype of `AbstractEpiModel` CAN be used
     struct TestEpiModelAdd <: AbstractEpiModel
     end
-    function (epimodel::TestEpiModelAdd)(a, b)
+    function (epi_model::TestEpiModelAdd)(a, b)
         return a + b, a + b
     end
 
@@ -41,7 +41,7 @@ end
     struct TestEpiModelMult <: AbstractEpiModel
     end
 
-    function (epimodel::TestEpiModelMult)(a, b)
+    function (epi_model::TestEpiModelMult)(a, b)
         return a * b, a * b
     end
 
