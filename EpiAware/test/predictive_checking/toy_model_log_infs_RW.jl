@@ -7,7 +7,8 @@ This is a toy model for demonstrating current functionality of EpiAware package.
 
 ### Latent Process
 
-The latent process is a random walk defined by a Turing model `random_walk` of specified length `n`.
+The latent process is a random walk defined by a Turing model `random_walk` of specified
+    length `n`.
 
 _Unfixed parameters_:
 - `σ²_RW`: The variance of the random walk process. Current defauly prior is
@@ -25,10 +26,12 @@ X(0) &\sim \mathcal{N}(0, 1) \\
 
 ### Log-Infections Model
 
-The log-infections model is defined by a Turing model `log_infections` that takes the observed data `y_t` (or `missing` value),
-an `EpiModel` object `epi_model`, and a `latent_model` model. In this case the latent process is a random walk model.
+The log-infections model is defined by a Turing model `log_infections` that takes the
+    observed data `y_t` (or `missing` value), an `EpiModel` object `epi_model`, and a
+    `latent_model` model. In this case the latent process is a random walk model.
 
-It also accepts optional arguments for the `process_priors`, `transform_function`, `pos_shift`, `neg_bin_cluster_factor`, and `neg_bin_cluster_factor_prior`.
+It also accepts optional arguments for the `process_priors`, `transform_function`,
+    `pos_shift`, `neg_bin_cluster_factor`, and `neg_bin_cluster_factor_prior`.
 
 ```math
 \log I_t = \exp(X(t)).
@@ -36,8 +39,9 @@ It also accepts optional arguments for the `process_priors`, `transform_function
 
 ### Observation model
 
-The observation model is a negative binomial distribution with mean `μ` and cluster factor `r`. Delays are implemented
-as the action of a sparse kernel on the infections $I(t)$. The delay kernel is contained in an `EpiModel` struct.
+The observation model is a negative binomial distribution with mean `μ` and cluster factor
+    `r`. Delays are implemented as the action of a sparse kernel on the infections $I(t)$.
+The delay kernel is contained in an `EpiModel` struct.
 
 ```math
 \begin{align}
@@ -68,7 +72,8 @@ using Random
 using DynamicPPL
 using Statistics
 using DataFramesMeta
-using CSV # For outputting the MCMC chain
+using CSV
+using Pathfinder
 
 Random.seed!(0)
 
@@ -94,7 +99,6 @@ In this case we use the `DirectInfections` model.
 
 rwp = EpiAware.RandomWalk(Normal(),
     truncated(Normal(0.0, 0.01), 0.0, 0.5))
-obs_mdl = delay_observations_model()
 
 #Define the observation model - no delay model
 time_horizon = 100
@@ -133,22 +137,42 @@ plot(gen.I_t,
 scatter!(random_epidemic.y_t, lab = "generated cases")
 
 #=
-## Inference
+## Model with observed data
 
 We treat the generated data as observed data and attempt to infer underlying infections.
 =#
 
 truth_data = random_epidemic.y_t
 
-model = make_epi_aware(truth_data, time_horizon, ; epi_model = epi_model,
+model = make_epi_aware(truth_data, time_horizon; epi_model = epi_model,
     latent_model_model = rwp, observation_model = obs_model,
     pos_shift = 1e-6)
+
+#=
+### Pathfinder inference
+
+We can use pathfinder to get draws from the model. We can later use these draws to
+    initialize the MCMC chain. We can also compare a single run of pathfinder with
+=#
+
+safe_model = make_epi_aware(truth_data, time_horizon, Val(:safe);
+    epi_model = epi_model,
+    latent_model_model = rwp,
+    observation_model = obs_model,
+    pos_shift = 1e-6)
+
+mpf_result = multipathfinder(safe_model, 1000; nruns = 10)
+
+mpf_chn = mpf_result.draws_transformed
+
 @time chn = sample(model,
     NUTS(; adtype = AutoReverseDiff(true)),
     MCMCThreads(),
     250,
     4;
-    drop_warmup = true)
+    drop_warmup = true,
+    init_params = collect.(eachrow(mpf_chn.value[1:4, :, 1]))
+)
 
 #=
 ## Postior predictive checking
@@ -156,27 +180,56 @@ model = make_epi_aware(truth_data, time_horizon, ; epi_model = epi_model,
 We check the posterior predictive checking by plotting the predicted cases against the observed cases.
 =#
 
-predicted_y_t = mapreduce(hcat, generated_quantities(log_infs_model, chn)) do gen
-    gen.generated_y_t
+predicted_y_t, mpf_predicted_y_t = map((chn, mpf_chn)) do _chn
+    mapreduce(hcat, generated_quantities(log_infs_model, _chn)) do gen
+        gen.generated_y_t
+    end
 end
 
-plot(predicted_y_t, c = :grey, alpha = 0.05, lab = "")
-scatter!(truth_data,
-    lab = "Observed cases",
-    xlabel = "Time",
-    ylabel = "Cases",
-    title = "Posterior Predictive Checking",
-    ylims = (-0.5, maximum(truth_data) * 2.5))
+data_pred_plts = map(("NUTS", "multi-pf"),
+    (predicted_y_t, mpf_predicted_y_t)) do title_str, pred_y_t
+    plt = plot(pred_y_t, c = :grey, alpha = 0.05, lab = "")
+    scatter!(plt, truth_data,
+        lab = "Observed cases",
+        xlabel = "Time",
+        ylabel = "Cases",
+        title = "Posterior Predictive Checking: " * title_str,
+        ylims = (-0.5, maximum(truth_data) * 2.5))
+    return plt
+end
+
+plot(data_pred_plts...,
+    layout = (2, 1),
+    size = (500, 700))
 
 #=
 ## Underlying inferred infections
 =#
 
-predicted_I_t = mapreduce(hcat, generated_quantities(log_infs_model, chn)) do gen
-    gen.I_t
+predicted_I_t, mpf_predicted_I_t = map((chn, mpf_chn)) do _chn
+    mapreduce(hcat, generated_quantities(log_infs_model, _chn)) do gen
+        gen.I_t
+    end
 end
 
-plot(predicted_I_t, c = :grey, alpha = 0.05, lab = "")
+plts_infs = map(("NUTS", "multi-pf"),
+    (predicted_I_t, mpf_predicted_I_t)) do title_str, pred_I_t
+    plt = plot(pred_I_t, c = :grey, alpha = 0.05, lab = "")
+    scatter!(plt, gen.I_t,
+        lab = "Actual infections",
+        xlabel = "Time",
+        ylabel = "Infections",
+        title = "Posterior Predictive Checking: " * title_str,
+        ylims = (-0.5, maximum(gen.I_t) * 1.5))
+    return plt
+end
+
+plot(plts_infs...,
+    layout = (2, 1),
+    size = (500, 700))
+plot(pf_predicted_I_t, c = :grey, alpha = 0.05, lab = "")
+plot(predicted_I_t, c = :blue, alpha = 0.05, lab = "")
+
 scatter!(gen.I_t,
     lab = "Actual infections",
     xlabel = "Time",
