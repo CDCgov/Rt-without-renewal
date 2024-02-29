@@ -48,8 +48,8 @@ using Distributions, Turing, LogExpFunctions, LinearAlgebra, SparseArrays, Rando
 export create_discrete_pmf, spread_draws, scan
 
 # Exported types
-export EpiData, Renewal, ExpGrowthRate, DirectInfections, AbstractEpiModel,
-       AbstractLatentModel, AbstractObservationModel
+export EpiData, Renewal, ExpGrowthRate, DirectInfections, AbstractModel,
+       AbstractEpiModel, AbstractLatentModel, AbstractObservationModel
 
 # Exported Turing model constructors
 export make_epi_aware
