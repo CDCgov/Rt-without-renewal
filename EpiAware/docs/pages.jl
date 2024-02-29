@@ -10,8 +10,8 @@ pages = [
         "Public API" => "lib/public.md"
     ],
     "Developers" => [
-        "contributing.md",
-        "checklists.md",
+        "Contributing" => "contributing.md",
+        "Release checklist" => "checklist.md",
         "Internals" => "lib/internals.md"
     ],
     "release-notes.md"
