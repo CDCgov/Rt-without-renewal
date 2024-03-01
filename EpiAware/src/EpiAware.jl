@@ -48,7 +48,7 @@ export EpiData, Renewal, ExpGrowthRate, DirectInfections, RandomWalk,
 export make_epi_aware
 
 # Exported model functions
-export generate_latent, generate_latent_infs, generate_observation
+export generate_latent, generate_latent_infs, generate_observations
 
 # Exported utilities
 export create_discrete_pmf, spread_draws, scan, R_to_r, r_to_R,
