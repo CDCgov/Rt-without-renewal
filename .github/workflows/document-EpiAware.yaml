@@ -1,9 +1,8 @@
-name: Test EpiAware
-
+name: Documenter
 on:
   push:
-    branches:
-      - main
+    branches: main
+    tags: [v*]
   pull_request:
 
 concurrency:
@@ -11,13 +10,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: true
-      matrix:
-        julia-version: ['1.10', '1']
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+  Documenter:
+    permissions:
+      contents: write
+      statuses: write
+    name: Documentation
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -25,9 +23,8 @@ jobs:
           sparse-checkout-cone-mode: false
       - name: Move EpiAware to root
         run: mv EpiAware/* .
-      - uses: julia-actions/setup-julia@v1
-        with:
-          version: ${{ matrix.julia-version }}
       - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
-      - uses: julia-actions/julia-runtest@v1
+      - uses: julia-actions/julia-docdeploy@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
