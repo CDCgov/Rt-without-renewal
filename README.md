@@ -1,50 +1,23 @@
-![Test](https://github.com/CDCgov/Rt-without-renewal/actions/workflows/test-EpiAware.yaml/badge.svg)
-![CodeCov](https://github.com/CDCgov/Rt-without-renewal/actions/workflows/codecoverage-EpiAware.yaml/badge.svg)
-![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)
-
-# cfa-repo-template
-A template for new CFA repos
+# Effective reproduction number (Rt) estimation with or without a renewal process
 
 ⚠️ This is a work in progress
 
-## How to use this template
-To open a new repo using this template, click the green `Use this template`
-button above and to the right. Then select `Create a new repository`.
-Boilerplate language from [CDCgov GitHub Oroganization Open Source Project Template](https://github.com/cdcgov/template)
-below the horizontal rule should be maintained in the final `README.md` file.
-
-[Guidance about when clearance is needed and how to get it]
-
-## This template contains
-- [x] An Apache 2.0 license
-- [ ] Issue templates for bugs, feature requests, and scientific improvements
-- [ ] A pull request (PR) template
-- [x] CI for linting and styling, following CFA's style guide for R, Python, and Java
-- [x] A .gitignore template that covers R, Python, and Java
-
-## Reminder: how to open issues, branches, submit PRs, and review PRs
-[TODO]
-* Link to CFA's style guide
-* How to open issues, including naming conventions, template usage
-* How to create new branches, including naming conventions, template usage
-* How to submit a PR, including when, template usage
-* How to review a PR, including whose responsibility to merge
-
-------------------------------------------------------------------------------------
-# Your project name
-
 ## Overview
 
-Describe the purpose of your project. Add additional sections as necessary to help collaborators and potential collaborators understand and use your project.
+To evaluate the role of the latent generative process in the estimation of the effective reproduction number (Rt), we are developing a flexible framework (see `EpiAware`) for Rt estimation that allows for the inclusion of different latent infection models (such as a renewal process) and provides a consistent interface for model fitting, posterior checking, and post-processing.
+
+In `pipeline`, we will use `EpiAware` to explore whether the inclusion of a renewal process in the latent generative process improves the estimation of Rt and other situational awareness signals. This exploration is then written as a manuscript for publication (see `manuscript` for work supporting this).
 
 ## Project Admin
 
 Name, Degrees, e-mail, CDC org (e.g., CDC/IOD/ORR/CFA)
 
 ## General Disclaimer
+
 This repository was created for use by CDC programs to collaborate on public health related projects in support of the [CDC mission](https://www.cdc.gov/about/organization/mission.htm).  GitHub is not hosted by the CDC, but is a third party website used by CDC and its partners to share information and collaborate on software. CDC use of GitHub does not imply an endorsement of any one particular service, product, or enterprise.
 
 ## Public Domain Standard Notice
+
 This repository constitutes a work of the United States Government and is not
 subject to domestic copyright protection under 17 USC § 105. This repository is in
 the public domain within the United States, and copyright and related rights in
@@ -54,6 +27,7 @@ submitting a pull request you are agreeing to comply with this waiver of
 copyright interest.
 
 ## License Standard Notice
+
 This repository is licensed under ASL v2 or later.
 
 This source code in this repository is free: you can redistribute it and/or modify it under
@@ -70,6 +44,7 @@ program. If not, see http://www.apache.org/licenses/LICENSE-2.0.html
 The source code forked from other open source projects will inherit its license.
 
 ## Privacy Standard Notice
+
 This repository contains only non-sensitive, publicly available data and
 information. All material and community participation is covered by the
 [Disclaimer](https://github.com/CDCgov/template/blob/master/DISCLAIMER.md)
@@ -77,6 +52,7 @@ and [Code of Conduct](https://github.com/CDCgov/template/blob/master/code-of-con
 For more information about CDC's privacy policy, please visit [http://www.cdc.gov/other/privacy.html](https://www.cdc.gov/other/privacy.html).
 
 ## Contributing Standard Notice
+
 Anyone is encouraged to contribute to the repository by [forking](https://help.github.com/articles/fork-a-repo)
 and submitting a pull request. (If you are new to GitHub, you might start with a
 [basic tutorial](https://help.github.com/articles/set-up-git).) By contributing
@@ -89,11 +65,13 @@ All comments, messages, pull requests, and other submissions received through
 CDC including this GitHub page may be subject to applicable federal law, including but not limited to the Federal Records Act, and may be archived. Learn more at [http://www.cdc.gov/other/privacy.html](http://www.cdc.gov/other/privacy.html).
 
 ## Records Management Standard Notice
+
 This repository is not a source of government records but is a copy to increase
 collaboration and collaborative potential. All government records will be
 published through the [CDC web site](http://www.cdc.gov).
 
 ## Additional Standard Notices
+
 Please refer to [CDC's Template Repository](https://github.com/CDCgov/template)
 for more information about [contributing to this repository](https://github.com/CDCgov/template/blob/master/CONTRIBUTING.md),
 [public domain notices and disclaimers](https://github.com/CDCgov/template/blob/master/DISCLAIMER.md),
