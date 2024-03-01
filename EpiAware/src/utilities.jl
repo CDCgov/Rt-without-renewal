@@ -196,7 +196,7 @@ function r_to_R(r, w::AbstractVector)
 end
 
 """
-    mean_cc_neg_bin(μ, α)
+    NegativeBinomialMeanClust(μ, α)
 
 Compute the mean-cluster factor negative binomial distribution.
 
@@ -207,7 +207,7 @@ Compute the mean-cluster factor negative binomial distribution.
 # Returns
 A `NegativeBinomial` distribution object.
 """
-function mean_cc_neg_bin(μ, α)
+function NegativeBinomialMeanClust(μ, α)
     ex_σ² = (α * μ^2) + 1e-6
     p = μ / (μ + ex_σ² + 1e-6)
     r = μ^2 / ex_σ²

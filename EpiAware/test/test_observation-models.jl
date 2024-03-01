@@ -25,7 +25,7 @@
                 chn -> generated_quantities(fix_mdl, chn) .|>
                        (gen -> gen[1][1]) |>
                        vec
-    direct_samples = EpiAware.mean_cc_neg_bin(I_t[1], neg_bin_cf) |>
+    direct_samples = EpiAware.NegativeBinomialMeanClust(I_t[1], neg_bin_cf) |>
                      dist -> rand(dist, n_samples)
 
     #For discrete distributions, checking mean and variance is as expected
@@ -36,6 +36,59 @@
     #Check var
     var_pval = VarianceFTest(first_obs, direct_samples) |> pvalue
     @test var_pval > 1e-6 #Very unlikely to fail if the model is correctly implemented
+end
+
+@testitem "Testing delay obs with partial missing data against theoretical properties" begin
+    using DynamicPPL, Turing, Distributions
+    using HypothesisTests
+
+    # Set up test data with fixed infection and some missing observations
+    I_t_partial_missing = [10.0, missing, 30.0]  # Simulating partial missing data in infections
+    obs_prior = EpiAware.default_delay_obs_priors()
+
+    # Delay kernel is just event observed on same day
+    delay_obs = EpiAware.DelayObservations([1.0], length(I_t_partial_missing),
+        obs_prior[:neg_bin_cluster_factor_prior])
+
+    # Set up priors
+    neg_bin_cf = 0.05
+
+    # Call the function with partial missing data
+    mdl_partial_missing = EpiAware.generate_observations(delay_obs,
+        missing,  # Assuming y_t can be initially missing
+        I_t_partial_missing;
+        pos_shift = 1e-6)
+    fix_mdl_partial_missing = fix(
+        mdl_partial_missing, (neg_bin_cluster_factor = neg_bin_cf,))
+
+    n_samples = 2000
+    first_obs_partial_missing = sample(fix_mdl_partial_missing, Prior(), n_samples) |>
+                                chn -> generated_quantities(
+                                           fix_mdl_partial_missing, chn) .|>
+                                       (gen -> gen[1]) |>
+                                       collect
+
+    # For each non-missing observation in I_t_partial_missing, generate direct samples and perform tests
+    for (index, I_t_val) in enumerate(I_t_partial_missing)
+        if ismissing(I_t_val)
+            continue  # Skip missing data points
+        end
+
+        # Generate direct samples for comparison
+        direct_samples_partial_missing = EpiAware.NegativeBinomialMeanClust(
+            I_t_val, neg_bin_cf) |>
+                                         dist -> rand(dist, n_samples)
+
+        # Check mean
+        mean_pval_partial_missing = OneWayANOVATest(
+            first_obs_partial_missing[index], direct_samples_partial_missing) |> pvalue
+        @test mean_pval_partial_missing > 1e-6
+
+        # Check variance
+        var_pval_partial_missing = VarianceFTest(
+            first_obs_partial_missing[index], direct_samples_partial_missing) |> pvalue
+        @test var_pval_partial_missing > 1e-6
+    end
 end
 
 @testitem "Testing DelayObservations struct" begin
