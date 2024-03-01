@@ -29,29 +29,25 @@ An epidemiological model in `EpiAware` consists of composable structs with core 
         of infection and the time of observation as a convolution, followed by a negative
         binomial distributed sample.
 
-## Imports
-
-$(IMPORTS)
-
-## Exports
-
-$(EXPORTS)
-
 """
 module EpiAware
 
-using Distributions, Turing, LogExpFunctions, LinearAlgebra, SparseArrays, Random,
-      ReverseDiff, Optim, Parameters, QuadGK, DataFramesMeta, DocStringExtensions
+using Distributions, Turing, LogExpFunctions, LinearAlgebra, SparseArrays,
+      Random, ReverseDiff, Optim, Parameters, QuadGK, DataFramesMeta,
+      DocStringExtensions
 
-# Exported utilities
-export create_discrete_pmf, spread_draws, scan
+# Exported abstract types
+export AbstractModel, AbstractEpiModel, AbstractLatentModel,
+       AbstractObservationModel
 
 # Exported types
-export EpiData, Renewal, ExpGrowthRate, DirectInfections, AbstractModel,
-       AbstractEpiModel, AbstractLatentModel, AbstractObservationModel
+export EpiData, Renewal, ExpGrowthRate, DirectInfections, RandomWalk
 
 # Exported Turing model constructors
 export make_epi_aware
+
+# Exported utilities
+export create_discrete_pmf, spread_draws, scan
 
 include("docstrings.jl")
 include("abstract-types.jl")
