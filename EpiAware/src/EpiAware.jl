@@ -53,6 +53,7 @@ export EpiData, Renewal, ExpGrowthRate, DirectInfections, AbstractModel,
 # Exported Turing model constructors
 export make_epi_aware
 
+include("docstrings.jl")
 include("abstract-types.jl")
 include("epi-models.jl")
 include("utilities.jl")
