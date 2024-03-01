@@ -29,14 +29,6 @@ An epidemiological model in `EpiAware` consists of composable structs with core 
         of infection and the time of observation as a convolution, followed by a negative
         binomial distributed sample.
 
-## Imports
-
-$(IMPORTS)
-
-## Exports
-
-$(EXPORTS)
-
 """
 module EpiAware
 
@@ -57,6 +49,7 @@ export make_epi_aware
 # Exported utilities
 export create_discrete_pmf, spread_draws, scan
 
+include("docstrings.jl")
 include("abstract-types.jl")
 include("epi-models.jl")
 include("utilities.jl")
