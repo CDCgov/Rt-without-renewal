@@ -83,7 +83,7 @@ truth_GI = Gamma(2, 5)
 model_data = EpiData(truth_GI,
     D_gen = 10.0)
 
-log_I0_prior = Normal(0.0, 1.0)
+log_I0_prior = Normal(0.0, 10.0)
 epi_model = DirectInfections(model_data, log_I0_prior)
 
 #=
