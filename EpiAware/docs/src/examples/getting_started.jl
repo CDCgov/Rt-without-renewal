@@ -127,7 +127,7 @@ We can supply a prior for the initial log_infections.
 "
 
 # ╔═╡ 6639e66f-7725-4976-81b2-6472419d1a62
-log_I0_prior = Normal(0.0, 10.0)
+log_I0_prior = Normal(log(100.0), 1.0)
 
 # ╔═╡ df5e59f8-3185-4bed-9cca-7c266df17cec
 md"
@@ -162,13 +162,21 @@ obs_model = EpiAware.DelayObservations([1.0],
     time_horizon,
     truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0))
 
+# ╔═╡ e49713e8-4840-4083-8e3f-fc52d791be7b
+md"
+## Generation
+"
+
 # ╔═╡ abeff860-58c3-4644-9325-66ffd4446b6d
-log_infs_model = make_epi_aware(missing, time_horizon, ; epi_model = epi_model,
+full_epi_aware_mdl = make_epi_aware(missing, time_horizon; epi_model = epi_model,
     latent_model_model = rwp, observation_model = obs_model,
     pos_shift = 1e-6)
 
+# ╔═╡ 36b34fd2-2891-42ca-b5dc-abb482e516ee
+fixed_parameters = (init_incidence = log(100.0), σ²_RW = 0.1^2, init_rw = 0.0)
+
 # ╔═╡ 7e0e6012-8648-4f84-a25a-8b0138c4b72a
-cond_toy = fix(log_infs_model, (init_incidence = log(10.0), σ²_RW = 0.1, init_rw = 0.0))
+cond_toy = fix(full_epi_aware_mdl, fixed_parameters)
 
 # ╔═╡ b20c28be-7b07-410c-a33b-ea5ad6828c12
 random_epidemic = rand(cond_toy)
@@ -177,30 +185,78 @@ random_epidemic = rand(cond_toy)
 gen = generated_quantities(cond_toy, random_epidemic)
 
 # ╔═╡ f68b4e41-ac5c-42cd-a8c2-8761d66f7543
-plot(gen.I_t,
-    label = "I_t",
-    xlabel = "Time",
-    ylabel = "Infections",
-    title = "Generated Infections")
+let
+    plot(gen.I_t,
+        label = "I_t",
+        xlabel = "Time",
+        ylabel = "Infections",
+        title = "Generated Infections")
+    scatter!(random_epidemic.y_t, lab = "generated cases")
+end
 
-# ╔═╡ 31764672-3073-4280-8ab2-d42544be1629
-scatter!(random_epidemic.y_t, lab = "generated cases")
+# ╔═╡ b5bc8f05-b538-4abf-aa84-450bf2dff3d9
+md"
+## Inference
+"
 
 # ╔═╡ c8ce0d46-a160-4c40-a055-69b3d10d1770
 truth_data = random_epidemic.y_t
 
 # ╔═╡ b4033728-b321-4100-8194-1fd9fe2d268d
-model = make_epi_aware(truth_data, time_horizon, ; epi_model = epi_model,
-    latent_model_model = rwp, observation_model = obs_model,
-    pos_shift = 1e-6) | (init_rw = 0.0,)
+inference_mdl = fix(
+    make_epi_aware(truth_data, time_horizon; epi_model = epi_model,
+        latent_model_model = rwp, observation_model = obs_model,
+        pos_shift = 1e-6),
+    (init_rw = 0.0,))
 
 # ╔═╡ 3eb5ec5e-aae7-478e-84fb-80f2e9f85b4c
-chn = sample(mdl,
+chn = sample(inference_mdl,
     NUTS(; adtype = AutoReverseDiff(true)),
     MCMCThreads(),
-    250,
-    4;
+    500,
+    2;
+    n_warmup = 100,
     drop_warmup = true)
+
+# ╔═╡ e9df22b8-8e4d-4ab7-91ea-c01f2239b3e5
+let
+    post_check_mdl = fix(full_epi_aware_mdl, (init_rw = 0.0,))
+    post_check_y_t = mapreduce(hcat, generated_quantities(full_epi_aware_mdl, chn)) do gen
+        gen.generated_y_t
+    end
+
+    predicted_I_t = mapreduce(hcat, generated_quantities(inference_mdl, chn)) do gen
+        gen.I_t
+    end
+
+    p1 = plot(post_check_y_t, c = :grey, alpha = 0.05, lab = "")
+    scatter!(p1, truth_data,
+        lab = "Observed cases",
+        xlabel = "Time",
+        ylabel = "Cases",
+        title = "Post. predictive checking: cases",
+        ylims = (-0.5, maximum(truth_data) * 2.5),
+        c = :green)
+
+    p2 = plot(predicted_I_t, c = :grey, alpha = 0.05, lab = "")
+    scatter!(p2, gen.I_t,
+        lab = "Actual infections",
+        xlabel = "Time",
+        ylabel = "Unobserved Infections",
+        title = "Post. predictions: infections",
+        ylims = (-0.5, maximum(gen.I_t) * 1.5),
+        c = :red)
+
+    plot(p1, p2, layout = (2, 1))
+end
+
+# ╔═╡ 10d8fe24-83a6-47ac-97b7-a374481473d3
+let
+    var_samples = chn[:σ²_RW] |> vec
+    histogram(var_samples, bins = 50, norm = :pdf)
+    vline!([fixed_parameters.:σ²_RW])
+    plot!(rwp.var_prior)
+end
 
 # ╔═╡ Cell order:
 # ╟─c593a2a0-d7f5-11ee-0931-d9f65ae84a72
@@ -219,12 +275,16 @@ chn = sample(mdl,
 # ╠═5e62a50a-71f4-4902-b1c9-fdf51fe145fa
 # ╠═c7580ae6-0db5-448e-8b20-4dd6fcdb1ae0
 # ╠═448669bc-99f4-4823-b15e-fcc9040ba31b
+# ╟─e49713e8-4840-4083-8e3f-fc52d791be7b
 # ╠═abeff860-58c3-4644-9325-66ffd4446b6d
+# ╠═36b34fd2-2891-42ca-b5dc-abb482e516ee
 # ╠═7e0e6012-8648-4f84-a25a-8b0138c4b72a
 # ╠═b20c28be-7b07-410c-a33b-ea5ad6828c12
 # ╠═d073e63b-62da-4743-ace0-78ef7806bc0b
-# ╠═f68b4e41-ac5c-42cd-a8c2-8761d66f7543
-# ╠═31764672-3073-4280-8ab2-d42544be1629
+# ╟─f68b4e41-ac5c-42cd-a8c2-8761d66f7543
+# ╟─b5bc8f05-b538-4abf-aa84-450bf2dff3d9
 # ╠═c8ce0d46-a160-4c40-a055-69b3d10d1770
 # ╠═b4033728-b321-4100-8194-1fd9fe2d268d
 # ╠═3eb5ec5e-aae7-478e-84fb-80f2e9f85b4c
+# ╠═e9df22b8-8e4d-4ab7-91ea-c01f2239b3e5
+# ╠═10d8fe24-83a6-47ac-97b7-a374481473d3
