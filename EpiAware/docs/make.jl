@@ -7,7 +7,7 @@ include("changelog.jl")
 include("pages.jl")
 include("build.jl")
 
-# build("examples")
+build("examples")
 
 makedocs(; sitename = "EpiAware.jl",
     authors = "Samuel Brand, Zachary Susswein, Sam Abbott, and contributors",
