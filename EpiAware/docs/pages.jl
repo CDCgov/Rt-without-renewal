@@ -3,7 +3,7 @@ pages = [
     "Manual" => Any[
         "Guide" => "man/guide.md",
         "Examples" => [
-            "Getting started" => "man/getting-started.md"
+            "Getting started" => "examples/getting_started.md"
         ]
     ],
     "Reference" => Any[
