@@ -26,6 +26,7 @@ begin
     using DynamicPPL
     using Statistics
     using DataFramesMeta
+    using LinearAlgebra
 end
 
 # ╔═╡ 3ebc8384-f73d-4597-83a7-07a3744fed61
@@ -94,7 +95,7 @@ Z_0 &\sim \mathcal{N}(0,1),\\
 
 # ╔═╡ 56ae496b-0094-460b-89cb-526627991717
 rwp = EpiAware.RandomWalk(Normal(),
-    truncated(Normal(0.0, 0.01), 0.0, 0.5))
+    truncated(Normal(0.0, 0.02), 0.0, Inf))
 
 # ╔═╡ 767beffd-1ef5-4e6c-9ac6-edb52e60fb44
 md"
@@ -118,8 +119,7 @@ The `EpiData` constructor performs double interval censoring to convert our _con
 "
 
 # ╔═╡ c0662d48-4b54-4b6d-8c91-ddf4b0e3aa43
-model_data = EpiData(truth_GI,
-    D_gen = 10.0)
+model_data = EpiData(truth_GI, D_gen = 10.0)
 
 # ╔═╡ fd72094f-1b95-4d07-a8b0-ef47dc560dfc
 md"
@@ -141,52 +141,81 @@ epi_model = DirectInfections(model_data, log_I0_prior)
 md"
 
 
-### Observation model
+### Delayed Observations `ObservationModel`
 
-The observation model is a negative binomial distribution with mean `μ` and cluster factor `r`. Delays are implemented
-as the action of a sparse kernel on the infections $I(t)$. The delay kernel is contained in an `EpiModel` struct.
+The observation model is a negative binomial distribution with mean `μ` and cluster factor `1 / r`. Delays are implemented
+as the action of a sparse kernel on the infections $I(t)$.
 
 ```math
 \begin{align}
-y_t &\sim \text{NegBinomial}(\mu = \sum_s\geq 0 K[t, t-s] I(s), r),
-r &\sim \text{Gamma}(3, 0.05/3).
+y_t &\sim \text{NegBinomial}(\mu = \sum_{s\geq 0} K[t, t-s] I(s), r), \\
+1 / r &\sim \text{Gamma}(3, 0.05/3).
 \end{align}
 ```
+"
+
+# ╔═╡ e813d547-6100-4c43-b84c-8cebe306bda8
+md"
+We also set up the inference to occur over 100 days.
 "
 
 # ╔═╡ c7580ae6-0db5-448e-8b20-4dd6fcdb1ae0
 time_horizon = 100
 
+# ╔═╡ 0aa3fcbd-0831-45b8-9a2c-7ffbabf5895f
+md"
+We choose a simple observation model where infections are observed 0, 1, 2, 3 days later with equal probability.
+"
+
 # ╔═╡ 448669bc-99f4-4823-b15e-fcc9040ba31b
-obs_model = EpiAware.DelayObservations([1.0],
+obs_model = EpiAware.DelayObservations(
+    fill(0.25, 4),
     time_horizon,
-    truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0))
+    truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0)
+)
 
 # ╔═╡ e49713e8-4840-4083-8e3f-fc52d791be7b
 md"
-## Generation
+## Generate cases from the `EpiAware` model
+
+Having chosen an `EpiModel`, `LatentModel` and `ObservationModel`, we can implement the model as a [`Turing`](https://turinglang.org/dev/) model using  `make_epi_aware`.
+
+By giving `missing` to the first argument, we indicate that case data will be _generated_ from the model rather than treated as fixed.
 "
 
 # ╔═╡ abeff860-58c3-4644-9325-66ffd4446b6d
-full_epi_aware_mdl = make_epi_aware(missing, time_horizon; epi_model = epi_model,
-    latent_model_model = rwp, observation_model = obs_model,
-    pos_shift = 1e-6)
+full_epi_aware_mdl = make_epi_aware(missing, time_horizon;
+    epi_model = epi_model,
+    latent_model_model = rwp,
+    observation_model = obs_model)
+
+# ╔═╡ 821628fb-8044-48b0-aa4f-0b7b57a2f45a
+md"
+We choose some fixed parameters:
+- Initial incidence is 100.
+- In the direct infection model, the initial incidence and in the initial value of the random walk form a non-identifiable pair. Therefore, we fix $Z_0 = 0$.
+"
 
 # ╔═╡ 36b34fd2-2891-42ca-b5dc-abb482e516ee
-fixed_parameters = (init_incidence = log(100.0), σ²_RW = 0.1^2, init_rw = 0.0)
+fixed_parameters = (rw_init = 0.0, init_incidence = log(100.0))
+
+# ╔═╡ 0aadd9e3-7f91-4b45-9663-67d11335f0d0
+md"
+We fix these parameters using `fix`, and generate a random epidemic.
+"
 
 # ╔═╡ 7e0e6012-8648-4f84-a25a-8b0138c4b72a
-cond_toy = fix(full_epi_aware_mdl, fixed_parameters)
+cond_generative_model = fix(full_epi_aware_mdl, fixed_parameters)
 
 # ╔═╡ b20c28be-7b07-410c-a33b-ea5ad6828c12
-random_epidemic = rand(cond_toy)
+random_epidemic = rand(cond_generative_model)
 
 # ╔═╡ d073e63b-62da-4743-ace0-78ef7806bc0b
-gen = generated_quantities(cond_toy, random_epidemic)
+true_infections = generated_quantities(cond_generative_model, random_epidemic).I_t
 
 # ╔═╡ f68b4e41-ac5c-42cd-a8c2-8761d66f7543
 let
-    plot(gen.I_t,
+    plot(true_infections,
         label = "I_t",
         xlabel = "Time",
         ylabel = "Infections",
@@ -197,6 +226,11 @@ end
 # ╔═╡ b5bc8f05-b538-4abf-aa84-450bf2dff3d9
 md"
 ## Inference
+Fixing $Z_0 = 0$ for the random walk was based on inference principles; in this model $Z_0$ and $\log I_0$ are non-identifiable.
+
+However, we now treat the generated data as `truth_data` and make inference without fixing any other parameters.
+
+We do the inference by MCMC/NUTS using the `Turing` NUTS sampler with default warm-up steps.
 "
 
 # ╔═╡ c8ce0d46-a160-4c40-a055-69b3d10d1770
@@ -205,23 +239,31 @@ truth_data = random_epidemic.y_t
 # ╔═╡ b4033728-b321-4100-8194-1fd9fe2d268d
 inference_mdl = fix(
     make_epi_aware(truth_data, time_horizon; epi_model = epi_model,
-        latent_model_model = rwp, observation_model = obs_model,
-        pos_shift = 1e-6),
-    (init_rw = 0.0,))
+        latent_model_model = rwp, observation_model = obs_model),
+    (rw_init = 0.0,)
+)
 
 # ╔═╡ 3eb5ec5e-aae7-478e-84fb-80f2e9f85b4c
 chn = sample(inference_mdl,
     NUTS(; adtype = AutoReverseDiff(true)),
     MCMCThreads(),
-    500,
-    2;
-    n_warmup = 100,
+    250,
+    4;
     drop_warmup = true)
+
+# ╔═╡ 30498cc7-16a5-441a-b8cd-c19b220c60c1
+md"
+### Predictive plotting
+
+We can spaghetti plot generated case data from the version of the model _which hasn't conditioned on case data_ using posterior parameters inferred from the version conditioned on observed data. This is known as _posterior predictive checking_, and is a useful diagnostic tool for Bayesian inference (see [here](http://www.stat.columbia.edu/~gelman/book/BDA3.pdf)).
+
+Because we are using synthetic data we can also plot the model predictions for the _unobserved_ infections and check that (at least in this example) we were able to capture some unobserved/latent variables in the process accurate.
+"
 
 # ╔═╡ e9df22b8-8e4d-4ab7-91ea-c01f2239b3e5
 let
-    post_check_mdl = fix(full_epi_aware_mdl, (init_rw = 0.0,))
-    post_check_y_t = mapreduce(hcat, generated_quantities(full_epi_aware_mdl, chn)) do gen
+    post_check_mdl = fix(full_epi_aware_mdl, (rw_init = 0.0,))
+    post_check_y_t = mapreduce(hcat, generated_quantities(post_check_mdl, chn)) do gen
         gen.generated_y_t
     end
 
@@ -235,27 +277,77 @@ let
         xlabel = "Time",
         ylabel = "Cases",
         title = "Post. predictive checking: cases",
-        ylims = (-0.5, maximum(truth_data) * 2.5),
+        ylims = (-0.5, maximum(truth_data) * 1.5),
         c = :green)
 
     p2 = plot(predicted_I_t, c = :grey, alpha = 0.05, lab = "")
-    scatter!(p2, gen.I_t,
+    scatter!(p2, true_infections,
         lab = "Actual infections",
         xlabel = "Time",
         ylabel = "Unobserved Infections",
         title = "Post. predictions: infections",
-        ylims = (-0.5, maximum(gen.I_t) * 1.5),
+        ylims = (-0.5, maximum(true_infections) * 1.5),
         c = :red)
 
-    plot(p1, p2, layout = (2, 1))
+    plot(p1, p2,
+        layout = (1, 2),
+        size = (700, 400))
 end
+
+# ╔═╡ fd6321b1-4c3a-4123-b0dc-c45b951e0b80
+md"
+As well as checking the posterior predictions for latent infections, we can also check how well inference recovered unknown parameters, such as the random walk variance or the cluster factor of the negative binomial observations.
+"
 
 # ╔═╡ 10d8fe24-83a6-47ac-97b7-a374481473d3
 let
-    var_samples = chn[:σ²_RW] |> vec
-    histogram(var_samples, bins = 50, norm = :pdf)
-    vline!([fixed_parameters.:σ²_RW])
-    plot!(rwp.var_prior)
+    parameters_to_plot = (:σ²_RW, :neg_bin_cluster_factor)
+
+    plts = map(parameters_to_plot) do name
+        var_samples = chn[name] |> vec
+        histogram(var_samples,
+            bins = 50,
+            norm = :pdf,
+            lw = 0,
+            fillalpha = 0.5,
+            lab = "MCMC")
+        vline!([getfield(random_epidemic, name)], lab = "True value")
+        title!(string(name))
+    end
+    plot(plts..., layout = (2, 1))
+end
+
+# ╔═╡ 81efe8ca-b753-4a12-bafc-a887a999377b
+md"
+## Reproductive number back-calculation
+
+As mentioned at the top, we _don't_ directly use the concept of reproductive numbers in this note. However, we can back-calculate the implied $\mathcal{R}(t)$ values, conditional on the specified generation interval being correct.
+
+Here we spaghetti plot posterior sampled time-varying reproductive numbers against the actual.
+"
+
+# ╔═╡ 15b9f37f-8d5f-460d-8c28-d7f2271fd099
+let
+    n = epi_model.data.len_gen_int
+    Rt_denom = [dot(reverse(epi_model.data.gen_int), true_infections[(t - n):(t - 1)])
+                for t in (n + 1):length(true_infections)]
+    true_Rt = true_infections[(n + 1):end] ./ Rt_denom
+
+    predicted_Rt = mapreduce(hcat, generated_quantities(inference_mdl, chn)) do gen
+        _It = gen.I_t
+        _Rt_denom = [dot(reverse(epi_model.data.gen_int), _It[(t - n):(t - 1)])
+                     for t in (n + 1):length(_It)]
+        Rt = _It[(n + 1):end] ./ _Rt_denom
+    end
+
+    plt = plot((n + 1):time_horizon, predicted_Rt, c = :grey, alpha = 0.05, lab = "")
+    plot!(plt, (n + 1):time_horizon, true_Rt,
+        lab = "true Rt",
+        xlabel = "Time",
+        ylabel = "Rt",
+        title = "Post. predictions: reproductive number",
+        c = :red,
+        lw = 2)
 end
 
 # ╔═╡ Cell order:
@@ -272,12 +364,16 @@ end
 # ╠═6639e66f-7725-4976-81b2-6472419d1a62
 # ╟─df5e59f8-3185-4bed-9cca-7c266df17cec
 # ╠═6fbdd8e6-2323-4352-9185-1f31a9cf9012
-# ╠═5e62a50a-71f4-4902-b1c9-fdf51fe145fa
+# ╟─5e62a50a-71f4-4902-b1c9-fdf51fe145fa
+# ╟─e813d547-6100-4c43-b84c-8cebe306bda8
 # ╠═c7580ae6-0db5-448e-8b20-4dd6fcdb1ae0
+# ╟─0aa3fcbd-0831-45b8-9a2c-7ffbabf5895f
 # ╠═448669bc-99f4-4823-b15e-fcc9040ba31b
 # ╟─e49713e8-4840-4083-8e3f-fc52d791be7b
 # ╠═abeff860-58c3-4644-9325-66ffd4446b6d
+# ╟─821628fb-8044-48b0-aa4f-0b7b57a2f45a
 # ╠═36b34fd2-2891-42ca-b5dc-abb482e516ee
+# ╟─0aadd9e3-7f91-4b45-9663-67d11335f0d0
 # ╠═7e0e6012-8648-4f84-a25a-8b0138c4b72a
 # ╠═b20c28be-7b07-410c-a33b-ea5ad6828c12
 # ╠═d073e63b-62da-4743-ace0-78ef7806bc0b
@@ -286,5 +382,9 @@ end
 # ╠═c8ce0d46-a160-4c40-a055-69b3d10d1770
 # ╠═b4033728-b321-4100-8194-1fd9fe2d268d
 # ╠═3eb5ec5e-aae7-478e-84fb-80f2e9f85b4c
+# ╟─30498cc7-16a5-441a-b8cd-c19b220c60c1
 # ╠═e9df22b8-8e4d-4ab7-91ea-c01f2239b3e5
+# ╟─fd6321b1-4c3a-4123-b0dc-c45b951e0b80
 # ╠═10d8fe24-83a6-47ac-97b7-a374481473d3
+# ╟─81efe8ca-b753-4a12-bafc-a887a999377b
+# ╠═15b9f37f-8d5f-460d-8c28-d7f2271fd099
