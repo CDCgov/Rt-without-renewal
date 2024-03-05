@@ -27,7 +27,7 @@
 
     # Create full epi model and sample from it
     test_mdl = make_epi_aware(y_t, time_horizon; epi_model = epi_model,
-        latent_model_model = rwp,
+        latent_model = rwp,
         observation_model = obs_model, pos_shift)
     gen = generated_quantities(test_mdl, rand(test_mdl))
 
@@ -63,7 +63,7 @@ end
     test_mdl = make_epi_aware(y_t,
         time_horizon;
         epi_model = epi_model,
-        latent_model_model = rwp,
+        latent_model = rwp,
         observation_model = obs_model,
         pos_shift)
 
@@ -102,7 +102,7 @@ end
     test_mdl = make_epi_aware(y_t,
         time_horizon;
         epi_model = epi_model,
-        latent_model_model = rwp,
+        latent_model = rwp,
         observation_model = obs_model,
         pos_shift)
 
