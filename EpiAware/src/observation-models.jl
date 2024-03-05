@@ -41,48 +41,22 @@ end
         y_t,
         I_t;
         pos_shift)
+
     #Parameters
     neg_bin_cluster_factor ~ observation_model.neg_bin_cluster_factor_prior
 
     #Predictive distribution
     expected_obs = observation_model.delay_kernel * I_t .+ pos_shift
 
-    if should_vectorize(y_t)
-        y_t ~ arraydist(NegativeBinomialMeanClust.(expected_obs, neg_bin_cluster_factor))
-    else
-        for i in eachindex(y_t)
-            y_t[i] ~ NegativeBinomialMeanClust(expected_obs[i], neg_bin_cluster_factor)
-        end
+    if ismissing(y_t)
+        y_t = Vector{Float64}(undef, length(expected_obs))
+    end
+
+    for i in eachindex(y_t)
+        y_t[i] ~ NegativeBinomialMeanClust(
+            expected_obs[i], neg_bin_cluster_factor
+        )
     end
 
     return y_t, (; neg_bin_cluster_factor,)
-end
-
-"""
-    should_vectorize(y_t)
-
-Determine whether the input `y_t` should be processed in a vectorized manner.
-This is determined based on whether `y_t` is completely missing or if it is an array
-with no missing values (vectorized processing is preferred) versus being an array with
-some missing values (non-vectorized, individual processing is necessary).
-
-# Arguments
-- `y_t`: The input data which can be a scalar, vector, or `missing`.
-
-# Returns
-- `Boolean`: `true` if `y_t` should be processed in a vectorized manner, `false` otherwise.
-"""
-function should_vectorize(y_t)
-    # Check if y_t is entirely missing, which implies non-vectorized processing
-    if ismissing(y_t)
-        return false
-    end
-
-    # If y_t is an array, check for any missing elements
-    if isa(y_t, AbstractArray)
-        return !any(ismissing, y_t)
-    end
-
-    # For all other cases, including scalar non-missing values, prefer vectorized processing
-    return true
 end
