@@ -381,3 +381,6 @@ docs/site/
 /Manifest.toml
 .DS_Store
 .vscode/settings.json
+
+#Ignore generated Pluto notebooks
+EpiAware/docs/src/examples/*.md
