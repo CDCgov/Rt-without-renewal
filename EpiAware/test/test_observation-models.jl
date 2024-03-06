@@ -53,10 +53,8 @@ end
     delay_obs = EpiAware.DelayObservations(
         [1.0], length(I_t), obs_prior[:neg_bin_cluster_factor_prior])
     neg_bin_cf = 0.05  # Set up priors
-
     # Expected point estimate calculation setup
     pos_shift = 1e-6
-    expected_obs_calculation = (I_t_val) -> I_t_val + pos_shift  # Simplified example
 
     # Test each y_t scenario
     for (scenario_name, y_t_scenario) in [("fully observed", y_t_fully_observed),
