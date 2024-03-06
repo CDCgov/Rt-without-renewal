@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.40
+# v0.19.39
 
 using Markdown
 using InteractiveUtils
@@ -213,6 +213,9 @@ random_epidemic = rand(cond_generative_model)
 # ╔═╡ d073e63b-62da-4743-ace0-78ef7806bc0b
 true_infections = generated_quantities(cond_generative_model, random_epidemic).I_t
 
+# ╔═╡ a04f3c1b-7e11-4800-9c2a-9fc0021de6e7
+generated_obs = generated_quantities(cond_generative_model, random_epidemic).generated_y_t
+
 # ╔═╡ f68b4e41-ac5c-42cd-a8c2-8761d66f7543
 let
     plot(true_infections,
@@ -220,7 +223,7 @@ let
         xlabel = "Time",
         ylabel = "Infections",
         title = "Generated Infections")
-    scatter!(random_epidemic.y_t, lab = "generated cases")
+    scatter!(generated_obs, lab = "generated cases")
 end
 
 # ╔═╡ b5bc8f05-b538-4abf-aa84-450bf2dff3d9
@@ -234,7 +237,7 @@ We do the inference by MCMC/NUTS using the `Turing` NUTS sampler with default wa
 "
 
 # ╔═╡ c8ce0d46-a160-4c40-a055-69b3d10d1770
-truth_data = random_epidemic.y_t
+truth_data = generated_obs
 
 # ╔═╡ b4033728-b321-4100-8194-1fd9fe2d268d
 inference_mdl = fix(
@@ -377,6 +380,7 @@ end
 # ╠═7e0e6012-8648-4f84-a25a-8b0138c4b72a
 # ╠═b20c28be-7b07-410c-a33b-ea5ad6828c12
 # ╠═d073e63b-62da-4743-ace0-78ef7806bc0b
+# ╠═a04f3c1b-7e11-4800-9c2a-9fc0021de6e7
 # ╟─f68b4e41-ac5c-42cd-a8c2-8761d66f7543
 # ╟─b5bc8f05-b538-4abf-aa84-450bf2dff3d9
 # ╠═c8ce0d46-a160-4c40-a055-69b3d10d1770
