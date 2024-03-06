@@ -38,56 +38,59 @@
     @test var_pval > 1e-6 #Very unlikely to fail if the model is correctly implemented
 end
 
-@testitem "Testing delay obs with partial missing data against theoretical properties" begin
+@testitem "Testing y_t observation handling and mean estimation" begin
     using DynamicPPL, Turing, Distributions
-    using HypothesisTests
+    # Define scenarios for y_t: fully observed, partially observed, and fully unobserved
+    y_t_fully_observed = [10.0, 20.0, 30.0]
+    y_t_partially_observed = [10.0, missing, 30.0]
+    y_t_fully_unobserved = [missing, missing, missing]
 
-    # Set up test data with fixed infection and some missing observations
-    I_t_partial_missing = [10.0, missing, 30.0]  # Simulating partial missing data in infections
+    # Simulated infection data, could be the same across tests for simplicity
+    I_t = [10.0, 20.0, 30.0]  # Assuming a simple case where all infections are known
+
+    # Define a common setup for your model that can be reused across different y_t scenarios
     obs_prior = EpiAware.default_delay_obs_priors()
+    delay_obs = EpiAware.DelayObservations(
+        [1.0], length(I_t), obs_prior[:neg_bin_cluster_factor_prior])
+    neg_bin_cf = 0.05  # Set up priors
 
-    # Delay kernel is just event observed on same day
-    delay_obs = EpiAware.DelayObservations([1.0], length(I_t_partial_missing),
-        obs_prior[:neg_bin_cluster_factor_prior])
+    # Expected point estimate calculation setup
+    pos_shift = 1e-6
+    expected_obs_calculation = (I_t_val) -> I_t_val + pos_shift  # Simplified example
 
-    # Set up priors
-    neg_bin_cf = 0.05
+    # Test each y_t scenario
+    for (scenario_name, y_t_scenario) in [("fully observed", y_t_fully_observed),
+        ("partially observed", y_t_partially_observed),
+        ("fully unobserved", y_t_fully_unobserved)]
+        @testset "$scenario_name y_t" begin
+            mdl = EpiAware.generate_observations(
+                delay_obs, y_t_scenario, I_t; pos_shift = pos_shift)
 
-    # Call the function with partial missing data
-    mdl_partial_missing = EpiAware.generate_observations(delay_obs,
-        missing,  # Assuming y_t can be initially missing
-        I_t_partial_missing;
-        pos_shift = 1e-6)
-    fix_mdl_partial_missing = fix(
-        mdl_partial_missing, (neg_bin_cluster_factor = neg_bin_cf,))
+            sampled_obs = sample(mdl, NUTS(), MCMCThreads(), 250, 2; drop_warmup = true) |>
+                          chn -> generated_quantities(fix_mdl, chn) .|>
+                                 (gen -> gen[1]) |>
+                                 collect
 
-    n_samples = 2000
-    first_obs_partial_missing = sample(fix_mdl_partial_missing, Prior(), n_samples) |>
-                                chn -> generated_quantities(
-                                           fix_mdl_partial_missing, chn) .|>
-                                       (gen -> gen[1]) |>
-                                       collect
+            # Calculate mean of generated quantities
+            generated_means = Vector{Float64}(undef, length(sampled_obs[1, 1]))
+            for i in 1:length(sampled_obs[1, 1])
+                # Extracting and flattening all observations for the i-th I_t value across all samples
+                observations_for_I_t = [sampled_obs[row, col][i]
+                                        for row in 1:size(sampled_obs, 1),
+                col in 1:size(sampled_obs, 2)]
 
-    # For each non-missing observation in I_t_partial_missing, generate direct samples and perform tests
-    for (index, I_t_val) in enumerate(I_t_partial_missing)
-        if ismissing(I_t_val)
-            continue  # Skip missing data points
+                # Calculating the mean of these observations
+                generated_means[i] = mean(observations_for_I_t)
+            end
+            # Calculate the absolute differences between generated means and I_t values
+            absolute_differences = abs.(generated_means - I_t)
+
+            # Check if all differences are within the tolerance
+            all_within_tolerance = all(absolute_differences .< 0.1)
+
+            # Perform the test
+            @test all_within_tolerance
         end
-
-        # Generate direct samples for comparison
-        direct_samples_partial_missing = EpiAware.NegativeBinomialMeanClust(
-            I_t_val, neg_bin_cf) |>
-                                         dist -> rand(dist, n_samples)
-
-        # Check mean
-        mean_pval_partial_missing = OneWayANOVATest(
-            first_obs_partial_missing[index], direct_samples_partial_missing) |> pvalue
-        @test mean_pval_partial_missing > 1e-6
-
-        # Check variance
-        var_pval_partial_missing = VarianceFTest(
-            first_obs_partial_missing[index], direct_samples_partial_missing) |> pvalue
-        @test var_pval_partial_missing > 1e-6
     end
 end
 
