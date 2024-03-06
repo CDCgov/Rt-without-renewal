@@ -239,7 +239,7 @@ truth_data = random_epidemic.y_t
 # ╔═╡ b4033728-b321-4100-8194-1fd9fe2d268d
 inference_mdl = fix(
     make_epi_aware(truth_data, time_horizon; epi_model = epi_model,
-        latent_model_model = rwp, observation_model = obs_model),
+        latent_model = rwp, observation_model = obs_model),
     (rw_init = 0.0,)
 )
 
