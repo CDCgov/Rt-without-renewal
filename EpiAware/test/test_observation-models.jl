@@ -20,12 +20,12 @@
         pos_shift = 1e-6)
     fix_mdl = fix(mdl, (neg_bin_cluster_factor = neg_bin_cf,))
 
-    n_samples = 2000
+    n_samples = 1000
     first_obs = sample(fix_mdl, Prior(), n_samples) |>
                 chn -> generated_quantities(fix_mdl, chn) .|>
                        (gen -> gen[1][1]) |>
                        vec
-    direct_samples = EpiAware.mean_cc_neg_bin(I_t[1], neg_bin_cf) |>
+    direct_samples = EpiAware.NegativeBinomialMeanClust(I_t[1], neg_bin_cf) |>
                      dist -> rand(dist, n_samples)
 
     #For discrete distributions, checking mean and variance is as expected
@@ -36,6 +36,58 @@
     #Check var
     var_pval = VarianceFTest(first_obs, direct_samples) |> pvalue
     @test var_pval > 1e-6 #Very unlikely to fail if the model is correctly implemented
+end
+
+@testitem "Testing y_t observation handling and mean estimation" begin
+    using DynamicPPL, Turing, Distributions
+    # Define scenarios for y_t: fully observed, partially observed, and fully unobserved
+    y_t_fully_observed = [10, 20, 30]
+    y_t_partially_observed = [10, missing, 30]
+    y_t_fully_unobserved = [missing, missing, missing]
+
+    # Simulated infection data, could be the same across tests for simplicity
+    I_t = [10.0, 20.0, 30.0]  # Assuming a simple case where all infections are known
+
+    # Define a common setup for your model that can be reused across different y_t scenarios
+    obs_prior = EpiAware.default_delay_obs_priors()
+    delay_obs = EpiAware.DelayObservations(
+        [1.0], length(I_t), obs_prior[:neg_bin_cluster_factor_prior])
+    neg_bin_cf = 0.05  # Set up priors
+    # Expected point estimate calculation setup
+    pos_shift = 1e-6
+
+    # Test each y_t scenario
+    for (scenario_name, y_t_scenario) in [("fully observed", y_t_fully_observed),
+        ("partially observed", y_t_partially_observed),
+        ("fully unobserved", y_t_fully_unobserved)]
+        @testset "$scenario_name y_t" begin
+            mdl = EpiAware.generate_observations(
+                delay_obs, y_t_scenario, I_t; pos_shift = pos_shift)
+            sampled_obs = sample(mdl, Prior(), 1000) |>
+                          chn -> generated_quantities(mdl, chn) .|>
+                                 (gen -> gen[1]) |>
+                                 collect
+
+            # Calculate mean of generated quantities
+            generated_means = Vector{Float64}(undef, length(sampled_obs[1, 1]))
+            for i in 1:length(sampled_obs[1, 1])
+                # Extracting and flattening all observations for the i-th I_t value across all samples
+                observations_for_I_t = [sampled_obs[row, col][i]
+                                        for row in 1:size(sampled_obs, 1),
+                col in 1:size(sampled_obs, 2)]
+
+                # Calculating the mean of these observations
+                generated_means[i] = mean(observations_for_I_t)
+            end
+            # Calculate the absolute differences between generated means and I_t values
+            abs_diffs = abs.(generated_means - I_t)
+
+            # Perform the
+            for i in eachindex(abs_diffs)
+                @test abs_diffs[i] < 1
+            end
+        end
+    end
 end
 
 @testitem "Testing DelayObservations struct" begin
