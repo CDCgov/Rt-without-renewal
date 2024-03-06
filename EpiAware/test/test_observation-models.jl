@@ -65,7 +65,7 @@ end
                 delay_obs, y_t_scenario, I_t; pos_shift = pos_shift)
 
             sampled_obs = sample(mdl, NUTS(), MCMCThreads(), 250, 2; drop_warmup = true) |>
-                          chn -> generated_quantities(fix_mdl, chn) .|>
+                          chn -> generated_quantities(mdl, chn) .|>
                                  (gen -> gen[1]) |>
                                  collect
 

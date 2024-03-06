@@ -49,7 +49,7 @@ end
     expected_obs = observation_model.delay_kernel * I_t .+ pos_shift
 
     if ismissing(y_t)
-        y_t = Vector{Float64}(undef, length(expected_obs))
+        y_t = Vector{Int}(undef, length(expected_obs))
     end
 
     for i in eachindex(y_t)
