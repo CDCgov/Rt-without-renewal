@@ -1,3 +1,4 @@
+
 ### A Pluto.jl notebook ###
 # v0.19.40
 
@@ -13,6 +14,7 @@ let
     using Pkg: Pkg
     Pkg.activate(docs_dir)
     Pkg.develop(; path = pkg_dir)
+    Pkg.resolve()
     Pkg.instantiate()
 end;
 
@@ -27,6 +29,10 @@ begin
     using Statistics
     using DataFramesMeta
     using LinearAlgebra
+    using Pathfinder
+    using Transducers
+
+    Random.seed!(1234)
 end
 
 # ╔═╡ 3ebc8384-f73d-4597-83a7-07a3744fed61
@@ -236,20 +242,11 @@ We do the inference by MCMC/NUTS using the `Turing` NUTS sampler with default wa
 # ╔═╡ c8ce0d46-a160-4c40-a055-69b3d10d1770
 truth_data = random_epidemic.y_t
 
-# ╔═╡ b4033728-b321-4100-8194-1fd9fe2d268d
-inference_mdl = fix(
-    make_epi_aware(truth_data, time_horizon; epi_model = epi_model,
-        latent_model = rwp, observation_model = obs_model),
-    (rw_init = 0.0,)
-)
-
-# ╔═╡ 3eb5ec5e-aae7-478e-84fb-80f2e9f85b4c
-chn = sample(inference_mdl,
-    NUTS(; adtype = AutoReverseDiff(true)),
-    MCMCThreads(),
-    250,
-    4;
-    drop_warmup = true)
+# ╔═╡ d0ed77f0-b27b-49af-a682-5ad567fe2d45
+@time chn, epi_mdls = EpiAware._epi_aware(
+    truth_data, time_horizon; epi_model = epi_model, latent_model = rwp,
+    observation_model = obs_model, nsamples = 1000, nchains = 4,
+    fixed_parameters = (rw_init = 0.0,))
 
 # ╔═╡ 30498cc7-16a5-441a-b8cd-c19b220c60c1
 md"
@@ -262,7 +259,8 @@ Because we are using synthetic data we can also plot the model predictions for t
 
 # ╔═╡ e9df22b8-8e4d-4ab7-91ea-c01f2239b3e5
 let
-    post_check_mdl = fix(full_epi_aware_mdl, (rw_init = 0.0,))
+    post_check_mdl = epi_mdls.generative_mdl
+    inference_mdl = epi_mdls.inference_mdl
     post_check_y_t = mapreduce(hcat, generated_quantities(post_check_mdl, chn)) do gen
         gen.generated_y_t
     end
@@ -328,6 +326,7 @@ Here we spaghetti plot posterior sampled time-varying reproductive numbers again
 
 # ╔═╡ 15b9f37f-8d5f-460d-8c28-d7f2271fd099
 let
+    inference_mdl = epi_mdls.inference_mdl
     n = epi_model.data.len_gen_int
     Rt_denom = [dot(reverse(epi_model.data.gen_int), true_infections[(t - n):(t - 1)])
                 for t in (n + 1):length(true_infections)]
@@ -351,7 +350,7 @@ let
 end
 
 # ╔═╡ Cell order:
-# ╟─c593a2a0-d7f5-11ee-0931-d9f65ae84a72
+# ╠═c593a2a0-d7f5-11ee-0931-d9f65ae84a72
 # ╟─3ebc8384-f73d-4597-83a7-07a3744fed61
 # ╠═da479d8d-1312-4b98-b0af-5be52dffaf3f
 # ╟─5a0d5ab8-e985-4126-a1ac-58fe08beee38
@@ -380,8 +379,7 @@ end
 # ╟─f68b4e41-ac5c-42cd-a8c2-8761d66f7543
 # ╟─b5bc8f05-b538-4abf-aa84-450bf2dff3d9
 # ╠═c8ce0d46-a160-4c40-a055-69b3d10d1770
-# ╠═b4033728-b321-4100-8194-1fd9fe2d268d
-# ╠═3eb5ec5e-aae7-478e-84fb-80f2e9f85b4c
+# ╠═d0ed77f0-b27b-49af-a682-5ad567fe2d45
 # ╟─30498cc7-16a5-441a-b8cd-c19b220c60c1
 # ╠═e9df22b8-8e4d-4ab7-91ea-c01f2239b3e5
 # ╟─fd6321b1-4c3a-4123-b0dc-c45b951e0b80
