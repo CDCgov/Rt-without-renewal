@@ -1,12 +1,10 @@
-
 ### A Pluto.jl notebook ###
 # v0.19.40
 
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ c593a2a0-d7f5-11ee-0931-d9f65ae84a72
-# hideall
+# ╔═╡ 4680eed2-dbd8-11ee-17d6-2552317711c1
 let
     docs_dir = dirname(dirname(@__DIR__))
     pkg_dir = dirname(docs_dir)
@@ -16,9 +14,9 @@ let
     Pkg.develop(; path = pkg_dir)
     Pkg.resolve()
     Pkg.instantiate()
-end;
+end
 
-# ╔═╡ da479d8d-1312-4b98-b0af-5be52dffaf3f
+# ╔═╡ 914b0cd7-86ca-4227-96cb-7cd887956833
 begin
     using EpiAware
     using Turing
@@ -32,15 +30,18 @@ begin
     using Pathfinder
     using Transducers
 
-    Random.seed!(1234)
-end
+    Random.seed!(1)
+end;
 
-# ╔═╡ 3ebc8384-f73d-4597-83a7-07a3744fed61
+# ╔═╡ 7c22d80b-2d52-4935-b62d-cbc64437195c
 md"
 # Getting stated with `EpiAware`
 
 This tutorial introduces the basic functionality of `EpiAware`. `EpiAware` is a package for making inferences on epidemiological case/determined infection data using a model-based approach.
+"
 
+# ╔═╡ 683743e6-9426-4b95-994b-4a579aa2564d
+md"
 ## `EpiAware` models
 The models we consider are discrete-time $t = 1,\dots, T$ with a latent random process, $Z_t$ generating stochasticity in the number of new infections $I_t$ at each time step. Observations are treated as downstream random variables determined by the actual infections and a model of infection to observation delay.
 
@@ -73,7 +74,7 @@ An `EpiAware` model in code is created from three modular components:
 Where $g_s$ is a discrete generation interval. For this reason, even when not using a reproductive number approach directly, we ask for a generation interval.
 "
 
-# ╔═╡ 5a0d5ab8-e985-4126-a1ac-58fe08beee38
+# ╔═╡ 0b554dd9-79c7-44bc-9cbf-ea56439cb80d
 md"
 ## Random walk `LatentModel`
 
@@ -99,11 +100,11 @@ Z_0 &\sim \mathcal{N}(0,1),\\
 ```
 "
 
-# ╔═╡ 56ae496b-0094-460b-89cb-526627991717
+# ╔═╡ 65540fb2-f97f-49dc-91f4-af26b803994e
 rwp = EpiAware.RandomWalk(Normal(),
-    truncated(Normal(0.0, 0.02), 0.0, Inf))
+    truncated(Normal(0.0, 0.02), 0.0, 0.5))
 
-# ╔═╡ 767beffd-1ef5-4e6c-9ac6-edb52e60fb44
+# ╔═╡ 3ed6eb84-d0e1-4f09-9fa0-4021d0f79f88
 md"
 ## Direct infection `EpiModel`
 
@@ -116,34 +117,34 @@ As discussed above, we still ask for a defined generation interval, which can be
 
 "
 
-# ╔═╡ 9e43cbe3-94de-44fc-a788-b9c7adb34218
+# ╔═╡ 0a532e52-8305-470a-8462-2aa023b724a2
 truth_GI = Gamma(2, 5)
 
-# ╔═╡ f067284f-a1a6-44a6-9b79-f8c2de447673
+# ╔═╡ ec24d355-0158-45e9-9584-ed89bbb17b31
 md"
 The `EpiData` constructor performs double interval censoring to convert our _continuous_ estimate of the generation interval into a discretized version. We also implement right truncation using the keyword `D_gen`.
 "
 
-# ╔═╡ c0662d48-4b54-4b6d-8c91-ddf4b0e3aa43
+# ╔═╡ 8452c589-aceb-41b7-978e-918b83db58d3
 model_data = EpiData(truth_GI, D_gen = 10.0)
 
-# ╔═╡ fd72094f-1b95-4d07-a8b0-ef47dc560dfc
+# ╔═╡ 6028ccd2-428f-4737-9fa6-ab5bf17631bd
 md"
 We can supply a prior for the initial log_infections.
 "
 
-# ╔═╡ 6639e66f-7725-4976-81b2-6472419d1a62
+# ╔═╡ bd6714a0-6e70-4602-993e-12238e1f37f2
 log_I0_prior = Normal(log(100.0), 1.0)
 
-# ╔═╡ df5e59f8-3185-4bed-9cca-7c266df17cec
+# ╔═╡ af012cc5-02ea-47f4-8545-cf54f2c6f6cc
 md"
 And construct the `EpiModel`.
 "
 
-# ╔═╡ 6fbdd8e6-2323-4352-9185-1f31a9cf9012
+# ╔═╡ 18e51238-4038-4022-9b22-0e51ed51ea0a
 epi_model = DirectInfections(model_data, log_I0_prior)
 
-# ╔═╡ 5e62a50a-71f4-4902-b1c9-fdf51fe145fa
+# ╔═╡ d75e7957-a020-46f6-8d40-e2ac1abb917f
 md"
 
 
@@ -160,27 +161,27 @@ y_t &\sim \text{NegBinomial}(\mu = \sum_{s\geq 0} K[t, t-s] I(s), r), \\
 ```
 "
 
-# ╔═╡ e813d547-6100-4c43-b84c-8cebe306bda8
+# ╔═╡ 74771683-48cb-456f-8089-65c2fe2fdef2
 md"
 We also set up the inference to occur over 100 days.
 "
 
-# ╔═╡ c7580ae6-0db5-448e-8b20-4dd6fcdb1ae0
+# ╔═╡ cba7072f-aaaa-40fe-8e5f-f22d98fbdb30
 time_horizon = 100
 
-# ╔═╡ 0aa3fcbd-0831-45b8-9a2c-7ffbabf5895f
+# ╔═╡ 6c39de90-4791-42f0-b863-228753618c8a
 md"
 We choose a simple observation model where infections are observed 0, 1, 2, 3 days later with equal probability.
 "
 
-# ╔═╡ 448669bc-99f4-4823-b15e-fcc9040ba31b
+# ╔═╡ b4a420af-71e6-4094-9795-9544dd5f34a2
 obs_model = EpiAware.DelayObservations(
     fill(0.25, 4),
     time_horizon,
-    truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0)
+    truncated(Gamma(5, 0.05 / 5), 1e-3, 0.2)
 )
 
-# ╔═╡ e49713e8-4840-4083-8e3f-fc52d791be7b
+# ╔═╡ 5b667f47-8c90-42ca-8253-998a3ad3878d
 md"
 ## Generate cases from the `EpiAware` model
 
@@ -189,37 +190,37 @@ Having chosen an `EpiModel`, `LatentModel` and `ObservationModel`, we can implem
 By giving `missing` to the first argument, we indicate that case data will be _generated_ from the model rather than treated as fixed.
 "
 
-# ╔═╡ abeff860-58c3-4644-9325-66ffd4446b6d
+# ╔═╡ 12632c1c-b233-4990-9e7e-9add1bb9a8ee
 full_epi_aware_mdl = make_epi_aware(missing, time_horizon;
     epi_model = epi_model,
     latent_model = rwp,
     observation_model = obs_model)
 
-# ╔═╡ 821628fb-8044-48b0-aa4f-0b7b57a2f45a
+# ╔═╡ 031a55e8-617b-4da4-859c-94b660ec424d
 md"
 We choose some fixed parameters:
 - Initial incidence is 100.
 - In the direct infection model, the initial incidence and in the initial value of the random walk form a non-identifiable pair. Therefore, we fix $Z_0 = 0$.
 "
 
-# ╔═╡ 36b34fd2-2891-42ca-b5dc-abb482e516ee
+# ╔═╡ 775c7295-a4ea-484e-9ad9-291df3f6ffe8
 fixed_parameters = (rw_init = 0.0, init_incidence = log(100.0))
 
-# ╔═╡ 0aadd9e3-7f91-4b45-9663-67d11335f0d0
+# ╔═╡ 5ce1855e-9f9e-4feb-8df3-8ec6139ac943
 md"
 We fix these parameters using `fix`, and generate a random epidemic.
 "
 
-# ╔═╡ 7e0e6012-8648-4f84-a25a-8b0138c4b72a
+# ╔═╡ 5b86a63b-677c-4125-b0be-1527b73b91bd
 cond_generative_model = fix(full_epi_aware_mdl, fixed_parameters)
 
-# ╔═╡ b20c28be-7b07-410c-a33b-ea5ad6828c12
+# ╔═╡ 4a1fc7bb-82a0-4643-a18b-d331a31c1390
 random_epidemic = rand(cond_generative_model)
 
-# ╔═╡ d073e63b-62da-4743-ace0-78ef7806bc0b
+# ╔═╡ e571e7b6-0e26-4855-ae90-05a18be6ff38
 true_infections = generated_quantities(cond_generative_model, random_epidemic).I_t
 
-# ╔═╡ f68b4e41-ac5c-42cd-a8c2-8761d66f7543
+# ╔═╡ 88e8fb2c-38ce-4c68-88b9-c42f3fa6de13
 let
     plot(true_infections,
         label = "I_t",
@@ -229,7 +230,7 @@ let
     scatter!(random_epidemic.y_t, lab = "generated cases")
 end
 
-# ╔═╡ b5bc8f05-b538-4abf-aa84-450bf2dff3d9
+# ╔═╡ 2f90bee6-067d-4267-beb9-356e4a4d714c
 md"
 ## Inference
 Fixing $Z_0 = 0$ for the random walk was based on inference principles; in this model $Z_0$ and $\log I_0$ are non-identifiable.
@@ -239,16 +240,16 @@ However, we now treat the generated data as `truth_data` and make inference with
 We do the inference by MCMC/NUTS using the `Turing` NUTS sampler with default warm-up steps.
 "
 
-# ╔═╡ c8ce0d46-a160-4c40-a055-69b3d10d1770
+# ╔═╡ 7e48a4c5-cd30-4377-8a98-e0c23f2dc31e
 truth_data = random_epidemic.y_t
 
-# ╔═╡ d0ed77f0-b27b-49af-a682-5ad567fe2d45
-@time chn, epi_mdls = EpiAware._epi_aware(
+# ╔═╡ 6b32f804-7534-4c98-9788-b0fd22771d43
+chn, epi_mdls = EpiAware._epi_aware(
     truth_data, time_horizon; epi_model = epi_model, latent_model = rwp,
-    observation_model = obs_model, nsamples = 1000, nchains = 4,
-    fixed_parameters = (rw_init = 0.0,))
+    observation_model = obs_model, nsamples = 1000, nchains = 4, pf_nruns = 4, pf_ndraws = 50,
+    fixed_parameters = (rw_init = 0.0,));
 
-# ╔═╡ 30498cc7-16a5-441a-b8cd-c19b220c60c1
+# ╔═╡ 2e42cb30-b087-4ae1-9b8f-95d103e1c290
 md"
 ### Predictive plotting
 
@@ -257,7 +258,7 @@ We can spaghetti plot generated case data from the version of the model _which h
 Because we are using synthetic data we can also plot the model predictions for the _unobserved_ infections and check that (at least in this example) we were able to capture some unobserved/latent variables in the process accurate.
 "
 
-# ╔═╡ e9df22b8-8e4d-4ab7-91ea-c01f2239b3e5
+# ╔═╡ e74fc652-cd5f-4764-a416-caa8bab0bf0c
 let
     post_check_mdl = epi_mdls.generative_mdl
     inference_mdl = epi_mdls.inference_mdl
@@ -292,12 +293,12 @@ let
         size = (700, 400))
 end
 
-# ╔═╡ fd6321b1-4c3a-4123-b0dc-c45b951e0b80
+# ╔═╡ 96df9c68-b2e2-4669-b420-5ef23c77aee7
 md"
 As well as checking the posterior predictions for latent infections, we can also check how well inference recovered unknown parameters, such as the random walk variance or the cluster factor of the negative binomial observations.
 "
 
-# ╔═╡ 10d8fe24-83a6-47ac-97b7-a374481473d3
+# ╔═╡ 04d741d8-a2ff-48eb-90b1-e4da416eb582
 let
     parameters_to_plot = (:σ²_RW, :neg_bin_cluster_factor)
 
@@ -315,7 +316,7 @@ let
     plot(plts..., layout = (2, 1))
 end
 
-# ╔═╡ 81efe8ca-b753-4a12-bafc-a887a999377b
+# ╔═╡ 42763332-096d-40eb-a152-96e858992ed4
 md"
 ## Reproductive number back-calculation
 
@@ -324,7 +325,7 @@ As mentioned at the top, we _don't_ directly use the concept of reproductive num
 Here we spaghetti plot posterior sampled time-varying reproductive numbers against the actual.
 "
 
-# ╔═╡ 15b9f37f-8d5f-460d-8c28-d7f2271fd099
+# ╔═╡ 3b5a3fa6-fc57-4b3c-b03d-04641bf0e48b
 let
     inference_mdl = epi_mdls.inference_mdl
     n = epi_model.data.len_gen_int
@@ -350,39 +351,40 @@ let
 end
 
 # ╔═╡ Cell order:
-# ╠═c593a2a0-d7f5-11ee-0931-d9f65ae84a72
-# ╟─3ebc8384-f73d-4597-83a7-07a3744fed61
-# ╠═da479d8d-1312-4b98-b0af-5be52dffaf3f
-# ╟─5a0d5ab8-e985-4126-a1ac-58fe08beee38
-# ╠═56ae496b-0094-460b-89cb-526627991717
-# ╟─767beffd-1ef5-4e6c-9ac6-edb52e60fb44
-# ╠═9e43cbe3-94de-44fc-a788-b9c7adb34218
-# ╟─f067284f-a1a6-44a6-9b79-f8c2de447673
-# ╠═c0662d48-4b54-4b6d-8c91-ddf4b0e3aa43
-# ╟─fd72094f-1b95-4d07-a8b0-ef47dc560dfc
-# ╠═6639e66f-7725-4976-81b2-6472419d1a62
-# ╟─df5e59f8-3185-4bed-9cca-7c266df17cec
-# ╠═6fbdd8e6-2323-4352-9185-1f31a9cf9012
-# ╟─5e62a50a-71f4-4902-b1c9-fdf51fe145fa
-# ╟─e813d547-6100-4c43-b84c-8cebe306bda8
-# ╠═c7580ae6-0db5-448e-8b20-4dd6fcdb1ae0
-# ╟─0aa3fcbd-0831-45b8-9a2c-7ffbabf5895f
-# ╠═448669bc-99f4-4823-b15e-fcc9040ba31b
-# ╟─e49713e8-4840-4083-8e3f-fc52d791be7b
-# ╠═abeff860-58c3-4644-9325-66ffd4446b6d
-# ╟─821628fb-8044-48b0-aa4f-0b7b57a2f45a
-# ╠═36b34fd2-2891-42ca-b5dc-abb482e516ee
-# ╟─0aadd9e3-7f91-4b45-9663-67d11335f0d0
-# ╠═7e0e6012-8648-4f84-a25a-8b0138c4b72a
-# ╠═b20c28be-7b07-410c-a33b-ea5ad6828c12
-# ╠═d073e63b-62da-4743-ace0-78ef7806bc0b
-# ╟─f68b4e41-ac5c-42cd-a8c2-8761d66f7543
-# ╟─b5bc8f05-b538-4abf-aa84-450bf2dff3d9
-# ╠═c8ce0d46-a160-4c40-a055-69b3d10d1770
-# ╠═d0ed77f0-b27b-49af-a682-5ad567fe2d45
-# ╟─30498cc7-16a5-441a-b8cd-c19b220c60c1
-# ╠═e9df22b8-8e4d-4ab7-91ea-c01f2239b3e5
-# ╟─fd6321b1-4c3a-4123-b0dc-c45b951e0b80
-# ╠═10d8fe24-83a6-47ac-97b7-a374481473d3
-# ╟─81efe8ca-b753-4a12-bafc-a887a999377b
-# ╠═15b9f37f-8d5f-460d-8c28-d7f2271fd099
+# ╟─4680eed2-dbd8-11ee-17d6-2552317711c1
+# ╟─914b0cd7-86ca-4227-96cb-7cd887956833
+# ╟─7c22d80b-2d52-4935-b62d-cbc64437195c
+# ╟─683743e6-9426-4b95-994b-4a579aa2564d
+# ╟─0b554dd9-79c7-44bc-9cbf-ea56439cb80d
+# ╠═65540fb2-f97f-49dc-91f4-af26b803994e
+# ╟─3ed6eb84-d0e1-4f09-9fa0-4021d0f79f88
+# ╠═0a532e52-8305-470a-8462-2aa023b724a2
+# ╟─ec24d355-0158-45e9-9584-ed89bbb17b31
+# ╠═8452c589-aceb-41b7-978e-918b83db58d3
+# ╟─6028ccd2-428f-4737-9fa6-ab5bf17631bd
+# ╠═bd6714a0-6e70-4602-993e-12238e1f37f2
+# ╟─af012cc5-02ea-47f4-8545-cf54f2c6f6cc
+# ╠═18e51238-4038-4022-9b22-0e51ed51ea0a
+# ╟─d75e7957-a020-46f6-8d40-e2ac1abb917f
+# ╟─74771683-48cb-456f-8089-65c2fe2fdef2
+# ╠═cba7072f-aaaa-40fe-8e5f-f22d98fbdb30
+# ╟─6c39de90-4791-42f0-b863-228753618c8a
+# ╠═b4a420af-71e6-4094-9795-9544dd5f34a2
+# ╟─5b667f47-8c90-42ca-8253-998a3ad3878d
+# ╠═12632c1c-b233-4990-9e7e-9add1bb9a8ee
+# ╟─031a55e8-617b-4da4-859c-94b660ec424d
+# ╠═775c7295-a4ea-484e-9ad9-291df3f6ffe8
+# ╟─5ce1855e-9f9e-4feb-8df3-8ec6139ac943
+# ╠═5b86a63b-677c-4125-b0be-1527b73b91bd
+# ╠═4a1fc7bb-82a0-4643-a18b-d331a31c1390
+# ╠═e571e7b6-0e26-4855-ae90-05a18be6ff38
+# ╟─88e8fb2c-38ce-4c68-88b9-c42f3fa6de13
+# ╟─2f90bee6-067d-4267-beb9-356e4a4d714c
+# ╠═7e48a4c5-cd30-4377-8a98-e0c23f2dc31e
+# ╠═6b32f804-7534-4c98-9788-b0fd22771d43
+# ╟─2e42cb30-b087-4ae1-9b8f-95d103e1c290
+# ╠═e74fc652-cd5f-4764-a416-caa8bab0bf0c
+# ╠═96df9c68-b2e2-4669-b420-5ef23c77aee7
+# ╠═04d741d8-a2ff-48eb-90b1-e4da416eb582
+# ╠═42763332-096d-40eb-a152-96e858992ed4
+# ╠═3b5a3fa6-fc57-4b3c-b03d-04641bf0e48b
