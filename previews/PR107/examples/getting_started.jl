@@ -239,7 +239,24 @@ We do the inference by MCMC/NUTS using the `Turing` NUTS sampler with default wa
 # ╔═╡ c8ce0d46-a160-4c40-a055-69b3d10d1770
 truth_data = generated_obs
 
+# ╔═╡ 4a4c6e91-8d8f-4bbf-bb7e-a36dc281e312
+md"
+The observation model supports partially complete data. To test this we set some of the generated observations to be `missing`.
+"
+
+# ╔═╡ 259a7042-e74f-43c7-aeb4-97a3beeb7776
+let
+    truth_data = Union{Int, Missing}[truth_data...]
+    truth_data[vcat([3, 5], 10:20)] .= missing
+end
+
+# ╔═╡ 32638954-2c99-4d4e-8e03-52154030c657
+md"
+We now make the model but fixing the initial condition of the random walk to be 0.
+"
+
 # ╔═╡ b4033728-b321-4100-8194-1fd9fe2d268d
+
 inference_mdl = fix(
     make_epi_aware(truth_data, time_horizon; epi_model = epi_model,
         latent_model = rwp, observation_model = obs_model),
@@ -296,6 +313,8 @@ let
         layout = (1, 2),
         size = (700, 400))
 end
+
+# ╔═╡ 2293b711-0bd0-44d5-8a30-94e56c5e4c65
 
 # ╔═╡ fd6321b1-4c3a-4123-b0dc-c45b951e0b80
 md"
@@ -382,12 +401,16 @@ end
 # ╠═d073e63b-62da-4743-ace0-78ef7806bc0b
 # ╠═a04f3c1b-7e11-4800-9c2a-9fc0021de6e7
 # ╟─f68b4e41-ac5c-42cd-a8c2-8761d66f7543
-# ╟─b5bc8f05-b538-4abf-aa84-450bf2dff3d9
+# ╠═b5bc8f05-b538-4abf-aa84-450bf2dff3d9
 # ╠═c8ce0d46-a160-4c40-a055-69b3d10d1770
+# ╟─4a4c6e91-8d8f-4bbf-bb7e-a36dc281e312
+# ╠═259a7042-e74f-43c7-aeb4-97a3beeb7776
+# ╟─32638954-2c99-4d4e-8e03-52154030c657
 # ╠═b4033728-b321-4100-8194-1fd9fe2d268d
 # ╠═3eb5ec5e-aae7-478e-84fb-80f2e9f85b4c
 # ╟─30498cc7-16a5-441a-b8cd-c19b220c60c1
 # ╠═e9df22b8-8e4d-4ab7-91ea-c01f2239b3e5
+# ╠═2293b711-0bd0-44d5-8a30-94e56c5e4c65
 # ╟─fd6321b1-4c3a-4123-b0dc-c45b951e0b80
 # ╠═10d8fe24-83a6-47ac-97b7-a374481473d3
 # ╟─81efe8ca-b753-4a12-bafc-a887a999377b
