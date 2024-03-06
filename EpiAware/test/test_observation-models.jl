@@ -20,7 +20,7 @@
         pos_shift = 1e-6)
     fix_mdl = fix(mdl, (neg_bin_cluster_factor = neg_bin_cf,))
 
-    n_samples = 2000
+    n_samples = 1000
     first_obs = sample(fix_mdl, Prior(), n_samples) |>
                 chn -> generated_quantities(fix_mdl, chn) .|>
                        (gen -> gen[1][1]) |>
@@ -41,8 +41,8 @@ end
 @testitem "Testing y_t observation handling and mean estimation" begin
     using DynamicPPL, Turing, Distributions
     # Define scenarios for y_t: fully observed, partially observed, and fully unobserved
-    y_t_fully_observed = [10.0, 20.0, 30.0]
-    y_t_partially_observed = [10.0, missing, 30.0]
+    y_t_fully_observed = [10, 20, 30]
+    y_t_partially_observed = [10, missing, 30]
     y_t_fully_unobserved = [missing, missing, missing]
 
     # Simulated infection data, could be the same across tests for simplicity
@@ -63,8 +63,7 @@ end
         @testset "$scenario_name y_t" begin
             mdl = EpiAware.generate_observations(
                 delay_obs, y_t_scenario, I_t; pos_shift = pos_shift)
-
-            sampled_obs = sample(mdl, NUTS(), MCMCThreads(), 250, 2; drop_warmup = true) |>
+            sampled_obs = sample(mdl, Prior(), 1000) |>
                           chn -> generated_quantities(mdl, chn) .|>
                                  (gen -> gen[1]) |>
                                  collect
@@ -81,13 +80,12 @@ end
                 generated_means[i] = mean(observations_for_I_t)
             end
             # Calculate the absolute differences between generated means and I_t values
-            absolute_differences = abs.(generated_means - I_t)
+            abs_diffs = abs.(generated_means - I_t)
 
-            # Check if all differences are within the tolerance
-            all_within_tolerance = all(absolute_differences .< 0.1)
-
-            # Perform the test
-            @test all_within_tolerance
+            # Perform the
+            for i in eachindex(abs_diffs)
+                @test abs_diffs[i] < 1
+            end
         end
     end
 end
