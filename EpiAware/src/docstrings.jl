@@ -8,9 +8,6 @@
                                          ---
                                          ## Methods
                                          $(METHODLIST)
-                                         ---
-                                         ## Fields
-                                         $(TYPEDFIELDS)
                                          """
 
 @template (TYPES) = """

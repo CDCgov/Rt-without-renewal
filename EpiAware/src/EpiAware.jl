@@ -41,13 +41,18 @@ export AbstractModel, AbstractEpiModel, AbstractLatentModel,
        AbstractObservationModel
 
 # Exported types
-export EpiData, Renewal, ExpGrowthRate, DirectInfections, RandomWalk
+export EpiData, Renewal, ExpGrowthRate, DirectInfections, RandomWalk,
+       DelayObservations
 
 # Exported Turing model constructors
 export make_epi_aware
 
+# Exported model functions
+export generate_latent, generate_latent_infs, generate_observations
+
 # Exported utilities
-export create_discrete_pmf, spread_draws, scan
+export create_discrete_pmf, spread_draws, scan, R_to_r, r_to_R,
+       default_rw_priors, default_delay_obs_priors
 
 include("docstrings.jl")
 include("abstract-types.jl")

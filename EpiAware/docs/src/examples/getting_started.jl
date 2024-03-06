@@ -186,7 +186,7 @@ By giving `missing` to the first argument, we indicate that case data will be _g
 # ╔═╡ abeff860-58c3-4644-9325-66ffd4446b6d
 full_epi_aware_mdl = make_epi_aware(missing, time_horizon;
     epi_model = epi_model,
-    latent_model_model = rwp,
+    latent_model = rwp,
     observation_model = obs_model)
 
 # ╔═╡ 821628fb-8044-48b0-aa4f-0b7b57a2f45a

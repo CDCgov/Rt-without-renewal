@@ -12,7 +12,7 @@ build("examples")
 makedocs(; sitename = "EpiAware.jl",
     authors = "Samuel Brand, Zachary Susswein, Sam Abbott, and contributors",
     clean = true, doctest = true, linkcheck = true,
-    warnonly = [:docs_block, :missing_docs],
+    warnonly = [:docs_block, :missing_docs, :linkcheck],
     modules = [EpiAware],
     pages = pages,
     format = Documenter.HTML(
