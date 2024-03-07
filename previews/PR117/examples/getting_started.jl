@@ -252,7 +252,7 @@ inference_mdl = fix(
         epi_model = epi_model,
         latent_model = rwp,
         observation_model = obs_model),
-    (init_rw = 0.0,)
+    (rw_init = 0.0,)
 )
 
 # ╔═╡ 4298f0ec-f6df-42ee-aa28-f7ed60f1e530
@@ -308,7 +308,7 @@ Because we are using synthetic data we can also plot the model predictions for t
 
 # ╔═╡ e74fc652-cd5f-4764-a416-caa8bab0bf0c
 let
-    post_check_mdl = fix(full_epi_aware_mdl, (init_rw = 0.0,))
+    post_check_mdl = fix(full_epi_aware_mdl, (rw_init = 0.0,))
     post_check_y_t = mapreduce(hcat, generated_quantities(post_check_mdl, chn)) do gen
         gen.generated_y_t
     end
