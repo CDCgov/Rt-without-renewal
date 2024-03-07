@@ -32,13 +32,14 @@ of tries is reached.
 - `mdl::DynamicPPL.Model`: The model to perform inference on.
 - `max_tries`: The maximum number of tries to run the pathfinder algorithm. Default is
     `Inf`.
+- `nruns`: The number of times to run the `pathfinder` function.
 - `kwargs...`: Additional keyword arguments passed to `pathfinder`.
 
 # Returns
 - `pfs`: The updated array of pathfinder objects.
 
 """
-function _continue_manypathfinder!(pfs, mdl::DynamicPPL.Model; max_tries, kwargs...)
+function _continue_manypathfinder!(pfs, mdl::DynamicPPL.Model; max_tries, nruns, kwargs...)
     tryiter = 1
     if all(pfs .== :fail)
         @warn "All initial pathfinder runs failed, trying again for $max_tries tries."
@@ -53,8 +54,8 @@ function _continue_manypathfinder!(pfs, mdl::DynamicPPL.Model; max_tries, kwargs
         tryiter += 1
     end
     if all(pfs .== :fail)
-        @warn "All pathfinder runs failed after $max_tries tries. Returning failed
-                    pathfinder."
+        e = ErrorException("All pathfinder runs failed after $max_tries tries.")
+        throw(e)
     end
     return pfs
 end
@@ -97,6 +98,6 @@ function manypathfinder(mdl::DynamicPPL.Model; nruns = 4, ndraws = 10,
         nchains = 4, maxiters = 50, max_tries = 100, kwargs...)
     ndraws = max(ndraws, nchains)
     _run_manypathfinder(mdl; nruns, ndraws, maxiters, kwargs...) |>
-    pfs -> _continue_manypathfinder!(pfs, mdl; max_tries, kwargs...) |>
+    pfs -> _continue_manypathfinder!(pfs, mdl; max_tries, nruns, kwargs...) |>
            pfs -> _get_best_elbo_pathfinder(pfs)
 end
