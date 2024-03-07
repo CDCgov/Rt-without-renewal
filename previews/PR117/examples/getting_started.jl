@@ -220,6 +220,9 @@ random_epidemic = rand(cond_generative_model)
 # ╔═╡ e571e7b6-0e26-4855-ae90-05a18be6ff38
 true_infections = generated_quantities(cond_generative_model, random_epidemic).I_t
 
+# ╔═╡ 62092c7f-ebe7-428e-baaa-65c34be52371
+generated_obs = generated_quantities(cond_generative_model, random_epidemic).generated_y_t
+
 # ╔═╡ 88e8fb2c-38ce-4c68-88b9-c42f3fa6de13
 let
     plot(true_infections,
@@ -227,7 +230,7 @@ let
         xlabel = "Time",
         ylabel = "Infections",
         title = "Generated Infections")
-    scatter!(random_epidemic.y_t, lab = "generated cases")
+    scatter!(generated_obs, lab = "generated cases")
 end
 
 # ╔═╡ 2f90bee6-067d-4267-beb9-356e4a4d714c
@@ -241,13 +244,58 @@ We do the inference by MCMC/NUTS using the `Turing` NUTS sampler with default wa
 "
 
 # ╔═╡ 7e48a4c5-cd30-4377-8a98-e0c23f2dc31e
-truth_data = random_epidemic.y_t
+truth_data = generated_obs
 
-# ╔═╡ 6b32f804-7534-4c98-9788-b0fd22771d43
-chn, epi_mdls = EpiAware._epi_aware(
-    truth_data, time_horizon; epi_model = epi_model, latent_model = rwp,
-    observation_model = obs_model, nsamples = 1000, nchains = 4, pf_nruns = 4, pf_ndraws = 50,
-    fixed_parameters = (rw_init = 0.0,));
+# ╔═╡ 272e6798-1151-486f-9667-924dbc63bd69
+inference_mdl = fix(
+    make_epi_aware(truth_data, time_horizon;
+        epi_model = epi_model,
+        latent_model = rwp,
+        observation_model = obs_model),
+    (init_rw = 0.0,)
+)
+
+# ╔═╡ 4298f0ec-f6df-42ee-aa28-f7ed60f1e530
+md"
+### Initialising inference
+
+It is possible for the default warm-up process for NUTS to get stuck in low probability or otherwise degenerate regions of parameter space.
+
+To make NUTS more robust we provide `manypathfinder`, which is built on pathfinder variational inference through the [Pathfinder.jl](https://mlcolab.github.io/Pathfinder.jl/stable/). `manypathfinder` runs `nruns` pathfinder processes on the inference problem and returns the pathfinder run with maximum estimated ELBO.
+
+`manypathfinder` differs from `Pathfinder.multipathfinder`; `multipathfinder` is aimed at sampling from a potentially non-Gaussian target distribution which is first approximated as a uniformly weighted collection of normal approximations from pathfinder runs. `manypathfinder` is aimed at moving rapidly to a 'good' part of parameter space, and is robust to runs that fail.
+"
+
+# ╔═╡ 40ebd47a-4a08-4a46-a727-26347d3fca51
+best_pf = manypathfinder(inference_mdl; nruns = 20);
+
+# ╔═╡ b7d9a56a-b2d5-4595-a6b9-9cd5fa6b1445
+md"
+We can use draws from the best pathfinder run to initialise NUTS.
+"
+
+# ╔═╡ cdd805e2-b00c-4522-9261-1819c6a195eb
+best_pf.draws_transformed
+
+# ╔═╡ e847b0b6-9d70-46ba-bec6-1e3fa676a33c
+init_params = collect.(eachrow(best_pf.draws_transformed.value[1:4, :, 1]))
+
+# ╔═╡ 9734a535-e3d8-4481-9897-f537ad095d21
+md"
+**NB: We are running this inference run for speed rather than accuracy as a demonstration. Use a higher target acceptance and more samples in a typical workflow.**
+"
+
+# ╔═╡ 2fdb4ca6-47ba-4a16-95fa-14b2b32cef10
+begin
+    target_acc_rate = 0.8
+    chn = sample(inference_mdl,
+        NUTS(target_acc_rate; adtype = AutoReverseDiff(true)),
+        MCMCThreads(),
+        250,
+        4;
+        init_params,
+        drop_warmup = true)
+end
 
 # ╔═╡ 2e42cb30-b087-4ae1-9b8f-95d103e1c290
 md"
@@ -260,8 +308,7 @@ Because we are using synthetic data we can also plot the model predictions for t
 
 # ╔═╡ e74fc652-cd5f-4764-a416-caa8bab0bf0c
 let
-    post_check_mdl = epi_mdls.generative_mdl
-    inference_mdl = epi_mdls.inference_mdl
+    post_check_mdl = fix(full_epi_aware_mdl, (init_rw = 0.0,))
     post_check_y_t = mapreduce(hcat, generated_quantities(post_check_mdl, chn)) do gen
         gen.generated_y_t
     end
@@ -327,7 +374,6 @@ Here we spaghetti plot posterior sampled time-varying reproductive numbers again
 
 # ╔═╡ 3b5a3fa6-fc57-4b3c-b03d-04641bf0e48b
 let
-    inference_mdl = epi_mdls.inference_mdl
     n = epi_model.data.len_gen_int
     Rt_denom = [dot(reverse(epi_model.data.gen_int), true_infections[(t - n):(t - 1)])
                 for t in (n + 1):length(true_infections)]
@@ -378,10 +424,18 @@ end
 # ╠═5b86a63b-677c-4125-b0be-1527b73b91bd
 # ╠═4a1fc7bb-82a0-4643-a18b-d331a31c1390
 # ╠═e571e7b6-0e26-4855-ae90-05a18be6ff38
+# ╠═62092c7f-ebe7-428e-baaa-65c34be52371
 # ╟─88e8fb2c-38ce-4c68-88b9-c42f3fa6de13
 # ╟─2f90bee6-067d-4267-beb9-356e4a4d714c
 # ╠═7e48a4c5-cd30-4377-8a98-e0c23f2dc31e
-# ╠═6b32f804-7534-4c98-9788-b0fd22771d43
+# ╠═272e6798-1151-486f-9667-924dbc63bd69
+# ╟─4298f0ec-f6df-42ee-aa28-f7ed60f1e530
+# ╠═40ebd47a-4a08-4a46-a727-26347d3fca51
+# ╟─b7d9a56a-b2d5-4595-a6b9-9cd5fa6b1445
+# ╠═cdd805e2-b00c-4522-9261-1819c6a195eb
+# ╠═e847b0b6-9d70-46ba-bec6-1e3fa676a33c
+# ╟─9734a535-e3d8-4481-9897-f537ad095d21
+# ╠═2fdb4ca6-47ba-4a16-95fa-14b2b32cef10
 # ╟─2e42cb30-b087-4ae1-9b8f-95d103e1c290
 # ╠═e74fc652-cd5f-4764-a416-caa8bab0bf0c
 # ╠═96df9c68-b2e2-4669-b420-5ef23c77aee7
