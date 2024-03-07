@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.39
+# v0.19.40
 
 using Markdown
 using InteractiveUtils
@@ -220,6 +220,9 @@ random_epidemic = rand(cond_generative_model)
 # ╔═╡ e571e7b6-0e26-4855-ae90-05a18be6ff38
 true_infections = generated_quantities(cond_generative_model, random_epidemic).I_t
 
+# ╔═╡ 62092c7f-ebe7-428e-baaa-65c34be52371
+generated_obs = generated_quantities(cond_generative_model, random_epidemic).generated_y_t
+
 # ╔═╡ 88e8fb2c-38ce-4c68-88b9-c42f3fa6de13
 let
     plot(true_infections,
@@ -241,7 +244,7 @@ We do the inference by MCMC/NUTS using the `Turing` NUTS sampler with default wa
 "
 
 # ╔═╡ 7e48a4c5-cd30-4377-8a98-e0c23f2dc31e
-truth_data = random_epidemic.y_t
+truth_data = generated_obs
 
 # ╔═╡ 272e6798-1151-486f-9667-924dbc63bd69
 inference_mdl = fix(
@@ -337,7 +340,6 @@ let
         size = (700, 400))
 end
 
-
 # ╔═╡ 96df9c68-b2e2-4669-b420-5ef23c77aee7
 md"
 As well as checking the posterior predictions for latent infections, we can also check how well inference recovered unknown parameters, such as the random walk variance or the cluster factor of the negative binomial observations.
@@ -422,6 +424,7 @@ end
 # ╠═5b86a63b-677c-4125-b0be-1527b73b91bd
 # ╠═4a1fc7bb-82a0-4643-a18b-d331a31c1390
 # ╠═e571e7b6-0e26-4855-ae90-05a18be6ff38
+# ╠═62092c7f-ebe7-428e-baaa-65c34be52371
 # ╟─88e8fb2c-38ce-4c68-88b9-c42f3fa6de13
 # ╟─2f90bee6-067d-4267-beb9-356e4a4d714c
 # ╠═7e48a4c5-cd30-4377-8a98-e0c23f2dc31e
