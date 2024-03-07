@@ -1,14 +1,14 @@
 @testitem "Testing _run_manypathfinder function" begin
     using Turing, Pathfinder
-    @model function test_model()
-        x ~ Normal(0, 1)
-        y ~ Normal(x, 1)
-    end
 
-    mdl = test_model()
+    @testset "Test case: check runs" begin
+        @model function test_model()
+            x ~ Normal(0, 1)
+            y ~ Normal(x, 1)
+        end
 
-    # Test case 1
-    @testset "Test case 1" begin
+        mdl = test_model()
+
         nruns = 10
         ndraws = 100
         maxiters = 50
@@ -19,30 +19,31 @@
         @test length(pfs) == nruns
         @test all(p -> p isa Union{PathfinderResult, Symbol}, pfs)
     end
-
-    # Test case 2
-    @testset "Test case 2" begin
+    @testset "Test case: check fail mode for bad model" begin
+        @model function bad_model()
+            x ~ Normal(0, 1)
+            return sqrt(x) #<-fails
+        end
+        badmdl = bad_model()
         nruns = 5
         ndraws = 50
         maxiters = 100
 
         pfs = EpiAware._run_manypathfinder(
-            mdl; nruns = nruns, ndraws = ndraws, maxiters = maxiters)
+            badmdl; nruns = nruns, ndraws = ndraws, maxiters = maxiters)
 
-        @test length(pfs) == nruns
-        @test all(p -> p isa Union{PathfinderResult, Symbol}, pfs)
+        @test all(pfs .== :fail)
     end
 end
 @testitem "Testing _continue_manypathfinder! function" begin
     using Turing, Pathfinder
 
-    @testset "Test case 1" begin
-        @model function test_model()
+    @testset "Check that it only adds one more for easy model" begin
+        @model function easy_model()
             x ~ Normal(0, 1)
-            y ~ Normal(x, 1)
         end
 
-        mdl = test_model()
+        easymdl = easy_model()
 
         pfs = Vector{Union{PathfinderResult, Symbol}}([:fail, :fail, :fail])
         max_tries = 3
@@ -51,18 +52,17 @@ end
         maxiters = 50
 
         pfs = EpiAware._continue_manypathfinder!(
-            pfs, mdl; max_tries, nruns, ndraws, maxiters)
+            pfs, easymdl; max_tries, nruns, ndraws, maxiters)
 
-        @test all(p -> p isa Union{PathfinderResult, Symbol}, pfs)
+        @test pfs[end] isa PathfinderResult
     end
 
-    @testset "Test case 2" begin
-        @model function test_model()
+    @testset "Check always fails for bad models and throws correct Exception" begin
+        @model function bad_model()
             x ~ Normal(0, 1)
-            y ~ Normal(x, 1)
+            return sqrt(x) #<-fails
         end
-
-        mdl = test_model()
+        badmdl = bad_model()
 
         pfs = Vector{Union{PathfinderResult, Symbol}}([:fail, :fail, :fail])
         max_tries = 3
@@ -70,10 +70,10 @@ end
         ndraws = 100
         maxiters = 50
 
-        pfs = EpiAware._continue_manypathfinder!(
-            pfs, mdl; max_tries, nruns, ndraws, maxiters)
-
-        @test all(p -> p isa Union{PathfinderResult, Symbol}, pfs)
+        @test_throws "All pathfinder runs failed after $max_tries tries." begin
+            pfs = EpiAware._continue_manypathfinder!(
+                pfs, badmdl; max_tries, nruns, ndraws, maxiters)
+        end
     end
 end
 @testitem "Testing _get_best_elbo_pathfinder function" begin
@@ -96,17 +96,15 @@ end
     @test best_pf isa PathfinderResult
 end
 @testitem "Testing manypathfinder function" begin
-    using Turing, Pathfinder
+    using Turing, Pathfinder, HypothesisTests
+    @testset "Test model works" begin
+        @model function test_model()
+            x ~ Normal(0, 1)
+            y ~ Normal(x, 1)
+        end
 
-    @model function test_model()
-        x ~ Normal(0, 1)
-        y ~ Normal(x, 1)
-    end
+        mdl = test_model()
 
-    mdl = test_model()
-
-    # Test case 1
-    @testset "Test case 1" begin
         nruns = 4
         ndraws = 10
         nchains = 4
@@ -119,17 +117,41 @@ end
         @test best_pf isa PathfinderResult
     end
 
-    # Test case 2
-    @testset "Test case 2" begin
-        nruns = 2
-        ndraws = 5
-        nchains = 2
-        maxiters = 30
-        max_tries = 50
+    @testset "Does good job finding simple distribution" begin
+        @model function basic_normal()
+            x ~ Normal(0, 1)
+        end
+        mdl = basic_normal()
+        nruns = 4
+        ndraws = 2000
+        nchains = 4
+        maxiters = 50
+        max_tries = 10
 
         best_pf = manypathfinder(mdl; nruns = nruns, ndraws = ndraws, nchains = nchains,
             maxiters = maxiters, max_tries = max_tries)
 
-        @test best_pf isa PathfinderResult
+        pathfinder_samples = best_pf.draws |> vec
+        ks_test_pval = ExactOneSampleKSTest(pathfinder_samples, Normal(0.0, 1)) |> pvalue
+        @test ks_test_pval > 1e-6
+    end
+
+    @testset "Check always fails for bad models and throws correct Exception" begin
+        @model function bad_model()
+            x ~ Normal(0, 1)
+            return sqrt(x) #<-fails
+        end
+        badmdl = bad_model()
+
+        max_tries = 3
+        nruns = 10
+        ndraws = 100
+        maxiters = 50
+        nchains = 4
+
+        @test_throws "All pathfinder runs failed after $max_tries tries." begin
+            manypathfinder(badmdl; nruns = nruns, ndraws = ndraws, nchains = nchains,
+                maxiters = maxiters, max_tries = max_tries)
+        end
     end
 end
