@@ -1,4 +1,5 @@
 """
+
 Run pathfinder multiple times and store the results in an array. Fails safely.
 
 # Arguments
@@ -39,6 +40,9 @@ of tries is reached.
 """
 function _continue_manypathfinder!(pfs, mdl::DynamicPPL.Model; max_tries, kwargs...)
     tryiter = 1
+    if all(pfs .== :fail)
+        @warn "All initial pathfinder runs failed, trying again for $max_tries tries."
+    end
     while all(pfs .== :fail) && tryiter <= max_tries
         new_pf = try
             pathfinder(mdl; kwargs...)
@@ -49,7 +53,8 @@ function _continue_manypathfinder!(pfs, mdl::DynamicPPL.Model; max_tries, kwargs
         tryiter += 1
     end
     if all(pfs .== :fail)
-        @warn "All pathfinder runs failed"
+        @warn "All pathfinder runs failed after $max_tries tries. Returning failed
+                    pathfinder."
     end
     return pfs
 end
