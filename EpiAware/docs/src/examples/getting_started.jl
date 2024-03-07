@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.40
+# v0.19.39
 
 using Markdown
 using InteractiveUtils
@@ -227,7 +227,7 @@ let
         xlabel = "Time",
         ylabel = "Infections",
         title = "Generated Infections")
-    scatter!(random_epidemic.y_t, lab = "generated cases")
+    scatter!(generated_obs, lab = "generated cases")
 end
 
 # ╔═╡ 2f90bee6-067d-4267-beb9-356e4a4d714c
@@ -336,6 +336,7 @@ let
         layout = (1, 2),
         size = (700, 400))
 end
+
 
 # ╔═╡ 96df9c68-b2e2-4669-b420-5ef23c77aee7
 md"

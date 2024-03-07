@@ -41,15 +41,22 @@ end
         y_t,
         I_t;
         pos_shift)
+
     #Parameters
     neg_bin_cluster_factor ~ observation_model.neg_bin_cluster_factor_prior
 
     #Predictive distribution
-    case_pred_dists = (observation_model.delay_kernel * I_t) .+ pos_shift .|>
-                      μ -> mean_cc_neg_bin(μ, neg_bin_cluster_factor)
+    expected_obs = observation_model.delay_kernel * I_t .+ pos_shift
 
-    #Likelihood
-    y_t ~ arraydist(case_pred_dists)
+    if ismissing(y_t)
+        y_t = Vector{Int}(undef, length(expected_obs))
+    end
+
+    for i in eachindex(y_t)
+        y_t[i] ~ NegativeBinomialMeanClust(
+            expected_obs[i], neg_bin_cluster_factor
+        )
+    end
 
     return y_t, (; neg_bin_cluster_factor,)
 end
