@@ -1,55 +1,135 @@
-@testitem "Testing _epi_aware function" begin
-    using Transducers, Turing
-    time_steps = 20
+@testitem "Testing _run_manypathfinder function" begin
+    using Turing, Pathfinder
+    @model function test_model()
+        x ~ Normal(0, 1)
+        y ~ Normal(x, 1)
+    end
 
-    y_t = fill(10, time_steps)
-    nsamples = 10
-    nchains = 2
-    pf_ndraws = 10
-    pf_nruns = 10
-    fixed_parameters = (;)
-    pos_shift = 1e-6
-    executor = Transducers.ThreadedEx()
-    adtype = AutoReverseDiff(true)
-    maxiters = 10
+    mdl = test_model()
 
-    #Define the epi_model
-    epi_model = DirectInfections(EpiData([0.2, 0.3, 0.5], exp), Normal())
+    # Test case 1
+    @testset "Test case 1" begin
+        nruns = 10
+        ndraws = 100
+        maxiters = 50
 
-    #Define the latent process model
-    rwp = EpiAware.RandomWalk(Normal(0.0, 1.0),
-        truncated(Normal(0.0, 0.05), 0.0, Inf))
+        pfs = EpiAware._run_manypathfinder(
+            mdl; nruns = nruns, ndraws = ndraws, maxiters = maxiters)
 
-    #Define the observation model
-    delay_distribution = Gamma(2.0, 5 / 2)
-    time_horizon = time_steps
-    D_delay = 14.0
-    Δd = 1.0
+        @test length(pfs) == nruns
+        @test all(p -> p isa Union{PathfinderResult, Symbol}, pfs)
+    end
 
-    obs_model = EpiAware.DelayObservations(delay_distribution = delay_distribution,
-        time_horizon = time_horizon,
-        neg_bin_cluster_factor_prior = Gamma(5, 0.05 / 5),
-        D_delay = D_delay,
-        Δd = Δd)
+    # Test case 2
+    @testset "Test case 2" begin
+        nruns = 5
+        ndraws = 50
+        maxiters = 100
 
-    # Call the _epi_aware function to check this runs
-    chn, results = EpiAware._epi_aware(y_t, time_steps;
-        epi_model = epi_model,
-        latent_model = rwp,
-        observation_model = obs_model,
-        nsamples = nsamples,
-        nchains = nchains,
-        pf_ndraws = pf_ndraws,
-        pf_nruns = pf_nruns,
-        fixed_parameters = fixed_parameters,
-        pos_shift = pos_shift,
-        executor = executor,
-        adtype = adtype,
-        maxiters = maxiters)
+        pfs = EpiAware._run_manypathfinder(
+            mdl; nruns = nruns, ndraws = ndraws, maxiters = maxiters)
 
-    # Perform assertions to check the correctness of the results
-    @test size(chn, 1) == nsamples ÷ nchains
-    @test haskey(results, :pathfinder_res)
-    @test haskey(results, :inference_mdl)
-    @test haskey(results, :generative_mdl)
+        @test length(pfs) == nruns
+        @test all(p -> p isa Union{PathfinderResult, Symbol}, pfs)
+    end
+end
+@testitem "Testing _continue_manypathfinder! function" begin
+    using Turing, Pathfinder
+
+    @testset "Test case 1" begin
+        @model function test_model()
+            x ~ Normal(0, 1)
+            y ~ Normal(x, 1)
+        end
+
+        mdl = test_model()
+
+        pfs = Vector{Union{PathfinderResult, Symbol}}([:fail, :fail, :fail])
+        max_tries = 3
+        nruns = 10
+        ndraws = 100
+        maxiters = 50
+
+        pfs = EpiAware._continue_manypathfinder!(
+            pfs, mdl; max_tries, nruns, ndraws, maxiters)
+
+        @test all(p -> p isa Union{PathfinderResult, Symbol}, pfs)
+    end
+
+    @testset "Test case 2" begin
+        @model function test_model()
+            x ~ Normal(0, 1)
+            y ~ Normal(x, 1)
+        end
+
+        mdl = test_model()
+
+        pfs = Vector{Union{PathfinderResult, Symbol}}([:fail, :fail, :fail])
+        max_tries = 3
+        nruns = 10
+        ndraws = 100
+        maxiters = 50
+
+        pfs = EpiAware._continue_manypathfinder!(
+            pfs, mdl; max_tries, nruns, ndraws, maxiters)
+
+        @test all(p -> p isa Union{PathfinderResult, Symbol}, pfs)
+    end
+end
+@testitem "Testing _get_best_elbo_pathfinder function" begin
+    using Pathfinder, Turing
+
+    @model function test_model()
+        x ~ Normal(0, 1)
+        y ~ Normal(x, 1)
+    end
+
+    mdl = test_model()
+    nruns = 10
+    ndraws = 100
+    maxiters = 50
+
+    pfs = EpiAware._run_manypathfinder(
+        mdl; nruns = nruns, ndraws = ndraws, maxiters = maxiters)
+
+    best_pf = EpiAware._get_best_elbo_pathfinder(pfs)
+    @test best_pf isa PathfinderResult
+end
+@testitem "Testing manypathfinder function" begin
+    using Turing, Pathfinder
+
+    @model function test_model()
+        x ~ Normal(0, 1)
+        y ~ Normal(x, 1)
+    end
+
+    mdl = test_model()
+
+    # Test case 1
+    @testset "Test case 1" begin
+        nruns = 4
+        ndraws = 10
+        nchains = 4
+        maxiters = 50
+        max_tries = 100
+
+        best_pf = manypathfinder(mdl; nruns = nruns, ndraws = ndraws, nchains = nchains,
+            maxiters = maxiters, max_tries = max_tries)
+
+        @test best_pf isa PathfinderResult
+    end
+
+    # Test case 2
+    @testset "Test case 2" begin
+        nruns = 2
+        ndraws = 5
+        nchains = 2
+        maxiters = 30
+        max_tries = 50
+
+        best_pf = manypathfinder(mdl; nruns = nruns, ndraws = ndraws, nchains = nchains,
+            maxiters = maxiters, max_tries = max_tries)
+
+        @test best_pf isa PathfinderResult
+    end
 end
