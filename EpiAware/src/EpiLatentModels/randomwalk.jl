@@ -41,7 +41,7 @@ struct AR <: AbstractLatentModel
 
     function AR(damp_prior::Priors, var_prior::Distribution, init_prior::Priors)
         p = length(damp_prior)
-        return new(damp_prior, var_prior, init_prior, p)
+        return AR(damp_prior, var_prior, init_prior, p)
     end
 
     function AR(damp_prior::Priors, var_prior::Distribution, init_prior::Priors, p::Int)
@@ -83,15 +83,15 @@ struct DiffLatentModel{T <: AbstractModel} <: AbstractLatentModel
     init_prior::Priors
     d::Int
 
-    function DiffLatentModel(model::T, init_prior::Priors)
+    function DiffLatentModel(model::AbstractModel, init_prior::Priors)
         d = length(init_prior)
-        return new(model, init_prior, d)
+        return DiffLatentModel(model, init_prior, d)  # Add the missing type parameter to the new function call
     end
 
-    function DiffLatentModel(model::T, d::Int, init_prior::Priors)
+    function DiffLatentModel(model::AbstractModel, init_prior::Priors, d::Int)
         @assert d>0 "d must be greater than 0"
         @assert length(init_prior)==d "Length of init_prior must be equal to d"
-        return new(model, init_prior, d)
+        return new{T <: AbstractModel}(model, init_prior, d)  # Add the missing type parameter to the new function call
     end
 end
 
