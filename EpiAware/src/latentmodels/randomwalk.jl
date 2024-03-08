@@ -1,8 +1,3 @@
-function generate_latent(latent_model::AbstractLatentModel, n)
-    @info "No concrete implementation for generate_latent is defined."
-    return nothing
-end
-
 struct RandomWalk{D <: Sampleable, S <: Sampleable} <: AbstractLatentModel
     init_prior::D
     std_prior::S
@@ -26,25 +21,30 @@ end
     return rw, (; σ_RW, rw_init)
 end
 
+# Define the Priors type alias
+const Priors = Union{Distribution, Vector{<:Distribution}, Product}
+
 struct AR <: AbstractLatentModel
-    """A distribution, a vector of distributions, or a product of distributions representing the prior distributions of the damping factors."""
-    damp_prior::Union{Distribution, Vector{<:Distribution}, Product}
+    """A distribution representing the prior distribution of the damping factors."""
+    damp_prior::Priors
 
     """A distribution representing the prior distribution of the variance."""
     var_prior::Distribution
 
-    """A distribution, a vector of distributions, or a product of distributions representing the prior distributions of the initial values."""
-    init_prior::Union{Distribution, Vector{<:Distribution}, Product}
+    """A distribution representing the prior distribution of the initial values."""
+    init_prior::Priors
 
     """
     The order of the AR process, determined by the length of `damp_prior`.
     """
     p::Int
 
-    function AR(damp_prior::Union{Distribution, Vector{<:Distribution}, Product},
-            var_prior::Distribution,
-            init_prior::Union{Distribution, Vector{<:Distribution}, Product})
+    function AR(damp_prior::Priors, var_prior::Distribution, init_prior::Priors)
         p = length(damp_prior)
+        return new(damp_prior, var_prior, init_prior, p)
+    end
+
+    function AR(damp_prior::Priors, var_prior::Distribution, init_prior::Priors, p::Int)
         @assert length(init_prior)==p "Dimension of init_prior must be equal to the order of the AR process"
         return new(damp_prior, var_prior, init_prior, p)
     end
@@ -76,4 +76,34 @@ end
     end
 
     return ar, (; σ_AR, ar_init, damp_AR)
+end
+
+struct DiffLatentModel{T <: AbstractModel} <: AbstractLatentModel
+    model::T
+    d::Int
+    init_prior::Priors
+
+    function DiffLatentModel(model::T, init_prior::Priors)
+        d = length(init_prior)
+        return new(model, d, init_prior)
+    end
+
+    function DiffLatentModel(model::T, d::Int, init_prior::Priors)
+        @assert d>0 "d must be greater than 0"
+        @assert length(init_prior)==d "Length of init_prior must be equal to d"
+        return new(model, d, init_prior)
+    end
+end
+
+@model function generate_latent(latent_model::DiffLatentModel, n)
+    d = latent_model.d
+    @assert n>d "n must be longer than d"
+    init_latent ~ latent_model.init_prior
+
+    @submodel diff_latent, diff_latent_aux = generate_latent(latent_model.model, n - d)
+
+    latent = vcat(init_latent, diff_latent) |>
+             cumsum
+    # Return the reconstructed series and the parameters
+    return latent, (; init_latent, diff_latent_aux...)
 end
