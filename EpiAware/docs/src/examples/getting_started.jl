@@ -143,14 +143,21 @@ md"
 
 ### Delayed Observations `ObservationModel`
 
-The observation model is a negative binomial distribution with mean `μ` and cluster factor `1 / r`. Delays are implemented
-as the action of a sparse kernel on the infections $I(t)$.
+The observation model is a negative binomial distribution parameterised with mean $\mu$ and 'successes' parameter $r$. The standard deviation _relative_ to the mean $\sigma_{\text{rel}} = \sigma / \mu$ for negative binomial observations is,
 
 ```math
-\begin{align}
-y_t &\sim \text{NegBinomial}(\mu = \sum_{s\geq 0} K[t, t-s] I(s), r), \\
-1 / \sqrt{r} &\sim \text{HalfNormal}\Big(0.1 \sqrt{{\pi \over 2}}\Big).
-\end{align}
+\sigma_{\text{rel}} =(1/\sqrt{\mu}) + (1 / \sqrt{r}).
+```
+It is standard to use a half-t distribution for standard deviation priors (e.g. as argued in this [paper](http://www.stat.columbia.edu/~gelman/research/published/taumain.pdf)); we specialise this to a Half-Normal prior and use an _a priori_ assumption that a typical observation fluctuation around the mean (when the mean is $\sim\mathcal{O}(10^2)$) would be 10%. This implies a standard deviation prior,
+```math
+1 / \sqrt{r} \sim \text{HalfNormal}\Big(0.1 ~\sqrt{{\pi \over 2}}\Big).
+```
+The $\sqrt{{\pi \over 2}}$ factor ensures the correct prior mean (see [here](https://en.wikipedia.org/wiki/Half-normal_distribution)).
+
+The expected observed cases are delayed infections. Delays are implemented as the action of a sparse kernel on the infections $I(t)$.
+
+```math
+y_t \sim \text{NegBinomial}\Big(\mu = \sum_{s\geq 0} K[t, t-s] I(s), r\Big). \\
 ```
 "
 
@@ -384,7 +391,7 @@ end
 # ╠═6639e66f-7725-4976-81b2-6472419d1a62
 # ╟─df5e59f8-3185-4bed-9cca-7c266df17cec
 # ╠═6fbdd8e6-2323-4352-9185-1f31a9cf9012
-# ╠═5e62a50a-71f4-4902-b1c9-fdf51fe145fa
+# ╟─5e62a50a-71f4-4902-b1c9-fdf51fe145fa
 # ╟─e813d547-6100-4c43-b84c-8cebe306bda8
 # ╠═c7580ae6-0db5-448e-8b20-4dd6fcdb1ae0
 # ╟─0aa3fcbd-0831-45b8-9a2c-7ffbabf5895f
