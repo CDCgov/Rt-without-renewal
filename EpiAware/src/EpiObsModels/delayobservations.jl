@@ -30,7 +30,11 @@ function default_delay_obs_priors()
         Normal(0, 0.1 * sqrt(pi) / sqrt(2)), 0.0, Inf),) |> Dict
 end
 
+<<<<<<< HEAD:EpiAware/src/EpiObsModels/delayobservations.jl
 @model function EpiAwareBase.generate_observations(observation_model::DelayObservations,
+=======
+@model function generate_observations(observation_model::DelayObservations,
+>>>>>>> c8ad6fd (move files around and add differencing infrastructure):EpiAware/src/observationmodels/delayobservations.jl
         y_t,
         I_t;
         pos_shift)
