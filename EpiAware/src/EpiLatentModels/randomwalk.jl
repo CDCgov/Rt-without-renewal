@@ -80,18 +80,18 @@ end
 
 struct DiffLatentModel{T <: AbstractModel} <: AbstractLatentModel
     model::T
-    d::Int
     init_prior::Priors
+    d::Int
 
     function DiffLatentModel(model::T, init_prior::Priors)
         d = length(init_prior)
-        return new(model, d, init_prior)
+        return new(model, init_prior, d)
     end
 
     function DiffLatentModel(model::T, d::Int, init_prior::Priors)
         @assert d>0 "d must be greater than 0"
         @assert length(init_prior)==d "Length of init_prior must be equal to d"
-        return new(model, d, init_prior)
+        return new(model, init_prior, d)
     end
 end
 
