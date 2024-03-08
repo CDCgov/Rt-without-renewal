@@ -8,7 +8,7 @@
     rw_process = EpiAware.RandomWalk(Normal(0.0, 1.0),
         truncated(Normal(0.0, 0.05), 0.0, Inf))
     model = EpiAware.generate_latent(rw_process, n)
-    fixed_model = fix(model, (σ²_RW = 1.0, init_rw_value = 0.0)) #Fixing the standard deviation of the random walk process
+    fixed_model = fix(model, (σ_RW = 1.0, init_rw_value = 0.0)) #Fixing the standard deviation of the random walk process
     n_samples = 1000
     samples_day_5 = sample(fixed_model, Prior(), n_samples) |>
                     chn -> mapreduce(vcat, generated_quantities(fixed_model, chn)) do gen

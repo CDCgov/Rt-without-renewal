@@ -10,9 +10,8 @@ end
 
 @model function generate_latent(latent_model::RandomWalk, n)
     ϵ_t ~ MvNormal(ones(n))
-    σ²_RW ~ latent_model.var_prior
+    σ_RW ~ latent_model.var_prior
     rw_init ~ latent_model.init_prior
-    σ_RW = sqrt(σ²_RW)
     rw = Vector{eltype(ϵ_t)}(undef, n)
 
     rw[1] = rw_init + σ_RW * ϵ_t[1]

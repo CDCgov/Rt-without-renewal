@@ -89,14 +89,14 @@ In `EpiAware` we provide a constructor for random walk latent models with priors
 ```math
 \begin{align}
 Z_0 &\sim \mathcal{N}(0,1),\\
-\sigma^2_Z &\sim \text{HalfNormal}(0.01).
+\sigma_{RW} &\sim \text{HalfNormal}(0.1 * \sqrt{\pi} / \sqrt{2})).
 \end{align}
 ```
 "
 
 # ╔═╡ 56ae496b-0094-460b-89cb-526627991717
 rwp = EpiAware.RandomWalk(Normal(),
-    truncated(Normal(0.0, 0.02), 0.0, Inf))
+    EpiAware._make_halfnormal_prior(0.1))
 
 # ╔═╡ 767beffd-1ef5-4e6c-9ac6-edb52e60fb44
 md"
@@ -179,7 +179,7 @@ We choose a simple observation model where infections are observed 0, 1, 2, 3 da
 obs_model = EpiAware.DelayObservations(
     fill(0.25, 4),
     time_horizon,
-    truncated(Normal(0, 0.1 * sqrt(pi) / sqrt(2)), 0.0, Inf)
+    EpiAware._make_halfnormal_prior(0.1)
 )
 
 # ╔═╡ e49713e8-4840-4083-8e3f-fc52d791be7b
@@ -298,12 +298,15 @@ init_params = collect.(eachrow(best_pf.draws_transformed.value[1:4, :, 1]))
 
 # ╔═╡ 4deb3a51-781d-48c4-91f6-6adf2b1affcf
 md"
-**NB: We are running this inference run for speed rather than accuracy as a demonstration. Use a higher target acceptance and more samples in a typical workflow.**
+**NB: We are running this inference run for speed rather than accuracy as a demonstration. You might want to use a higher target acceptance and more samples in a typical workflow.**
 "
+
+# ╔═╡ 946b1c43-e750-40c9-9f14-79da9735e437
+target_acc_prob = 0.8
 
 # ╔═╡ 3eb5ec5e-aae7-478e-84fb-80f2e9f85b4c
 chn = sample(inference_mdl,
-    NUTS(; adtype = AutoReverseDiff(true)),
+    NUTS(target_acc_prob; adtype = AutoReverseDiff(true)),
     MCMCThreads(),
     250,
     4;
@@ -360,7 +363,7 @@ As well as checking the posterior predictions for latent infections, we can also
 
 # ╔═╡ 10d8fe24-83a6-47ac-97b7-a374481473d3
 let
-    parameters_to_plot = (:σ²_RW, :neg_bin_cluster_factor)
+    parameters_to_plot = (:σ_RW, :neg_bin_cluster_factor)
 
     plts = map(parameters_to_plot) do name
         var_samples = chn[name] |> vec
@@ -449,7 +452,8 @@ end
 # ╠═073a1d40-456a-450e-969f-11b23eb7fd1f
 # ╠═0379b058-4c35-440a-bc01-aafa0178bdbf
 # ╠═a7798f71-9bb5-4506-9476-0cc11553b9e2
-# ╟─4deb3a51-781d-48c4-91f6-6adf2b1affcf
+# ╠═4deb3a51-781d-48c4-91f6-6adf2b1affcf
+# ╠═946b1c43-e750-40c9-9f14-79da9735e437
 # ╠═3eb5ec5e-aae7-478e-84fb-80f2e9f85b4c
 # ╟─30498cc7-16a5-441a-b8cd-c19b220c60c1
 # ╠═e9df22b8-8e4d-4ab7-91ea-c01f2239b3e5
