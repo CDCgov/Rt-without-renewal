@@ -104,6 +104,6 @@ end
 
     latent = vcat(init_latent, diff_latent) |>
              cumsum
-    # Return the reconstructed series and the parameters
+
     return latent, (; init_latent, diff_latent_aux...)
 end
