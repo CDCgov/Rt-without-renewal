@@ -34,7 +34,7 @@ module EpiAware
 
 using Distributions, Turing, LogExpFunctions, LinearAlgebra, SparseArrays,
       Random, ReverseDiff, Optim, Parameters, QuadGK, DataFramesMeta,
-      DocStringExtensions
+      DocStringExtensions, Pathfinder, DynamicPPL, Transducers
 
 # Exported abstract types
 export AbstractModel, AbstractEpiModel, AbstractLatentModel,
@@ -54,6 +54,9 @@ export generate_latent, generate_latent_infs, generate_observations
 export create_discrete_pmf, spread_draws, scan, R_to_r, r_to_R,
        default_rw_priors, default_delay_obs_priors
 
+# Exported inference methods
+export manypathfinder
+
 include("docstrings.jl")
 include("abstract-types.jl")
 include("epi-models.jl")
@@ -61,5 +64,6 @@ include("utilities.jl")
 include("latent-models.jl")
 include("observation-models.jl")
 include("models.jl")
+include("inference-methods.jl")
 
 end
