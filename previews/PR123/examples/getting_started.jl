@@ -27,6 +27,7 @@ begin
     using Statistics
     using DataFramesMeta
     using LinearAlgebra
+    using Transducers
 end
 
 # ╔═╡ 3ebc8384-f73d-4597-83a7-07a3744fed61
@@ -243,13 +244,13 @@ However, we now treat the generated data as `truth_data` and make inference with
 We do the inference by MCMC/NUTS using the `Turing` NUTS sampler with default warm-up steps.
 "
 
-# ╔═╡ c8ce0d46-a160-4c40-a055-69b3d10d1770
-truth_data = generated_obs
-
 # ╔═╡ 4a4c6e91-8d8f-4bbf-bb7e-a36dc281e312
 md"
 The observation model supports partially complete data. To test this we set some of the generated observations to be `missing`.
 "
+
+# ╔═╡ 525aa98c-d0e5-4ffa-b808-d90fc986204c
+truth_data = generated_obs
 
 # ╔═╡ 259a7042-e74f-43c7-aeb4-97a3beeb7776
 let
@@ -270,12 +271,43 @@ inference_mdl = fix(
     (rw_init = 0.0,)
 )
 
+# ╔═╡ 9222b436-9445-4039-abbf-25c8cddb7f63
+md"
+### Initialising inference
+
+It is possible for the default warm-up process for NUTS to get stuck in low probability or otherwise degenerate regions of parameter space.
+
+To make NUTS more robust we provide `manypathfinder`, which is built on pathfinder variational inference from [Pathfinder.jl](https://mlcolab.github.io/Pathfinder.jl/stable/). `manypathfinder` runs `nruns` pathfinder processes on the inference problem and returns the pathfinder run with maximum estimated ELBO.
+
+`manypathfinder` differs from `Pathfinder.multipathfinder`; `multipathfinder` is aimed at sampling from a potentially non-Gaussian target distribution which is first approximated as a uniformly weighted collection of normal approximations from pathfinder runs. `manypathfinder` is aimed at moving rapidly to a 'good' part of parameter space, and is robust to runs that fail.
+"
+
+# ╔═╡ 197a4fbb-b71a-475a-bb78-28ff613e3094
+best_pf = manypathfinder(inference_mdl, 10; nruns = 20, executor = Transducers.ThreadedEx());
+
+# ╔═╡ 073a1d40-456a-450e-969f-11b23eb7fd1f
+md"
+We can use draws from the best pathfinder run to initialise NUTS.
+"
+
+# ╔═╡ 0379b058-4c35-440a-bc01-aafa0178bdbf
+best_pf.draws_transformed
+
+# ╔═╡ a7798f71-9bb5-4506-9476-0cc11553b9e2
+init_params = collect.(eachrow(best_pf.draws_transformed.value[1:4, :, 1]))
+
+# ╔═╡ 4deb3a51-781d-48c4-91f6-6adf2b1affcf
+md"
+**NB: We are running this inference run for speed rather than accuracy as a demonstration. Use a higher target acceptance and more samples in a typical workflow.**
+"
+
 # ╔═╡ 3eb5ec5e-aae7-478e-84fb-80f2e9f85b4c
 chn = sample(inference_mdl,
     NUTS(; adtype = AutoReverseDiff(true)),
     MCMCThreads(),
     250,
     4;
+    init_params,
     drop_warmup = true)
 
 # ╔═╡ 30498cc7-16a5-441a-b8cd-c19b220c60c1
@@ -407,11 +439,17 @@ end
 # ╠═a04f3c1b-7e11-4800-9c2a-9fc0021de6e7
 # ╟─f68b4e41-ac5c-42cd-a8c2-8761d66f7543
 # ╟─b5bc8f05-b538-4abf-aa84-450bf2dff3d9
-# ╠═c8ce0d46-a160-4c40-a055-69b3d10d1770
 # ╟─4a4c6e91-8d8f-4bbf-bb7e-a36dc281e312
+# ╠═525aa98c-d0e5-4ffa-b808-d90fc986204c
 # ╠═259a7042-e74f-43c7-aeb4-97a3beeb7776
 # ╟─32638954-2c99-4d4e-8e03-52154030c657
 # ╠═b4033728-b321-4100-8194-1fd9fe2d268d
+# ╟─9222b436-9445-4039-abbf-25c8cddb7f63
+# ╠═197a4fbb-b71a-475a-bb78-28ff613e3094
+# ╠═073a1d40-456a-450e-969f-11b23eb7fd1f
+# ╠═0379b058-4c35-440a-bc01-aafa0178bdbf
+# ╠═a7798f71-9bb5-4506-9476-0cc11553b9e2
+# ╟─4deb3a51-781d-48c4-91f6-6adf2b1affcf
 # ╠═3eb5ec5e-aae7-478e-84fb-80f2e9f85b4c
 # ╟─30498cc7-16a5-441a-b8cd-c19b220c60c1
 # ╠═e9df22b8-8e4d-4ab7-91ea-c01f2239b3e5
