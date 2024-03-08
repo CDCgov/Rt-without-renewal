@@ -25,7 +25,7 @@
                 chn -> generated_quantities(fix_mdl, chn) .|>
                        (gen -> gen[1][1]) |>
                        vec
-    direct_samples = EpiAware.NegativeBinomialMeanClust(I_t[1], neg_bin_cf) |>
+    direct_samples = EpiAware.NegativeBinomialMeanClust(I_t[1], neg_bin_cf^2) |>
                      dist -> rand(dist, n_samples)
 
     #For discrete distributions, checking mean and variance is as expected

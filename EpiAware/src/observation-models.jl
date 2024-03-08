@@ -26,7 +26,8 @@ struct DelayObservations{T <: AbstractFloat, S <: Sampleable} <: AbstractObserva
 end
 
 function default_delay_obs_priors()
-    return (:neg_bin_cluster_factor_prior => Gamma(3, 0.05 / 3),) |> Dict
+    return (:neg_bin_cluster_factor_prior => truncated(
+        Normal(0, 0.1 * sqrt(pi) / sqrt(2)), 0.0, Inf),) |> Dict
 end
 
 function generate_observations(observation_model::AbstractObservationModel,
@@ -54,7 +55,7 @@ end
 
     for i in eachindex(y_t)
         y_t[i] ~ NegativeBinomialMeanClust(
-            expected_obs[i], neg_bin_cluster_factor
+            expected_obs[i], neg_bin_cluster_factor^2
         )
     end
 
