@@ -267,7 +267,7 @@ To make NUTS more robust we provide `manypathfinder`, which is built on pathfind
 "
 
 # ╔═╡ 40ebd47a-4a08-4a46-a727-26347d3fca51
-best_pf = manypathfinder(inference_mdl; nruns = 20);
+best_pf = manypathfinder(inference_mdl, 10; nruns = 20, executor = Transducers.ThreadedEx());
 
 # ╔═╡ b7d9a56a-b2d5-4595-a6b9-9cd5fa6b1445
 md"
