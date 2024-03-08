@@ -74,5 +74,3 @@ export make_epi_aware
 
 include("docstrings.jl")
 include("make_epi_aware.jl")
-
-end
