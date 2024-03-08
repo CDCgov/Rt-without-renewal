@@ -94,7 +94,7 @@ largest ELBO estimate.
 ## Returns
 - `best_pfs::PathfinderResult`: Best pathfinder result by estimated ELBO.
 """
-function manypathfinder(mdl::DynamicPPL.Model; nruns = 4, ndraws = 10,
+function manypathfinder(mdl::DynamicPPL.Model, ndraws; nruns = 4,
         nchains = 4, maxiters = 50, max_tries = 100, kwargs...)
     ndraws = max(ndraws, nchains)
     _run_manypathfinder(mdl; nruns, ndraws, maxiters, kwargs...) |>
