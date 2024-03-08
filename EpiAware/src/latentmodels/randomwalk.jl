@@ -8,11 +8,6 @@ function default_rw_priors()
         :init_rw_value_prior => Normal()) |> Dict
 end
 
-function generate_latent(latent_model::AbstractLatentModel, n)
-    @info "No concrete implementation for generate_latent is defined."
-    return nothing
-end
-
 @model function generate_latent(latent_model::RandomWalk, n)
     ϵ_t ~ MvNormal(ones(n))
     σ²_RW ~ latent_model.var_prior

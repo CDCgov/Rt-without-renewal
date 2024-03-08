@@ -1,5 +1,4 @@
 """
-
 Run pathfinder multiple times and store the results in an array. Fails safely.
 
 # Arguments

@@ -1,40 +1,3 @@
-struct EpiData{T <: Real, F <: Function}
-    gen_int::Vector{T}
-    len_gen_int::Integer
-    transformation::F
-
-    #Inner constructors for EpiData object
-    function EpiData(gen_int,
-            transformation::Function)
-        @assert all(gen_int .>= 0) "Generation interval must be non-negative"
-        @assert sum(gen_int)≈1 "Generation interval must sum to 1"
-
-        new{eltype(gen_int), typeof(transformation)}(gen_int,
-            length(gen_int),
-            transformation)
-    end
-
-    function EpiData(gen_distribution::ContinuousDistribution;
-            D_gen,
-            Δd = 1.0,
-            transformation::Function = exp)
-        gen_int = create_discrete_pmf(gen_distribution, Δd = Δd, D = D_gen) |>
-                  p -> p[2:end] ./ sum(p[2:end])
-
-        return EpiData(gen_int, transformation)
-    end
-end
-
-struct DirectInfections{S <: Sampleable} <: AbstractEpiModel
-    data::EpiData
-    initialisation_prior::S
-end
-
-struct ExpGrowthRate{S <: Sampleable} <: AbstractEpiModel
-    data::EpiData
-    initialisation_prior::S
-end
-
 struct Renewal{S <: Sampleable} <: AbstractEpiModel
     data::EpiData
     initialisation_prior::S
@@ -70,24 +33,7 @@ function (epi_model::Renewal)(recent_incidence, Rt)
         new_incidence)
 end
 
-function generate_latent_infs(epi_model::AbstractEpiModel, latent_model)
-    @info "No concrete implementation for `generate_latent_infs` is defined."
-    return nothing
-end
-
-@model function generate_latent_infs(epi_model::DirectInfections, _It)
-    init_incidence ~ epi_model.initialisation_prior
-    return epi_model.data.transformation.(init_incidence .+ _It)
-end
-
-@model function generate_latent_infs(epi_model::ExpGrowthRate, rt)
-    init_incidence ~ epi_model.initialisation_prior
-    return exp.(init_incidence .+ cumsum(rt))
-end
-
 """
-    generate_latent_infs(epi_model::Renewal, _Rt)
-
 `Turing` model constructor for latent infections using the `Renewal` object `epi_model` and time-varying unconstrained reproduction number `_Rt`.
 
 `generate_latent_infs` creates a `Turing` model for sampling latent infections with given unconstrainted

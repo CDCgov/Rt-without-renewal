@@ -1,17 +1,14 @@
 @template (FUNCTIONS, METHODS, MACROS) = """
-                                         $(FUNCTIONNAME)
+                                             $(TYPEDSIGNATURES)
                                          $(DOCSTRING)
 
-                                         ---
-                                         # Signatures
-                                         $(TYPEDSIGNATURES)
                                          ---
                                          ## Methods
                                          $(METHODLIST)
                                          """
 
 @template (TYPES) = """
-                    $(TYPEDEF)
+                        $(TYPEDEF)
                     $(DOCSTRING)
 
                     ---
@@ -20,12 +17,12 @@
                     """
 
 @template MODULES = """
-                    $(DOCSTRING)
+$(DOCSTRING)
 
-                    ---
-                    ## Exports
-                    $(EXPORTS)
-                    ---
-                    ## Imports
-                    $(IMPORTS)
-                    """
+---
+## Exports
+$(EXPORTS)
+---
+## Imports
+$(IMPORTS)
+"""

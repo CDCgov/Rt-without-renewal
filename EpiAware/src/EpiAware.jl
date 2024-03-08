@@ -59,11 +59,9 @@ export manypathfinder
 
 include("docstrings.jl")
 include("abstract-types.jl")
-include("epi-models.jl")
-include("utilities.jl")
-include("latent-models.jl")
-include("observation-models.jl")
-include("models.jl")
-include("inference-methods.jl")
-
+include("epimodels/epimodels.jl")
+include("utils/utils.jl")
+include("latentmodels/latentmodels.jl")
+include("observationmodels/observationmodels.jl")
+include("inferencemethods/inferencemethods.jl")
 end
