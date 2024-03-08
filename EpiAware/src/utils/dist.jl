@@ -1,44 +1,4 @@
-
 """
-    scan(f::F, init, xs) where {F <: AbstractModel}
-
-Apply `f` to each element of `xs` and accumulate the results.
-
-`f` must be a [callable](https://docs.julialang.org/en/v1/manual/methods/#Function-like-objects)
-    on a sub-type of `AbstractModel`.
-
-### Design note
-`scan` is being restricted to `AbstractModel` sub-types to ensure:
-    1. That compiler specialization is [activated](https://docs.julialang.org/en/v1/manual/performance-tips/#Be-aware-of-when-Julia-avoids-specializing)
-    2. Also avoids potential compiler [overhead](https://docs.julialang.org/en/v1/devdocs/functions/#compiler-efficiency-issues)
-    from specialisation on `f<: Function`.
-
-
-
-# Arguments
-- `f`: A callable/functor that takes two arguments, `carry` and `x`, and returns a new
-    `carry` and a result `y`.
-- `init`: The initial value for the `carry` variable.
-- `xs`: An iterable collection of elements.
-
-# Returns
-- `ys`: An array containing the results of applying `f` to each element of `xs`.
-- `carry`: The final value of the `carry` variable after processing all elements of `xs`.
-
-"""
-function scan(f::F, init, xs) where {F <: AbstractModel}
-    carry = init
-    ys = similar(xs)
-    for (i, x) in enumerate(xs)
-        carry, y = f(carry, x)
-        ys[i] = y
-    end
-    return ys, carry
-end
-
-"""
-    create_discrete_pmf(dist::Distribution, ::Val{:basic}; Δd = 1.0, D)
-
 Create a discrete probability mass function (PMF) from a given distribution, assuming that the
 primary event happens at `primary_approximation_point * Δd` within an intial censoring interval. Common
 single-censoring approximations are `primary_approximation_point = 0` (left-hand approximation),
@@ -79,8 +39,6 @@ function create_discrete_pmf(dist::Distribution,
 end
 
 """
-    create_discrete_pmf(dist::Distribution; Δd = 1.0, D)
-
 Create a discrete probability mass function (PMF) from a given distribution, assuming
 a uniform distribution over primary event times with censoring intervals of width `Δd` for
 both primary and secondary events. The CDF for the time from the left edge of the interval
@@ -117,8 +75,6 @@ function create_discrete_pmf(dist::Distribution; Δd = 1.0, D)
 end
 
 """
-    neg_MGF(r, w::AbstractVector)
-
 Compute the negative moment generating function (MGF) for a given rate `r` and weights `w`.
 
 # Arguments
@@ -138,8 +94,6 @@ function dneg_MGF_dr(r, w::AbstractVector)
 end
 
 """
-    R_to_r(R₀, w::Vector{T}; newton_steps = 2, Δd = 1.0)
-
 This function computes an approximation to the exponential growth rate `r`
 given the reproductive ratio `R₀` and the discretized generation interval `w` with
 discretized interval width `Δd`. This is based on the implicit solution of
@@ -212,48 +166,4 @@ function NegativeBinomialMeanClust(μ, α)
     p = μ / (μ + ex_σ² + 1e-6)
     r = μ^2 / ex_σ²
     return NegativeBinomial(r, p)
-end
-
-"""
-    generate_observation_kernel(delay_int, time_horizon)
-
-Generate an observation kernel matrix based on the given delay interval and time horizon.
-
-# Arguments
-- `delay_int::Vector{Float64}`: The delay PMF vector.
-- `time_horizon::Int`: The number of time steps of the observation period.
-
-# Returns
-- `K::SparseMatrixCSC{Float64, Int}`: The observation kernel matrix.
-"""
-function generate_observation_kernel(delay_int, time_horizon)
-    K = zeros(eltype(delay_int), time_horizon, time_horizon) |> SparseMatrixCSC
-    for i in 1:time_horizon, j in 1:time_horizon
-        m = i - j
-        if m >= 0 && m <= (length(delay_int) - 1)
-            K[i, j] = delay_int[m + 1]
-        end
-    end
-    return K
-end
-
-"""
-    spread_draws(chn::Chains)
-
-Converts a `Chains` object into a DataFrame in `tidybayes` format.
-
-# Arguments
-- `chn::Chains`: The `Chains` object to be converted.
-
-# Returns
-- `df::DataFrame`: The converted DataFrame.
-"""
-function spread_draws(chn::Chains)
-    df = DataFrame(chn)
-    df = hcat(DataFrame(draw = 1:size(df, 1)), df)
-    @rename!(df, $(".draw")=:draw)
-    @rename!(df, $(".chain")=:chain)
-    @rename!(df, $(".iteration")=:iteration)
-
-    return df
 end

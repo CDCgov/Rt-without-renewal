@@ -1,14 +1,3 @@
-
-struct DirectInfections{S <: Sampleable} <: AbstractEpiModel
-    data::EpiData
-    initialisation_prior::S
-end
-
-struct ExpGrowthRate{S <: Sampleable} <: AbstractEpiModel
-    data::EpiData
-    initialisation_prior::S
-end
-
 struct Renewal{S <: Sampleable} <: AbstractEpiModel
     data::EpiData
     initialisation_prior::S
@@ -44,24 +33,7 @@ function (epi_model::Renewal)(recent_incidence, Rt)
         new_incidence)
 end
 
-function generate_latent_infs(epi_model::AbstractEpiModel, latent_model)
-    @info "No concrete implementation for `generate_latent_infs` is defined."
-    return nothing
-end
-
-@model function generate_latent_infs(epi_model::DirectInfections, _It)
-    init_incidence ~ epi_model.initialisation_prior
-    return epi_model.data.transformation.(init_incidence .+ _It)
-end
-
-@model function generate_latent_infs(epi_model::ExpGrowthRate, rt)
-    init_incidence ~ epi_model.initialisation_prior
-    return exp.(init_incidence .+ cumsum(rt))
-end
-
 """
-    generate_latent_infs(epi_model::Renewal, _Rt)
-
 `Turing` model constructor for latent infections using the `Renewal` object `epi_model` and time-varying unconstrained reproduction number `_Rt`.
 
 `generate_latent_infs` creates a `Turing` model for sampling latent infections with given unconstrainted
