@@ -111,7 +111,7 @@ end
         maxiters = 50
         max_tries = 100
 
-        best_pf = manypathfinder(mdl, ndraws; nruns = nruns, nchains = nchains,
+        best_pf = manypathfinder(mdl, ndraws; nruns = nruns,
             maxiters = maxiters, max_tries = max_tries)
 
         @test best_pf isa PathfinderResult
@@ -128,7 +128,7 @@ end
         maxiters = 50
         max_tries = 10
 
-        best_pf = manypathfinder(mdl, ndraws; nruns = nruns, nchains = nchains,
+        best_pf = manypathfinder(mdl, ndraws; nruns = nruns,
             maxiters = maxiters, max_tries = max_tries)
 
         pathfinder_samples = best_pf.draws |> vec
