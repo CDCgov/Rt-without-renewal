@@ -1,24 +1,3 @@
-"""
-Generate an observation kernel matrix based on the given delay interval and time horizon.
-
-# Arguments
-- `delay_int::Vector{Float64}`: The delay PMF vector.
-- `time_horizon::Int`: The number of time steps of the observation period.
-
-# Returns
-- `K::SparseMatrixCSC{Float64, Int}`: The observation kernel matrix.
-"""
-function generate_observation_kernel(delay_int, time_horizon)
-    K = zeros(eltype(delay_int), time_horizon, time_horizon) |> SparseMatrixCSC
-    for i in 1:time_horizon, j in 1:time_horizon
-        m = i - j
-        if m >= 0 && m <= (length(delay_int) - 1)
-            K[i, j] = delay_int[m + 1]
-        end
-    end
-    return K
-end
-
 struct DelayObservations{T <: AbstractFloat, S <: Sampleable} <: AbstractObservationModel
     delay_kernel::SparseMatrixCSC{T, Integer}
     neg_bin_cluster_factor_prior::S
@@ -46,17 +25,9 @@ struct DelayObservations{T <: AbstractFloat, S <: Sampleable} <: AbstractObserva
     end
 end
 
-function default_delay_obs_priors()
+function default_delay_obs_priors(model::DelayObservations)
     return (:neg_bin_cluster_factor_prior => truncated(
         Normal(0, 0.1 * sqrt(pi) / sqrt(2)), 0.0, Inf),) |> Dict
-end
-
-function generate_observations(observation_model::AbstractObservationModel,
-        y_t,
-        I_t;
-        pos_shift)
-    @info "No concrete implementation for generate_observations is defined."
-    return nothing
 end
 
 @model function generate_observations(observation_model::DelayObservations,

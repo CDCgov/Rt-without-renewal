@@ -148,34 +148,3 @@ Compute the reproductive ratio given exponential growth rate `r`
 function r_to_R(r, w::AbstractVector)
     return 1 / neg_MGF(r, w::AbstractVector)
 end
-
-"""
-Compute the mean-cluster factor negative binomial distribution.
-
-# Arguments
-- `μ`: The mean of the distribution.
-- `α`: The clustering factor parameter.
-
-# Returns
-A `NegativeBinomial` distribution object.
-"""
-function NegativeBinomialMeanClust(μ, α)
-    ex_σ² = (α * μ^2) + 1e-6
-    p = μ / (μ + ex_σ² + 1e-6)
-    r = μ^2 / ex_σ²
-    return NegativeBinomial(r, p)
-end
-
-"""
-Create a half-normal prior distribution with the specified mean.
-
-# Arguments
-- `prior_mean::AbstractFloat`: The mean of the prior distribution.
-
-# Returns
-- `Truncated{Normal}`: The half-normal prior distribution.
-
-"""
-function _make_halfnormal_prior(prior_mean::AbstractFloat)
-    return truncated(Normal(0.0, prior_mean * sqrt(pi) / sqrt(2)), 0.0, Inf)
-end

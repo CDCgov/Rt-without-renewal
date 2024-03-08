@@ -32,36 +32,41 @@ An epidemiological model in `EpiAware` consists of composable structs with core 
 """
 module EpiAware
 
-using Distributions, Turing, LogExpFunctions, LinearAlgebra, SparseArrays,
-      Random, ReverseDiff, Optim, Parameters, QuadGK, DataFramesMeta,
-      DocStringExtensions, Pathfinder, DynamicPPL, Transducers
+include("EpiAwareBase/EpiAwareBase.jl")
+using .EpiAwareBase
 
-# Exported abstract types
 export AbstractModel, AbstractEpiModel, AbstractLatentModel,
-       AbstractObservationModel
+       AbstractObservationModel, make_epi_aware, generate_latent,
+       generate_latent_infs, generate_observations
 
-# Exported types
-export EpiData, Renewal, ExpGrowthRate, DirectInfections, RandomWalk,
-       DelayObservations
+include("EpiModels/EpiModels.jl")
+using .EpiModels
 
-# Exported Turing model constructors
-export make_epi_aware
+export EpiData, DirectInfections, ExpGrowthRate, Renewal,
+       R_to_r, r_to_R, create_discrete_pmf, default_rw_priors
 
-# Exported model functions
-export generate_latent, generate_latent_infs, generate_observations
+include("InferenceMethods/InferenceMethods.jl")
+using .InferenceMethods
 
-# Exported utilities
-export create_discrete_pmf, spread_draws, scan, R_to_r, r_to_R,
-       default_rw_priors, default_delay_obs_priors
-
-# Exported inference methods
 export manypathfinder
 
+include("LatentModels/LatentModels.jl")
+using .LatentModels
+
+export RandomWalk, default_delay_obs
+
+include("ObservationModels/ObservationModels.jl")
+using .ObservationModels
+
+export DelayObservations, default_delay_obs
+
+include("EpiAwareUtils/EpiAwareUtils.jl")
+using .EpiAwareUtils
+
+export spread_draws, scan
+
+using DocStringExtensions
+
 include("docstrings.jl")
-include("abstract-types.jl")
-include("epimodels/epimodels.jl")
-include("utils/utils.jl")
-include("latentmodels/latentmodels.jl")
-include("observationmodels/observationmodels.jl")
-include("inferencemethods/inferencemethods.jl")
+
 end
