@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.39
+# v0.19.38
 
 using Markdown
 using InteractiveUtils
@@ -138,6 +138,12 @@ And construct the `EpiModel`.
 # ╔═╡ 6fbdd8e6-2323-4352-9185-1f31a9cf9012
 epi_model = DirectInfections(model_data, log_I0_prior)
 
+# ╔═╡ 10c750db-6d00-4ef6-9caa-3cf7b3c0d711
+latent = generate_latent_infs(epi_model, 20)
+
+# ╔═╡ 45b287b8-22b5-4f09-9a93-51df82477b01
+rand(latent)
+
 # ╔═╡ 5e62a50a-71f4-4902-b1c9-fdf51fe145fa
 md"
 
@@ -176,7 +182,7 @@ We choose a simple observation model where infections are observed 0, 1, 2, 3 da
 "
 
 # ╔═╡ 448669bc-99f4-4823-b15e-fcc9040ba31b
-obs_model = EpiAware.DelayObservations(
+obs_model = DelayObservations(
     fill(0.25, 4),
     time_horizon,
     EpiAware._make_halfnormal_prior(0.1)
@@ -426,6 +432,8 @@ end
 # ╠═6639e66f-7725-4976-81b2-6472419d1a62
 # ╟─df5e59f8-3185-4bed-9cca-7c266df17cec
 # ╠═6fbdd8e6-2323-4352-9185-1f31a9cf9012
+# ╠═10c750db-6d00-4ef6-9caa-3cf7b3c0d711
+# ╠═45b287b8-22b5-4f09-9a93-51df82477b01
 # ╟─5e62a50a-71f4-4902-b1c9-fdf51fe145fa
 # ╟─e813d547-6100-4c43-b84c-8cebe306bda8
 # ╠═c7580ae6-0db5-448e-8b20-4dd6fcdb1ae0

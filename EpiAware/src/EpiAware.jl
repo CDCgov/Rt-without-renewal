@@ -33,10 +33,11 @@ An epidemiological model in `EpiAware` consists of composable structs with core 
 module EpiAware
 
 include("EpiAwareBase/EpiAwareBase.jl")
-using .EpiAwareBase
+import .EpiAwareBase: AbstractModel, AbstractEpiModel, AbstractLatentModel,
+                      AbstractObservationModel
 
 export AbstractModel, AbstractEpiModel, AbstractLatentModel,
-       AbstractObservationModel, make_epi_aware, generate_latent,
+       AbstractObservationModel, generate_latent,
        generate_latent_infs, generate_observations
 
 include("EpiModels/EpiModels.jl")
@@ -65,8 +66,13 @@ using .EpiAwareUtils
 
 export spread_draws, scan
 
-using DocStringExtensions
+# Non-submodule imports
+using Turing, DocStringExtensions
+
+# Non-submodule exports
+export make_epi_aware
 
 include("docstrings.jl")
+include("make_epi_aware.jl")
 
 end

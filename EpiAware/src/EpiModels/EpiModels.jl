@@ -5,7 +5,7 @@ Module for defining epidemiological models.
 """
 
 include("../EpiAwareBase/EpiAwareBase.jl")
-using .EpiAwareBase
+import .EpiAwareBase: AbstractEpiModel, generate_latent_infs
 
 include("../EpiAwareUtils/EpiAwareUtils.jl")
 import .EpiAwareUtils: scan
@@ -13,7 +13,7 @@ import .EpiAwareUtils: scan
 using Turing, Distributions, DocStringExtensions, QuadGK
 
 export EpiData, DirectInfections, ExpGrowthRate, Renewal,
-       R_to_r, r_to_R, create_discrete_pmf
+       generate_latent_infs, R_to_r, r_to_R, create_discrete_pmf
 
 include("epidata.jl")
 include("directinfections.jl")
