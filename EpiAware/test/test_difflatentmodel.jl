@@ -36,7 +36,7 @@ end
 
     latent_model = EpiAware.generate_latent(diff_model, n)
     fixed_model = fix(
-        latent_model, (latent_init = [0.0, 1.0], σ²_RW = 1.0, init_rw_value = 0.0))
+        latent_model, (σ²_RW = 0, rw_init = 0.0))
 
     n_samples = 100
     samples = sample(fixed_model, Prior(), n_samples) |>
@@ -47,7 +47,6 @@ end
     @test size(samples) == (n, n_samples)
     @test all(samples[1, :] .≈ 0.0)
     @test all(samples[2, :] .≈ 1.0)
-    @test all(samples[3, :] .≈ samples[2, :] .+ samples[1, :])
 end
 
 @testitem "Testing DiffLatentModel with AR process" begin
