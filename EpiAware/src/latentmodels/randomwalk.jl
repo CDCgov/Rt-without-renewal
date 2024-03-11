@@ -1,6 +1,6 @@
 struct RandomWalk{D <: Sampleable, S <: Sampleable} <: AbstractLatentModel
     init_prior::D
-    var_prior::S
+    std_prior::S
 end
 
 function default_rw_priors()
@@ -10,7 +10,7 @@ end
 
 @model function generate_latent(latent_model::RandomWalk, n)
     ϵ_t ~ MvNormal(ones(n))
-    σ_RW ~ latent_model.var_prior
+    σ_RW ~ latent_model.std_prior
     rw_init ~ latent_model.init_prior
     rw = Vector{eltype(ϵ_t)}(undef, n)
 
