@@ -36,9 +36,15 @@ include("EpiAwareBase/EpiAwareBase.jl")
 
 using .EpiAwareBase
 
+<<<<<<< HEAD
 export AbstractModel, AbstractLatentModel, AbstractEpiModel,
        AbstractObservationModel, generate_latent,
        generate_latent_infs, generate_observations
+=======
+# Exported types
+export EpiData, Renewal, ExpGrowthRate, DirectInfections, RandomWalk,
+       DelayObservations, AR, DiffLatentModel
+>>>>>>> 9fb97d9 (improve testing)
 
 include("EpiAwareUtils/EpiAwareUtils.jl")
 using .EpiAwareUtils
