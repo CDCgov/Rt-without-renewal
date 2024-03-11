@@ -1,10 +1,6 @@
 @template (FUNCTIONS, METHODS, MACROS) = """
                                              $(TYPEDSIGNATURES)
                                          $(DOCSTRING)
-
-                                         ---
-                                         ## Methods
-                                         $(METHODLIST)
                                          """
 
 @template (TYPES) = """
