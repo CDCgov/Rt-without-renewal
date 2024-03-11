@@ -177,5 +177,5 @@ Create a half-normal prior distribution with the specified mean.
 
 """
 function _make_halfnormal_prior(prior_mean::AbstractFloat)
-    return truncated(Normal(0.0, prior_mean * sqrt(pi) / sqrt(2)), 0.0, Inf)::Distribution
+    return truncated(Normal(0.0, prior_mean * sqrt(pi) / sqrt(2)), 0.0, Inf)
 end
