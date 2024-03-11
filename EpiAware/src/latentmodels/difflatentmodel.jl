@@ -15,6 +15,10 @@ struct DiffLatentModel{T <: AbstractModel} <: AbstractLatentModel
     end
 end
 
+function default_diff_latent_priors(d::Int)
+    return (init_prior = [Normal(0.0, 1.0) for i in 1:d],)
+end
+
 @model function generate_latent(latent_model::DiffLatentModel, n)
     d = latent_model.d
     @assert n>d "n must be longer than d"
