@@ -1,6 +1,6 @@
 @testitem "Testing delay obs against theoretical properties" begin
     using DynamicPPL, Turing, Distributions
-    using HypothesisTests#: ExactOneSampleKSTest, pvalue
+    using HypothesisTests
 
     # Set up test data with fixed infection
     I_t = [10.0, 20.0, 30.0]
