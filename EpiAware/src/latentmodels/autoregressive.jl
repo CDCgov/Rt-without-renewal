@@ -1,3 +1,11 @@
+"""
+The autoregressive (AR) model struct.
+
+# Fields
+- `damp_prior::D`: The prior distribution for the damping factor.
+- `std_prior::S`: The prior distribution for the standard deviation.
+- `init_prior::I`: The prior distribution for the initial values.
+"""
 @with_kw struct AR{D <: Priors, S <: Distribution, I <: Priors} <: AbstractLatentModel
     damp_prior::D = truncated(Normal(0.0, 0.05), 0.0, 1)
     std_prior::S = truncated(Normal(0.0, 0.05), 0.0, Inf)
@@ -5,6 +13,21 @@
     @assert length(damp_prior)==length(init_prior) "damp_prior and init_prior must have the same length"
 end
 
+"""
+Generate a latent AR series.
+
+# Arguments
+- `latent_model::AR`: The AR model.
+- `n::Int`: The length of the AR series.
+
+# Returns
+- `ar::Vector{Float64}`: The generated AR series.
+- `params::NamedTuple`: A named tuple containing the generated parameters (`σ_AR`, `ar_init`, `damp_AR`).
+
+# Notes
+- The length of `damp_prior` and `init_prior` must be the same.
+- `n` must be longer than the order of the autoregressive process.
+"""
 @model function generate_latent(latent_model::AR, n)
     p = length(latent_model.damp_prior)
     ϵ_t ~ MvNormal(ones(n - p))
