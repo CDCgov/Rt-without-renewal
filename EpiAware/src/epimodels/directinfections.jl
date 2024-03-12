@@ -38,7 +38,7 @@ latent_inf = generate_latent_infs(direct_inf_model, Z_t)
 ```
 "
 @kwdef struct DirectInfections{S <: Sampleable} <: AbstractEpiModel
-    "`Epidata`` object."
+    "`Epidata` object."
     data::EpiData
     "Prior distribution for the initialisation of the infections. Default is `Normal()`."
     initialisation_prior::S = Normal()
