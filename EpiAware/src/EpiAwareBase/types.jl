@@ -1,13 +1,15 @@
 abstract type AbstractModel end
 
 """
-    abstract type AbstractEpiModel <: AbstractModel end
-
 The abstract supertype for all structs that define a model for generating unobserved/latent
-    infections.
+infections.
 """
 abstract type AbstractEpiModel <: AbstractModel end
 
+"""
+The abstract supertype for all structs that define a model for generating a latent process
+used in `EpiAware` models.
+"""
 abstract type AbstractLatentModel <: AbstractModel end
 
 abstract type AbstractObservationModel <: AbstractModel end

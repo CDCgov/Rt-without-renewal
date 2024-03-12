@@ -16,10 +16,8 @@ I_t &= g(\hat{I}_0) \exp(r(\mathcal{R}_1) t), \qquad t \leq 0.
 ```
 
 where ``g`` is a transformation function and the unconstrained initial infections
-``\hat{I}_0`` are sampled from a prior distribution, `initialisation_prior` which must
-be supplied to the `DirectInfections` constructor. The default `initialisation_prior` is
-the standard Normal `Distributions.Normal()`. The discrete generation interval is given by
-``g_i``.
+``\hat{I}_0`` are sampled from a prior distribution. The discrete generation interval is
+given by ``g_i``.
 
 ``r(\mathcal{R}_1)`` is the exponential growth rate implied by ``\mathcal{R}_1)``
 using the implicit relationship between the exponential growth rate and the reproduction
@@ -29,10 +27,13 @@ number.
 \mathcal{R} \sum_{j \geq 1} g_j \exp(- r j)= 1.
 ```
 
+`Renewal` are constructed by passing an `EpiData` object `data` and an
+`initialisation_prior` for the prior distribution of ``\hat{I}_0``. The default
+`initialisation_prior` is `Normal()`.
+
 ## Constructor
 
-`Renewal` can be constructed by passing an `EpiData` object and and subtype of
-[`Distributions.Sampleable`](https://juliastats.org/Distributions.jl/latest/types/#Sampleable).
+- `Renewal(; data, initialisation_prior)`.
 
 ## Example usage with `generate_latent_infs`
 
@@ -82,6 +83,8 @@ I_t = generated_quantities(latent_inf, θ)
 end
 
 @doc """
+    function (epi_model::Renewal)(recent_incidence, Rt)
+
 Callable on a `Renewal` struct for compute new incidence based on recent incidence and Rt.
 
 ## Mathematical specification
