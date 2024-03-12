@@ -120,7 +120,7 @@ The `EpiData` constructor performs double interval censoring to convert our _con
 "
 
 # ╔═╡ c0662d48-4b54-4b6d-8c91-ddf4b0e3aa43
-model_data = EpiData(truth_GI, D_gen = 10.0)
+model_data = EpiData(gen_distribution = truth_GI, D_gen = 10.0)
 
 # ╔═╡ fd72094f-1b95-4d07-a8b0-ef47dc560dfc
 md"
