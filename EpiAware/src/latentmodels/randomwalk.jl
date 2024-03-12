@@ -51,8 +51,10 @@ Z_t, _ = generated_quantities(rw_model, θ)
 
 "
 @kwdef struct RandomWalk{D <: Sampleable, S <: Sampleable} <: AbstractLatentModel
-    init_prior::D
-    std_prior::S
+    "Prior for the initial distribution of the random walk."
+    init_prior::D = Normal()
+    "Prior for the standard deviation of the random walk step size."
+    std_prior::S = _make_halfnormal_prior(0.25)
 end
 
 @model function generate_latent(latent_model::RandomWalk, n)
