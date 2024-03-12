@@ -1,33 +1,17 @@
-struct AR <: AbstractLatentModel
+@kwdef struct AR{D <: Priors, S <: Distribution, I <: Priors, P <: Int}
     """A distribution representing the prior distribution of the damping factors."""
-    damp_prior::Priors
+    damp_prior::D = [truncated(Normal(0.0, 0.05), 0.0, 1)]
 
     """A distribution representing the prior distribution of the variance."""
-    var_prior::Distribution
+    var_prior::S = truncated(Normal(0.0, 0.05), 0.0, Inf)
 
     """A distribution representing the prior distribution of the initial values."""
-    init_prior::Priors
+    init_prior::I = Normal()
 
     """
     The order of the AR process, determined by the length of `damp_prior`.
     """
-    p::Int
-
-    function AR(damp_prior::Priors, var_prior::Distribution, init_prior::Priors)
-        p = length(damp_prior)
-        return AR(damp_prior, var_prior, init_prior, p)
-    end
-
-    function AR(damp_prior::Priors, var_prior::Distribution, init_prior::Priors, p::Int)
-        @assert length(init_prior)==p "Dimension of init_prior must be equal to the order of the AR process"
-        return new(damp_prior, var_prior, init_prior, p)
-    end
-end
-
-function default_ar_priors()
-    return (:damp_prior => [truncated(Normal(0.0, 0.05), 0.0, 1)],
-        :var_prior => truncated(Normal(0.0, 0.05), 0.0, Inf),
-        :init_prior => Normal()) |> Dict
+    p::P = length(damp_prior)
 end
 
 @model function generate_latent(latent_model::AR, n)
@@ -38,7 +22,7 @@ end
     damp_AR ~ latent_model.damp_prior
     σ_AR = sqrt(σ²_AR)
 
-    @assert n>p "n must be longer than p"
+    @assert n>p "n must be longer than latent_model.p"
 
     # Initialize the AR series with the initial values
     ar = Vector{Float64}(undef, n)
