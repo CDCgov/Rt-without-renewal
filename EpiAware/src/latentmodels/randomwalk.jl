@@ -57,6 +57,37 @@ Z_t, _ = generated_quantities(rw_model, θ)
     std_prior::S = _make_halfnormal_prior(0.25)
 end
 
+"""
+Implement the `generate_latent` function for the `RandomWalk` model.
+
+## Example usage of `generate_latent` with `RandomWalk` type of latent process model
+
+```julia
+using Distributions, Turing, EpiAware
+
+# Create a RandomWalk model
+rw = RandomWalk(init_prior = Normal(2., 1.),
+                                std_prior = _make_halfnormal_prior(0.1))
+```
+
+Then, we can use `generate_latent` to construct a Turing model for a 10 step random walk.
+
+```julia
+# Construct a Turing model
+rw_model = generate_latent(rw, 10)
+```
+
+Now we can use the `Turing` PPL API to sample underlying parameters and generate the
+unobserved infections.
+
+```julia
+#Sample random parameters from prior
+θ = rand(rw_model)
+#Get random walk sample path as a generated quantities from the model
+Z_t, _ = generated_quantities(rw_model, θ)
+```
+
+"""
 @model function generate_latent(latent_model::RandomWalk, n)
     ϵ_t ~ MvNormal(ones(n))
     σ_RW ~ latent_model.std_prior
