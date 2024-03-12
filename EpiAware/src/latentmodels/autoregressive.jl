@@ -6,7 +6,7 @@
 end
 
 @model function generate_latent(latent_model::AR, n)
-    p = length(damp_prior)
+    p = length(latent_model.damp_prior)
     ϵ_t ~ MvNormal(ones(n - p))
     σ_AR ~ latent_model.std_prior
     ar_init ~ latent_model.init_prior
