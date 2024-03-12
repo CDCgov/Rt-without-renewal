@@ -17,7 +17,7 @@ the standard Normal `Distributions.Normal()`.
 
 ## Constructor
 
-`DirectInfections` can be constructed by passing an `EpiData` object and and subtype of
+`DirectInfections` can be constructed by passing an `EpiData` object and subtype of
 [`Distributions.Sampleable`](https://juliastats.org/Distributions.jl/latest/types/#Sampleable).
 
 ## Example usage with `generate_latent_infs`
