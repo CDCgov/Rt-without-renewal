@@ -20,7 +20,7 @@ end
     D_gen = 10.0
     Δd = 1.0
 
-    data = EpiData(gen_distribution;
+    data = EpiData(; gen_distribution,
         D_gen = 10.0)
 
     @test data.len_gen_int == Int64(D_gen / Δd) - 1
