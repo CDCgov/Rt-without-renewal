@@ -8,12 +8,12 @@ include("../EpiAwareBase/EpiAwareBase.jl")
 import .EpiAwareBase: AbstractEpiModel, generate_latent_infs
 
 include("../EpiAwareUtils/EpiAwareUtils.jl")
-import .EpiAwareUtils: scan
+import .EpiAwareUtils: scan, create_discrete_pmf
 
-using Turing, Distributions, DocStringExtensions, QuadGK
+using Turing, Distributions, DocStringExtensions, LinearAlgebra
 
 export EpiData, DirectInfections, ExpGrowthRate, Renewal,
-       generate_latent_infs, R_to_r, r_to_R, create_discrete_pmf
+       generate_latent_infs, R_to_r, r_to_R
 
 include("epidata.jl")
 include("directinfections.jl")

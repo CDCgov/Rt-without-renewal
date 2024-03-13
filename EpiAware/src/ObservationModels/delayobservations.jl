@@ -25,7 +25,7 @@ struct DelayObservations{T <: AbstractFloat, S <: Sampleable} <: AbstractObserva
     end
 end
 
-function default_delay_obs_priors(model::DelayObservations)
+function default_delay_obs_priors()
     return (:neg_bin_cluster_factor_prior => truncated(
         Normal(0, 0.1 * sqrt(pi) / sqrt(2)), 0.0, Inf),) |> Dict
 end

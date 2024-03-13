@@ -185,7 +185,7 @@ We choose a simple observation model where infections are observed 0, 1, 2, 3 da
 obs_model = DelayObservations(
     fill(0.25, 4),
     time_horizon,
-    EpiAware._make_halfnormal_prior(0.1)
+    EpiAware.EpiAwareUtils._make_halfnormal_prior(0.1)
 )
 
 # ╔═╡ e49713e8-4840-4083-8e3f-fc52d791be7b

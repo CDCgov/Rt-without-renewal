@@ -4,7 +4,7 @@ module InferenceMethods
 Module for defining inference methods.
 """
 
-import Pathfinder: pathfinder
+import Pathfinder: pathfinder, PathfinderResult
 
 using DynamicPPL, DocStringExtensions
 

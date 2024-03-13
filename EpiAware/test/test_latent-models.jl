@@ -4,10 +4,10 @@
     using HypothesisTests: ExactOneSampleKSTest, pvalue
 
     n = 5
-    priors = EpiAware.default_rw_priors()
-    rw_process = EpiAware.RandomWalk(Normal(0.0, 1.0),
+    priors = default_rw_priors()
+    rw_process = RandomWalk(Normal(0.0, 1.0),
         truncated(Normal(0.0, 0.05), 0.0, Inf))
-    model = EpiAware.generate_latent(rw_process, n)
+    model = generate_latent(rw_process, n)
     fixed_model = fix(model, (σ_RW = 1.0, init_rw_value = 0.0)) #Fixing the standard deviation of the random walk process
     n_samples = 1000
     samples_day_5 = sample(fixed_model, Prior(), n_samples) |>
@@ -20,13 +20,13 @@
 end
 @testitem "Testing default_rw_priors" begin
     @testset "var_RW_prior" begin
-        priors = EpiAware.default_rw_priors()
+        priors = default_rw_priors()
         var_RW = rand(priors[:var_RW_prior])
         @test var_RW >= 0.0
     end
 
     @testset "init_rw_value_prior" begin
-        priors = EpiAware.default_rw_priors()
+        priors = default_rw_priors()
         init_rw_value = rand(priors[:init_rw_value_prior])
         @test typeof(init_rw_value) == Float64
     end

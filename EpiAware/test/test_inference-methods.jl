@@ -13,7 +13,7 @@
         ndraws = 100
         maxiters = 50
 
-        pfs = EpiAware._run_manypathfinder(
+        pfs = EpiAware.InferenceMethods._run_manypathfinder(
             mdl; nruns = nruns, ndraws = ndraws, maxiters = maxiters)
 
         @test length(pfs) == nruns
@@ -29,7 +29,7 @@
         ndraws = 50
         maxiters = 100
 
-        pfs = EpiAware._run_manypathfinder(
+        pfs = EpiAware.InferenceMethods._run_manypathfinder(
             badmdl; nruns = nruns, ndraws = ndraws, maxiters = maxiters)
 
         @test all(pfs .== :fail)
@@ -51,7 +51,7 @@ end
         ndraws = 100
         maxiters = 50
 
-        pfs = EpiAware._continue_manypathfinder!(
+        pfs = EpiAware.InferenceMethods._continue_manypathfinder!(
             pfs, easymdl; max_tries, nruns, ndraws, maxiters)
 
         @test pfs[end] isa PathfinderResult
@@ -71,7 +71,7 @@ end
         maxiters = 50
 
         @test_throws "All pathfinder runs failed after $max_tries tries." begin
-            pfs = EpiAware._continue_manypathfinder!(
+            pfs = EpiAware.InferenceMethods._continue_manypathfinder!(
                 pfs, badmdl; max_tries, nruns, ndraws, maxiters)
         end
     end
@@ -89,10 +89,10 @@ end
     ndraws = 100
     maxiters = 50
 
-    pfs = EpiAware._run_manypathfinder(
+    pfs = EpiAware.InferenceMethods._run_manypathfinder(
         mdl; nruns = nruns, ndraws = ndraws, maxiters = maxiters)
 
-    best_pf = EpiAware._get_best_elbo_pathfinder(pfs)
+    best_pf = EpiAware.InferenceMethods._get_best_elbo_pathfinder(pfs)
     @test best_pf isa PathfinderResult
 end
 @testitem "Testing manypathfinder function" begin

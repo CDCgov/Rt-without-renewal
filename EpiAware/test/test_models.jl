@@ -10,7 +10,7 @@
     epi_model = DirectInfections(data, Normal())
 
     #Define the latent process model
-    rwp = EpiAware.RandomWalk(Normal(0.0, 1.0),
+    rwp = RandomWalk(Normal(0.0, 1.0),
         truncated(Normal(0.0, 0.05), 0.0, Inf))
 
     #Define the observation model
@@ -19,7 +19,7 @@
     D_delay = 14.0
     Δd = 1.0
 
-    obs_model = EpiAware.DelayObservations(delay_distribution = delay_distribution,
+    obs_model = DelayObservations(delay_distribution = delay_distribution,
         time_horizon = time_horizon,
         neg_bin_cluster_factor_prior = Gamma(5, 0.05 / 5),
         D_delay = D_delay,
@@ -45,17 +45,17 @@ end
     pos_shift = 1e-6
 
     #Define the epi_model
-    epi_model = EpiAware.ExpGrowthRate(data, Normal())
+    epi_model = ExpGrowthRate(data, Normal())
 
     #Define the latent process model
     r_3 = log(2) / 3.0
-    rwp = EpiAware.RandomWalk(
+    rwp = RandomWalk(
         truncated(Normal(0.0, r_3 / 3), -r_3, r_3), # 3 day doubling time at 3 sigmas in prior
         truncated(Normal(0.0, 0.01), 0.0, 0.1))
 
     #Define the observation model - no delay model
     time_horizon = 5
-    obs_model = EpiAware.DelayObservations([1.0],
+    obs_model = DelayObservations([1.0],
         time_horizon,
         truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0))
 
@@ -84,17 +84,17 @@ end
     pos_shift = 1e-6
 
     #Define the epi_model
-    epi_model = EpiAware.Renewal(data, Normal())
+    epi_model = Renewal(data, Normal())
 
     #Define the latent process model
     r_3 = log(2) / 3.0
-    rwp = EpiAware.RandomWalk(
+    rwp = RandomWalk(
         truncated(Normal(0.0, r_3 / 3), -r_3, r_3), # 3 day doubling time at 3 sigmas in prior
         truncated(Normal(0.0, 0.01), 0.0, 0.1))
 
     #Define the observation model - no delay model
     time_horizon = 5
-    obs_model = EpiAware.DelayObservations([1.0],
+    obs_model = DelayObservations([1.0],
         time_horizon,
         truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0))
 

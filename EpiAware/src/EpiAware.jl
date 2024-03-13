@@ -44,7 +44,7 @@ include("EpiModels/EpiModels.jl")
 using .EpiModels
 
 export EpiData, DirectInfections, ExpGrowthRate, Renewal,
-       R_to_r, r_to_R, create_discrete_pmf, default_rw_priors
+       R_to_r, r_to_R
 
 include("InferenceMethods/InferenceMethods.jl")
 using .InferenceMethods
@@ -54,17 +54,17 @@ export manypathfinder
 include("LatentModels/LatentModels.jl")
 using .LatentModels
 
-export RandomWalk, default_delay_obs
+export RandomWalk, default_rw_priors
 
 include("ObservationModels/ObservationModels.jl")
 using .ObservationModels
 
-export DelayObservations, default_delay_obs
+export DelayObservations, default_delay_obs_priors
 
 include("EpiAwareUtils/EpiAwareUtils.jl")
 using .EpiAwareUtils
 
-export spread_draws, scan
+export spread_draws, scan, create_discrete_pmf
 
 # Non-submodule imports
 using Turing, DocStringExtensions
