@@ -1,17 +1,35 @@
-struct DiffLatentModel <: AbstractLatentModel
-    model::AbstractModel
-    init_prior::Priors
+"""
+The `DiffLatentModel` struct represents a differential latent model that is a subtype of `AbstractLatentModel`.
+
+## Fields
+- `model::M`: The underlying latent model.
+- `init_prior::P`: The initial priors for the latent variables.
+- `d::Int`: The dimensionality of the latent variables.
+
+## Constructors
+- `DiffLatentModel(;latentmodel, init_priors::Vector{<:Distribution})`: Constructs a `DiffLatentModel` object with the given latent model and initial priors.
+- `DiffLatentModel(;latentmodel, init_prior_distribution::Distribution, d::Int)`: Constructs a `DiffLatentModel` object with the given latent model, initial prior distribution, and dimensionality.
+
+"""
+struct DiffLatentModel{M, P} <: AbstractLatentModel
+    "Underlying latent model for the differenced process"
+    model::M
+    "The prior distribution for the initial latent variables."
+    init_prior::P
+    "Number of times differenced."
     d::Int
 
-    function DiffLatentModel(model::AbstractModel, init_prior::Priors)
-        d = length(init_prior)
-        return DiffLatentModel(model, init_prior, d)
+    function DiffLatentModel(latentmodel; init_prior_distribution::Distribution, d::Int)
+        init_priors = fill(init_prior_distribution, d)
+        return DiffLatentModel(; latentmodel = latentmodel, init_priors = init_priors)
     end
 
-    function DiffLatentModel(model::AbstractModel, init_prior::Priors, d::Int)
-        @assert d>0 "d must be greater than 0"
-        @assert length(init_prior)==d "Length of init_prior must be equal to d"
-        return new(model, init_prior, d)
+    function DiffLatentModel(;
+            latentmodel, init_priors::Vector{D} where {D <: Distribution})
+        d = length(init_priors)
+        init_prior = all(first(init_priors) .== init_priors) ?
+                     filldist(first(init_priors), d) : arraydist(init_priors)
+        return new{typeof(latentmodel), typeof(init_prior)}(latentmodel, init_prior, d)
     end
 end
 
