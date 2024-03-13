@@ -45,18 +45,18 @@ using .EpiModels
 export EpiData, DirectInfections, ExpGrowthRate, Renewal,
        R_to_r, r_to_R, generate_latent_infs
 
-include("InferenceMethods/InferenceMethods.jl")
-using .InferenceMethods
+include("EpiInference/EpiInference.jl")
+using .EpiInference
 
 export manypathfinder
 
-include("LatentModels/LatentModels.jl")
-using .LatentModels
+include("EpiLatentModels/EpiLatentModels.jl")
+using .EpiLatentModels
 
 export RandomWalk, default_rw_priors, generate_latent
 
-include("ObservationModels/ObservationModels.jl")
-using .ObservationModels
+include("EpiObsModels/EpiObsModels.jl")
+using .EpiObsModels
 
 export DelayObservations, default_delay_obs_priors, generate_observations
 

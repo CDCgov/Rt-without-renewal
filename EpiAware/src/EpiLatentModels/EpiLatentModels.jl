@@ -1,4 +1,4 @@
-module LatentModels
+module EpiLatentModels
 
 """
 Module for defining latent models.

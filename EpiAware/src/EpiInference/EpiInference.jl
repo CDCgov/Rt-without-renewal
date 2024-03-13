@@ -1,4 +1,4 @@
-module InferenceMethods
+module EpiInference
 
 """
 Module for defining inference methods.

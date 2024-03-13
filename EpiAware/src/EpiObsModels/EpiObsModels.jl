@@ -1,4 +1,4 @@
-module ObservationModels
+module EpiObsModels
 
 """
 Module for defining observation models.

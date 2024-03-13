@@ -128,7 +128,7 @@ end
                                       0.3 0.5 0.2 0 0
                                       0 0.3 0.5 0.2 0
                                       0 0 0.3 0.5 0.2])
-        K = EpiAware.ObservationModels.generate_observation_kernel(delay_int, time_horizon)
+        K = EpiAware.EpiObsModels.generate_observation_kernel(delay_int, time_horizon)
         @test K == expected_K
     end
 end
