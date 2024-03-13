@@ -37,14 +37,13 @@ import .EpiAwareBase: AbstractModel, AbstractEpiModel, AbstractLatentModel,
                       AbstractObservationModel
 
 export AbstractModel, AbstractEpiModel, AbstractLatentModel,
-       AbstractObservationModel, generate_latent,
-       generate_latent_infs, generate_observations
+       AbstractObservationModel
 
 include("EpiModels/EpiModels.jl")
 using .EpiModels
 
 export EpiData, DirectInfections, ExpGrowthRate, Renewal,
-       R_to_r, r_to_R
+       R_to_r, r_to_R, generate_latent_infs
 
 include("InferenceMethods/InferenceMethods.jl")
 using .InferenceMethods
@@ -54,12 +53,12 @@ export manypathfinder
 include("LatentModels/LatentModels.jl")
 using .LatentModels
 
-export RandomWalk, default_rw_priors
+export RandomWalk, default_rw_priors, generate_latent
 
 include("ObservationModels/ObservationModels.jl")
 using .ObservationModels
 
-export DelayObservations, default_delay_obs_priors
+export DelayObservations, default_delay_obs_priors, generate_observations
 
 include("EpiAwareUtils/EpiAwareUtils.jl")
 using .EpiAwareUtils

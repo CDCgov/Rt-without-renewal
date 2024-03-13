@@ -122,7 +122,8 @@ end
 end
 
 @testitem "Testing generate_observations default" begin
-    struct TestObsModel <: AbstractObservationModel
+    using EpiAware.EpiAwareBase
+    struct TestObsModel <: EpiAware.EpiAwareBase.AbstractObservationModel
     end
 
     @test try

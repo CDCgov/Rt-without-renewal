@@ -117,10 +117,11 @@ end
     @test mdl_incidence ≈ expected_incidence
 end
 @testitem "generate_latent_infs function: default" begin
+    using EpiAware.EpiAwareBase
     latent_model = [0.1, 0.2, 0.3]
     init_incidence = 10.0
 
-    struct TestEpiModel <: AbstractEpiModel
+    struct TestEpiModel <: EpiAware.EpiAwareBase.AbstractEpiModel
     end
 
     @test isnothing(generate_latent_infs(TestEpiModel(), latent_model))
