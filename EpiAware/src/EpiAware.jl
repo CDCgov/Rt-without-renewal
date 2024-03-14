@@ -33,38 +33,37 @@ An epidemiological model in `EpiAware` consists of composable structs with core 
 module EpiAware
 
 include("EpiAwareBase/EpiAwareBase.jl")
-import .EpiAwareBase: AbstractModel, AbstractEpiModel, AbstractLatentModel,
-                      AbstractObservationModel
 
-export AbstractModel, AbstractEpiModel, AbstractLatentModel,
-       AbstractObservationModel
+using .EpiAwareBase
+export AbstractModel, AbstractLatentModel, AbstractEpiModel,
+       AbstractObservationModel, generate_latent,
+       generate_latent_infs, generate_observations
 
 include("EpiAwareUtils/EpiAwareUtils.jl")
 using .EpiAwareUtils
 
 export spread_draws, scan, create_discrete_pmf
 
+include("EpiLatentModels/EpiLatentModels.jl")
+using .EpiLatentModels
+
+export RandomWalk, default_rw_priors
+
 include("EpiModels/EpiModels.jl")
 using .EpiModels
 
 export EpiData, DirectInfections, ExpGrowthRate, Renewal,
-       R_to_r, r_to_R, generate_latent_infs
+       R_to_r, r_to_R
+
+include("EpiObsModels/EpiObsModels.jl")
+using .EpiObsModels
+
+export DelayObservations, default_delay_obs_priors
 
 include("EpiInference/EpiInference.jl")
 using .EpiInference
 
 export manypathfinder
-
-include("EpiLatentModels/EpiLatentModels.jl")
-using .EpiLatentModels
-
-export RandomWalk, default_rw_priors, generate_latent
-
-include("EpiObsModels/EpiObsModels.jl")
-using .EpiObsModels
-
-export DelayObservations, default_delay_obs_priors, generate_observations
-
 # Non-submodule imports
 using Turing, DocStringExtensions
 

@@ -4,8 +4,7 @@ module EpiAwareUtils
 Module for defining utility functions.
 """
 
-include("../EpiAwareBase/EpiAwareBase.jl")
-using .EpiAwareBase
+using ..EpiAwareBase
 
 import DataFramesMeta: DataFrame, @rename!
 import Turing: Chains

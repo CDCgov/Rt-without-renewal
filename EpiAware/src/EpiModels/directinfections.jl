@@ -63,7 +63,7 @@ I_t = generated_quantities(latent_inf, θ)
 ```
 
 "
-@kwdef struct DirectInfections{S <: Sampleable} <: EpiAwareBase.AbstractEpiModel
+@kwdef struct DirectInfections{S <: Sampleable} <: AbstractEpiModel
     "`Epidata` object."
     data::EpiData
     "Prior distribution for the initialisation of the infections. Default is `Normal()`."
@@ -109,7 +109,7 @@ unobserved infections.
 I_t = generated_quantities(latent_inf, θ)
 ```
 """
-@model function EpiAwareBase.generate_latent_infs(epi_model::DirectInfections, Z_t)
+@model function generate_latent_infs(epi_model::DirectInfections, Z_t)
     init_incidence ~ epi_model.initialisation_prior
     return epi_model.data.transformation.(init_incidence .+ Z_t)
 end

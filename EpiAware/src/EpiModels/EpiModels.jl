@@ -4,16 +4,14 @@ module EpiModels
 Module for defining epidemiological models.
 """
 
-include("../EpiAwareBase/EpiAwareBase.jl")
-using .EpiAwareBase
+using ..EpiAwareBase
 
-include("../EpiAwareUtils/EpiAwareUtils.jl")
-import .EpiAwareUtils: scan, create_discrete_pmf
+import ..EpiAwareUtils: scan, create_discrete_pmf
 
 using Turing, Distributions, DocStringExtensions, LinearAlgebra
 
 export EpiData, DirectInfections, ExpGrowthRate, Renewal,
-       R_to_r, r_to_R, generate_latent_infs
+       R_to_r, r_to_R
 
 include("epidata.jl")
 include("directinfections.jl")
