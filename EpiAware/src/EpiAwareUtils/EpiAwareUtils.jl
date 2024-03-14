@@ -8,7 +8,7 @@ using ..EpiAwareBase
 
 import DataFramesMeta: DataFrame, @rename!
 import Turing: Chains
-import Distributions: Distribution, cdf
+import Distributions: Distribution, cdf, Normal, truncated
 
 using DocStringExtensions, QuadGK
 

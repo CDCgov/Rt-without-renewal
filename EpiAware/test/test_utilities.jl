@@ -201,13 +201,13 @@ end
     using Distributions, HypothesisTests
     @testset "Check distribution type" begin
         prior_mean = 10.0
-        prior_dist = EpiAware.EpiWareUtils._make_halfnormal_prior(prior_mean)
+        prior_dist = EpiAware.EpiAwareUtils._make_halfnormal_prior(prior_mean)
         @test typeof(prior_dist) <: Distribution
     end
 
     @testset "Check distribution properties" begin
         prior_mean = 2.0
-        prior_dist = EpiAware.EpiWareUtils._make_halfnormal_prior(prior_mean)
+        prior_dist = EpiAware.EpiAwareUtils._make_halfnormal_prior(prior_mean)
         #Check Distributions.jl mean function
         @test mean(prior_dist) ≈ prior_mean
         samples = rand(prior_dist, 10_000)
