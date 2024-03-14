@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.38
+# v0.19.39
 
 using Markdown
 using InteractiveUtils
@@ -28,6 +28,7 @@ begin
     using DataFramesMeta
     using LinearAlgebra
     using Transducers
+    using ReverseDiff
 end
 
 # ╔═╡ 3ebc8384-f73d-4597-83a7-07a3744fed61
@@ -96,7 +97,7 @@ Z_0 &\sim \mathcal{N}(0,1),\\
 
 # ╔═╡ 56ae496b-0094-460b-89cb-526627991717
 rwp = EpiAware.RandomWalk(Normal(),
-    EpiAware.EpiWareBase._make_halfnormal_prior(0.1))
+    EpiAware.EpiAwareUtils._make_halfnormal_prior(0.1))
 
 # ╔═╡ 767beffd-1ef5-4e6c-9ac6-edb52e60fb44
 md"
