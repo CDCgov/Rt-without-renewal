@@ -5,7 +5,7 @@ Module for defining observation models.
 """
 
 include("../EpiAwareBase/EpiAwareBase.jl")
-import .EpiAwareBase: AbstractObservationModel, generate_observations
+using .EpiAwareBase
 
 include("../EpiAwareUtils/EpiAwareUtils.jl")
 import .EpiAwareUtils: create_discrete_pmf

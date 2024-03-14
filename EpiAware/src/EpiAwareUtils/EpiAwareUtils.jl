@@ -5,7 +5,7 @@ Module for defining utility functions.
 """
 
 include("../EpiAwareBase/EpiAwareBase.jl")
-import .EpiAwareBase: AbstractModel
+using .EpiAwareBase
 
 import DataFramesMeta: DataFrame, @rename!
 import Turing: Chains

@@ -5,7 +5,7 @@ Module for defining latent models.
 """
 
 include("../EpiAwareBase/EpiAwareBase.jl")
-import .EpiAwareBase: AbstractLatentModel, generate_latent
+using .EpiAwareBase
 
 using Turing, Distributions, DocStringExtensions
 
