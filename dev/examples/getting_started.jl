@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.40
+# v0.19.39
 
 using Markdown
 using InteractiveUtils
@@ -28,6 +28,7 @@ begin
     using DataFramesMeta
     using LinearAlgebra
     using Transducers
+    using ReverseDiff
 end
 
 # ╔═╡ 3ebc8384-f73d-4597-83a7-07a3744fed61
@@ -96,7 +97,7 @@ Z_0 &\sim \mathcal{N}(0,1),\\
 
 # ╔═╡ 56ae496b-0094-460b-89cb-526627991717
 rwp = EpiAware.RandomWalk(Normal(),
-    EpiAware._make_halfnormal_prior(0.1))
+    EpiAware.EpiAwareUtils._make_halfnormal_prior(0.1))
 
 # ╔═╡ 767beffd-1ef5-4e6c-9ac6-edb52e60fb44
 md"
@@ -138,6 +139,12 @@ And construct the `EpiModel`.
 # ╔═╡ 6fbdd8e6-2323-4352-9185-1f31a9cf9012
 epi_model = DirectInfections(model_data, log_I0_prior)
 
+# ╔═╡ 10c750db-6d00-4ef6-9caa-3cf7b3c0d711
+latent = generate_latent_infs(epi_model, 20)
+
+# ╔═╡ 45b287b8-22b5-4f09-9a93-51df82477b01
+rand(latent)
+
 # ╔═╡ 5e62a50a-71f4-4902-b1c9-fdf51fe145fa
 md"
 
@@ -176,10 +183,10 @@ We choose a simple observation model where infections are observed 0, 1, 2, 3 da
 "
 
 # ╔═╡ 448669bc-99f4-4823-b15e-fcc9040ba31b
-obs_model = EpiAware.DelayObservations(
+obs_model = DelayObservations(
     fill(0.25, 4),
     time_horizon,
-    EpiAware._make_halfnormal_prior(0.1)
+    EpiAware.EpiAwareUtils._make_halfnormal_prior(0.1)
 )
 
 # ╔═╡ e49713e8-4840-4083-8e3f-fc52d791be7b
@@ -426,6 +433,8 @@ end
 # ╠═6639e66f-7725-4976-81b2-6472419d1a62
 # ╟─df5e59f8-3185-4bed-9cca-7c266df17cec
 # ╠═6fbdd8e6-2323-4352-9185-1f31a9cf9012
+# ╠═10c750db-6d00-4ef6-9caa-3cf7b3c0d711
+# ╠═45b287b8-22b5-4f09-9a93-51df82477b01
 # ╟─5e62a50a-71f4-4902-b1c9-fdf51fe145fa
 # ╟─e813d547-6100-4c43-b84c-8cebe306bda8
 # ╠═c7580ae6-0db5-448e-8b20-4dd6fcdb1ae0
