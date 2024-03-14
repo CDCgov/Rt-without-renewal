@@ -139,7 +139,7 @@ end
         r = 0.5
         w = [0.2, 0.3, 0.5]
         expected_result = 0.2 * exp(-0.5 * 1) + 0.3 * exp(-0.5 * 2) + 0.5 * exp(-0.5 * 3)
-        result = EpiAware.EpiModels.neg_MGF(r, w)
+        result = EpiAware.EpiInfModels.neg_MGF(r, w)
         @test result≈expected_result atol=1e-15
     end
 
@@ -149,7 +149,7 @@ end
         w = [0.1, 0.2, 0.3, 0.4]
         expected_result = 0.1 * exp(-0 * 1) + 0.2 * exp(-0 * 2) + 0.3 * exp(-0 * 3) +
                           0.4 * exp(-0 * 4)
-        result = EpiAware.EpiModels.neg_MGF(r, w)
+        result = EpiAware.EpiInfModels.neg_MGF(r, w)
         @test result≈expected_result atol=1e-15
     end
 end
@@ -162,7 +162,7 @@ end
         w = [0.2, 0.3, 0.5]
         expected_result = -(0.2 * 1 * exp(-0.5 * 1) + 0.3 * 2 * exp(-0.5 * 2) +
                             0.5 * 3 * exp(-0.5 * 3))
-        result = EpiAware.EpiModels.dneg_MGF_dr(r, w)
+        result = EpiAware.EpiInfModels.dneg_MGF_dr(r, w)
         @test result≈expected_result atol=1e-15
     end
 
@@ -174,7 +174,7 @@ end
                             0.2 * 2 * exp(-0 * 2) +
                             0.3 * 3 * exp(-0 * 3) +
                             0.4 * 4 * exp(-0 * 4))
-        result = EpiAware.EpiModels.dneg_MGF_dr(r, w)
+        result = EpiAware.EpiInfModels.dneg_MGF_dr(r, w)
         @test result≈expected_result atol=1e-15
     end
 end

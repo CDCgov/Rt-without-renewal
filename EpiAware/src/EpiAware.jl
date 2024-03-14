@@ -50,8 +50,8 @@ using .EpiLatentModels
 
 export RandomWalk, default_rw_priors
 
-include("EpiModels/EpiModels.jl")
-using .EpiModels
+include("EpiInfModels/EpiInfModels.jl")
+using .EpiInfModels
 
 export EpiData, DirectInfections, ExpGrowthRate, Renewal,
        R_to_r, r_to_R

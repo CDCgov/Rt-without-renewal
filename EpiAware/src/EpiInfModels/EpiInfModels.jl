@@ -1,4 +1,4 @@
-module EpiModels
+module EpiInfModels
 
 """
 Module for defining epidemiological models.
