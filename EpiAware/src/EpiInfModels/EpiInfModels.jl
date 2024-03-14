@@ -6,7 +6,7 @@ Module for defining epidemiological models.
 
 using ..EpiAwareBase
 
-import ..EpiAwareUtils: scan, create_discrete_pmf
+using ..EpiAwareUtils: scan, create_discrete_pmf
 
 using Turing, Distributions, DocStringExtensions, LinearAlgebra
 
