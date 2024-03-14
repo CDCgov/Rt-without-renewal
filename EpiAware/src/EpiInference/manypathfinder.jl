@@ -11,7 +11,7 @@ An array of `PathfinderResult` objects or `Symbol` values indicating success or 
 """
 function _run_manypathfinder(mdl::DynamicPPL.Model; nruns, kwargs...)
     @info "Running pathfinder $nruns times"
-    pfs = Vector{Union{Pathfinder.PathfinderResult, Symbol}}(undef, nruns)
+    pfs = Vector{Union{PathfinderResult, Symbol}}(undef, nruns)
     Threads.@threads for i in 1:nruns
         try
             pfs[i] = pathfinder(mdl; kwargs...)

@@ -69,7 +69,7 @@ end
     rt = [log(recent_incidence[1]) - log_init; diff(log.(recent_incidence))]
 
     #Check log_init is sampled from the correct distribution
-    sample_init_inc = sample(EpiAware.generate_latent_infs(rt_model, rt), Prior(), 1000) |>
+    sample_init_inc = sample(generate_latent_infs(rt_model, rt), Prior(), 1000) |>
                       chn -> chn[:init_incidence] |>
                              Array |>
                              vec
@@ -78,7 +78,7 @@ end
     @test ks_test_pval > 1e-6 #Very unlikely to fail if the model is correctly implemented
 
     #Check that the generated incidence is correct given correct initialisation
-    mdl_incidence = generated_quantities(EpiAware.generate_latent_infs(rt_model, rt),
+    mdl_incidence = generated_quantities(generate_latent_infs(rt_model, rt),
         (init_incidence = log_init,))
     @test mdl_incidence ≈ recent_incidence
 end
@@ -99,7 +99,7 @@ end
 
     #Check log_init is sampled from the correct distribution
     sample_init_inc = sample(
-        EpiAware.generate_latent_infs(direct_inf_model, log_incidence),
+        generate_latent_infs(direct_inf_model, log_incidence),
         Prior(), 1000) |>
                       chn -> chn[:init_incidence] |>
                              Array |>
@@ -110,20 +110,21 @@ end
 
     #Check that the generated incidence is correct given correct initialisation
     mdl_incidence = generated_quantities(
-        EpiAware.generate_latent_infs(direct_inf_model,
+        generate_latent_infs(direct_inf_model,
             log_incidence),
         (init_incidence = log_init_scale,))
 
     @test mdl_incidence ≈ expected_incidence
 end
 @testitem "generate_latent_infs function: default" begin
+    using EpiAware.EpiAwareBase
     latent_model = [0.1, 0.2, 0.3]
     init_incidence = 10.0
 
-    struct TestEpiModel <: EpiAware.AbstractEpiModel
+    struct TestEpiModel <: EpiAware.EpiAwareBase.AbstractEpiModel
     end
 
-    @test isnothing(EpiAware.generate_latent_infs(TestEpiModel(), latent_model))
+    @test isnothing(generate_latent_infs(TestEpiModel(), latent_model))
 end
 @testitem "generate_latent_infs dispatched on Renewal" begin
     using Distributions, Turing, HypothesisTests, DynamicPPL, LinearAlgebra
@@ -141,7 +142,7 @@ end
     initial_incidence = [1.0, 1.0, 1.0]#aligns with initial exp growth rate of 0.
 
     #Check log_init is sampled from the correct distribution
-    @time sample_init_inc = sample(EpiAware.generate_latent_infs(renewal_model, log_Rt),
+    @time sample_init_inc = sample(generate_latent_infs(renewal_model, log_Rt),
         Prior(), 1000) |>
                             chn -> chn[:init_incidence] |>
                                    Array |>
@@ -153,7 +154,7 @@ end
     #Check that the generated incidence is correct given correct initialisation
     #Check first three days "by hand"
     mdl_incidence = generated_quantities(
-        EpiAware.generate_latent_infs(renewal_model,
+        generate_latent_infs(renewal_model,
             log_Rt), (init_incidence = 0.0,))
 
     day1_incidence = dot(initial_incidence, gen_int) * Rt[1]

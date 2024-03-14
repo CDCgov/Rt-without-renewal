@@ -32,36 +32,47 @@ An epidemiological model in `EpiAware` consists of composable structs with core 
 """
 module EpiAware
 
-using Distributions, Turing, LogExpFunctions, LinearAlgebra, SparseArrays,
-      Random, ReverseDiff, Optim, Parameters, QuadGK, DataFramesMeta,
-      DocStringExtensions, Pathfinder, DynamicPPL, Transducers
+include("EpiAwareBase/EpiAwareBase.jl")
 
-# Exported abstract types
-export AbstractModel, AbstractEpiModel, AbstractLatentModel,
-       AbstractObservationModel
+using .EpiAwareBase
 
-# Exported types
-export EpiData, Renewal, ExpGrowthRate, DirectInfections, RandomWalk,
-       DelayObservations
+export AbstractModel, AbstractLatentModel, AbstractEpiModel,
+       AbstractObservationModel, generate_latent,
+       generate_latent_infs, generate_observations
 
-# Exported Turing model constructors
-export make_epi_aware
+include("EpiAwareUtils/EpiAwareUtils.jl")
+using .EpiAwareUtils
 
-# Exported model functions
-export generate_latent, generate_latent_infs, generate_observations
+export spread_draws, scan, create_discrete_pmf
 
-# Exported utilities
-export create_discrete_pmf, spread_draws, scan, R_to_r, r_to_R,
-       default_rw_priors, default_delay_obs_priors
+include("EpiLatentModels/EpiLatentModels.jl")
+using .EpiLatentModels
 
-# Exported inference methods
+export RandomWalk, default_rw_priors
+
+include("EpiInfModels/EpiInfModels.jl")
+using .EpiInfModels
+
+export EpiData, DirectInfections, ExpGrowthRate, Renewal,
+       R_to_r, r_to_R
+
+include("EpiObsModels/EpiObsModels.jl")
+using .EpiObsModels
+
+export DelayObservations, default_delay_obs_priors
+
+include("EpiInference/EpiInference.jl")
+using .EpiInference
+
 export manypathfinder
 
+# Non-submodule imports
+using Turing, DocStringExtensions
+
+# Non-submodule exports
+export make_epi_aware
+
 include("docstrings.jl")
-include("abstract-types.jl")
-include("epimodels/epimodels.jl")
-include("utils/utils.jl")
-include("latentmodels/latentmodels.jl")
-include("observationmodels/observationmodels.jl")
-include("inferencemethods/inferencemethods.jl")
+include("make_epi_aware.jl")
+
 end
