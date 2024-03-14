@@ -39,6 +39,11 @@ import .EpiAwareBase: AbstractModel, AbstractEpiModel, AbstractLatentModel,
 export AbstractModel, AbstractEpiModel, AbstractLatentModel,
        AbstractObservationModel
 
+include("EpiAwareUtils/EpiAwareUtils.jl")
+using .EpiAwareUtils
+
+export spread_draws, scan, create_discrete_pmf
+
 include("EpiModels/EpiModels.jl")
 using .EpiModels
 
@@ -59,11 +64,6 @@ include("EpiObsModels/EpiObsModels.jl")
 using .EpiObsModels
 
 export DelayObservations, default_delay_obs_priors, generate_observations
-
-include("EpiAwareUtils/EpiAwareUtils.jl")
-using .EpiAwareUtils
-
-export spread_draws, scan, create_discrete_pmf
 
 # Non-submodule imports
 using Turing, DocStringExtensions
