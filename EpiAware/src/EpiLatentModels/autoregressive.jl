@@ -1,33 +1,38 @@
 @doc raw"
 The autoregressive (AR) model struct.
 "
-struct AR{D <: Distribution, S <: Distribution, I <: Distribution, P <: Int} <: AbstractLatentModel
+struct AR{D <: Distribution, S <: Distribution, I <: Distribution, P <: Int} <:
+       AbstractLatentModel
     damp_prior::D,
     std_prior::S,
     init_prior::I,
     p::P
 
-    function AR(damp_prior::Distribution, std_prior::Distribution; init_prior::Distribution; p::Int = 1)
-
+    function AR(damp_prior::Distribution, std_prior::Distribution;
+            init_prior::Distribution; p::Int = 1)
         damp_priors = fill(damp_prior, p)
         init_priors = fill(init_prior, p)
-        return AR(; damp_priors = damp_priors, std_prior = std_prior, init_priors = init_priors, p = p)
+        return AR(; damp_priors = damp_priors, std_prior = std_prior,
+            init_priors = init_priors, p = p)
     end
 
     function AR(; damp_priors::Vector{D} = [truncated(Normal(0.0, 0.05))],
-         std_prior::Distribution = truncated(Normal(0.0, 0.05), 0.0, Inf),
-         init_priors::Vector{I} = [Normal()]) where {D <: Distribution, I <: Distribution}
+            std_prior::Distribution = truncated(Normal(0.0, 0.05), 0.0, Inf),
+            init_priors::Vector{I} = [Normal()]) where {
+            D <: Distribution, I <: Distribution}
         p = length(damp_priors)
         damp_prior = _expand_dist(damp_prior)
         init_prior = _expand_dist(init_priors)
         return AR(damp_prior, std_prior, init_prior, p)
     end
 
-    function AR(damp_prior::Distribution, std_prior::Distribution, init_prior::Distribution, p::Int)
-        @assert p > 0 "p must be greater than 0"
-        @assert length(damp_prior) == length(init_prior) "damp_prior and init_prior must have the same length"
-        @assert p == length(damp_prior) "p must be equal to the length of damp_prior"
-        new{typeof(damp_prior), typeof(std_prior), typeof(init_prior), typeof(p)}(damp_prior, std_prior, init_prior, p)
+    function AR(damp_prior::Distribution, std_prior::Distribution,
+            init_prior::Distribution, p::Int)
+        @assert p>0 "p must be greater than 0"
+        @assert length(damp_prior)==length(init_prior) "damp_prior and init_prior must have the same length"
+        @assert p==length(damp_prior) "p must be equal to the length of damp_prior"
+        new{typeof(damp_prior), typeof(std_prior), typeof(init_prior), typeof(p)}(
+            damp_prior, std_prior, init_prior, p)
     end
 end
 
