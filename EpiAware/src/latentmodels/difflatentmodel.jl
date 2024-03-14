@@ -72,7 +72,8 @@ unobserved latent process.
 #Sample random parameters from prior
 θ = rand(difference_mdl)
 #Get a sampled latent process as a generated quantity from the model
-Z_t = generated_quantities(difference_mdl, θ)
+(Z_t, _) = generated_quantities(difference_mdl, θ)
+Z_t
 ```
 
 """
@@ -99,6 +100,73 @@ struct DiffLatentModel{M <: AbstractLatentModel, P} <: AbstractLatentModel
     end
 end
 
+"""
+Generate a `Turing` model for `n`-step latent process ``Z_t`` using a differenced
+latent model defined by `latent_model`.
+
+# Arguments
+- `latent_model::DiffLatentModel`: The differential latent model.
+- `n`: The length of the latent variables.
+
+## Turing model specifications
+
+### Sampled random variables
+- `latent_init`: The initial latent process variables.
+- Other random variables defined by `model<:AbstractLatentModel` field of the undifferenced
+    model.
+
+### Generated quantities
+- A tuple containing the generated latent process as its first argument
+    and a `NamedTuple` of sampled auxiliary variables as second argument.
+
+# Example usage with `DiffLatentModel` model constructor
+
+`generate_latent` can be used to construct a `Turing` model for the differenced latent
+process. In this example, the underlying undifferenced process is a `RandomWalk` model.
+
+First, we construct a `RandomWalk` struct with an initial value prior and a step size
+standard deviation prior.
+
+```julia
+using Distributions, EpiAware
+rw = RandomWalk(Normal(0.0, 1.0), truncated(Normal(0.0, 0.05), 0.0, Inf))
+```
+
+Then, we can use `DiffLatentModel` to construct a `DiffLatentModel` for `d`-fold
+differenced process with `rw` as the undifferenced latent process.
+
+We have two constructor options for `DiffLatentModel`. The first option is to supply a
+common prior distribution for the initial terms and specify `d` as follows:
+
+```julia
+diff_model = DiffLatentModel(rw, Normal(); d = 2)
+```
+
+Or we can supply a vector of priors for the initial terms and `d` is inferred as follows:
+```julia
+diff_model2 = DiffLatentModel(;undiffmodel = rw, init_priors = [Normal(), Normal()])
+```
+
+Then, we can use `generate_latent` to construct a Turing model for the differenced latent
+process generating a length `n` process,
+
+```julia
+# Construct a Turing model
+n = 100
+difference_mdl = generate_latent(diff_model, n)
+```
+
+Now we can use the `Turing` PPL API to sample underlying parameters and generate the
+unobserved latent process.
+
+```julia
+#Sample random parameters from prior
+θ = rand(difference_mdl)
+#Get a sampled latent process as a generated quantity from the model
+(Z_t, _) = generated_quantities(difference_mdl, θ)
+Z_t
+```
+"""
 @model function generate_latent(latent_model::DiffLatentModel, n)
     d = latent_model.d
     @assert n>d "n must be longer than d"
