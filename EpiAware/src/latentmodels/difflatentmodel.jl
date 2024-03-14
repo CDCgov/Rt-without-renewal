@@ -111,10 +111,8 @@ end
 
 function _combine_diff(init, diff, d)
     combined = vcat(init, diff)
-
-    for i in 1:d
+    for _ in 1:d
         combined = cumsum(combined)
     end
-
     return combined
 end
