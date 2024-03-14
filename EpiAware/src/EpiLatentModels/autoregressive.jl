@@ -24,7 +24,7 @@ Generate a latent AR series.
 - The length of `damp_prior` and `init_prior` must be the same.
 - `n` must be longer than the order of the autoregressive process.
 "
-@model function generate_latent(latent_model::AR, n)
+@model function EpiAwareBase.generate_latent(latent_model::AR, n)
     p = length(latent_model.damp_prior)
     ϵ_t ~ MvNormal(ones(n - p))
     σ_AR ~ latent_model.std_prior
