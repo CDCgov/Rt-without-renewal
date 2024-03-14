@@ -35,6 +35,7 @@ module EpiAware
 include("EpiAwareBase/EpiAwareBase.jl")
 
 using .EpiAwareBase
+
 export AbstractModel, AbstractLatentModel, AbstractEpiModel,
        AbstractObservationModel, generate_latent,
        generate_latent_infs, generate_observations
@@ -64,6 +65,7 @@ include("EpiInference/EpiInference.jl")
 using .EpiInference
 
 export manypathfinder
+
 # Non-submodule imports
 using Turing, DocStringExtensions
 
