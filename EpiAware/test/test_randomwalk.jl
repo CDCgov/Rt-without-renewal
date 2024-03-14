@@ -4,7 +4,6 @@
     using HypothesisTests: ExactOneSampleKSTest, pvalue
 
     n = 5
-    priors = default_rw_priors()
     rw_process = RandomWalk(Normal(0.0, 1.0),
         truncated(Normal(0.0, 0.05), 0.0, Inf))
     model = generate_latent(rw_process, n)
@@ -18,17 +17,17 @@
     ks_test_pval = ExactOneSampleKSTest(samples_day_5, Normal(0.0, sqrt(5))) |> pvalue
     @test ks_test_pval > 1e-6 #Very unlikely to fail if the model is correctly implemented
 end
-@testitem "Testing default_rw_priors" begin
-    @testset "var_RW_prior" begin
-        priors = default_rw_priors()
-        var_RW = rand(priors[:var_RW_prior])
-        @test var_RW >= 0.0
+@testitem "Testing default RW priors" begin
+    @testset "std_prior" begin
+        priors = RandomWalk()
+        std_rw = rand(priors.std_prior])
+        @test std_rw >= 0.0
     end
 
-    @testset "init_rw_value_prior" begin
-        priors = default_rw_priors()
-        init_rw_value = rand(priors[:init_rw_value_prior])
-        @test typeof(init_rw_value) == Float64
+    @testset "init_prior" begin
+        priors = RandomWalk()
+        init_value = rand(priors.init_prior)
+        @test typeof(init_value) == Float64
     end
 end
 @testset "Testing RandomWalk constructor" begin
