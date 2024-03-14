@@ -6,7 +6,7 @@ Module for defining observation models.
 
 using ..EpiAwareBase
 
-import ..EpiAwareUtils: create_discrete_pmf
+using ..EpiAwareUtils: create_discrete_pmf
 
 using Turing, Distributions, DocStringExtensions, SparseArrays
 

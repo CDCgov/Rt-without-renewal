@@ -4,7 +4,7 @@ module EpiInference
 Module for defining inference methods.
 """
 
-import Pathfinder: pathfinder, PathfinderResult
+using Pathfinder: pathfinder, PathfinderResult
 
 using DynamicPPL, DocStringExtensions
 

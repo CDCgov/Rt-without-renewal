@@ -6,9 +6,9 @@ Module for defining utility functions.
 
 using ..EpiAwareBase
 
-import DataFramesMeta: DataFrame, @rename!
-import Turing: Chains
-import Distributions: Distribution, cdf, Normal, truncated
+using DataFramesMeta: DataFrame, @rename!
+using Turing: Chains
+using Distributions: Distribution, cdf, Normal, truncated
 
 using DocStringExtensions, QuadGK
 
