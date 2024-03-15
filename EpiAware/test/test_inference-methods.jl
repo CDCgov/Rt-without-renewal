@@ -21,7 +21,8 @@
     end
     @testset "Test case: check fail mode for bad model" begin
         @model function bad_model()
-            x ~ Normal(0, 1)
+            x ~ truncated(Normal(0, 1), -Inf, -1e-6)
+            y ~ Normal(sqrt(x), 1) #<-fails
             return sqrt(x) #<-fails
         end
         badmdl = bad_model()

@@ -11,3 +11,8 @@ abstract type AbstractEpiModel <: AbstractModel end
 abstract type AbstractLatentModel <: AbstractModel end
 
 abstract type AbstractObservationModel <: AbstractModel end
+
+"""
+Abstract supertype for all `EpiAware` problems.
+"""
+abstract type AbstractEpiAwareProblem end
