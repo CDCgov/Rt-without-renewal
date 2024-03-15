@@ -14,6 +14,7 @@ using DocStringExtensions, QuadGK
 
 export scan, spread_draws, create_discrete_pmf
 
+include("docstrings.jl")
 include("prior-tools.jl")
 include("distributions.jl")
 include("scan.jl")
