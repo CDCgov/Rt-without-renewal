@@ -69,7 +69,8 @@ end
     rt = [log(recent_incidence[1]) - log_init; diff(log.(recent_incidence))]
 
     #Check log_init is sampled from the correct distribution
-    sample_init_inc = sample(generate_latent_infs(rt_model, rt), Prior(), 1000) |>
+    sample_init_inc = sample(
+        generate_latent_infs(rt_model, rt), Prior(), 1000, progress = false) |>
                       chn -> chn[:init_incidence] |>
                              Array |>
                              vec
@@ -100,7 +101,7 @@ end
     #Check log_init is sampled from the correct distribution
     sample_init_inc = sample(
         generate_latent_infs(direct_inf_model, log_incidence),
-        Prior(), 1000) |>
+        Prior(), 1000, progress = false) |>
                       chn -> chn[:init_incidence] |>
                              Array |>
                              vec
@@ -143,7 +144,7 @@ end
 
     #Check log_init is sampled from the correct distribution
     @time sample_init_inc = sample(generate_latent_infs(renewal_model, log_Rt),
-        Prior(), 1000) |>
+        Prior(), 1000, progress = false) |>
                             chn -> chn[:init_incidence] |>
                                    Array |>
                                    vec

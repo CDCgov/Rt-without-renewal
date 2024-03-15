@@ -38,7 +38,7 @@ end
         latent_model, (σ_RW = 0, rw_init = 0.0))
 
     n_samples = 2000
-    samples = sample(fixed_model, Prior(), n_samples) |>
+    samples = sample(fixed_model, Prior(), n_samples, progress = false) |>
               chn -> mapreduce(hcat, generated_quantities(fixed_model, chn)) do gen
         gen[1]
     end
@@ -81,7 +81,7 @@ end
         (latent_init = [0.0, 1.0], σ_AR = 1.0, damp_AR = [0.8], ar_init = [0.0]))
 
     n_samples = 100
-    samples = sample(fixed_model, Prior(), n_samples) |>
+    samples = sample(fixed_model, Prior(), n_samples, progress = false) |>
               chn -> mapreduce(hcat, generated_quantities(fixed_model, chn)) do gen
         gen[1]
     end
