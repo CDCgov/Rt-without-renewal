@@ -12,6 +12,7 @@ using Turing, Distributions, DocStringExtensions, SparseArrays
 
 export DelayObservations, default_delay_obs_priors
 
+include("docstrings.jl")
 include("delayobservations.jl")
 include("utils.jl")
 
