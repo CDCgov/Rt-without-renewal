@@ -32,42 +32,27 @@ An epidemiological model in `EpiAware` consists of composable structs with core 
 """
 module EpiAware
 
+# Non-submodule imports
+using Turing, DocStringExtensions, Reexport
+
+# Submodule imports
 include("EpiAwareBase/EpiAwareBase.jl")
-
-using .EpiAwareBase
-
-export AbstractModel, AbstractLatentModel, AbstractEpiModel,
-       AbstractObservationModel, generate_latent,
-       generate_latent_infs, generate_observations
+@reexport using .EpiAwareBase
 
 include("EpiAwareUtils/EpiAwareUtils.jl")
-using .EpiAwareUtils
-
-export spread_draws, scan, create_discrete_pmf
+@reexport using .EpiAwareUtils
 
 include("EpiLatentModels/EpiLatentModels.jl")
-using .EpiLatentModels
-
-export RandomWalk, AR, DiffLatentModel
+@reexport using .EpiLatentModels
 
 include("EpiInfModels/EpiInfModels.jl")
-using .EpiInfModels
-
-export EpiData, DirectInfections, ExpGrowthRate, Renewal,
-       R_to_r, r_to_R
+@reexport using .EpiInfModels
 
 include("EpiObsModels/EpiObsModels.jl")
-using .EpiObsModels
-
-export DelayObservations, default_delay_obs_priors
+@reexport using .EpiObsModels
 
 include("EpiInference/EpiInference.jl")
-using .EpiInference
-
-export manypathfinder
-
-# Non-submodule imports
-using Turing, DocStringExtensions
+@reexport using .EpiInference
 
 # Non-submodule exports
 export make_epi_aware
