@@ -33,35 +33,32 @@ An epidemiological model in `EpiAware` consists of composable structs with core 
 """
 module EpiAware
 
-using Distributions, Turing, LogExpFunctions, LinearAlgebra, SparseArrays,
-      Random, ReverseDiff, Optim, Parameters, QuadGK, DataFramesMeta,
-      DocStringExtensions, Pathfinder, DynamicPPL, Transducers
+# Non-submodule imports
+using Turing, DocStringExtensions, Reexport
 
-# Exported abstract types
-export AbstractModel, AbstractEpiModel, AbstractLatentModel,
-       AbstractObservationModel
+# Submodule imports
+include("EpiAwareBase/EpiAwareBase.jl")
+@reexport using .EpiAwareBase
 
-# Exported types
-export EpiData, Renewal, ExpGrowthRate, DirectInfections, RandomWalk,
-       DelayObservations
+include("EpiAwareUtils/EpiAwareUtils.jl")
+@reexport using .EpiAwareUtils
 
-# Exported Turing model constructors
+include("EpiLatentModels/EpiLatentModels.jl")
+@reexport using .EpiLatentModels
+
+include("EpiInfModels/EpiInfModels.jl")
+@reexport using .EpiInfModels
+
+include("EpiObsModels/EpiObsModels.jl")
+@reexport using .EpiObsModels
+
+include("EpiInference/EpiInference.jl")
+@reexport using .EpiInference
+
+# Non-submodule exports
 export make_epi_aware
 
-# Exported model functions
-export generate_latent, generate_latent_infs, generate_observations
-
-# Exported utilities
-export create_discrete_pmf, spread_draws, scan, R_to_r, r_to_R, default_delay_obs_priors
-
-# Exported inference methods
-export manypathfinder
-
 include("docstrings.jl")
-include("abstract-types.jl")
-include("epimodels/epimodels.jl")
-include("utils/utils.jl")
-include("latentmodels/latentmodels.jl")
-include("observationmodels/observationmodels.jl")
-include("inferencemethods/inferencemethods.jl")
+include("make_epi_aware.jl")
+
 end

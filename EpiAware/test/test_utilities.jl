@@ -9,7 +9,7 @@
     expected_carry = 15
 
     # Check that a generic function CAN'T be used
-    @test_throws MethodError EpiAware.scan(add, 0, xs)
+    @test_throws MethodError scan(add, 0, xs)
 
     # Check that a callable subtype of `AbstractEpiModel` CAN be used
     struct TestEpiModelAdd <: AbstractEpiModel
@@ -18,7 +18,7 @@
         return a + b, a + b
     end
 
-    ys, carry = EpiAware.scan(TestEpiModelAdd(), 0, xs)
+    ys, carry = scan(TestEpiModelAdd(), 0, xs)
 
     @test ys == expected_ys
     @test carry == expected_carry
@@ -35,7 +35,7 @@ end
     expected_carry = 120
 
     # Check that a generic function CAN'T be used
-    @test_throws MethodError ys, carry=EpiAware.scan(multiply, 1, xs)
+    @test_throws MethodError ys, carry=scan(multiply, 1, xs)
 
     # Check that a callable subtype of `AbstractEpiModel` CAN be used
     struct TestEpiModelMult <: AbstractEpiModel
@@ -45,7 +45,7 @@ end
         return a * b, a * b
     end
 
-    ys, carry = EpiAware.scan(TestEpiModelMult(), 1, xs)
+    ys, carry = scan(TestEpiModelMult(), 1, xs)
 
     @test ys == expected_ys
     @test carry == expected_carry
@@ -128,7 +128,7 @@ end
                                       0.3 0.5 0.2 0 0
                                       0 0.3 0.5 0.2 0
                                       0 0 0.3 0.5 0.2])
-        K = EpiAware.generate_observation_kernel(delay_int, time_horizon)
+        K = EpiAware.EpiObsModels.generate_observation_kernel(delay_int, time_horizon)
         @test K == expected_K
     end
 end
@@ -139,7 +139,7 @@ end
         r = 0.5
         w = [0.2, 0.3, 0.5]
         expected_result = 0.2 * exp(-0.5 * 1) + 0.3 * exp(-0.5 * 2) + 0.5 * exp(-0.5 * 3)
-        result = EpiAware.neg_MGF(r, w)
+        result = EpiAware.EpiInfModels.neg_MGF(r, w)
         @test result≈expected_result atol=1e-15
     end
 
@@ -149,7 +149,7 @@ end
         w = [0.1, 0.2, 0.3, 0.4]
         expected_result = 0.1 * exp(-0 * 1) + 0.2 * exp(-0 * 2) + 0.3 * exp(-0 * 3) +
                           0.4 * exp(-0 * 4)
-        result = EpiAware.neg_MGF(r, w)
+        result = EpiAware.EpiInfModels.neg_MGF(r, w)
         @test result≈expected_result atol=1e-15
     end
 end
@@ -162,7 +162,7 @@ end
         w = [0.2, 0.3, 0.5]
         expected_result = -(0.2 * 1 * exp(-0.5 * 1) + 0.3 * 2 * exp(-0.5 * 2) +
                             0.5 * 3 * exp(-0.5 * 3))
-        result = EpiAware.dneg_MGF_dr(r, w)
+        result = EpiAware.EpiInfModels.dneg_MGF_dr(r, w)
         @test result≈expected_result atol=1e-15
     end
 
@@ -174,7 +174,7 @@ end
                             0.2 * 2 * exp(-0 * 2) +
                             0.3 * 3 * exp(-0 * 3) +
                             0.4 * 4 * exp(-0 * 4))
-        result = EpiAware.dneg_MGF_dr(r, w)
+        result = EpiAware.EpiInfModels.dneg_MGF_dr(r, w)
         @test result≈expected_result atol=1e-15
     end
 end
@@ -201,13 +201,13 @@ end
     using Distributions, HypothesisTests
     @testset "Check distribution type" begin
         prior_mean = 10.0
-        prior_dist = EpiAware._make_halfnormal_prior(prior_mean)
+        prior_dist = EpiAware.EpiAwareUtils._make_halfnormal_prior(prior_mean)
         @test typeof(prior_dist) <: Distribution
     end
 
     @testset "Check distribution properties" begin
         prior_mean = 2.0
-        prior_dist = EpiAware._make_halfnormal_prior(prior_mean)
+        prior_dist = EpiAware.EpiAwareUtils._make_halfnormal_prior(prior_mean)
         #Check Distributions.jl mean function
         @test mean(prior_dist) ≈ prior_mean
         samples = rand(prior_dist, 10_000)

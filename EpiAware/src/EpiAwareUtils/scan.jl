@@ -23,7 +23,7 @@ Apply `f` to each element of `xs` and accumulate the results.
 - `carry`: The final value of the `carry` variable after processing all elements of `xs`.
 
 """
-function scan(f::F, init, xs) where {F <: AbstractModel}
+function scan(f::F, init, xs) where {F <: EpiAwareBase.AbstractModel}
     carry = init
     ys = similar(xs)
     for (i, x) in enumerate(xs)

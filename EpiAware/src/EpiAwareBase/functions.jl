@@ -1,21 +1,3 @@
-abstract type AbstractModel end
-
-"""
-    abstract type AbstractEpiModel <: AbstractModel end
-
-The abstract supertype for all structs that define a model for generating unobserved/latent
-    infections.
-"""
-abstract type AbstractEpiModel <: AbstractModel end
-
-"""
-The abstract supertype for all structs that define a model for generating a latent process
-used in `EpiAware` models.
-"""
-abstract type AbstractLatentModel <: AbstractModel end
-
-abstract type AbstractObservationModel <: AbstractModel end
-
 @doc raw"""
 Generate unobserved/latent infections based on the given `epi_model <: AbstractEpimodel`
     and a latent process path ``Z_t``.
@@ -56,5 +38,13 @@ for model parameters are fields of `epi_model`.
 """
 function generate_latent(latent_model::AbstractLatentModel, n)
     @info "No concrete implementation for generate_latent is defined."
+    return nothing
+end
+
+function generate_observations(observation_model::AbstractObservationModel,
+        y_t,
+        I_t;
+        pos_shift)
+    @info "No concrete implementation for generate_observations is defined."
     return nothing
 end

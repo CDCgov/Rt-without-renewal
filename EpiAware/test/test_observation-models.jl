@@ -4,20 +4,20 @@
 
     # Set up test data with fixed infection
     I_t = [10.0, 20.0, 30.0]
-    obs_prior = EpiAware.default_delay_obs_priors()
+    obs_prior = default_delay_obs_priors()
 
     # Delay kernel is just event observed on same day
-    delay_obs = EpiAware.DelayObservations([1.0], length(I_t),
-        obs_prior[:neg_bin_cluster_factor_prior])
+    delay_obs = DelayObservations([1.0], length(I_t),
+        obs_prior[:neg_bin_cluster_factor_prior];
+        pos_shift = 1e-6)
 
     # Set up priors
     neg_bin_cf = 0.05
 
     # Call the function
-    mdl = EpiAware.generate_observations(delay_obs,
+    mdl = generate_observations(delay_obs,
         missing,
-        I_t;
-        pos_shift = 1e-6)
+        I_t)
     fix_mdl = fix(mdl, (neg_bin_cluster_factor = neg_bin_cf,))
 
     n_samples = 1000
@@ -25,7 +25,8 @@
                 chn -> generated_quantities(fix_mdl, chn) .|>
                        (gen -> gen[1][1]) |>
                        vec
-    direct_samples = EpiAware.NegativeBinomialMeanClust(I_t[1], neg_bin_cf^2) |>
+    direct_samples = EpiAware.EpiObsModels.NegativeBinomialMeanClust(
+        I_t[1], neg_bin_cf^2) |>
                      dist -> rand(dist, n_samples)
 
     #For discrete distributions, checking mean and variance is as expected
@@ -49,20 +50,20 @@ end
     I_t = [10.0, 20.0, 30.0]  # Assuming a simple case where all infections are known
 
     # Define a common setup for your model that can be reused across different y_t scenarios
-    obs_prior = EpiAware.default_delay_obs_priors()
-    delay_obs = EpiAware.DelayObservations(
-        [1.0], length(I_t), obs_prior[:neg_bin_cluster_factor_prior])
+    obs_prior = default_delay_obs_priors()
+    delay_obs = DelayObservations(
+        [1.0], length(I_t), obs_prior[:neg_bin_cluster_factor_prior];
+        pos_shift = 1e-6)
     neg_bin_cf = 0.05  # Set up priors
     # Expected point estimate calculation setup
-    pos_shift = 1e-6
 
     # Test each y_t scenario
     for (scenario_name, y_t_scenario) in [("fully observed", y_t_fully_observed),
         ("partially observed", y_t_partially_observed),
         ("fully unobserved", y_t_fully_unobserved)]
         @testset "$scenario_name y_t" begin
-            mdl = EpiAware.generate_observations(
-                delay_obs, y_t_scenario, I_t; pos_shift = pos_shift)
+            mdl = generate_observations(
+                delay_obs, y_t_scenario, I_t)
             sampled_obs = sample(mdl, Prior(), 1000) |>
                           chn -> generated_quantities(mdl, chn) .|>
                                  (gen -> gen[1]) |>
@@ -96,9 +97,9 @@ end
     # Test case 1
     delay_int = [0.2, 0.3, 0.5]
     time_horizon = 30
-    obs_prior = EpiAware.default_delay_obs_priors()
+    obs_prior = default_delay_obs_priors()
 
-    obs_model = EpiAware.DelayObservations(delay_int, time_horizon,
+    obs_model = DelayObservations(delay_int, time_horizon,
         obs_prior[:neg_bin_cluster_factor_prior])
 
     @test size(obs_model.delay_kernel) == (time_horizon, time_horizon)
@@ -110,7 +111,7 @@ end
     D_delay = 10.0
     Δd = 1.0
 
-    obs_model = EpiAware.DelayObservations(delay_distribution = delay_distribution,
+    obs_model = DelayObservations(delay_distribution = delay_distribution,
         time_horizon = time_horizon,
         neg_bin_cluster_factor_prior = obs_prior[:neg_bin_cluster_factor_prior],
         D_delay = D_delay,
@@ -121,11 +122,11 @@ end
 end
 
 @testitem "Testing generate_observations default" begin
-    struct TestObsModel <: EpiAware.AbstractObservationModel
+    struct TestObsModel <: EpiAware.EpiAwareBase.AbstractObservationModel
     end
 
     @test try
-        EpiAware.generate_observations(TestObsModel(), missing, missing; pos_shift = 1e-6)
+        generate_observations(TestObsModel(), missing, missing; pos_shift = 1e-6)
         true
     catch
         false
