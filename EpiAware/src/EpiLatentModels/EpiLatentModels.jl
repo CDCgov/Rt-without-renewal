@@ -13,5 +13,6 @@ export RandomWalk, AR
 include("docstrings.jl")
 include("randomwalk.jl")
 include("autoregressive.jl")
+include("difflatentmodel.jl")
 include("utils.jl")
 end

@@ -86,17 +86,22 @@ struct DiffLatentModel{M <: AbstractLatentModel, P} <: AbstractLatentModel
     d::Int
 
     function DiffLatentModel(
-            undiffmodel::AbstractLatentModel, init_prior_distribution::Distribution; d::Int)
-        init_priors = fill(init_prior_distribution, d)
-        return DiffLatentModel(; undiffmodel = undiffmodel, init_priors = init_priors)
+            model::AbstractLatentModel, init_prior::Distribution; d::Int)
+        init_priors = fill(init_prior, d)
+        return DiffLatentModel(; model = model, init_priors = init_priors)
     end
 
-    function DiffLatentModel(; undiffmodel::AbstractLatentModel,
+    function DiffLatentModel(; model::AbstractLatentModel,
             init_priors::Vector{D} where {D <: Distribution})
         d = length(init_priors)
-        init_prior = all(first(init_priors) .== init_priors) ?
-                     filldist(first(init_priors), d) : arraydist(init_priors)
-        return new{typeof(undiffmodel), typeof(init_prior)}(undiffmodel, init_prior, d)
+        init_prior = _expand_dist(init_priors)
+        return AR(model, init_prior, d)
+    end
+
+    function DiffLatentModel(model::AbstractLatentModel, init_prior::Distribution, d::Int)
+        @assert d>0 "d must be greater than 0"
+        @assert d==length(init_prior) "d must be equal to the length of init_prior"
+        new{typeof(model), typeof(init_prior)}(model, init_prior, d)
     end
 end
 

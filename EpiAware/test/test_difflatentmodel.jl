@@ -62,6 +62,16 @@ end
 
     #Because of the recursive d-times cumsum to undifference the process,
     #The distribution of the second day should be d lots of first day init distribution
+    """
+Add two normal distributions `x` and `y` together.
+
+# Returns
+- `Normal`: The sum of `x` and `y` as a normal distribution.
+"""
+    function _add_normals(x::Normal, y::Normal)
+        return Normal(x.μ + y.μ, sqrt(x.σ^2 + y.σ^2))
+    end
+
     #Plus day two distribution
     day2_dist = foldl((x, y) -> _add_normals(x, init_priors[1]), 1:d, init = init_priors[2])
 
