@@ -172,7 +172,7 @@ unobserved latent process.
 Z_t
 ```
 """
-@model function generate_latent(latent_model::DiffLatentModel, n)
+@model function EpiAwareBase.generate_latent(latent_model::DiffLatentModel, n)
     d = latent_model.d
     @assert n>d "n must be longer than d"
     latent_init ~ latent_model.init_prior

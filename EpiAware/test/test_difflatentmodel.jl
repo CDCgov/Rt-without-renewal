@@ -26,17 +26,16 @@ end
     using DynamicPPL, Turing
     using Distributions
     using HypothesisTests: ExactOneSampleKSTest, pvalue
-    using EpiAware: _add_normals
 
     n = 100
     d = 2
-    model = EpiAware.RandomWalk(Normal(0.0, 1.0), truncated(Normal(0.0, 0.05), 0.0, Inf))
+    model = RandomWalk(Normal(0.0, 1.0), truncated(Normal(0.0, 0.05), 0.0, Inf))
     init_priors = [Normal(0.0, 1.0), Normal(1.0, 2.0)]
-    diff_model = EpiAware.DiffLatentModel(latentmodel = model, init_priors = init_priors)
+    diff_model = DiffLatentModel(model = model, init_priors = init_priors)
 
-    latent_model = EpiAware.generate_latent(diff_model, n)
+    latent_model = generate_latent(diff_model, n)
     fixed_model = fix(
-        latent_model, (σ²_RW = 0, rw_init = 0.0))
+        latent_model, (σ_RW = 0, rw_init = 0.0))
 
     n_samples = 2000
     samples = sample(fixed_model, Prior(), n_samples) |>
@@ -47,11 +46,11 @@ end
     #Because of the recursive d-times cumsum to undifference the process,
     #The distribution of the second day should be d lots of first day init distribution
     """
-Add two normal distributions `x` and `y` together.
+    Add two normal distributions `x` and `y` together.
 
-# Returns
-- `Normal`: The sum of `x` and `y` as a normal distribution.
-"""
+    # Returns
+    - `Normal`: The sum of `x` and `y` as a normal distribution.
+    """
     function _add_normals(x::Normal, y::Normal)
         return Normal(x.μ + y.μ, sqrt(x.σ^2 + y.σ^2))
     end
@@ -73,15 +72,13 @@ end
 
     n = 100
     d = 2
-    model = EpiAware.AR(EpiAware.default_ar_priors()[:damp_prior],
-        EpiAware.default_ar_priors()[:var_prior],
-        EpiAware.default_ar_priors()[:init_prior])
+    model = AR()
     init_priors = [Normal(0.0, 1.0), Normal(1.0, 2.0)]
-    diff_model = EpiAware.DiffLatentModel(latentmodel = model, init_priors = init_priors)
+    diff_model = DiffLatentModel(model = model, init_priors = init_priors)
 
-    latent_model = EpiAware.generate_latent(diff_model, n)
+    latent_model = generate_latent(diff_model, n)
     fixed_model = fix(latent_model,
-        (latant_init = [0.0, 1.0], σ²_AR = 1.0, damp_AR = [0.8], ar_init = [0.0]))
+        (latent_init = [0.0, 1.0], σ_AR = 1.0, damp_AR = [0.8], ar_init = [0.0]))
 
     n_samples = 100
     samples = sample(fixed_model, Prior(), n_samples) |>
