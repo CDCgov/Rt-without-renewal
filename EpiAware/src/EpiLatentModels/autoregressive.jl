@@ -12,7 +12,7 @@ struct AR{D <: Sampleable, S <: Sampleable, I <: Sampleable, P <: Int} <:
     "Order of the AR model."
     p::P
     function AR(damp_prior::Distribution, std_prior::Distribution,
-            init_prior::Distribution; p::Int)
+            init_prior::Distribution; p::Int = 1)
         damp_priors = fill(damp_prior, p)
         init_priors = fill(init_prior, p)
         return AR(; damp_priors = damp_priors, std_prior = std_prior,
@@ -24,7 +24,7 @@ struct AR{D <: Sampleable, S <: Sampleable, I <: Sampleable, P <: Int} <:
             init_priors::Vector{I} = [Normal()]) where {
             D <: Distribution, I <: Distribution}
         p = length(damp_priors)
-        damp_prior = _expand_dist(damp_prior)
+        damp_prior = _expand_dist(damp_priors)
         init_prior = _expand_dist(init_priors)
         return AR(damp_prior, std_prior, init_prior, p)
     end
