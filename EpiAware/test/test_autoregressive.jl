@@ -1,7 +1,7 @@
 @testitem "Testing AR constructor" begin
     using Distributions
 
-    damp_prior = [truncated(Normal(0.0, 0.05), 0.0, 1)]
+    damp_prior = truncated(Normal(0.0, 0.05), 0.0, 1)
     std_prior = truncated(Normal(0.0, 0.05), 0.0, Inf)
     init_prior = Normal()
     ar_process = EpiAware.AR(damp_prior, std_prior, init_prior)
