@@ -2,8 +2,8 @@
         time_steps;
         epi_model::AbstractEpiModel,
         latent_model::AbstractLatentModel,
-        observation_model::AbstractObservationModel,
-        pos_shift = 1e-6)
+        observation_model::AbstractObservationModel
+)
     #Latent process
     @submodel Z_t, latent_model_aux = generate_latent(
         latent_model,
@@ -15,8 +15,7 @@
     #Predictive distribution of ascerted cases
     @submodel generated_y_t, generated_y_t_aux = generate_observations(observation_model,
         y_t,
-        I_t;
-        pos_shift = pos_shift)
+        I_t)
 
     #Generate quantities
     return (;
