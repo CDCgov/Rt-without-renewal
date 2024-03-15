@@ -70,7 +70,7 @@ end
 
     #Check log_init is sampled from the correct distribution
     sample_init_inc = sample(
-        generate_latent_infs(rt_model, rt), Prior(), 1000, progress = false) |>
+        generate_latent_infs(rt_model, rt), Prior(), 1000; progress = false) |>
                       chn -> chn[:init_incidence] |>
                              Array |>
                              vec
@@ -101,7 +101,7 @@ end
     #Check log_init is sampled from the correct distribution
     sample_init_inc = sample(
         generate_latent_infs(direct_inf_model, log_incidence),
-        Prior(), 1000, progress = false) |>
+        Prior(), 1000; progress = false) |>
                       chn -> chn[:init_incidence] |>
                              Array |>
                              vec
@@ -144,7 +144,7 @@ end
 
     #Check log_init is sampled from the correct distribution
     @time sample_init_inc = sample(generate_latent_infs(renewal_model, log_Rt),
-        Prior(), 1000, progress = false) |>
+        Prior(), 1000; progress = false) |>
                             chn -> chn[:init_incidence] |>
                                    Array |>
                                    vec

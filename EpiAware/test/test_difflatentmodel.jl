@@ -38,7 +38,7 @@ end
         latent_model, (σ_RW = 0, rw_init = 0.0))
 
     n_samples = 2000
-    samples = sample(fixed_model, Prior(), n_samples, progress = false) |>
+    samples = sample(fixed_model, Prior(), n_samples; progress = false) |>
               chn -> mapreduce(hcat, generated_quantities(fixed_model, chn)) do gen
         gen[1]
     end
@@ -56,7 +56,8 @@ end
     end
 
     #Plus day two distribution
-    day2_dist = foldl((x, y) -> _add_normals(x, init_priors[1]), 1:d, init = init_priors[2])
+    day2_dist = _add_normals(
+        Normal(d * init_priors[1].μ, d * init_priors[1].σ), init_priors[2])
 
     ks_test_pval_day1 = ExactOneSampleKSTest(samples[1, :], init_priors[1]) |> pvalue
     ks_test_pval_day2 = ExactOneSampleKSTest(samples[2, :], day2_dist) |> pvalue
@@ -81,7 +82,7 @@ end
         (latent_init = [0.0, 1.0], σ_AR = 1.0, damp_AR = [0.8], ar_init = [0.0]))
 
     n_samples = 100
-    samples = sample(fixed_model, Prior(), n_samples, progress = false) |>
+    samples = sample(fixed_model, Prior(), n_samples; progress = false) |>
               chn -> mapreduce(hcat, generated_quantities(fixed_model, chn)) do gen
         gen[1]
     end

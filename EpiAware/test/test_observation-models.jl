@@ -21,7 +21,7 @@
     fix_mdl = fix(mdl, (neg_bin_cluster_factor = neg_bin_cf,))
 
     n_samples = 1000
-    first_obs = sample(fix_mdl, Prior(), n_samples, progress = false) |>
+    first_obs = sample(fix_mdl, Prior(), n_samples; progress = false) |>
                 chn -> generated_quantities(fix_mdl, chn) .|>
                        (gen -> gen[1][1]) |>
                        vec
@@ -64,7 +64,7 @@ end
         @testset "$scenario_name y_t" begin
             mdl = generate_observations(
                 delay_obs, y_t_scenario, I_t)
-            sampled_obs = sample(mdl, Prior(), 1000, progress = false) |>
+            sampled_obs = sample(mdl, Prior(), 1000; progress = false) |>
                           chn -> generated_quantities(mdl, chn) .|>
                                  (gen -> gen[1]) |>
                                  collect

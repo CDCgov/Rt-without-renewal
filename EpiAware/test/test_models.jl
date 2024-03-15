@@ -68,7 +68,7 @@ end
         latent_model = rwp,
         observation_model = obs_model)
 
-    chn = sample(test_mdl, Prior(), 1000, progress = false)
+    chn = sample(test_mdl, Prior(), 1000; progress = false)
     gens = generated_quantities(test_mdl, chn)
 
     #Check model sampled
@@ -108,7 +108,7 @@ end
         observation_model = obs_model
     )
 
-    chn = sample(test_mdl, Prior(), 1000, progress = false)
+    chn = sample(test_mdl, Prior(), 1000; progress = false)
     gens = generated_quantities(test_mdl, chn)
 
     #Check model sampled
