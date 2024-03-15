@@ -1,5 +1,22 @@
 @doc raw"
 The autoregressive (AR) model struct.
+
+# Constructors
+- `AR(damp_prior::Distribution, std_prior::Distribution, init_prior::Distribution; p::Int = 1)`: Constructs an AR model with the specified prior distributions for damping coefficients, standard deviation, and initial conditions. The order of the AR model can also be specified.
+
+- `AR(; damp_priors::Vector{D} = [truncated(Normal(0.0, 0.05))], std_prior::Distribution = truncated(Normal(0.0, 0.05), 0.0, Inf), init_priors::Vector{I} = [Normal()]) where {D <: Distribution, I <: Distribution}`: Constructs an AR model with the specified prior distributions for damping coefficients, standard deviation, and initial conditions. The order of the AR model is determined by the length of the `damp_priors` vector.
+
+- `AR(damp_prior::Distribution, std_prior::Distribution, init_prior::Distribution, p::Int)`: Constructs an AR model with the specified prior distributions for damping coefficients, standard deviation, and initial conditions. The order of the AR model is explicitly specified.
+
+# Examples
+
+```julia
+using Distributions
+using EpiAware
+ar = AR()
+ar_model = generate_latent(ar, 10)
+rand(ar_model)
+```
 "
 struct AR{D <: Sampleable, S <: Sampleable, I <: Sampleable, P <: Int} <:
        AbstractLatentModel
