@@ -96,8 +96,9 @@ Z_0 &\sim \mathcal{N}(0,1),\\
 "
 
 # ╔═╡ 56ae496b-0094-460b-89cb-526627991717
-rwp = EpiAware.RandomWalk(Normal(),
-    EpiAware.EpiAwareUtils._make_halfnormal_prior(0.1))
+rwp = EpiAware.RandomWalk(
+    init_prior = Normal(),
+    std_prior = EpiAware.EpiLatentModels._make_halfnormal_prior(0.1))
 
 # ╔═╡ 767beffd-1ef5-4e6c-9ac6-edb52e60fb44
 md"
@@ -186,7 +187,7 @@ We choose a simple observation model where infections are observed 0, 1, 2, 3 da
 obs_model = DelayObservations(
     fill(0.25, 4),
     time_horizon,
-    EpiAware.EpiAwareUtils._make_halfnormal_prior(0.1)
+    EpiAware.EpiLatentModels._make_halfnormal_prior(0.1)
 )
 
 # ╔═╡ e49713e8-4840-4083-8e3f-fc52d791be7b

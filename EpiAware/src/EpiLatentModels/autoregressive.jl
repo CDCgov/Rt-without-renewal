@@ -37,7 +37,7 @@ struct AR{D <: Sampleable, S <: Sampleable, I <: Sampleable, P <: Int} <:
     end
 
     function AR(; damp_priors::Vector{D} = [truncated(Normal(0.0, 0.05), 0, 1)],
-            std_prior::Distribution = truncated(Normal(0.0, 0.05), 0.0, Inf),
+            std_prior::Distribution = _make_halfnormal_prior(0.1),
             init_priors::Vector{I} = [Normal()]) where {
             D <: Distribution, I <: Distribution}
         p = length(damp_priors)
