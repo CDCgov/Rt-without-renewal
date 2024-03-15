@@ -23,12 +23,13 @@
         time_horizon = time_horizon,
         neg_bin_cluster_factor_prior = Gamma(5, 0.05 / 5),
         D_delay = D_delay,
-        Δd = Δd)
+        Δd = Δd;
+        pos_shift = pos_shift)
 
     # Create full epi model and sample from it
     test_mdl = make_epi_aware(y_t, time_horizon; epi_model = epi_model,
         latent_model = rwp,
-        observation_model = obs_model, pos_shift)
+        observation_model = obs_model)
     gen = generated_quantities(test_mdl, rand(test_mdl))
 
     #Check model sampled
@@ -57,15 +58,15 @@ end
     time_horizon = 5
     obs_model = DelayObservations([1.0],
         time_horizon,
-        truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0))
+        truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0);
+        pos_shift)
 
     # Create full epi model and sample from it
     test_mdl = make_epi_aware(y_t,
         time_horizon;
         epi_model = epi_model,
         latent_model = rwp,
-        observation_model = obs_model,
-        pos_shift)
+        observation_model = obs_model)
 
     chn = sample(test_mdl, Prior(), 1000)
     gens = generated_quantities(test_mdl, chn)
@@ -96,15 +97,16 @@ end
     time_horizon = 5
     obs_model = DelayObservations([1.0],
         time_horizon,
-        truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0))
+        truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0);
+        pos_shift)
 
     # Create full epi model and sample from it
     test_mdl = make_epi_aware(y_t,
         time_horizon;
         epi_model = epi_model,
         latent_model = rwp,
-        observation_model = obs_model,
-        pos_shift)
+        observation_model = obs_model
+    )
 
     chn = sample(test_mdl, Prior(), 1000)
     gens = generated_quantities(test_mdl, chn)
