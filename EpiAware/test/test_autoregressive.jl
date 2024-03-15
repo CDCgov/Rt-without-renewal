@@ -1,14 +1,14 @@
 @testitem "Testing AR constructor" begin
-    using Distributions
+    using Distributions, Turing
 
     damp_prior = truncated(Normal(0.0, 0.05), 0.0, 1)
     std_prior = truncated(Normal(0.0, 0.05), 0.0, Inf)
     init_prior = Normal()
     ar_process = EpiAware.AR(damp_prior, std_prior, init_prior)
 
-    @test ar_process.damp_prior == damp_prior
+    @test ar_process.damp_prior == filldist(damp_prior, 1)
     @test ar_process.std_prior == std_prior
-    @test ar_process.init_prior == init_prior
+    @test ar_process.init_prior == filldist(init_prior, 1)
 end
 
 @testitem "Test AR defaults" begin
@@ -16,7 +16,7 @@ end
     ar = EpiAware.AR()
     @testset "damp_prior" begin
         damp = rand(ar.damp_prior)
-        @test 0.0 <= damp <= 1.0
+        @test 0.0 <= damp[1] <= 1.0
     end
 
     @testset "std_prior" begin
@@ -26,7 +26,7 @@ end
 
     @testset "init_prior" begin
         init_ar_value = rand(ar.init_prior)
-        @test typeof(init_ar_value) == Float64
+        @test typeof(init_ar_value[1]) == Float64
     end
 end
 
