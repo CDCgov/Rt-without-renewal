@@ -22,6 +22,6 @@
     return (;
         generated_y_t,
         I_t,
-        latent_model,
+        Z_t,
         process_aux = merge(latent_model_aux, generated_y_t_aux))
 end
