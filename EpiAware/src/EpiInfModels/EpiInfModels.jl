@@ -13,6 +13,7 @@ using Turing, Distributions, DocStringExtensions, LinearAlgebra
 export EpiData, DirectInfections, ExpGrowthRate, Renewal,
        R_to_r, r_to_R
 
+include("docstrings.jl")
 include("epidata.jl")
 include("directinfections.jl")
 include("expgrowthrate.jl")

@@ -1,11 +1,6 @@
-struct RandomWalk{D <: Sampleable, S <: Sampleable} <: AbstractLatentModel
-    init_prior::D
-    std_prior::S
-end
-
-function default_rw_priors()
-    return (:var_RW_prior => truncated(Normal(0.0, 0.05), 0.0, Inf),
-        :init_rw_value_prior => Normal()) |> Dict
+@kwdef struct RandomWalk{D <: Sampleable, S <: Sampleable} <: AbstractLatentModel
+    init_prior::D = Normal()
+    std_prior::S = truncated(Normal(0.0, 0.05), 0.0, Inf)
 end
 
 @model function EpiAwareBase.generate_latent(latent_model::RandomWalk, n)

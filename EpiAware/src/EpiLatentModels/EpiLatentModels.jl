@@ -8,8 +8,10 @@ using ..EpiAwareBase
 
 using Turing, Distributions, DocStringExtensions
 
-export RandomWalk, default_rw_priors
+export RandomWalk, AR
 
+include("docstrings.jl")
 include("randomwalk.jl")
-
+include("autoregressive.jl")
+include("utils.jl")
 end

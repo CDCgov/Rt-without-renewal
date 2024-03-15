@@ -10,6 +10,7 @@ using DynamicPPL, DocStringExtensions
 
 export manypathfinder
 
+include("docstrings.jl")
 include("manypathfinder.jl")
 
 end
