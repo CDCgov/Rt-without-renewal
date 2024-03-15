@@ -73,7 +73,7 @@ end
     fixed_model = fix(model, (σ_AR = σ_AR, damp_AR = damp, ar_init = ar_init))
 
     n_samples = 100
-    samples = sample(fixed_model, Prior(), n_samples) |>
+    samples = sample(fixed_model, Prior(), n_samples; progress = false) |>
               chn -> mapreduce(vcat, generated_quantities(fixed_model, chn)) do gen
         gen[1]
     end

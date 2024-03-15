@@ -9,7 +9,7 @@
     model = generate_latent(rw_process, n)
     fixed_model = fix(model, (σ_RW = 1.0, init_rw_value = 0.0)) #Fixing the standard deviation of the random walk process
     n_samples = 1000
-    samples_day_5 = sample(fixed_model, Prior(), n_samples) |>
+    samples_day_5 = sample(fixed_model, Prior(), n_samples; progress = false) |>
                     chn -> mapreduce(vcat, generated_quantities(fixed_model, chn)) do gen
         gen[1][5] #Extracting day 5 samples
     end
