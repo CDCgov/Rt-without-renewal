@@ -38,7 +38,7 @@ using .EpiAwareBase
 
 export AbstractModel, AbstractLatentModel, AbstractEpiModel,
        AbstractObservationModel, generate_latent,
-       generate_latent_infs, generate_observations
+       generate_latent_infs, generate_observations, AbstractEpiAwareProblem
 
 include("EpiAwareUtils/EpiAwareUtils.jl")
 using .EpiAwareUtils
