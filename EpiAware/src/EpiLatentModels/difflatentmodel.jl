@@ -95,7 +95,7 @@ struct DiffLatentModel{M <: AbstractLatentModel, P} <: AbstractLatentModel
             init_priors::Vector{D} where {D <: Distribution} = [Normal()])
         d = length(init_priors)
         init_prior = _expand_dist(init_priors)
-        return AR(model, init_prior, d)
+        return DiffLatentModel(model, init_prior, d)
     end
 
     function DiffLatentModel(model::AbstractLatentModel, init_prior::Distribution, d::Int)

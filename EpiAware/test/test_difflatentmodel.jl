@@ -1,25 +1,10 @@
-@testitem "Testing default_diff_latent_priors" begin
-    using Distributions
-
-    d = 3
-    priors = EpiAware.default_diff_latent_priors(d)
-
-    @test length(priors[:init_prior]) == d
-    for prior in priors[:init_prior]
-        @test prior isa Normal
-        @test prior.μ == 0.0
-        @test prior.σ == 1.0
-    end
-end
-
 @testitem "Testing DiffLatentModel constructor" begin
     using Distributions, Turing
 
-    model = EpiAware.RandomWalk(Normal(0.0, 1.0), truncated(Normal(0.0, 0.05), 0.0, Inf))
+    model = RandomWalk()
     @testset "Testing DiffLatentModel with vector of priors" begin
         init_priors = [Normal(0.0, 1.0), Normal(1.0, 2.0)]
-        diff_model = EpiAware.DiffLatentModel(;
-            latentmodel = model, init_priors = init_priors)
+        diff_model = DiffLatentModel(; model = model, init_priors = init_priors)
 
         @test diff_model.model == model
         @test diff_model.init_prior == arraydist(init_priors)
@@ -29,8 +14,7 @@ end
     @testset "Testing DiffLatentModel with single prior and d" begin
         d = 3
         init_prior = Normal()
-        diff_model = EpiAware.DiffLatentModel(
-            model; init_prior_distribution = init_prior, d = d)
+        diff_model = DiffLatentModel(model, init_prior; d = d)
 
         @test diff_model.model == model
         @test diff_model.init_prior == filldist(init_prior, d)

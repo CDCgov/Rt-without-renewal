@@ -48,7 +48,7 @@ export spread_draws, scan, create_discrete_pmf
 include("EpiLatentModels/EpiLatentModels.jl")
 using .EpiLatentModels
 
-export RandomWalk, AR
+export RandomWalk, AR, DiffLatentModel
 
 include("EpiInfModels/EpiInfModels.jl")
 using .EpiInfModels
