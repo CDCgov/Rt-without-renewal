@@ -1,4 +1,3 @@
-
 @testitem "Testing random_walk against theoretical properties" begin
     using DynamicPPL, Turing
     using HypothesisTests: ExactOneSampleKSTest, pvalue

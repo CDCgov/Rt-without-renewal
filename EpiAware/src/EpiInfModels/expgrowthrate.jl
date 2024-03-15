@@ -12,14 +12,15 @@ I_t = g(\hat{I}_0) \exp(Z_t).
 ```
 
 where ``g`` is a transformation function and the unconstrained initial infections
-    ``\hat{I}_0`` are sampled from a prior distribution, `initialisation_prior` which must
-be supplied to the `DirectInfections` constructor. The default `initialisation_prior` is
-the standard Normal `Distributions.Normal()`.
+    ``\hat{I}_0`` are sampled from a prior distribution.
+
+`ExpGrowthRate` are constructed by passing an `EpiData` object `data` and an
+`initialisation_prior` for the prior distribution of ``\hat{I}_0``. The default
+`initialisation_prior` is `Normal()`.
 
 ## Constructor
 
-`ExpGrowthRate` can be constructed by passing an `EpiData` object and and subtype of
-[`Distributions.Sampleable`](https://juliastats.org/Distributions.jl/latest/types/#Sampleable).
+- `ExpGrowthRate(; data, initialisation_prior)`.
 
 ## Example usage with `generate_latent_infs`
 

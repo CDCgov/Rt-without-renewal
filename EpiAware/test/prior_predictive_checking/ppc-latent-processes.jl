@@ -15,7 +15,7 @@ latent_model_priors = (var_RW_prior = truncated(Normal(0.0, 0.5), 0.0, Inf),)
 
 model = random_walk(n; latent_model_priors = latent_model_priors)
 n_samples = 2000
-prior_chn = sample(model, Prior(), n_samples)
+prior_chn = sample(model, Prior(), n_samples, progress = false)
 sampled_walks = prior_chn |> chn -> mapreduce(hcat, generated_quantities(model, chn)) do gen
     gen[1]
 end
