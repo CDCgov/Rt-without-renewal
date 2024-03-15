@@ -1,19 +1,22 @@
 @doc raw"
 The autoregressive (AR) model struct.
 "
-struct AR{D <: Distribution, S <: Distribution, I <: Distribution, P <: Int} <:
+struct AR{D <: Sampleable, S <: Sampleable, I <: Sampleable, P <: Int} <:
        AbstractLatentModel
-    damp_prior::D,
-    std_prior::S,
-    init_prior::I,
+    "Prior distribution for the damping coefficients."
+    damp_prior::D
+    "Prior distribution for the standard deviation."
+    std_prior::S
+    "Prior distribution for the initial conditions"
+    init_prior::I
+    "Order of the AR model."
     p::P
-
-    function AR(damp_prior::Distribution, std_prior::Distribution;
-            init_prior::Distribution; p::Int = 1)
+    function AR(damp_prior::Distribution, std_prior::Distribution,
+            init_prior::Distribution; p::Int)
         damp_priors = fill(damp_prior, p)
         init_priors = fill(init_prior, p)
         return AR(; damp_priors = damp_priors, std_prior = std_prior,
-            init_priors = init_priors, p = p)
+            init_priors = init_priors)
     end
 
     function AR(; damp_priors::Vector{D} = [truncated(Normal(0.0, 0.05))],
@@ -32,7 +35,8 @@ struct AR{D <: Distribution, S <: Distribution, I <: Distribution, P <: Int} <:
         @assert length(damp_prior)==length(init_prior) "damp_prior and init_prior must have the same length"
         @assert p==length(damp_prior) "p must be equal to the length of damp_prior"
         new{typeof(damp_prior), typeof(std_prior), typeof(init_prior), typeof(p)}(
-            damp_prior, std_prior, init_prior, p)
+            damp_prior, std_prior, init_prior, p
+        )
     end
 end
 

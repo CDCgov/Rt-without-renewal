@@ -20,7 +20,7 @@ end
 @testitem "Testing default RW priors" begin
     @testset "std_prior" begin
         priors = RandomWalk()
-        std_rw = rand(priors.std_prior])
+        std_rw = rand(priors.std_prior)
         @test std_rw >= 0.0
     end
 
