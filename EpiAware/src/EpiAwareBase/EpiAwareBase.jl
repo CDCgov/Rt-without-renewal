@@ -1,8 +1,7 @@
-module EpiAwareBase
-
 """
 Module for defining abstract epidemiological types.
 """
+module EpiAwareBase
 
 using DocStringExtensions
 

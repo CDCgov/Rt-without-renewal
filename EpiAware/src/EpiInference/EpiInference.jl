@@ -10,8 +10,10 @@ using Pathfinder: pathfinder, PathfinderResult
 
 using DynamicPPL, DocStringExtensions
 
-export AbstractNUTSMethod
-export ManyPathfinderMethod
+#Export inference methods
+export AbstractNUTSMethod, ManyPathfinder
+
+#Export functions
 export manypathfinder
 
 include("docstrings.jl")
