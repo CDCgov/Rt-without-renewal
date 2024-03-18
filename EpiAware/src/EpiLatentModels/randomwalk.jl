@@ -29,7 +29,7 @@ using Distributions, Turing, EpiAware
 
 # Create a RandomWalk model
 rw = RandomWalk(init_prior = Normal(2., 1.),
-                                std_prior = _make_halfnormal_prior(0.1))
+                                std_prior = HalfNormal(0.1))
 ```
 
 Then, we can use `generate_latent` to construct a Turing model for a 10 step random walk.
@@ -51,7 +51,7 @@ Z_t, _ = generated_quantities(rw_model, θ)
 "
 @kwdef struct RandomWalk{D <: Sampleable, S <: Sampleable} <: AbstractLatentModel
     init_prior::D = Normal()
-    std_prior::S = _make_halfnormal_prior(0.25)
+    std_prior::S = HalfNormal(0.25)
 end
 
 @doc raw"
@@ -64,7 +64,7 @@ using Distributions, Turing, EpiAware
 
 # Create a RandomWalk model
 rw = RandomWalk(init_prior = Normal(2., 1.),
-                                std_prior = _make_halfnormal_prior(0.1))
+                                std_prior = HalfNormal(0.1))
 ```
 
 Then, we can use `generate_latent` to construct a Turing model for a 10 step random walk.

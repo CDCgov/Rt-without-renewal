@@ -5,6 +5,8 @@ module EpiLatentModels
 
 using ..EpiAwareBase
 
+using ..EpiAwareUtils: HalfNormal
+
 using Turing, Distributions, DocStringExtensions
 
 #Export models

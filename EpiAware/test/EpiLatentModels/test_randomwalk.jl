@@ -29,7 +29,7 @@ end
         @test typeof(init_value) == Float64
     end
 end
-@testset "Testing RandomWalk constructor" begin
+@testitem "Testing RandomWalk constructor" begin
     init_prior = Normal(0.0, 1.0)
     std_prior = truncated(Normal(0.0, 0.05), 0.0, Inf)
     rw_process = RandomWalk(init_prior, std_prior)
