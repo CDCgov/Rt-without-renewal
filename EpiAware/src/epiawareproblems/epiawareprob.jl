@@ -10,7 +10,7 @@ Along with a `tspan` tuple for the time span of the case data.
 """
 @kwdef struct EpiAwareProblem{
     E <: AbstractEpiModel, L <: AbstractLatentModel, O <: AbstractObservationModel} <:
-              AbstractEpiAwareProblem
+              AbstractEpiProblem
     "Epidemiological model for unobserved infections."
     epi_model::E
     "Latent model for underlying latent process."

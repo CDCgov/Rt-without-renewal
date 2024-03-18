@@ -1,7 +1,7 @@
 """
 A variational inference method that runs `manypathfinder`.
 """
-@kwdef struct ManyPathfinderMethod <: AbstractEpiAwareOptMethod
+@kwdef struct ManyPathfinderMethod <: AbstractEpiOptMethod
     "Number of many pathfinder runs."
     nruns::Int = 4
     "Maximum number of iterations for each run."

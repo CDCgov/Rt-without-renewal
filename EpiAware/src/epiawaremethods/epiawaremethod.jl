@@ -4,8 +4,8 @@ modelling, which combines a sequence of optimization steps to pass initialisatio
 information to a sampler method.
 """
 @kwdef struct EpiAwareMethod{
-    O <: AbstractEpiAwareOptMethod, S <: AbstractEpiAwareSamplingMethod} <:
-              AbstractEpiAwareMethod
+    O <: AbstractEpiOptMethod, S <: AbstractEpiSamplingMethod} <:
+              AbstractEpiMethod
     pre_sampler_steps::Vector{O}
     sampler::S
 end

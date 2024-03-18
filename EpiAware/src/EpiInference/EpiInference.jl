@@ -4,8 +4,8 @@ Module for defining inference methods.
 """
 module EpiInference
 
-using ..EpiAwareBase: AbstractEpiAwareMethod, AbstractEpiAwareOptMethod,
-                      AbstractEpiAwareSamplingMethod
+using ..EpiAwareBase: AbstractEpiMethod, AbstractEpiOptMethod,
+                      AbstractEpiSamplingMethod
 using Pathfinder: pathfinder, PathfinderResult
 
 using DynamicPPL, DocStringExtensions
