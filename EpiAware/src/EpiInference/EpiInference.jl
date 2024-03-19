@@ -11,12 +11,13 @@ using Pathfinder: pathfinder, PathfinderResult
 using DynamicPPL, DocStringExtensions
 
 #Export inference methods
-export AbstractNUTSMethod, ManyPathfinder
+export AbstractNUTSMethod, EpiMethod, ManyPathfinder
 
 #Export functions
 export manypathfinder
 
 include("docstrings.jl")
+include("epiawaremethod.jl")
 include("manypathfinder.jl")
 include("nuts.jl")
 
