@@ -60,7 +60,8 @@ end
 
     @testset "Check always fails for bad models and throws correct Exception" begin
         @model function bad_model()
-            x ~ Normal(0, 1)
+            x ~ truncated(Normal(0, 1), -Inf, -1e-3)
+            y ~ Normal(sqrt(x), 1.0)
             return sqrt(x) #<-fails
         end
         badmdl = bad_model()

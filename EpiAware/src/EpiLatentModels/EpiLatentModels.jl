@@ -1,13 +1,13 @@
-module EpiLatentModels
-
 """
 Module for defining latent models.
 """
+module EpiLatentModels
 
 using ..EpiAwareBase
 
 using Turing, Distributions, DocStringExtensions
 
+#Export models
 export RandomWalk, AR, DiffLatentModel
 
 include("docstrings.jl")

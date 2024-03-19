@@ -1,4 +1,16 @@
 """
+A variational inference method that runs `manypathfinder`.
+"""
+@kwdef struct ManyPathfinder <: AbstractEpiOptMethod
+    "Number of many pathfinder runs."
+    nruns::Int = 4
+    "Maximum number of iterations for each run."
+    maxiters::Int = 50
+    "Maximum number of tries if all runs fail."
+    max_tries::Int = 100
+end
+
+"""
 Run pathfinder multiple times and store the results in an array. Fails safely.
 
 # Arguments
