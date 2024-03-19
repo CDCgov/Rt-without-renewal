@@ -1,5 +1,5 @@
 @testitem "Testing _run_manypathfinder function" begin
-    using Turing, Pathfinder
+    using Turing, Pathfinder, Suppressor
 
     @testset "Test case: check runs" begin
         @model function test_model()
@@ -13,11 +13,13 @@
         ndraws = 100
         maxiters = 50
 
-        pfs = EpiAware.EpiInference._run_manypathfinder(
-            mdl; nruns = nruns, ndraws = ndraws, maxiters = maxiters)
+        @suppress begin
+            pfs = EpiAware.EpiInference._run_manypathfinder(
+                mdl; nruns = nruns, ndraws = ndraws, maxiters = maxiters)
 
-        @test length(pfs) == nruns
-        @test all(p -> p isa Union{PathfinderResult, Symbol}, pfs)
+            @test length(pfs) == nruns
+            @test all(p -> p isa Union{PathfinderResult, Symbol}, pfs)
+        end
     end
     @testset "Test case: check fail mode for bad model" begin
         @model function bad_model()
@@ -30,14 +32,16 @@
         ndraws = 50
         maxiters = 100
 
-        pfs = EpiAware.EpiInference._run_manypathfinder(
-            badmdl; nruns = nruns, ndraws = ndraws, maxiters = maxiters)
+        @suppress begin
+            pfs = EpiAware.EpiInference._run_manypathfinder(
+                badmdl; nruns = nruns, ndraws = ndraws, maxiters = maxiters)
 
-        @test all(pfs .== :fail)
+            @test all(pfs .== :fail)
+        end
     end
 end
 @testitem "Testing _continue_manypathfinder! function" begin
-    using Turing, Pathfinder
+    using Turing, Pathfinder, Suppressor
 
     @testset "Check that it only adds one more for easy model" begin
         @model function easy_model()
@@ -52,10 +56,12 @@ end
         ndraws = 100
         maxiters = 50
 
-        pfs = EpiAware.EpiInference._continue_manypathfinder!(
-            pfs, easymdl; max_tries, nruns, ndraws, maxiters)
+        @suppress begin
+            pfs = EpiAware.EpiInference._continue_manypathfinder!(
+                pfs, easymdl; max_tries, nruns, ndraws, maxiters)
 
-        @test pfs[end] isa PathfinderResult
+            @test pfs[end] isa PathfinderResult
+        end
     end
 
     @testset "Check always fails for bad models and throws correct Exception" begin
@@ -72,14 +78,16 @@ end
         ndraws = 100
         maxiters = 50
 
-        @test_throws "All pathfinder runs failed after $max_tries tries." begin
-            pfs = EpiAware.EpiInference._continue_manypathfinder!(
-                pfs, badmdl; max_tries, nruns, ndraws, maxiters)
+        @suppress_err begin
+            @test_throws "All pathfinder runs failed after $max_tries tries." begin
+                pfs = EpiAware.EpiInference._continue_manypathfinder!(
+                    pfs, badmdl; max_tries, nruns, ndraws, maxiters)
+            end
         end
     end
 end
 @testitem "Testing _get_best_elbo_pathfinder function" begin
-    using Pathfinder, Turing
+    using Pathfinder, Turing, Suppressor
 
     @model function test_model()
         x ~ Normal(0, 1)
@@ -91,14 +99,16 @@ end
     ndraws = 100
     maxiters = 50
 
-    pfs = EpiAware.EpiInference._run_manypathfinder(
-        mdl; nruns = nruns, ndraws = ndraws, maxiters = maxiters)
+    @suppress begin
+        pfs = EpiAware.EpiInference._run_manypathfinder(
+            mdl; nruns = nruns, ndraws = ndraws, maxiters = maxiters)
 
-    best_pf = EpiAware.EpiInference._get_best_elbo_pathfinder(pfs)
-    @test best_pf isa PathfinderResult
+        best_pf = EpiAware.EpiInference._get_best_elbo_pathfinder(pfs)
+        @test best_pf isa PathfinderResult
+    end
 end
 @testitem "Testing manypathfinder function" begin
-    using Turing, Pathfinder, HypothesisTests
+    using Turing, Pathfinder, HypothesisTests, Suppressor
     @testset "Test model works" begin
         @model function test_model()
             x ~ Normal(0, 1)
@@ -113,10 +123,12 @@ end
         maxiters = 50
         max_tries = 100
 
-        best_pf = manypathfinder(mdl, ndraws; nruns = nruns,
-            maxiters = maxiters, max_tries = max_tries)
+        @suppress begin
+            best_pf = manypathfinder(mdl, ndraws; nruns = nruns,
+                maxiters = maxiters, max_tries = max_tries)
 
-        @test best_pf isa PathfinderResult
+            @test best_pf isa PathfinderResult
+        end
     end
 
     @testset "Does good job finding simple distribution" begin
@@ -130,12 +142,15 @@ end
         maxiters = 50
         max_tries = 10
 
-        best_pf = manypathfinder(mdl, ndraws; nruns = nruns,
-            maxiters = maxiters, max_tries = max_tries)
+        @suppress begin
+            best_pf = manypathfinder(mdl, ndraws; nruns = nruns,
+                maxiters = maxiters, max_tries = max_tries)
 
-        pathfinder_samples = best_pf.draws |> vec
-        ks_test_pval = ExactOneSampleKSTest(pathfinder_samples, Normal(0.0, 1)) |> pvalue
-        @test ks_test_pval > 1e-6
+            pathfinder_samples = best_pf.draws |> vec
+            ks_test_pval = ExactOneSampleKSTest(pathfinder_samples, Normal(0.0, 1)) |>
+                           pvalue
+            @test ks_test_pval > 1e-6
+        end
     end
 
     @testset "Check always fails for bad models and throws correct Exception" begin
@@ -151,9 +166,11 @@ end
         maxiters = 50
         nchains = 4
 
-        @test_throws "All pathfinder runs failed after $max_tries tries." begin
-            manypathfinder(badmdl, ndraws; nruns = nruns, nchains = nchains,
-                maxiters = maxiters, max_tries = max_tries)
+        @suppress_err begin
+            @test_throws "All pathfinder runs failed after $max_tries tries." begin
+                manypathfinder(badmdl, ndraws; nruns = nruns, nchains = nchains,
+                    maxiters = maxiters, max_tries = max_tries)
+            end
         end
     end
 end
