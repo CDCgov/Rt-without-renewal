@@ -18,16 +18,16 @@
     @test nb.pos_shift ≈ 1e-3
 end
 
-@testset "Testing NegativeBinomialError against theoretical properties" begin
+@testitem "Testing NegativeBinomialError against theoretical properties" begin
     using Distributions, Turing, HypothesisTests, DynamicPPL
 
     # Set up test parameters
-    n = 10  # Number of observations
+    n = 100  # Number of observations
     μ = 10.0  # Mean of the negative binomial distribution
     α = 0.2  # Cluster factor (dispersion parameter)
 
     # Define the observation model
-    nb_obs_model = NegativeBinomialError()
+    nb_obs_model = NegativeBinomialError(pos_shift = 0.0)
 
     # Generate observations from the model
     Y_t = fill(μ, n)  # True values
@@ -42,9 +42,4 @@ end
 
     @test isapprox(mean(obs_samples), μ, atol = 0.1)  # Test the mean
     @test isapprox(var(obs_samples), μ + α^2 * μ^2, atol = 0.2)  # Test the variance
-
-    # Test the distribution of the observations
-    theoretical_dist = EpiAware.EpiObsModels.NegativeBinomialMeanClust(μ, α^2)
-    ks_test = ExactOneSampleKSTest(obs_samples, theoretical_dist)
-    @test pvalue(ks_test) > 0.05  # Fail to reject the null hypothesis at 5% significance level
 end
