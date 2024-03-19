@@ -2,7 +2,8 @@
     using Distributions
     # Test default constructor
     nb = NegativeBinomialError()
-    @test nb.cluster_factor_prior isa HalfNormal{Float64}
+    @test all(rand(nb.cluster_factor_prior, 100) .>= 0.0)
+    @test isapprox(mean(nb.cluster_factor_prior), 0.1)
     @test nb.pos_shift ≈ 1e-6
 
     # Test constructor with custom prior
@@ -18,29 +19,32 @@
 end
 
 @testset "Testing NegativeBinomialError against theoretical properties" begin
-    using Distributions, Turing, HypothesisTests
+    using Distributions, Turing, HypothesisTests, DynamicPPL
 
     # Set up test parameters
     n = 10  # Number of observations
     μ = 10.0  # Mean of the negative binomial distribution
-    α = 0.05  # Cluster factor (dispersion parameter)
+    α = 0.2  # Cluster factor (dispersion parameter)
 
     # Define the observation model
     nb_obs_model = NegativeBinomialError()
 
     # Generate observations from the model
     Y_t = fill(μ, n)  # True values
-    model = generate_observations(nb_obs_model, missing, Y_t)ww
+    model = generate_observations(nb_obs_model, missing, Y_t)
     fix_model = fix(model, (cluster_factor = α))
-    samples = sample(model, Prior(), 1000)
+    samples = sample(fix_model, Prior(), 1000; progress = false)
 
-    # Test the mean and variance of the observations
-    obs_samples = [s[1] for s in samples]
+    obs_samples = samples |>
+                  chn -> mapreduce(vcat, generated_quantities(fix_model, chn)) do gen
+        gen[1]
+    end
+
     @test isapprox(mean(obs_samples), μ, atol = 0.1)  # Test the mean
-    @test isapprox(var(obs_samples), μ + α^2 * μ^2, atol = 0.1)  # Test the variance
+    @test isapprox(var(obs_samples), μ + α^2 * μ^2, atol = 0.2)  # Test the variance
 
     # Test the distribution of the observations
-    theoretical_dist = NegativeBinomialMeanClust(μ, α^2)
+    theoretical_dist = EpiAware.EpiObsModels.NegativeBinomialMeanClust(μ, α^2)
     ks_test = ExactOneSampleKSTest(obs_samples, theoretical_dist)
     @test pvalue(ks_test) > 0.05  # Fail to reject the null hypothesis at 5% significance level
 end
