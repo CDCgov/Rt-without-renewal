@@ -66,7 +66,6 @@ export make_epi_aware
 
 include("docstrings.jl")
 include("epiawareprob.jl")
-include("epiawaremethod.jl")
 include("make_epi_aware.jl")
 
 end
