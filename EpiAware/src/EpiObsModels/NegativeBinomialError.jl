@@ -51,14 +51,14 @@ Generate observations using the NegativeBinomialError observation model.
         y_t,
         Y_t)
     cluster_factor ~ obs_model.cluster_factor_prior
-
+    sq_cluster_factor = cluster_factor^2
     if ismissing(y_t)
         y_t = Vector{Int}(undef, length(Y_t))
     end
 
     for i in eachindex(y_t)
         y_t[i] ~ NegativeBinomialMeanClust(
-            Y_t[i] + obs_model.pos_shift, cluster_factor^2
+            Y_t[i] + obs_model.pos_shift, sq_cluster_factor
         )
     end
 
