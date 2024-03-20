@@ -7,7 +7,7 @@ using ..EpiAwareBase
 
 using ..EpiAwareUtils: create_discrete_pmf, HalfNormal
 
-using Turing, Distributions, DocStringExtensions, SparseArrays
+using Turing, Distributions, DocStringExtensions, SparseArrays, Memoization
 
 export NegativeBinomialError, LatentDelay
 

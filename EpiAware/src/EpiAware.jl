@@ -65,7 +65,11 @@ export EpiMethod
 export make_epi_aware
 
 include("docstrings.jl")
+<<<<<<< HEAD
 include("epiawareprob.jl")
+=======
+include("epiawareproblem.jl")
+>>>>>>> bd9174b (reorganise tests to match code org and update latent delay tests to new structure)
 include("make_epi_aware.jl")
 
 end

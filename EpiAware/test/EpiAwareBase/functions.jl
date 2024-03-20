@@ -1,4 +1,5 @@
 @testitem "generate_latent_infs function: default" begin
+    using EpiAware.EpiAwareBase
     latent_model = [0.1, 0.2, 0.3]
     init_incidence = 10.0
 
