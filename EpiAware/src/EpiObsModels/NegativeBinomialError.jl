@@ -1,4 +1,4 @@
-"""
+@doc raw"
 
 The `NegativeBinomialError` struct represents an observation model for negative binomial errors. It is a subtype of `AbstractObservationModel`.
 
@@ -13,7 +13,7 @@ nb = NegativeBinomialError()
 nb_model = generate_observations(nb, missing, fill(10, 10))
 rand(nb_model)
 ```
-"""
+"
 struct NegativeBinomialError{S <: Sampleable, T <: AbstractFloat} <:
        AbstractObservationModel
     "The prior distribution for the cluster factor."

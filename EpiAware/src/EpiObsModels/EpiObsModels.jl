@@ -9,9 +9,10 @@ using ..EpiAwareUtils: create_discrete_pmf, HalfNormal
 
 using Turing, Distributions, DocStringExtensions, SparseArrays
 
-export NegativeBinomialError
+export NegativeBinomialError, LatentDelay
 
 include("docstrings.jl")
+include("LatentDelay.jl")
 include("NegativeBinomialError.jl")
 include("utils.jl")
 
