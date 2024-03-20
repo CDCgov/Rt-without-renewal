@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.40
+# v0.19.39
 
 using Markdown
 using InteractiveUtils
@@ -184,11 +184,12 @@ We choose a simple observation model where infections are observed 0, 1, 2, 3 da
 "
 
 # ╔═╡ 448669bc-99f4-4823-b15e-fcc9040ba31b
-obs_model = DelayObservations(
-    fill(0.25, 4),
-    time_horizon,
-    EpiAware.EpiLatentModels.HalfNormal(0.1)
+obs_model = LatentDelay(
+    NegativeBinomialError(),
+    fill(0.25, 4)
 )
+
+# ╔═╡ 352cc919-e12f-43f4-b2de-dc1f759c377a
 
 # ╔═╡ e49713e8-4840-4083-8e3f-fc52d791be7b
 md"
@@ -371,7 +372,7 @@ As well as checking the posterior predictions for latent infections, we can also
 
 # ╔═╡ 10d8fe24-83a6-47ac-97b7-a374481473d3
 let
-    parameters_to_plot = (:σ_RW, :neg_bin_cluster_factor)
+    parameters_to_plot = (:σ_RW, :cluster_factor)
 
     plts = map(parameters_to_plot) do name
         var_samples = chn[name] |> vec
@@ -441,6 +442,7 @@ end
 # ╠═c7580ae6-0db5-448e-8b20-4dd6fcdb1ae0
 # ╟─0aa3fcbd-0831-45b8-9a2c-7ffbabf5895f
 # ╠═448669bc-99f4-4823-b15e-fcc9040ba31b
+# ╠═352cc919-e12f-43f4-b2de-dc1f759c377a
 # ╟─e49713e8-4840-4083-8e3f-fc52d791be7b
 # ╠═abeff860-58c3-4644-9325-66ffd4446b6d
 # ╟─821628fb-8044-48b0-aa4f-0b7b57a2f45a
