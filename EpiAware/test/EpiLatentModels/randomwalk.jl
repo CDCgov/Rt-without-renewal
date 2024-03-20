@@ -16,6 +16,7 @@
     ks_test_pval = ExactOneSampleKSTest(samples_day_5, Normal(0.0, sqrt(5))) |> pvalue
     @test ks_test_pval > 1e-6 #Very unlikely to fail if the model is correctly implemented
 end
+
 @testitem "Testing default RW priors" begin
     @testset "std_prior" begin
         priors = RandomWalk()
@@ -29,7 +30,9 @@ end
         @test typeof(init_value) == Float64
     end
 end
+
 @testitem "Testing RandomWalk constructor" begin
+    using Distributions: Normal, truncated
     init_prior = Normal(0.0, 1.0)
     std_prior = truncated(Normal(0.0, 0.05), 0.0, Inf)
     rw_process = RandomWalk(init_prior, std_prior)
