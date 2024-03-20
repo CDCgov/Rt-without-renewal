@@ -32,7 +32,7 @@ end
     obs_model = NegativeBinomialError()
 
     # Delay kernel is just event observed on same day
-    delay_obs = DelayObservations(NegativeBinomialError(), [1.0], length(I_t))
+    delay_obs = LatentDelay(NegativeBinomialError(), [1.0])
 
     # Set up priors
     neg_bin_cf = 0.05
@@ -73,7 +73,7 @@ end
     I_t = [10.0, 20.0, 30.0]  # Assuming a simple case where all infections are known
 
     # Define a common setup for your model that can be reused across different y_t scenarios
-    delay_obs = DelayObservations(NegativeBinomialError(), [1.0])
+    delay_obs = LatentDelay(NegativeBinomialError(), [1.0])
 
     # Test each y_t scenario
     for (scenario_name, y_t_scenario) in [("fully observed", y_t_fully_observed),
