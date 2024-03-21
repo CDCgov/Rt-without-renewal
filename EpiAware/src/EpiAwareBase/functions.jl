@@ -42,10 +42,9 @@ function generate_latent(latent_model::AbstractLatentModel, n)
     return nothing
 end
 
-function generate_observations(observation_model::AbstractObservationModel,
+function generate_observations(obs_model::AbstractObservationModel,
         y_t,
-        I_t;
-        pos_shift)
+        Y_t)
     @info "No concrete implementation for generate_observations is defined."
     return nothing
 end
