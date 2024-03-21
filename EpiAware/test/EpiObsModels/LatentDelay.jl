@@ -1,15 +1,38 @@
+@testitem "Testing LatentDelay struct" begin
+    using Distributions
+
+    # Define a dummy observation model for testing
+    struct DummyObservationModel <: AbstractObservationModel end
+    dummy_model = DummyObservationModel()
+
+    # Test case 1
+    delay_int = [0.2, 0.3, 0.5]
+    obs_model = LatentDelay(dummy_model, delay_int)
+
+    @test obs_model.model == dummy_model
+    @test obs_model.pmf == delay_int
+
+    # Test case 2
+    delay_distribution = Uniform(0.0, 20.0)
+    D_delay = 10.0
+    Δd = 1.0
+
+    obs_model = LatentDelay(dummy_model, delay_distribution, D = D_delay, Δd = Δd)
+
+    @test obs_model.model == dummy_model
+    @test length(obs_model.pmf) == D_delay
+end
+
 @testitem "Testing delay obs against theoretical properties" begin
     using DynamicPPL, Turing, Distributions
     using HypothesisTests
 
     # Set up test data with fixed infection
     I_t = [10.0, 20.0, 30.0]
-    obs_prior = default_delay_obs_priors()
+    obs_model = NegativeBinomialError()
 
     # Delay kernel is just event observed on same day
-    delay_obs = DelayObservations([1.0], length(I_t),
-        obs_prior[:neg_bin_cluster_factor_prior];
-        pos_shift = 1e-6)
+    delay_obs = LatentDelay(NegativeBinomialError(), [1.0])
 
     # Set up priors
     neg_bin_cf = 0.05
@@ -18,7 +41,7 @@
     mdl = generate_observations(delay_obs,
         missing,
         I_t)
-    fix_mdl = fix(mdl, (neg_bin_cluster_factor = neg_bin_cf,))
+    fix_mdl = fix(mdl, (cluster_factor = neg_bin_cf,))
 
     n_samples = 1000
     first_obs = sample(fix_mdl, Prior(), n_samples; progress = false) |>
@@ -50,20 +73,14 @@ end
     I_t = [10.0, 20.0, 30.0]  # Assuming a simple case where all infections are known
 
     # Define a common setup for your model that can be reused across different y_t scenarios
-    obs_prior = default_delay_obs_priors()
-    delay_obs = DelayObservations(
-        [1.0], length(I_t), obs_prior[:neg_bin_cluster_factor_prior];
-        pos_shift = 1e-6)
-    neg_bin_cf = 0.05  # Set up priors
-    # Expected point estimate calculation setup
+    delay_obs = LatentDelay(NegativeBinomialError(), [1.0])
 
     # Test each y_t scenario
     for (scenario_name, y_t_scenario) in [("fully observed", y_t_fully_observed),
         ("partially observed", y_t_partially_observed),
         ("fully unobserved", y_t_fully_unobserved)]
         @testset "$scenario_name y_t" begin
-            mdl = generate_observations(
-                delay_obs, y_t_scenario, I_t)
+            mdl = generate_observations(delay_obs, y_t_scenario, I_t)
             sampled_obs = sample(mdl, Prior(), 1000; progress = false) |>
                           chn -> generated_quantities(mdl, chn) .|>
                                  (gen -> gen[1]) |>
@@ -88,47 +105,5 @@ end
                 @test abs_diffs[i] < 1
             end
         end
-    end
-end
-
-@testitem "Testing DelayObservations struct" begin
-    using Distributions
-
-    # Test case 1
-    delay_int = [0.2, 0.3, 0.5]
-    time_horizon = 30
-    obs_prior = default_delay_obs_priors()
-
-    obs_model = DelayObservations(delay_int, time_horizon,
-        obs_prior[:neg_bin_cluster_factor_prior])
-
-    @test size(obs_model.delay_kernel) == (time_horizon, time_horizon)
-    @test obs_model.neg_bin_cluster_factor_prior == obs_prior[:neg_bin_cluster_factor_prior]
-
-    # Test case 2
-    delay_distribution = Uniform(0.0, 20.0)
-    time_horizon = 365
-    D_delay = 10.0
-    Δd = 1.0
-
-    obs_model = DelayObservations(delay_distribution = delay_distribution,
-        time_horizon = time_horizon,
-        neg_bin_cluster_factor_prior = obs_prior[:neg_bin_cluster_factor_prior],
-        D_delay = D_delay,
-        Δd = Δd)
-
-    @test size(obs_model.delay_kernel) == (time_horizon, time_horizon)
-    @test obs_model.neg_bin_cluster_factor_prior == obs_prior[:neg_bin_cluster_factor_prior]
-end
-
-@testitem "Testing generate_observations default" begin
-    struct TestObsModel <: EpiAware.EpiAwareBase.AbstractObservationModel
-    end
-
-    @test try
-        generate_observations(TestObsModel(), missing, missing; pos_shift = 1e-6)
-        true
-    catch
-        false
     end
 end

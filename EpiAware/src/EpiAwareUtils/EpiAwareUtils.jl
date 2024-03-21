@@ -12,11 +12,12 @@ using Distributions: Distribution, cdf, Normal, truncated
 using DocStringExtensions, QuadGK
 
 #Export functions
-export scan, spread_draws, create_discrete_pmf
+export scan, spread_draws, create_discrete_pmf, HalfNormal
 
 include("docstrings.jl")
 include("distributions.jl")
 include("scan.jl")
+include("priors.jl")
 include("post-inference.jl")
 
 end
