@@ -8,7 +8,7 @@
 
     @testset "Check distribution properties" begin
         prior_mean = 2.0
-        prior_dist = EpiAware.EpiLatentModels.HalfNormal(prior_mean)
+        prior_dist = HalfNormal(prior_mean)
         #Check Distributions.jl mean function
         @test mean(prior_dist) ≈ prior_mean
         samples = rand(prior_dist, 10_000)
