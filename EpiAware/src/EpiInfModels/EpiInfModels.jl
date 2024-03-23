@@ -5,7 +5,7 @@ module EpiInfModels
 
 using ..EpiAwareBase
 
-using ..EpiAwareUtils: scan, create_discrete_pmf
+using ..EpiAwareUtils: scan, censored_pmf
 
 using Turing, Distributions, DocStringExtensions, LinearAlgebra
 

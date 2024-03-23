@@ -13,13 +13,12 @@ using Distributions: Distribution, cdf, rand, logpdf, cdf, quantile, minimum,
 using DocStringExtensions, QuadGK
 
 #Export functions
-export scan, spread_draws, create_discrete_pmf, HalfNormal
+export scan, spread_draws, censored_pmf, HalfNormal
 
 include("docstrings.jl")
-include("pmfs.jl")
+include("censored_pmf.jl")
 include("distributions.jl")
 include("scan.jl")
-include("priors.jl")
 include("post-inference.jl")
 
 end
