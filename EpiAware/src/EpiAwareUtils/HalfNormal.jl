@@ -27,12 +27,7 @@ struct HalfNormal{T <: Real} <: ContinuousUnivariateDistribution
     μ::T
 end
 
-# Sampling
-function Distributions.sampler(d::HalfNormal{T}) where {T <: Real}
-    HalfNormalSampler(d.μ * sqrt(π / 2), d.μ / sqrt(2))
-end
-
-function Random.rand(rng::AbstractRNG, d::HalfNormal{T}) where {T <: Real}
+function Base.rand(rng::AbstractRNG, d::HalfNormal{T}) where {T <: Real}
     abs(rand(rng, Normal(d.μ * sqrt(π / 2), d.μ / sqrt(2))))
 end
 
@@ -42,7 +37,7 @@ function Distributions.logpdf(d::HalfNormal{T}, x::Real) where {T <: Real}
 end
 
 # Cumulative distribution function
-function Distributionscdf(d::HalfNormal{T}, x::Real) where {T <: Real}
+function Distributions.cdf(d::HalfNormal{T}, x::Real) where {T <: Real}
     x < 0 ? 0.0 :
     cdf(Normal(d.μ * sqrt(π / 2), d.μ / sqrt(2)), x) -
     cdf(Normal(d.μ * sqrt(π / 2), d.μ / sqrt(2)), -x)
@@ -59,10 +54,30 @@ Base.maximum(d::HalfNormal) = Inf
 Distributions.insupport(d::HalfNormal, x::Real) = x >= 0
 
 # Mean
-Distributions.mean(d::HalfNormal{T}) where {T <: Real} = d.μ * sqrt(2 / π)
+Statistics.mean(d::HalfNormal{T}) where {T <: Real} = d.μ * sqrt(2 / π)
 
 # Variance
-Distributions.var(d::HalfNormal{T}) where {T <: Real} = d.μ^2 * (1 - 2 / π)
+Statistics.var(d::HalfNormal{T}) where {T <: Real} = d.μ^2 * (1 - 2 / π)
 
 # Entropy
-Distributions.entropy(d::HalfNormal{T}) where {T <: Real} = log(2 * d.μ * sqrt(π / 2)) + 0.5
+StatsBase.entropy(d::HalfNormal{T}) where {T <: Real} = log(2 * d.μ * sqrt(π / 2)) + 0.5
+
+# Modes
+StatsBase.modes(d::HalfNormal) = [0.0]
+StatsBase.mode(d::HalfNormal) = 0.0
+
+# Skewness
+StatsBase.skewness(d::HalfNormal{T}) where {T <: Real} = (4 - π) * sqrt(2 / (π - 2))
+
+# Kurtosis
+StatsBase.kurtosis(d::HalfNormal, ::Bool) = 3 + (8 * (π - 3)) / (π - 2)
+
+# Moment generating function
+function Distributions.mgf(d::HalfNormal{T}, t::Real) where {T <: Real}
+    exp(d.μ^2 * t^2 / 2) * (1 + erf(d.μ * t / sqrt(2))) / 2
+end
+
+# Characteristic function
+function Distributions.cf(d::HalfNormal{T}, t::Real) where {T <: Real}
+    exp(-d.μ^2 * t^2 / 4) * (1 + sqrt(2 / π) * d.μ * t * erfi(d.μ * t / sqrt(2)))
+end
