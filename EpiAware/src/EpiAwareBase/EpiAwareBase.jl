@@ -3,7 +3,7 @@ Module for defining abstract epidemiological types.
 """
 module EpiAwareBase
 
-using DocStringExtensions
+using DocStringExtensions, DynamicPPL
 
 #Export models
 export AbstractModel, AbstractEpiModel, AbstractLatentModel, AbstractObservationModel
@@ -15,7 +15,7 @@ export AbstractEpiProblem
 export AbstractEpiMethod, AbstractEpiOptMethod, AbstractEpiSamplingMethod
 
 #Export functions
-export generate_latent, generate_latent_infs, generate_observations
+export generate_latent, generate_latent_infs, generate_observations, _apply_method
 
 include("docstrings.jl")
 include("types.jl")
