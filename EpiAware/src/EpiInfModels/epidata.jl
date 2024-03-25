@@ -56,7 +56,7 @@ struct EpiData{T <: Real, F <: Function}
             D_gen,
             Δd = 1.0,
             transformation::Function = exp)
-        gen_int = create_discrete_pmf(gen_distribution, Δd = Δd, D = D_gen) |>
+        gen_int = censored_pmf(gen_distribution, Δd = Δd, D = D_gen) |>
                   p -> p[2:end] ./ sum(p[2:end])
 
         return EpiData(gen_int, transformation)

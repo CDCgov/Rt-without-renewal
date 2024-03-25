@@ -21,7 +21,7 @@ Raises:
 - `AssertionError` if `Δd` is not positive.
 - `AssertionError` if `D` is not greater than `Δd`.
 """
-function create_discrete_pmf(dist::Distribution,
+function censored_pmf(dist::Distribution,
         ::Val{:single_censored};
         primary_approximation_point = 0.5,
         Δd = 1.0,
@@ -60,7 +60,7 @@ Raises:
 - `AssertionError` if `Δd` is not positive.
 - `AssertionError` if `D` is not greater than `Δd`.
 """
-function create_discrete_pmf(dist::Distribution; Δd = 1.0, D)
+function censored_pmf(dist::Distribution; Δd = 1.0, D)
     @assert minimum(dist)>=0.0 "Distribution must be non-negative."
     @assert Δd>0.0 "Δd must be positive."
     @assert D>Δd "D must be greater than Δd."

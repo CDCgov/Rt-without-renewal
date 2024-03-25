@@ -3,8 +3,7 @@
     using HypothesisTests: ExactOneSampleKSTest, pvalue
 
     n = 5
-    rw_process = RandomWalk(Normal(0.0, 1.0),
-        truncated(Normal(0.0, 0.05), 0.0, Inf))
+    rw_process = RandomWalk(Normal(0.0, 1.0), HalfNormal(0.05))
     model = generate_latent(rw_process, n)
     fixed_model = fix(model, (σ_RW = 1.0, init_rw_value = 0.0)) #Fixing the standard deviation of the random walk process
     n_samples = 1000
@@ -34,7 +33,7 @@ end
 @testitem "Testing RandomWalk constructor" begin
     using Distributions: Normal, truncated
     init_prior = Normal(0.0, 1.0)
-    std_prior = truncated(Normal(0.0, 0.05), 0.0, Inf)
+    std_prior = HalfNormal(0.05)
     rw_process = RandomWalk(init_prior, std_prior)
     @test rw_process.init_prior == init_prior
     @test rw_process.std_prior == std_prior

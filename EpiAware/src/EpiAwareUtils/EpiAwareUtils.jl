@@ -7,17 +7,20 @@ using ..EpiAwareBase
 
 using DataFramesMeta: DataFrame, @rename!
 using Turing: Chains
-using Distributions: Distribution, cdf, Normal, truncated
+using Random: AbstractRNG
 
-using DocStringExtensions, QuadGK
+using Distributions, DocStringExtensions, QuadGK, Statistics
+
+#Export Structures
+export HalfNormal
 
 #Export functions
-export scan, spread_draws, create_discrete_pmf, HalfNormal
+export scan, spread_draws, censored_pmf
 
 include("docstrings.jl")
-include("distributions.jl")
+include("censored_pmf.jl")
+include("HalfNormal.jl")
 include("scan.jl")
-include("priors.jl")
 include("post-inference.jl")
 
 end

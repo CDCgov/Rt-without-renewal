@@ -6,7 +6,7 @@ module EpiInfModels
 using ..EpiAwareBase
 import ..EpiAwareBase: _apply_method
 
-using ..EpiAwareUtils: scan, create_discrete_pmf
+using ..EpiAwareUtils: scan, censored_pmf
 
 using Turing, Distributions, DocStringExtensions, LinearAlgebra
 

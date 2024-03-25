@@ -5,7 +5,7 @@ module EpiObsModels
 
 using ..EpiAwareBase
 
-using ..EpiAwareUtils: create_discrete_pmf, HalfNormal
+using ..EpiAwareUtils: censored_pmf, HalfNormal
 
 using Turing, Distributions, DocStringExtensions, SparseArrays
 

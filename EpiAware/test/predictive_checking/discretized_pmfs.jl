@@ -46,9 +46,9 @@ Therefore,
  \sum_{s \geq 0} P_S(s) = 1.
 ```
 
-## Predictive checking for the `create_discrete_pmf` function
+## Predictive checking for the `censored_pmf` function
 
-This predictive checking shows the difference between the two methods of the `create_discrete_pmf` function
+This predictive checking shows the difference between the two methods of the `censored_pmf` function
 for creating a discrete PMF from a continuous distribution with a given discretization interval `Δd` and upper bound `D`.
 
 The default method is double censoring based on censoring intervals of width `Δd`. The basic method is based on the
@@ -69,8 +69,8 @@ D = 21.0
 plt1 = let
     Δd = 1
     ts = (0.0:Δd:(D - Δd)) |> collect
-    pmf1 = create_discrete_pmf(cont_dist, Val(:single_censored); Δd = Δd, D = D)
-    pmf2 = create_discrete_pmf(cont_dist; Δd = Δd, D = D)
+    pmf1 = censored_pmf(cont_dist, Val(:single_censored); Δd = Δd, D = D)
+    pmf2 = censored_pmf(cont_dist; Δd = Δd, D = D)
 
     bar(ts,
         [pmf1;; pmf2],
@@ -88,8 +88,8 @@ savefig(plt1, joinpath(@__DIR__(), "assets/", "discrete_pmf_daily.png"))
 plt2 = let
     Δd = 1 / 24
     ts = (0.0:Δd:(D - Δd)) |> collect
-    pmf1 = create_discrete_pmf(cont_dist, Val(:single_censored); Δd = Δd, D = D)
-    pmf2 = create_discrete_pmf(cont_dist; Δd = Δd, D = D)
+    pmf1 = censored_pmf(cont_dist, Val(:single_censored); Δd = Δd, D = D)
+    pmf2 = censored_pmf(cont_dist; Δd = Δd, D = D)
 
     bar(ts,
         [pmf1;; pmf2],
