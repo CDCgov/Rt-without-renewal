@@ -9,7 +9,7 @@ using DataFramesMeta: DataFrame, @rename!
 using Turing: Chains
 using Random: AbstractRNG
 
-using Distributions, DocStringExtensions, QuadGK, Statistics, StatsBase
+using Distributions, DocStringExtensions, QuadGK, Statistics
 
 #Export Structures
 export HalfNormal

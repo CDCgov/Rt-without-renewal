@@ -56,8 +56,4 @@ Distributions.insupport(d::HalfNormal, x::Real) = x >= 0
 Statistics.mean(d::HalfNormal{T}) where {T <: Real} = d.μ
 
 # Variance
-Statistics.var(d::HalfNormal{T}) where {T <: Real} = d.μ^2 * (1 - 2 / π)
-
-# Modes
-StatsBase.modes(d::HalfNormal) = [0.0]
-StatsBase.mode(d::HalfNormal) = 0.0
+Statistics.var(d::HalfNormal{T}) where {T <: Real} = d.μ^2 * (π / 2 - 1)
