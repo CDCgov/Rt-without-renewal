@@ -1,17 +1,18 @@
-
 """
 Module for defining inference methods.
 """
 module EpiInference
 
-using ..EpiAwareBase: AbstractEpiMethod, AbstractEpiOptMethod,
-                      AbstractEpiSamplingMethod
+using ..EpiAwareBase: AbstractEpiMethod, AbstractEpiOptMethod, AbstractEpiSamplingMethod
+import ..EpiAwareBase: _apply_method
+
 using Pathfinder: pathfinder, PathfinderResult
-
-using DynamicPPL, DocStringExtensions
-
+using DynamicPPL, DocStringExtensions, ADTypes, AbstractMCMC, Turing
+import ADTypes: AbstractADType
+import AbstractMCMC: AbstractMCMCEnsemble
+import AdvancedHMC: AbstractMetric, DenseEuclideanMetric, DiagEuclideanMetric
 #Export inference methods
-export AbstractNUTSMethod, EpiMethod, ManyPathfinder
+export EpiMethod, ManyPathfinder, NUTSampler
 
 #Export functions
 export manypathfinder
