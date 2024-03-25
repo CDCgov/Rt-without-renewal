@@ -20,7 +20,6 @@ quantile(hn, 0.5)
 logpdf(hn, 2)
 mean(hn)
 var(hn)
-entropy(hn)
 ```
 "
 struct HalfNormal{T <: Real} <: ContinuousUnivariateDistribution
@@ -59,25 +58,6 @@ Statistics.mean(d::HalfNormal{T}) where {T <: Real} = d.μ
 # Variance
 Statistics.var(d::HalfNormal{T}) where {T <: Real} = d.μ^2 * (1 - 2 / π)
 
-# Entropy
-StatsBase.entropy(d::HalfNormal{T}) where {T <: Real} = log(2 * d.μ * sqrt(π / 2)) + 0.5
-
 # Modes
 StatsBase.modes(d::HalfNormal) = [0.0]
 StatsBase.mode(d::HalfNormal) = 0.0
-
-# Skewness
-StatsBase.skewness(d::HalfNormal{T}) where {T <: Real} = (4 - π) * sqrt(2 / (π - 2))
-
-# Kurtosis
-StatsBase.kurtosis(d::HalfNormal, ::Bool) = 3 + (8 * (π - 3)) / (π - 2)
-
-# Moment generating function
-function Distributions.mgf(d::HalfNormal{T}, t::Real) where {T <: Real}
-    exp(d.μ^2 * t^2 / 2) * (1 + erf(d.μ * t / sqrt(2))) / 2
-end
-
-# Characteristic function
-function Distributions.cf(d::HalfNormal{T}, t::Real) where {T <: Real}
-    exp(-d.μ^2 * t^2 / 4) * (1 + sqrt(2 / π) * d.μ * t * erfi(d.μ * t / sqrt(2)))
-end
