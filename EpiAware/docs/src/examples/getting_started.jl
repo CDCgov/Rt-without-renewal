@@ -30,12 +30,16 @@ begin
     using Transducers
     using ReverseDiff
 
+<<<<<<< HEAD
     Random.seed!(1)
+=======
+    import AdvancedHMC as AHMC
+>>>>>>> 0a2272c (Update getting started to showcase method)
 end
 
 # ╔═╡ 3ebc8384-f73d-4597-83a7-07a3744fed61
 md"
-# Getting stated with `EpiAware`
+# Getting started with `EpiAware`
 
 This tutorial introduces the basic functionality of `EpiAware`. `EpiAware` is a package for making inferences on epidemiological case/determined infection data using a model-based approach.
 
@@ -92,7 +96,7 @@ In `EpiAware` we provide a constructor for random walk latent models with priors
 ```math
 \begin{align}
 Z_0 &\sim \mathcal{N}(0,1),\\
-\sigma_{RW} &\sim \text{HalfNormal}(0.1 * \sqrt{\pi} / \sqrt{2})).
+\sigma_{RW} &\sim \text{HalfNormal}(0.1 * \sqrt{\pi / 2})).
 \end{align}
 ```
 "
@@ -124,7 +128,8 @@ The `EpiData` constructor performs double interval censoring to convert our _con
 "
 
 # ╔═╡ c0662d48-4b54-4b6d-8c91-ddf4b0e3aa43
-model_data = EpiData(gen_distribution = truth_GI, D_gen = 10.0)
+model_data = EpiData(gen_distribution = truth_GI,
+    D_gen = 10.0)
 
 # ╔═╡ fd72094f-1b95-4d07-a8b0-ef47dc560dfc
 md"
@@ -174,26 +179,41 @@ y_t \sim \text{NegBinomial}\Big(\mu = \sum_{s\geq 0} K[t, t-s] I(s), r\Big). \\
 ```
 "
 
-# ╔═╡ e813d547-6100-4c43-b84c-8cebe306bda8
-md"
-We also set up the inference to occur over 100 days.
-"
-
-# ╔═╡ c7580ae6-0db5-448e-8b20-4dd6fcdb1ae0
-time_horizon = 100
-
-# ╔═╡ 0aa3fcbd-0831-45b8-9a2c-7ffbabf5895f
-md"
-We choose a simple observation model where infections are observed 0, 1, 2, 3 days later with equal probability.
-"
-
 # ╔═╡ 448669bc-99f4-4823-b15e-fcc9040ba31b
 obs_model = LatentDelay(
     NegativeBinomialError(cluster_factor_prior = HalfNormal(0.01)),
     fill(0.25, 4)
 )
 
-# ╔═╡ 352cc919-e12f-43f4-b2de-dc1f759c377a
+# ╔═╡ 28a7a049-87d6-4ff1-ac1e-bcbb7ffb90c9
+md"
+## `EpiProblem`
+
+"
+
+# ╔═╡ 420dcccc-3eb6-4c33-9393-8135426b9372
+epi_prob = EpiProblem(epi_model = epi_model,
+    latent_model = rwp,
+    observation_model = obs_model,
+    tspan = (1, 60))
+
+# ╔═╡ e813d547-6100-4c43-b84c-8cebe306bda8
+md"
+We also set up the inference to occur over 100 days.
+"
+
+# ╔═╡ c7580ae6-0db5-448e-8b20-4dd6fcdb1ae0
+time_horizon = 30
+
+# ╔═╡ 0aa3fcbd-0831-45b8-9a2c-7ffbabf5895f
+md"
+We choose a simple observation model where infections are observed 0, 1, 2, 3 days later with equal probability.
+"
+
+# ╔═╡ 9926eb3e-ecea-4eb8-9b2c-3b5e3a563723
+md"
+## `Solution` method
+"
 
 # ╔═╡ e49713e8-4840-4083-8e3f-fc52d791be7b
 md"
@@ -204,8 +224,39 @@ Having chosen an `EpiModel`, `LatentModel` and `ObservationModel`, we can implem
 By giving `missing` to the first argument, we indicate that case data will be _generated_ from the model rather than treated as fixed.
 "
 
+# ╔═╡ 2437902b-0aee-4c0a-a420-8f22083a29fb
+md"
+### Using `epi_solve`
+"
+
+# ╔═╡ b287d321-39ba-4e52-9951-57642635d568
+nodata = (y_t = missing,)
+
+# ╔═╡ 36b34fd2-2891-42ca-b5dc-abb482e516ee
+fixed_parameters = (rw_init = 0.0, init_incidence = log(100.0))
+
+# ╔═╡ bc6c19fb-efec-4a59-b120-b4ee99306634
+sampled_epidemic = epi_solve(epi_prob, DirectSample(), nodata;
+    fix_parameters = fixed_parameters
+)
+
+# ╔═╡ 952add1d-80dc-48af-bc5c-d77be0788580
+let
+    plot(sampled_epidemic.gens.I_t,
+        label = "I_t",
+        xlabel = "Time",
+        ylabel = "Infections",
+        title = "Generated Infections")
+    scatter!(sampled_epidemic.gens.generated_y_t, lab = "Cases")
+end
+
+# ╔═╡ d0f86fa7-7439-4adc-a58f-1c53cd01162e
+md"
+### Direct interaction with `Turing` model
+"
+
 # ╔═╡ abeff860-58c3-4644-9325-66ffd4446b6d
-full_epi_aware_mdl = make_epi_aware(missing, time_horizon;
+full_epi_solve_mdl = make_epi_aware(missing, time_horizon;
     epi_model = epi_model,
     latent_model = rwp,
     observation_model = obs_model)
@@ -217,16 +268,13 @@ We choose some fixed parameters:
 - In the direct infection model, the initial incidence and in the initial value of the random walk form a non-identifiable pair. Therefore, we fix $Z_0 = 0$.
 "
 
-# ╔═╡ 36b34fd2-2891-42ca-b5dc-abb482e516ee
-fixed_parameters = (rw_init = 0.0, init_incidence = log(100.0))
-
 # ╔═╡ 0aadd9e3-7f91-4b45-9663-67d11335f0d0
 md"
 We fix these parameters using `fix`, and generate a random epidemic.
 "
 
 # ╔═╡ 7e0e6012-8648-4f84-a25a-8b0138c4b72a
-cond_generative_model = fix(full_epi_aware_mdl, fixed_parameters)
+cond_generative_model = fix(full_epi_solve_mdl, fixed_parameters)
 
 # ╔═╡ b20c28be-7b07-410c-a33b-ea5ad6828c12
 random_epidemic = rand(cond_generative_model)
@@ -265,12 +313,6 @@ The observation model supports partially complete data. To test this we set some
 # ╔═╡ 525aa98c-d0e5-4ffa-b808-d90fc986204c
 truth_data = generated_obs
 
-# ╔═╡ 259a7042-e74f-43c7-aeb4-97a3beeb7776
-let
-    truth_data = Union{Int, Missing}[truth_data...]
-    truth_data[vcat([3, 5], 10:20)] .= missing
-end
-
 # ╔═╡ 32638954-2c99-4d4e-8e03-52154030c657
 md"
 We now make the model but fixing the initial condition of the random walk to be 0.
@@ -284,6 +326,26 @@ inference_mdl = fix(
     (rw_init = 0.0,)
 )
 
+# ╔═╡ fa37466d-fe1f-4bb3-b558-5673135aea07
+num_threads = Threads.nthreads()
+
+# ╔═╡ 35b8f89b-683f-469d-b638-e7b0e2d8cdf1
+sampling_method = EpiMethod(
+    pre_sampler_steps = [ManyPathfinder(nruns = 20)],
+    sampler = NUTSampler(adtype = AutoReverseDiff(true),
+        ndraws = 1000,
+        nchains = num_threads,
+        mcmc_parallel = MCMCThreads())
+)
+
+# ╔═╡ 7fc3a191-1019-4b85-9321-d84f7b6838b3
+data = (y_t = sampled_epidemic.gens.generated_y_t,)
+
+# ╔═╡ 9caecb83-4ffb-423f-a780-62be0963cb12
+sol = epi_solve(epi_prob, sampling_method, data;
+    fix_parameters = (rw_init = 0.0,)
+)
+
 # ╔═╡ 9222b436-9445-4039-abbf-25c8cddb7f63
 md"
 ### Initialising inference
@@ -295,36 +357,10 @@ To make NUTS more robust we provide `manypathfinder`, which is built on pathfind
 `manypathfinder` differs from `Pathfinder.multipathfinder`; `multipathfinder` is aimed at sampling from a potentially non-Gaussian target distribution which is first approximated as a uniformly weighted collection of normal approximations from pathfinder runs. `manypathfinder` is aimed at moving rapidly to a 'good' part of parameter space, and is robust to runs that fail.
 "
 
-# ╔═╡ 197a4fbb-b71a-475a-bb78-28ff613e3094
-best_pf = manypathfinder(inference_mdl, 10; nruns = 20, executor = Transducers.ThreadedEx());
-
 # ╔═╡ 073a1d40-456a-450e-969f-11b23eb7fd1f
 md"
 We can use draws from the best pathfinder run to initialise NUTS.
 "
-
-# ╔═╡ 0379b058-4c35-440a-bc01-aafa0178bdbf
-best_pf.draws_transformed
-
-# ╔═╡ a7798f71-9bb5-4506-9476-0cc11553b9e2
-init_params = collect.(eachrow(best_pf.draws_transformed.value[1:4, :, 1]))
-
-# ╔═╡ 4deb3a51-781d-48c4-91f6-6adf2b1affcf
-md"
-**NB: We are running this inference run for speed rather than accuracy as a demonstration. You might want to use a higher target acceptance and more samples in a typical workflow.**
-"
-
-# ╔═╡ 946b1c43-e750-40c9-9f14-79da9735e437
-target_acc_prob = 0.8
-
-# ╔═╡ 3eb5ec5e-aae7-478e-84fb-80f2e9f85b4c
-chn = sample(inference_mdl,
-    NUTS(target_acc_prob; adtype = AutoReverseDiff(true)),
-    MCMCThreads(),
-    250,
-    4;
-    init_params,
-    drop_warmup = true)
 
 # ╔═╡ 30498cc7-16a5-441a-b8cd-c19b220c60c1
 md"
@@ -337,31 +373,31 @@ Because we are using synthetic data we can also plot the model predictions for t
 
 # ╔═╡ e9df22b8-8e4d-4ab7-91ea-c01f2239b3e5
 let
-    post_check_mdl = fix(full_epi_aware_mdl, (rw_init = 0.0,))
-    post_check_y_t = mapreduce(hcat, generated_quantities(post_check_mdl, chn)) do gen
+    post_check_y_t = mapreduce(
+        hcat, generated_quantities(sampled_epidemic.model, sol.samples)) do gen
         gen.generated_y_t
     end
 
-    predicted_I_t = mapreduce(hcat, generated_quantities(inference_mdl, chn)) do gen
+    predicted_I_t = mapreduce(hcat, sol.gens) do gen
         gen.I_t
     end
 
     p1 = plot(post_check_y_t, c = :grey, alpha = 0.05, lab = "")
-    scatter!(p1, truth_data,
+    scatter!(p1, data.y_t,
         lab = "Observed cases",
         xlabel = "Time",
         ylabel = "Cases",
         title = "Post. predictive checking: cases",
-        ylims = (-0.5, maximum(truth_data) * 1.5),
+        ylims = (-0.5, maximum(data.y_t) * 1.5),
         c = :green)
 
     p2 = plot(predicted_I_t, c = :grey, alpha = 0.05, lab = "")
-    scatter!(p2, true_infections,
+    scatter!(p2, sampled_epidemic.gens.I_t,
         lab = "Actual infections",
         xlabel = "Time",
         ylabel = "Unobserved Infections",
         title = "Post. predictions: infections",
-        ylims = (-0.5, maximum(true_infections) * 1.5),
+        ylims = (-0.5, maximum(sampled_epidemic.gens.I_t) * 1.5),
         c = :red)
 
     plot(p1, p2,
@@ -379,14 +415,14 @@ let
     parameters_to_plot = (:σ_RW, :cluster_factor)
 
     plts = map(parameters_to_plot) do name
-        var_samples = chn[name] |> vec
+        var_samples = sol.samples[name] |> vec
         histogram(var_samples,
             bins = 50,
             norm = :pdf,
             lw = 0,
             fillalpha = 0.5,
             lab = "MCMC")
-        vline!([getfield(random_epidemic, name)], lab = "True value")
+        vline!([getfield(sampled_epidemic.samples, name)], lab = "True value")
         title!(string(name))
     end
     plot(plts..., layout = (2, 1))
@@ -404,19 +440,21 @@ Here we spaghetti plot posterior sampled time-varying reproductive numbers again
 # ╔═╡ 15b9f37f-8d5f-460d-8c28-d7f2271fd099
 let
     n = epi_model.data.len_gen_int
+    true_infections = sampled_epidemic.gens.I_t
+
     Rt_denom = [dot(reverse(epi_model.data.gen_int), true_infections[(t - n):(t - 1)])
                 for t in (n + 1):length(true_infections)]
     true_Rt = true_infections[(n + 1):end] ./ Rt_denom
 
-    predicted_Rt = mapreduce(hcat, generated_quantities(inference_mdl, chn)) do gen
+    predicted_Rt = mapreduce(hcat, sol.gens) do gen
         _It = gen.I_t
         _Rt_denom = [dot(reverse(epi_model.data.gen_int), _It[(t - n):(t - 1)])
                      for t in (n + 1):length(_It)]
         Rt = _It[(n + 1):end] ./ _Rt_denom
     end
 
-    plt = plot((n + 1):time_horizon, predicted_Rt, c = :grey, alpha = 0.05, lab = "")
-    plot!(plt, (n + 1):time_horizon, true_Rt,
+    plt = plot((n + 1):epi_prob.tspan[2], predicted_Rt, c = :grey, alpha = 0.05, lab = "")
+    plot!(plt, (n + 1):epi_prob.tspan[2], true_Rt,
         lab = "true Rt",
         xlabel = "Time",
         ylabel = "Rt",
@@ -442,35 +480,39 @@ end
 # ╠═10c750db-6d00-4ef6-9caa-3cf7b3c0d711
 # ╠═45b287b8-22b5-4f09-9a93-51df82477b01
 # ╟─5e62a50a-71f4-4902-b1c9-fdf51fe145fa
+# ╠═448669bc-99f4-4823-b15e-fcc9040ba31b
+# ╠═28a7a049-87d6-4ff1-ac1e-bcbb7ffb90c9
+# ╠═420dcccc-3eb6-4c33-9393-8135426b9372
 # ╟─e813d547-6100-4c43-b84c-8cebe306bda8
 # ╠═c7580ae6-0db5-448e-8b20-4dd6fcdb1ae0
 # ╟─0aa3fcbd-0831-45b8-9a2c-7ffbabf5895f
-# ╠═448669bc-99f4-4823-b15e-fcc9040ba31b
-# ╠═352cc919-e12f-43f4-b2de-dc1f759c377a
+# ╠═9926eb3e-ecea-4eb8-9b2c-3b5e3a563723
 # ╟─e49713e8-4840-4083-8e3f-fc52d791be7b
+# ╟─2437902b-0aee-4c0a-a420-8f22083a29fb
+# ╠═b287d321-39ba-4e52-9951-57642635d568
+# ╠═36b34fd2-2891-42ca-b5dc-abb482e516ee
+# ╠═bc6c19fb-efec-4a59-b120-b4ee99306634
+# ╠═952add1d-80dc-48af-bc5c-d77be0788580
+# ╟─d0f86fa7-7439-4adc-a58f-1c53cd01162e
 # ╠═abeff860-58c3-4644-9325-66ffd4446b6d
 # ╟─821628fb-8044-48b0-aa4f-0b7b57a2f45a
-# ╠═36b34fd2-2891-42ca-b5dc-abb482e516ee
 # ╟─0aadd9e3-7f91-4b45-9663-67d11335f0d0
 # ╠═7e0e6012-8648-4f84-a25a-8b0138c4b72a
 # ╠═b20c28be-7b07-410c-a33b-ea5ad6828c12
 # ╠═d073e63b-62da-4743-ace0-78ef7806bc0b
 # ╠═a04f3c1b-7e11-4800-9c2a-9fc0021de6e7
-# ╟─f68b4e41-ac5c-42cd-a8c2-8761d66f7543
+# ╠═f68b4e41-ac5c-42cd-a8c2-8761d66f7543
 # ╟─b5bc8f05-b538-4abf-aa84-450bf2dff3d9
 # ╟─4a4c6e91-8d8f-4bbf-bb7e-a36dc281e312
 # ╠═525aa98c-d0e5-4ffa-b808-d90fc986204c
-# ╠═259a7042-e74f-43c7-aeb4-97a3beeb7776
 # ╟─32638954-2c99-4d4e-8e03-52154030c657
 # ╠═b4033728-b321-4100-8194-1fd9fe2d268d
+# ╠═fa37466d-fe1f-4bb3-b558-5673135aea07
+# ╠═35b8f89b-683f-469d-b638-e7b0e2d8cdf1
+# ╠═7fc3a191-1019-4b85-9321-d84f7b6838b3
+# ╠═9caecb83-4ffb-423f-a780-62be0963cb12
 # ╟─9222b436-9445-4039-abbf-25c8cddb7f63
-# ╠═197a4fbb-b71a-475a-bb78-28ff613e3094
 # ╟─073a1d40-456a-450e-969f-11b23eb7fd1f
-# ╠═0379b058-4c35-440a-bc01-aafa0178bdbf
-# ╠═a7798f71-9bb5-4506-9476-0cc11553b9e2
-# ╟─4deb3a51-781d-48c4-91f6-6adf2b1affcf
-# ╠═946b1c43-e750-40c9-9f14-79da9735e437
-# ╠═3eb5ec5e-aae7-478e-84fb-80f2e9f85b4c
 # ╟─30498cc7-16a5-441a-b8cd-c19b220c60c1
 # ╠═e9df22b8-8e4d-4ab7-91ea-c01f2239b3e5
 # ╟─fd6321b1-4c3a-4123-b0dc-c45b951e0b80
