@@ -16,23 +16,6 @@ broadcast_rule(rule, latent, n, period)
 struct RepeatEach <: AbstractBroadcastRule end
 
 @doc raw"
-`broadcast_rule` is a function that applies the `RepeatEach` rule to the latent process `latent` to generate `n` samples.
-
-## Arguments
-- `rule::RepeatEach`: The broadcasting rule.
-- `latent::Vector`: The latent process.
-- `n`: The number of samples to generate.
-- `period`: The period of the broadcast.
-
-## Returns
-- `latent`: The generated broadcasted latent periods.
-"
-function EpiAwareBase.broadcast_rule(::RepeatEach, latent, n, period)
-    broadcast_latent = repeat(latent, outer = ceil(Int, n / period))
-    return broadcast_latent[1:n]
-end
-
-@doc raw"
 A function that returns the length of the latent periods to generate using the `RepeatEach` rule which is equal to the period.
 
 ## Arguments
@@ -46,6 +29,24 @@ A function that returns the length of the latent periods to generate using the `
 function EpiAwareBase.broadcast_n(::RepeatEach, n, period)
     m = period
     return m
+end
+
+@doc raw"
+`broadcast_rule` is a function that applies the `RepeatEach` rule to the latent process `latent` to generate `n` samples.
+
+## Arguments
+- `rule::RepeatEach`: The broadcasting rule.
+- `latent::Vector`: The latent process.
+- `n`: The number of samples to generate.
+- `period`: The period of the broadcast.
+
+## Returns
+- `latent`: The generated broadcasted latent periods.
+"
+function EpiAwareBase.broadcast_rule(::RepeatEach, latent, n, period)
+    @assert length(latent)==period "length(latent) must be equal to period"
+    broadcast_latent = repeat(latent, outer = ceil(Int, n / period))
+    return broadcast_latent[1:n]
 end
 
 @doc raw"
@@ -66,6 +67,19 @@ broadcast_rule(rule, latent, n, period)
 struct RepeatBlock <: AbstractBroadcastRule end
 
 @doc raw"
+A function that returns the length of the latent periods to generate using the `RepeatBlock` rule which is equal n divided by the period and rounded up to the nearest integer.
+
+## Arguments
+- `rule::RepeatBlock`: The broadcasting rule.
+- `n`: The number of samples to generate.
+- `period`: The period of the broadcast.
+"
+function EpiAwareBase.broadcast_n(::RepeatBlock, n, period)
+    m = ceil(Int, n / period)
+    return m
+end
+
+@doc raw"
 `broadcast_rule` is a function that applies the `RepeatBlock` rule to the latent process `latent` to generate `n` samples.
 
 ## Arguments
@@ -81,17 +95,4 @@ function EpiAwareBase.broadcast_rule(::RepeatBlock, latent, n, period)
     @assert n<=period * length(latent) "n must be less than or equal to period * length(latent)"
     broadcast_latent = [latent[j] for j in 1:length(latent) for i in 1:period]
     return broadcast_latent[1:n]
-end
-
-@doc raw"
-A function that returns the length of the latent periods to generate using the `RepeatBlock` rule which is equal n divided by the period and rounded up to the nearest integer.
-
-## Arguments
-- `rule::RepeatBlock`: The broadcasting rule.
-- `n`: The number of samples to generate.
-- `period`: The period of the broadcast.
-"
-function EpiAwareBase.broadcast_n(::RepeatBlock, n, period)
-    m = ceil(Int, n / period)
-    return m
 end
