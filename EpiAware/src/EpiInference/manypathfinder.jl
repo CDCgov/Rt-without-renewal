@@ -2,10 +2,12 @@
 A variational inference method that runs `manypathfinder`.
 """
 @kwdef struct ManyPathfinder <: AbstractEpiOptMethod
+    "Number of draws per pathfinder run."
+    ndraws::Int = 10
     "Number of many pathfinder runs."
     nruns::Int = 4
-    "Maximum number of iterations for each run."
-    maxiters::Int = 50
+    "Maximum number of optimization iterations for each run."
+    maxiters::Int = 100
     "Maximum number of tries if all runs fail."
     max_tries::Int = 100
 end
@@ -110,4 +112,22 @@ function manypathfinder(mdl::DynamicPPL.Model, ndraws; nruns = 4,
     _run_manypathfinder(mdl; nruns, ndraws, maxiters, kwargs...) |>
     pfs -> _continue_manypathfinder!(pfs, mdl; max_tries, nruns, kwargs...) |>
            pfs -> _get_best_elbo_pathfinder(pfs)
+end
+
+"""
+Apply a `ManyPathfinder` method to a `DynamicPPL.Model` object.
+
+If `prev_result` is a vector of real numbers, then the `ManyPathfinder` method is applied
+with the initial values set to `prev_result`. Otherwise, the `ManyPathfinder` method is run
+with default initial values generated.
+"""
+function _apply_method(
+        method::ManyPathfinder, mdl::DynamicPPL.Model, prev_result = nothing; kwargs...)
+    pf_result = typeof(prev_result) <: Vector{<:Real} ?
+                manypathfinder(
+        mdl, method.ndraws; init = prev_result, nruns = method.nruns,
+        maxiters = method.maxiters, kwargs...) :
+                manypathfinder(
+        mdl, method.ndraws; nruns = method.nruns, maxiters = method.maxiters, kwargs...)
+    return pf_result
 end

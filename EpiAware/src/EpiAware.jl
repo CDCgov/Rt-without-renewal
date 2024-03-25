@@ -34,7 +34,7 @@ An epidemiological model in `EpiAware` consists of composable structs with core 
 module EpiAware
 
 # Non-submodule imports
-using Turing, DocStringExtensions, Reexport
+using Turing, DocStringExtensions, Reexport, DynamicPPL, MCMCChains
 
 # Submodule imports
 include("EpiAwareBase/EpiAwareBase.jl")
@@ -62,10 +62,11 @@ export EpiProblem
 export EpiMethod
 
 #Export functions
-export make_epi_aware
+export make_epi_aware, epi_solve
 
 include("docstrings.jl")
 include("epiawareprob.jl")
 include("make_epi_aware.jl")
+include("epi_solve.jl")
 
 end

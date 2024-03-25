@@ -1,6 +1,6 @@
 @testitem "EpiMethod" begin
     @testset "Constructor" begin
-        struct TestNUTSMethod <: AbstractNUTSMethod
+        struct TestNUTSMethod <: AbstractEpiSamplingMethod
         end
 
         pre_sampler_steps = [ManyPathfinder(), ManyPathfinder()]

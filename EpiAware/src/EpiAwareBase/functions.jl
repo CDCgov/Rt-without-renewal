@@ -17,3 +17,21 @@ function broadcast_n(broadcast_rule::AbstractBroadcastRule, latent, n, period)
     @info "No concrete implementation for broadcast_n is defined."
     return nothing
 end
+
+"""
+Apply the inference/generative method `method` to the `DynamicPPL.Model` object `mdl`.
+
+# Arguments
+- `method::AbstractEpiMethod`: The epidemiological method to apply.
+- `mdl::DynamicPPL.Model`: The model to apply the method to.
+- `prev_result`: The previous result of the method.
+- `kwargs`: Additional keyword arguments passed to the method.
+
+# Returns
+- `nothing`: If no concrete implementation is defined for the given `method`.
+"""
+function _apply_method(method::AbstractEpiMethod, mdl::DynamicPPL.Model, prev_result;
+        kwargs...)
+    @info "No concrete implementation for `_apply_method` is defined."
+    return nothing
+end
