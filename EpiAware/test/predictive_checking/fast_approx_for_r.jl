@@ -46,7 +46,7 @@ using StatsPlots
 # Create a discrete probability mass function (PMF) for a negative binomial distribution
 # with left truncation at 1.
 
-w = create_discrete_pmf(NegativeBinomial(2, 0.5), D = 20.0) |>
+w = censored_pmf(NegativeBinomial(2, 0.5), D = 20.0) |>
     p -> p[2:end] ./ sum(p[2:end])
 
 ##

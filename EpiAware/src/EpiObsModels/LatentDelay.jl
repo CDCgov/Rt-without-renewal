@@ -25,7 +25,7 @@ struct LatentDelay{M <: AbstractObservationModel, T <: AbstractVector{<:Real}} <
 
     function LatentDelay(model::M, distribution::C; D = 15,
             Δd = 1.0) where {M <: AbstractObservationModel, C <: ContinuousDistribution}
-        pmf = create_discrete_pmf(distribution; Δd = Δd, D = D)
+        pmf = censored_pmf(distribution; Δd = Δd, D = D)
         return LatentDelay(model, pmf)
     end
 
