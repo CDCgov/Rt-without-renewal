@@ -2,7 +2,7 @@
 The `BroadcastLatentModel` struct represents a latent model that supports broadcasting of latent periods.
 
 ## Constructors
-- `BroadcastLatentModel(model::M; period::Int, broadcast_rule::B)`: Constructs a `BroadcastLatentModel` with the given `model`, `period`, and `broadcast_rule`.
+- `BroadcastLatentModel(;model::M; period::Int, broadcast_rule::B)`: Constructs a `BroadcastLatentModel` with the given `model`, `period`, and `broadcast_rule`.
 - `BroadcastLatentModel(model::M, period::Int, broadcast_rule::B)`: An alternative constructor that allows the `model`, `period`, and `broadcast_rule` to be specified without keyword arguments.
 
 ## Examples
