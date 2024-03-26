@@ -33,7 +33,7 @@ function NegativeBinomialMeanClust(μ, α)
     _μ = clamp(μ, 1e-6, 1e17)
     _α = clamp(α, 1e-6, Inf)
     ex_σ² = (_α * _μ^2)
-    p = _μ / (_μ + ex_σ²)
-    r = _μ^2 / ex_σ²
+    p = clamp(_μ / (_μ + ex_σ²), 1e-17, 1 - 1e-17)
+    r = clamp(_μ^2 / ex_σ², 1e-17, 1e17)
     return NegativeBinomial(r, p)
 end
