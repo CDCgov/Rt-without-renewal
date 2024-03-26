@@ -13,12 +13,13 @@ struct Scale <: AbstractLatentModel
 end
 
 @model function EpiAware.generate_latent(model::Scale, n::Int)
-    scale ~ filldist(Normal(0.1, 0.001), n)
-    return scale
+    scale = 0.1
+    scale_vect = fill(scale, n)
+    return scale_vect, (; scale = scale)
 end
 
 obs = Ascertainment(NegativeBinomialError(), Scale(), x -> x)
-gen_obs = generate_observations(obs, missing, [1:10])
+gen_obs = generate_observations(obs, missing, fill(100, 10))
 rand(gen_obs)
 ```
 "
@@ -53,6 +54,5 @@ Generates observations based on the `LatentDelay` observation model.
     expected_obs = Y_t .* obs_model.link(expected_obs_mod)
 
     @submodel y_t, obs_aux = generate_observations(obs_model.model, y_t, expected_obs)
-
-    return y_t, (; expected_aux..., obs_aux...)
+    return y_t, (; expected_obs, expected_obs_mod, expected_aux..., obs_aux...)
 end
