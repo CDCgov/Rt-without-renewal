@@ -19,5 +19,5 @@ end
     struct TestObsModel <: EpiAware.EpiAwareBase.AbstractObservationModel
     end
 
-    @test_throws generate_observations(TestObsModel(), missing, missing)
+    @test isnothing(generate_observations(TestObsModel(), missing, missing))
 end
