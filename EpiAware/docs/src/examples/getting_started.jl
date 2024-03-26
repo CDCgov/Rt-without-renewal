@@ -29,6 +29,8 @@ begin
     using LinearAlgebra
     using Transducers
     using ReverseDiff
+
+    Random.seed!(1)
 end
 
 # ╔═╡ 3ebc8384-f73d-4597-83a7-07a3744fed61
@@ -157,9 +159,11 @@ The observation model is a negative binomial distribution parameterised with mea
 ```math
 \sigma_{\text{rel}} =(1/\sqrt{\mu}) + (1 / \sqrt{r}).
 ```
-It is standard to use a half-t distribution for standard deviation priors (e.g. as argued in this [paper](http://www.stat.columbia.edu/~gelman/research/published/taumain.pdf)); we specialise this to a Half-Normal prior and use an _a priori_ assumption that a typical observation fluctuation around the mean (when the mean is $\sim\mathcal{O}(10^2)$) would be 10%. This implies a standard deviation prior,
+It is standard to use a half-t distribution for standard deviation priors (e.g. as argued in this [paper](http://www.stat.columbia.edu/~gelman/research/published/taumain.pdf)); we specialise this to a Half-Normal prior and use an _a priori_ assumption that a typical observation fluctuation around the mean (when the mean is $\sim\mathcal{O}(10^2)$) would be 1%, which is close to Poisson noise.
+
+This implies a standard deviation prior,
 ```math
-1 / \sqrt{r} \sim \text{HalfNormal}\Big(0.1 ~\sqrt{{\pi \over 2}}\Big).
+1 / \sqrt{r} \sim \text{HalfNormal}\Big(0.01 ~\sqrt{{\pi \over 2}}\Big).
 ```
 The $\sqrt{{\pi \over 2}}$ factor ensures the correct prior mean (see [here](https://en.wikipedia.org/wiki/Half-normal_distribution)).
 
@@ -185,7 +189,7 @@ We choose a simple observation model where infections are observed 0, 1, 2, 3 da
 
 # ╔═╡ 448669bc-99f4-4823-b15e-fcc9040ba31b
 obs_model = LatentDelay(
-    NegativeBinomialError(),
+    NegativeBinomialError(cluster_factor_prior = HalfNormal(0.01)),
     fill(0.25, 4)
 )
 
