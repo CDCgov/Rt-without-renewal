@@ -31,10 +31,14 @@ begin
     using ReverseDiff
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     Random.seed!(1)
 =======
     import AdvancedHMC as AHMC
 >>>>>>> 0a2272c (Update getting started to showcase method)
+=======
+    Random.seed!(1)
+>>>>>>> 364b27d (Reduce the variance of sampling noise to check ability of model with safe Neg bin sampling to identify shifting Rt)
 end
 
 # ╔═╡ 3ebc8384-f73d-4597-83a7-07a3744fed61
@@ -210,10 +214,20 @@ md"
 We choose a simple observation model where infections are observed 0, 1, 2, 3 days later with equal probability.
 "
 
+<<<<<<< HEAD
 # ╔═╡ 9926eb3e-ecea-4eb8-9b2c-3b5e3a563723
 md"
 ## `Solution` method
 "
+=======
+# ╔═╡ 448669bc-99f4-4823-b15e-fcc9040ba31b
+obs_model = LatentDelay(
+    NegativeBinomialError(cluster_factor_prior = HalfNormal(0.01)),
+    fill(0.25, 4)
+)
+
+# ╔═╡ 352cc919-e12f-43f4-b2de-dc1f759c377a
+>>>>>>> 364b27d (Reduce the variance of sampling noise to check ability of model with safe Neg bin sampling to identify shifting Rt)
 
 # ╔═╡ e49713e8-4840-4083-8e3f-fc52d791be7b
 md"
