@@ -12,6 +12,14 @@ used in `EpiAware` models.
 """
 abstract type AbstractLatentModel <: AbstractModel end
 
+"""
+An abstract type representing a broadcast rule.
+"""
+abstract type AbstractBroadcastRule end
+
+"""
+A type representing an abstract observation model that is a subtype of `AbstractModel`.
+"""
 abstract type AbstractObservationModel <: AbstractModel end
 
 """
