@@ -29,16 +29,8 @@ begin
     using LinearAlgebra
     using Transducers
     using ReverseDiff
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-    Random.seed!(1)
-=======
     import AdvancedHMC as AHMC
->>>>>>> 0a2272c (Update getting started to showcase method)
-=======
     Random.seed!(1)
->>>>>>> 364b27d (Reduce the variance of sampling noise to check ability of model with safe Neg bin sampling to identify shifting Rt)
 end
 
 # ╔═╡ 3ebc8384-f73d-4597-83a7-07a3744fed61
@@ -47,10 +39,21 @@ md"
 
 This tutorial introduces the basic functionality of `EpiAware`. `EpiAware` is a package for making inferences on epidemiological case/determined infection data using a model-based approach.
 
-## `EpiAware` models
+In this tutorial we consider a time series of case data and make inference on the underlying unobserved infections that generated the case data along with the implied time-varying reproduction number.
+"
+
+# ╔═╡ 5a84e8fd-81ef-4a42-ae26-1b30c8909a63
+md"
+## Overview
 The models we consider are discrete-time $t = 1,\dots, T$ with a latent random process, $Z_t$ generating stochasticity in the number of new infections $I_t$ at each time step. Observations are treated as downstream random variables determined by the actual infections and a model of infection to observation delay.
 
+"
+
+# ╔═╡ 3dc17e20-c9e8-46f2-9c87-b8ebc7c18486
+md"
 #### Mathematical definition
+Let the parameters of the model be ``\theta = (\theta_Z, \theta_I, \theta_O)``, then the overall infection observation process is:
+
 ```math
 \begin{align}
 Z_\cdot &\sim \mathcal{P}(\mathbb{R}^T) | \theta_Z, \\
@@ -59,8 +62,12 @@ I_t &\sim g_I(\{I_s, Z_s\}_{s < t}, \theta_{I}), \\
 y_t &\sim f_O(\{I_s\}_{s \leq t}, \theta_{O}).
 \end{align}
 ```
-Where, $\mathcal{P}(\mathbb{R}^T) | \theta_Z$ is a parametric process on $\mathbb{R}^T$. $f_0$ and $f_O$ are parametric distributions on, respectively, the initial number of infections and the observed case data conditional on underlying infections. $g_I$ is distribution of new infections conditional on infections and latent process in the past. Note that we assume that new infections are conditional on the strict past, whereas new observations can depend on infections on the same time step.
 
+Where $\mathcal{P}(\mathbb{R}^T) | \theta_Z$ is a parametric process on $\mathbb{R}^T$. $f_0$ and $f_O$ are parametric distributions on, respectively, the initial number of infections and the observed case data conditional on underlying infections. $g_I$ is distribution of new infections conditional on infections and latent process in the past. Note that we assume that new infections are conditional on the strict past, whereas new observations can depend on infections on the same time step.
+"
+
+# ╔═╡ 0eb5dcf0-8fba-437f-8947-d73c4b2f47f0
+md"
 #### Code structure outline
 
 An `EpiAware` model in code is created from three modular components:
@@ -69,14 +76,15 @@ An `EpiAware` model in code is created from three modular components:
 - An `EpiModel`: This defines a generative process for infections conditional on the latent process. This chooses $f_0(\theta_I)$, and $g_I(\{I_s, Z_s\}_{s < t}, \theta_{I})$.
 - An `ObservationModel`: This defines the observation model. This chooses $f_O({I_s}_{s \leq t}, \theta_{O})$
 
-#### Reproductive number
-`EpiAware` models do not need to specify a time-varying reproductive number $\mathcal{R}_t$ to generate $I_\cdot$, however, this is often a quantity of interest. When not directly used we will typically back-calculate $\mathcal{R}_t$ from the generated infections:
-
-```math
-\mathcal{R}_t = {I_t \over \sum_{s \geq 1} g_s I_{t-s} }.
+We can bundle these three modular components into an `EpiProblem` struct along with a `tspan` field that defines how long the process last for. In this case,
+```julia
+tspan = (1, T)
 ```
+"
 
-Where $g_s$ is a discrete generation interval. For this reason, even when not using a reproductive number approach directly, we ask for a generation interval.
+# ╔═╡ 9c5453f5-f98d-4cd4-b50b-95af0b82fd0d
+md"
+## Model definition
 "
 
 # ╔═╡ 5a0d5ab8-e985-4126-a1ac-58fe08beee38
@@ -185,7 +193,12 @@ y_t \sim \text{NegBinomial}\Big(\mu = \sum_{s\geq 0} K[t, t-s] I(s), r\Big). \\
 
 # ╔═╡ 448669bc-99f4-4823-b15e-fcc9040ba31b
 obs_model = LatentDelay(
+<<<<<<< HEAD
     NegativeBinomialError(cluster_factor_prior = HalfNormal(0.01)),
+=======
+    NegativeBinomialError(cluster_factor_prior = truncated(
+        Normal(0.0, 0.01 * sqrt(π / 2)), 0.0, 0.1)),
+>>>>>>> 75048aa (change getting started to have near Poisson obs)
     fill(0.25, 4)
 )
 
@@ -199,7 +212,7 @@ md"
 epi_prob = EpiProblem(epi_model = epi_model,
     latent_model = rwp,
     observation_model = obs_model,
-    tspan = (1, 60))
+    tspan = (1, 100))
 
 # ╔═╡ e813d547-6100-4c43-b84c-8cebe306bda8
 md"
@@ -309,6 +322,12 @@ let
     scatter!(generated_obs, lab = "generated cases")
 end
 
+# ╔═╡ 4e26d535-00a6-4541-984c-3887cac35291
+inference_epi_solve_mdl = make_epi_aware(generated_obs, time_horizon;
+    epi_model = epi_model,
+    latent_model = rwp,
+    observation_model = obs_model)
+
 # ╔═╡ b5bc8f05-b538-4abf-aa84-450bf2dff3d9
 md"
 ## Inference
@@ -345,7 +364,7 @@ num_threads = Threads.nthreads()
 
 # ╔═╡ 35b8f89b-683f-469d-b638-e7b0e2d8cdf1
 sampling_method = EpiMethod(
-    pre_sampler_steps = [ManyPathfinder(nruns = 20)],
+    pre_sampler_steps = [ManyPathfinder(nruns = 20, maxiters = 100)],
     sampler = NUTSampler(adtype = AutoReverseDiff(true),
         ndraws = 1000,
         nchains = num_threads,
@@ -446,7 +465,13 @@ end
 md"
 ## Reproductive number back-calculation
 
-As mentioned at the top, we _don't_ directly use the concept of reproductive numbers in this note. However, we can back-calculate the implied $\mathcal{R}(t)$ values, conditional on the specified generation interval being correct.
+`EpiAware` models do not need to specify a time-varying reproductive number $\mathcal{R}_t$ to generate $I_\cdot$, however, this is often a quantity of interest. When not directly used we will typically back-calculate $\mathcal{R}_t$ from the generated infections:
+
+```math
+\mathcal{R}_t = {I_t \over \sum_{s \geq 1} g_s I_{t-s} }.
+```
+
+Where $g_s$ is a discrete generation interval. For this reason, even when not using a reproductive number approach directly, we ask for a generation interval.
 
 Here we spaghetti plot posterior sampled time-varying reproductive numbers against the actual.
 "
@@ -480,17 +505,21 @@ end
 # ╔═╡ Cell order:
 # ╟─c593a2a0-d7f5-11ee-0931-d9f65ae84a72
 # ╟─3ebc8384-f73d-4597-83a7-07a3744fed61
+# ╟─5a84e8fd-81ef-4a42-ae26-1b30c8909a63
+# ╟─3dc17e20-c9e8-46f2-9c87-b8ebc7c18486
+# ╟─0eb5dcf0-8fba-437f-8947-d73c4b2f47f0
+# ╠═9c5453f5-f98d-4cd4-b50b-95af0b82fd0d
 # ╠═da479d8d-1312-4b98-b0af-5be52dffaf3f
-# ╟─5a0d5ab8-e985-4126-a1ac-58fe08beee38
-# ╠═56ae496b-0094-460b-89cb-526627991717
 # ╟─767beffd-1ef5-4e6c-9ac6-edb52e60fb44
-# ╠═9e43cbe3-94de-44fc-a788-b9c7adb34218
 # ╟─f067284f-a1a6-44a6-9b79-f8c2de447673
+# ╠═9e43cbe3-94de-44fc-a788-b9c7adb34218
 # ╠═c0662d48-4b54-4b6d-8c91-ddf4b0e3aa43
-# ╟─fd72094f-1b95-4d07-a8b0-ef47dc560dfc
 # ╠═6639e66f-7725-4976-81b2-6472419d1a62
-# ╟─df5e59f8-3185-4bed-9cca-7c266df17cec
 # ╠═6fbdd8e6-2323-4352-9185-1f31a9cf9012
+# ╠═5a0d5ab8-e985-4126-a1ac-58fe08beee38
+# ╠═56ae496b-0094-460b-89cb-526627991717
+# ╟─fd72094f-1b95-4d07-a8b0-ef47dc560dfc
+# ╟─df5e59f8-3185-4bed-9cca-7c266df17cec
 # ╠═10c750db-6d00-4ef6-9caa-3cf7b3c0d711
 # ╠═45b287b8-22b5-4f09-9a93-51df82477b01
 # ╟─5e62a50a-71f4-4902-b1c9-fdf51fe145fa
@@ -516,6 +545,7 @@ end
 # ╠═d073e63b-62da-4743-ace0-78ef7806bc0b
 # ╠═a04f3c1b-7e11-4800-9c2a-9fc0021de6e7
 # ╠═f68b4e41-ac5c-42cd-a8c2-8761d66f7543
+# ╠═4e26d535-00a6-4541-984c-3887cac35291
 # ╟─b5bc8f05-b538-4abf-aa84-450bf2dff3d9
 # ╟─4a4c6e91-8d8f-4bbf-bb7e-a36dc281e312
 # ╠═525aa98c-d0e5-4ffa-b808-d90fc986204c
@@ -531,5 +561,5 @@ end
 # ╠═e9df22b8-8e4d-4ab7-91ea-c01f2239b3e5
 # ╟─fd6321b1-4c3a-4123-b0dc-c45b951e0b80
 # ╠═10d8fe24-83a6-47ac-97b7-a374481473d3
-# ╟─81efe8ca-b753-4a12-bafc-a887a999377b
+# ╠═81efe8ca-b753-4a12-bafc-a887a999377b
 # ╠═15b9f37f-8d5f-460d-8c28-d7f2271fd099
