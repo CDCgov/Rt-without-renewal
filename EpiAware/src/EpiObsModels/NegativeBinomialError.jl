@@ -22,7 +22,7 @@ struct NegativeBinomialError{S <: Sampleable, T <: AbstractFloat} <:
     pos_shift::T
 
     function NegativeBinomialError(;
-            cluster_factor_prior::Distribution = HalfNormal(0.1),
+            cluster_factor_prior::Distribution = HalfNormal(0.001),
             pos_shift::AbstractFloat = 1e-6)
         new{typeof(cluster_factor_prior), typeof(pos_shift)}(
             cluster_factor_prior, pos_shift)
