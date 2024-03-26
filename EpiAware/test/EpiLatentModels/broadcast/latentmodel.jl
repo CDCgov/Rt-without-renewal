@@ -1,10 +1,22 @@
 @testitem "BroadcastLatentModel constructor" begin
     model = RandomWalk()
-    broadcast_model = BroadcastLatentModel(model, 7, RepeatEach())
-    @test typeof(broadcast_model) <: BroadcastLatentModel
-    @test typeof(broadcast_model.model) <: RandomWalk
-    @test broadcast_model.period == 7
-    @test broadcast_model.broadcast_rule == RepeatEach()
+    @testset "Testing BroadcastLatentModel properties" begin
+        broadcast_model = BroadcastLatentModel(model, 7, RepeatEach())
+        @test typeof(broadcast_model) <: BroadcastLatentModel
+        @test typeof(broadcast_model.model) <: RandomWalk
+        @test broadcast_model.period == 7
+        @test broadcast_model.broadcast_rule == RepeatEach()
+    end
+
+    @testset "Testing BroadcastLatentModel properties with default values" begin
+        broadcast_model = BroadcastLatentModel(
+            model, period = 7, broadcast_rule = RepeatEach())
+        @test typeof(broadcast_model) <: BroadcastLatentModel
+        @test typeof(broadcast_model.model) <: RandomWalk
+        @test broadcast_model.period == 7
+        @test broadcast_model.model == model
+        @test broadcast_model.broadcast_rule == RepeatEach()
+    end
 end
 
 @testitem "generate_latent function with BroadcastLatentModel" begin
