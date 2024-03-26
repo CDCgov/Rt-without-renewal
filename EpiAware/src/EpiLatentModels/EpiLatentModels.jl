@@ -3,7 +3,6 @@ Module for defining latent models.
 """
 module EpiLatentModels
 
-using Base: AbstractBroadcasted
 using ..EpiAwareBase
 
 using ..EpiAwareUtils: HalfNormal
