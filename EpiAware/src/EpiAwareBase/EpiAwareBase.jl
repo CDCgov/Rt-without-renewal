@@ -9,10 +9,10 @@ using DocStringExtensions, DynamicPPL
 export AbstractModel, AbstractEpiModel, AbstractLatentModel, AbstractObservationModel
 
 #Export problems
-export AbstractEpiProblem
+export AbstractEpiProblem, EpiAwareProblem
 
 #Export inference methods
-export AbstractEpiMethod, AbstractEpiOptMethod, AbstractEpiSamplingMethod
+export AbstractEpiMethod, AbstractEpiOptMethod, AbstractEpiSamplingMethod, EpiMethod
 
 # Export support types
 export AbstractBroadcastRule
@@ -26,5 +26,6 @@ include("docstrings.jl")
 include("types.jl")
 include("functions.jl")
 include("generate_models.jl")
+include("EpiAwareProblem.jl")
 
 end

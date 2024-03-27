@@ -55,12 +55,6 @@ include("EpiObsModels/EpiObsModels.jl")
 include("EpiInference/EpiInference.jl")
 @reexport using .EpiInference
 
-#Export problems
-export EpiProblem
-
-#Export inference methods
-export EpiMethod
-
 #Export functions
 export make_epi_aware, epi_solve
 
