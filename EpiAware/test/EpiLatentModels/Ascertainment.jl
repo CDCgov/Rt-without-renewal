@@ -8,10 +8,15 @@
         scale_vect = fill(scale, n)
         return scale_vect, (; scale = scale)
     end
-    asc = Ascertainment(NegativeBinomialError(), Scale(), x -> x)
+
+    function natural(x)
+        return x
+    end
+
+    asc = Ascertainment(NegativeBinomialError(), Scale(), natural)
     @test asc.model == NegativeBinomialError()
     @test asc.latentmodel == Scale()
-    @test asc.link == x -> x
+    @test asc.link == natural
 end
 
 # make a test based on above example
