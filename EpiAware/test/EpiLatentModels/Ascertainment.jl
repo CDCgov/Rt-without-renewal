@@ -17,8 +17,7 @@ end
 # make a test based on above example
 @testitem "Test Ascertainment generate_observations" begin
     using Turing, DynamicPPL
-    struct Scale <: AbstractLatentModel
-    end
+    struct Scale <: AbstractLatentModel end
 
     @model function EpiAware.generate_latent(model::Scale, n::Int)
         scale = 0.1
@@ -27,4 +26,9 @@ end
     end
     obs = Ascertainment(NegativeBinomialError(), Scale(), x -> x)
     gen_obs = generate_observations(obs, missing, fill(100, 10))
+    samples = sample(gen_obs, Prior(), 100; progress = false)
+    gen = mapreduce(vcat, generated_quantities(gen_obs, samples)) do gen
+        gen[2][:expected_obs]
+    end
+    @test all(gen .== 10.0)
 end
