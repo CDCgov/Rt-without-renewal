@@ -14,11 +14,18 @@ export AbstractEpiProblem
 #Export inference methods
 export AbstractEpiMethod, AbstractEpiOptMethod, AbstractEpiSamplingMethod
 
-#Export functions
+# Export support types
+export AbstractBroadcastRule
+
+#Export generating functions
 export generate_latent, generate_latent_infs, generate_observations
+
+#Export support functions
+export broadcast_rule, broadcast_n
 
 include("docstrings.jl")
 include("types.jl")
 include("functions.jl")
+include("generate_models.jl")
 
 end
