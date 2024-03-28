@@ -3,6 +3,7 @@ A variational inference method that runs `manypathfinder`.
 "
 @kwdef struct ManyPathfinder <: AbstractEpiOptMethod
     "Number of draws per pathfinder run."
+    using Core: _apply
     ndraws::Int = 10
     "Number of many pathfinder runs."
     nruns::Int = 4
@@ -20,13 +21,16 @@ with the initial values set to `prev_result`. Otherwise, the `ManyPathfinder` me
 with default initial values generated.
 "
 function EpiAwareBase.apply_method(
-        model::DynamicPPL.Model, method::ManyPathfinder, prev_result::nothing; kwargs...)
-    manypathfinder(
-        model, method.ndraws; nruns = method.nruns, maxiters = method.maxiters, kwargs...)
+        model::Model, method::ManyPathfinder, prev_result; kwargs...)
+    _apply_pathfinder(model, method, prev_result; kwargs...)
 end
 
-function EpiAwareBase.apply_method(
-        model::DynamicPPL.Model, method::ManyPathfinder, prev_result::Vector{<:Real}; kwargs...)
+function _apply_pathfinder(model, method, prev_result; kwargs...)
+    manypathfinder(model, method.ndraws; nruns = method.nruns,
+        maxiters = method.maxiters, kwargs...)
+end
+
+function _apply_pathfinder(model, method, prev_result::Vector{<:Real}; kwargs...)
     manypathfinder(model, method.ndraws; init = prev_result,
         nruns = method.nruns, maxiters = method.maxiters, kwargs...)
 end

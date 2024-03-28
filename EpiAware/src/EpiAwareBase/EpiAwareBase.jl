@@ -21,7 +21,7 @@ export AbstractEpiMethod, AbstractEpiOptMethod, AbstractEpiSamplingMethod
 
 ### Structs ###
 
-export EpiProblem
+export EpiProblem, EpiMethod
 
 ### Functions ###
 
@@ -29,7 +29,7 @@ export EpiProblem
 export generate_latent, generate_latent_infs, generate_observations
 
 # Export support functions
-export broadcast_rule, broadcast_n
+export broadcast_rule, broadcast_n, generate_observables
 
 # Export methods functions
 export apply_method

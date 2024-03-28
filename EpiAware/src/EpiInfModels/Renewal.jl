@@ -111,7 +111,7 @@ function (epi_model::Renewal)(recent_incidence, Rt)
         new_incidence)
 end
 
-"""
+@doc raw"
 Implement the `generate_latent_infs` function for the `Renewal` model.
 
 ## Example usage with `Renewal` type of model for unobserved infection process
@@ -155,7 +155,7 @@ unobserved infections.
 #Get unobserved infections as a generated quantities from the model
 I_t = generated_quantities(latent_inf, θ)
 ```
-"""
+"
 @model function EpiAwareBase.generate_latent_infs(epi_model::Renewal, _Rt)
     init_incidence ~ epi_model.initialisation_prior
     I₀ = epi_model.data.transformation(init_incidence)

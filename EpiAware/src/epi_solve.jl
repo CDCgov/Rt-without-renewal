@@ -32,19 +32,3 @@ function apply_method(epiproblem::EpiProblem, method::AbstractEpiMethod, data;
     # Run the inference and return observables
     apply_method(_model, method; kwargs...)
 end
-
-function apply_method(momdel::DynamicPPL.Model, method::AbstractEpiMethod; kwargs...)
-    # Run the inference
-    sol = _apply_method(method, mdl, nothing; kwargs...)
-    obs = generate_observables(mdl, sol)
-    merge(obs, (model = mdl,))
-end
-
-"""
-Generate observables from a given model and solution including generated quantities.
-"""
-function generate_observables(
-        model::DynamicPPL.Model, solution::Union{MCMCChains.Chains, NamedTuple})
-    gens = Turing.generated_quantities(model, solution)
-    (samples = solution, gens = gens)
-end

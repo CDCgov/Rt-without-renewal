@@ -14,11 +14,11 @@ end
 Implements direct sampling from a `Turing` model.
 "
 function EpiAwareBase.apply_method(
-        model::DynamicPPL.Model, method::DirectSample, prev_result = nothing; kwargs...)
-        _apply_direct_sample(model, method, method.n_samples)
+        model::Model, method::DirectSample, prev_result = nothing; kwargs...)
+    _apply_direct_sample(model, method, method.n_samples)
 end
 
-@doc raw "
+@doc raw"
 Sample the model directly using `Turing.Prior()` and a `NamedTuple` of the
 sampled random variables along with generated quantities.
 "
@@ -27,7 +27,7 @@ function _apply_direct_sample(model, method, n_samples::Vector{<:Real})
     return generate_observables(model, solution)
 end
 
-@doc raw "
+@doc raw"
 Sample the model directly using rand and return a single set of sampled random variables.
 "
 function _apply_direct_sample(model, method, n_samples::Nothing)

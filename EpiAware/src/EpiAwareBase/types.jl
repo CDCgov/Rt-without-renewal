@@ -33,13 +33,12 @@ Abstract supertype for all `EpiAware` inference/generative modelling methods.
 abstract type AbstractEpiMethod end
 
 """
-Abstract supertype for infence/generative methods that are based on optimization, e.g. MAP
-estimation or variational inference.
+Abstract supertype for infence/generative methods that are based on optimization, e.g. MAP estimation or variational inference.
 """
 abstract type AbstractEpiOptMethod <: AbstractEpiMethod end
 
 """
-Abstract supertype for infence/generative methods that are based on sampling from the
-posterior distribution, e.g. NUTS.
+Abstract supertype for infence/generative methods that are based on sampling
+from the posterior distribution, e.g. NUTS.
 """
 abstract type AbstractEpiSamplingMethod <: AbstractEpiMethod end

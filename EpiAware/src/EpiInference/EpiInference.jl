@@ -17,7 +17,6 @@ export ManyPathfinder, NUTSampler
 export manypathfinder
 
 include("docstrings.jl")
-include("EpiMethod.jl")
 include("ManyPathfinder.jl")
 include("NUTSampler.jl")
 
