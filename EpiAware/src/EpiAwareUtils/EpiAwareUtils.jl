@@ -21,6 +21,8 @@ include("docstrings.jl")
 include("censored_pmf.jl")
 include("HalfNormal.jl")
 include("scan.jl")
+include("DirectSample.jl")
+include("apply_method.jl")
 include("post-inference.jl")
 
 end

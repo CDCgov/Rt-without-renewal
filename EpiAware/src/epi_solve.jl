@@ -17,23 +17,23 @@ Run the `EpiAware` algorithm to estimate the parameters of an epidemiological mo
     `model` field with the model used. Optionally, a `gens` field with the
         generated quantities from the model if that makes sense with the inference method.
 """
-function epi_solve(epiproblem::EpiProblem, method::AbstractEpiMethod, data;
+function apply_method(epiproblem::EpiProblem, method::AbstractEpiMethod, data;
         fix_parameters::NamedTuple = NamedTuple(),
         condition_parameters::NamedTuple = NamedTuple(),
         kwargs...)
 
     # Create the model
-    mdl = make_epi_aware(epiproblem, data)
+    model = make_epi_aware(epiproblem, data)
 
     # Fix and condition the model
-    _mdl = fix(mdl, fix_parameters)
-    _mdl = condition(_mdl, condition_parameters)
+    _model = fix(model, fix_parameters)
+    _model = condition(_model, condition_parameters)
 
     # Run the inference and return observables
-    epi_solve(_mdl, method; kwargs...)
+    apply_method(_model, method; kwargs...)
 end
 
-function epi_solve(mdl::DynamicPPL.Model, method::AbstractEpiMethod; kwargs...)
+function apply_method(momdel::DynamicPPL.Model, method::AbstractEpiMethod; kwargs...)
     # Run the inference
     sol = _apply_method(method, mdl, nothing; kwargs...)
     obs = generate_observables(mdl, sol)
@@ -41,17 +41,10 @@ function epi_solve(mdl::DynamicPPL.Model, method::AbstractEpiMethod; kwargs...)
 end
 
 """
-Generate observables from a given model and solution default to just returning the solution.
-"""
-function generate_observables(mdl::DynamicPPL.Model, sol)
-    (samples = sol,)
-end
-
-"""
 Generate observables from a given model and solution including generated quantities.
 """
 function generate_observables(
-        mdl::DynamicPPL.Model, sol::Union{MCMCChains.Chains, NamedTuple})
-    gens = Turing.generated_quantities(mdl, sol)
-    (samples = sol, gens = gens)
+        model::DynamicPPL.Model, solution::Union{MCMCChains.Chains, NamedTuple})
+    gens = Turing.generated_quantities(model, solution)
+    (samples = solution, gens = gens)
 end

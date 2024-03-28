@@ -4,7 +4,6 @@ Module for defining epidemiological models.
 module EpiInfModels
 
 using ..EpiAwareBase
-import ..EpiAwareBase: _apply_method
 
 using ..EpiAwareUtils: scan, censored_pmf
 
@@ -25,6 +24,5 @@ include("directinfections.jl")
 include("expgrowthrate.jl")
 include("renewal.jl")
 include("utils.jl")
-include("directsample.jl")
 
 end

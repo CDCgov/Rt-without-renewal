@@ -12,8 +12,8 @@ end
 """
 Implements direct sampling from a `Turing` model.
 """
-function _apply_method(
-        method::DirectSample, mdl::DynamicPPL.Model, prev_result = nothing; kwargs...)
+function EpiAwareBase.apply_method(
+        model::DynamicPPL.Model, method::DirectSample, prev_result = nothing; kwargs...)
     if method.n_samples === nothing
         return rand(mdl)
     else

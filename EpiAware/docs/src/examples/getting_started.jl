@@ -29,7 +29,6 @@ begin
     using LinearAlgebra
     using Transducers
     using ReverseDiff
-    import AdvancedHMC as AHMC
     Random.seed!(1)
 end
 
@@ -193,12 +192,7 @@ y_t \sim \text{NegBinomial}\Big(\mu = \sum_{s\geq 0} K[t, t-s] I(s), r\Big). \\
 
 # ╔═╡ 448669bc-99f4-4823-b15e-fcc9040ba31b
 obs_model = LatentDelay(
-<<<<<<< HEAD
     NegativeBinomialError(cluster_factor_prior = HalfNormal(0.01)),
-=======
-    NegativeBinomialError(cluster_factor_prior = truncated(
-        Normal(0.0, 0.01 * sqrt(π / 2)), 0.0, 0.1)),
->>>>>>> 75048aa (change getting started to have near Poisson obs)
     fill(0.25, 4)
 )
 
@@ -227,20 +221,10 @@ md"
 We choose a simple observation model where infections are observed 0, 1, 2, 3 days later with equal probability.
 "
 
-<<<<<<< HEAD
 # ╔═╡ 9926eb3e-ecea-4eb8-9b2c-3b5e3a563723
 md"
 ## `Solution` method
 "
-=======
-# ╔═╡ 448669bc-99f4-4823-b15e-fcc9040ba31b
-obs_model = LatentDelay(
-    NegativeBinomialError(cluster_factor_prior = HalfNormal(0.01)),
-    fill(0.25, 4)
-)
-
-# ╔═╡ 352cc919-e12f-43f4-b2de-dc1f759c377a
->>>>>>> 364b27d (Reduce the variance of sampling noise to check ability of model with safe Neg bin sampling to identify shifting Rt)
 
 # ╔═╡ e49713e8-4840-4083-8e3f-fc52d791be7b
 md"

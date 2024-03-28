@@ -1,6 +1,6 @@
-"""
+@doc raw"
 A variational inference method that runs `manypathfinder`.
-"""
+"
 @kwdef struct ManyPathfinder <: AbstractEpiOptMethod
     "Number of draws per pathfinder run."
     ndraws::Int = 10
@@ -10,6 +10,49 @@ A variational inference method that runs `manypathfinder`.
     maxiters::Int = 100
     "Maximum number of tries if all runs fail."
     max_tries::Int = 100
+end
+
+@doc raw"
+Apply a `ManyPathfinder` method to a `DynamicPPL.Model` object.
+
+If `prev_result` is a vector of real numbers, then the `ManyPathfinder` method is applied
+with the initial values set to `prev_result`. Otherwise, the `ManyPathfinder` method is run
+with default initial values generated.
+"
+function EpiAwareBase.apply_method(
+        model::DynamicPPL.Model, method::ManyPathfinder, prev_result::nothing; kwargs...)
+    manypathfinder(
+        model, method.ndraws; nruns = method.nruns, maxiters = method.maxiters, kwargs...)
+end
+
+function EpiAwareBase.apply_method(
+        model::DynamicPPL.Model, method::ManyPathfinder, prev_result::Vector{<:Real}; kwargs...)
+    manypathfinder(model, method.ndraws; init = prev_result,
+        nruns = method.nruns, maxiters = method.maxiters, kwargs...)
+end
+
+@doc raw"
+Run multiple instances of the pathfinder algorithm and returns the pathfinder run with the
+largest ELBO estimate.
+
+## Arguments
+- `mdl::DynamicPPL.Model`: The model to perform inference on.
+- `nruns::Int`: The number of pathfinder runs to perform.
+- `ndraws::Int`: The number of draws per pathfinder run, readjusted to be at least as large
+    as the number of chains.
+- `nchains::Int`: The number of chains that will be initialised by pathfinder draws.
+- `maxiters::Int`: The maximum number of optimizer iterations per pathfinder run.
+- `max_tries::Int`: The maximum number of extra tries to find a valid pathfinder result.
+- `kwargs...`: Additional keyword arguments passed to `pathfinder`.
+
+## Returns
+- `best_pfs::PathfinderResult`: Best pathfinder result by estimated ELBO.
+"
+function manypathfinder(mdl::DynamicPPL.Model, ndraws; nruns = 4,
+        maxiters = 50, max_tries = 100, kwargs...)
+    _run_manypathfinder(mdl; nruns, ndraws, maxiters, kwargs...) |>
+    pfs -> _continue_manypathfinder!(pfs, mdl; max_tries, nruns, kwargs...) |>
+           pfs -> _get_best_elbo_pathfinder(pfs)
 end
 
 """
@@ -88,46 +131,4 @@ function _get_best_elbo_pathfinder(pfs)
     end
     _, choice_of_pf = findmax(elbos)
     return pfs[choice_of_pf]
-end
-
-"""
-Run multiple instances of the pathfinder algorithm and returns the pathfinder run with the
-largest ELBO estimate.
-
-## Arguments
-- `mdl::DynamicPPL.Model`: The model to perform inference on.
-- `nruns::Int`: The number of pathfinder runs to perform.
-- `ndraws::Int`: The number of draws per pathfinder run, readjusted to be at least as large
-    as the number of chains.
-- `nchains::Int`: The number of chains that will be initialised by pathfinder draws.
-- `maxiters::Int`: The maximum number of optimizer iterations per pathfinder run.
-- `max_tries::Int`: The maximum number of extra tries to find a valid pathfinder result.
-- `kwargs...`: Additional keyword arguments passed to `pathfinder`.
-
-## Returns
-- `best_pfs::PathfinderResult`: Best pathfinder result by estimated ELBO.
-"""
-function manypathfinder(mdl::DynamicPPL.Model, ndraws; nruns = 4,
-        maxiters = 50, max_tries = 100, kwargs...)
-    _run_manypathfinder(mdl; nruns, ndraws, maxiters, kwargs...) |>
-    pfs -> _continue_manypathfinder!(pfs, mdl; max_tries, nruns, kwargs...) |>
-           pfs -> _get_best_elbo_pathfinder(pfs)
-end
-
-"""
-Apply a `ManyPathfinder` method to a `DynamicPPL.Model` object.
-
-If `prev_result` is a vector of real numbers, then the `ManyPathfinder` method is applied
-with the initial values set to `prev_result`. Otherwise, the `ManyPathfinder` method is run
-with default initial values generated.
-"""
-function _apply_method(
-        method::ManyPathfinder, mdl::DynamicPPL.Model, prev_result = nothing; kwargs...)
-    pf_result = typeof(prev_result) <: Vector{<:Real} ?
-                manypathfinder(
-        mdl, method.ndraws; init = prev_result, nruns = method.nruns,
-        maxiters = method.maxiters, kwargs...) :
-                manypathfinder(
-        mdl, method.ndraws; nruns = method.nruns, maxiters = method.maxiters, kwargs...)
-    return pf_result
 end

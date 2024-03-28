@@ -22,15 +22,15 @@ end
 Apply the inference/generative method `method` to the `DynamicPPL.Model` object `mdl`.
 
 # Arguments
-- `method::AbstractEpiMethod`: The epidemiological method to apply.
 - `model`: The model to apply the method to.
+- `method::AbstractEpiMethod`: The epidemiological method to apply.
 - `prev_result`: The previous result of the method.
 - `kwargs`: Additional keyword arguments passed to the method.
 
 # Returns
 - `nothing`: If no concrete implementation is defined for the given `method`.
 """
-function apply_method(method::AbstractEpiMethod, model, prev_result;
+function apply_method(model, method::AbstractEpiMethod, prev_result;
         kwargs...)
     @info "No concrete implementation for `_apply_method` is defined."
     return nothing
