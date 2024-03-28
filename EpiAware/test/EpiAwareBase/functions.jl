@@ -12,8 +12,8 @@ end
     @test isnothing(broadcast_rule(TestBroadcastModel(), missing, missing))
 end
 
-@testitem "_apply_method function: default" begin
-    using Turing
+@testitem "apply_method function: default" begin
+    using Turing, Distributions
     struct TestEpiMethod <: EpiAware.EpiAwareBase.AbstractEpiMethod
     end
 
@@ -23,5 +23,5 @@ end
 
     mdl = test_mdl()
 
-    @test isnothing(_apply_method(TestEpiMethod(), mdl, nothing))
+    @test isnothing(apply_method(mdl, TestEpiMethod()))
 end
