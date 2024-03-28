@@ -21,7 +21,7 @@ export AbstractEpiMethod, AbstractEpiOptMethod, AbstractEpiSamplingMethod
 
 ### Structs ###
 
-export EpiProblem, EpiMethod
+export EpiProblem
 
 ### Functions ###
 

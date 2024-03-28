@@ -35,3 +35,10 @@ function apply_method(model, method::AbstractEpiMethod, prev_result;
     @info "No concrete implementation for `_apply_method` is defined."
     return nothing
 end
+
+"""
+Generate observables from a given model and solution default to just returning the solution.
+"""
+function generate_observables(model, solution)
+    (samples = solution,)
+end

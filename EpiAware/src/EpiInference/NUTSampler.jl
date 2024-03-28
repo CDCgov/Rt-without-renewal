@@ -1,9 +1,8 @@
-"""
+@doc raw"
 A NUTS method for sampling from a `DynamicPPL.Model` object.
 
-The `NUTSampler` struct represents using the No-U-Turn Sampler (NUTS) to sample from the
-distribution defined by a `DynamicPPL.Model`.
-"""
+The `NUTSampler` struct represents using the No-U-Turn Sampler (NUTS) to sample from the distribution defined by a `DynamicPPL.Model`.
+"
 @kwdef struct NUTSampler{
     A <: AbstractADType, E <: AbstractMCMCEnsemble, M} <:
               AbstractEpiSamplingMethod
@@ -27,20 +26,20 @@ distribution defined by a `DynamicPPL.Model`.
     metricT::M = DiagEuclideanMetric
 end
 
-"""
+@doc raw"
 Apply NUTS sampling to a `DynamicPPL.Model` object with `prev_result` representing any
 initial results to use for sampler initialisation.
-"""
-function _apply_method(
-        method::NUTSampler, mdl::DynamicPPL.Model, prev_result = nothing; kwargs...)
-    _apply_nuts(method, mdl, prev_result; kwargs...)
+"
+function EpiAwareBase.apply_method(
+    mdl::DynamicPPL.Model, method::NUTSampler, prev_result = nothing; kwargs...)
+    _apply_nuts(model, method, prev_result; kwargs...)
 end
 
-"""
+@doc raw"
 No initialisation NUTS.
-"""
-function _apply_nuts(method, mdl, prev_result; kwargs...)
-    sample(mdl,
+"
+function _apply_nuts(model, method, prev_result; kwargs...)
+    sample(model,
         Turing.NUTS(
             method.target_acceptance;
             adtype = method.adtype,
@@ -58,11 +57,11 @@ end
 """
 Initialise NUTS with initial parameters from a Pathfinder result.
 """
-function _apply_nuts(method, mdl, prev_result::PathfinderResult; kwargs...)
+function _apply_nuts(model, method, prev_result::PathfinderResult; kwargs...)
     init_params = collect.(eachrow(prev_result.draws_transformed.value[
         1:(method.nchains), :, 1]))
 
-    sample(mdl,
+    sample(model,
         Turing.NUTS(method.target_acceptance;
             adtype = method.adtype,
             metricT = method.metricT),
