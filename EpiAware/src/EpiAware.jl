@@ -59,8 +59,7 @@ include("EpiInference/EpiInference.jl")
 export make_epi_aware, epi_solve
 
 include("docstrings.jl")
-include("epiawareprob.jl")
 include("make_epi_aware.jl")
-include("epi_solve.jl")
+include("apply_method.jl")
 
 end
