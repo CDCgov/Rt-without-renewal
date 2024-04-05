@@ -31,7 +31,7 @@ Apply NUTS sampling to a `DynamicPPL.Model` object with `prev_result` representi
 initial results to use for sampler initialisation.
 "
 function EpiAwareBase.apply_method(
-        mdl::DynamicPPL.Model, method::NUTSampler, prev_result = nothing; kwargs...)
+        model::DynamicPPL.Model, method::NUTSampler, prev_result = nothing; kwargs...)
     _apply_nuts(model, method, prev_result; kwargs...)
 end
 
