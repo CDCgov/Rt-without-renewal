@@ -15,9 +15,6 @@ export EpiData, DirectInfections, ExpGrowthRate, Renewal
 #Export functions
 export R_to_r, r_to_R
 
-#Export methods
-export DirectSample
-
 include("docstrings.jl")
 include("EpiData.jl")
 include("DirectInfections.jl")

@@ -30,9 +30,9 @@ Apply the inference/generative method `method` to the `DynamicPPL.Model` object 
 # Returns
 - `nothing`: If no concrete implementation is defined for the given `method`.
 """
-function apply_method(model, method::AbstractEpiMethod, prev_result;
+function apply_method(model, method::AbstractEpiMethod, prev_result = nothing;
         kwargs...)
-    @info "No concrete implementation for `_apply_method` is defined."
+    @info "No concrete implementation for `apply_method` is defined."
     return nothing
 end
 

@@ -56,7 +56,7 @@ include("EpiInference/EpiInference.jl")
 @reexport using .EpiInference
 
 #Export functions
-export make_epi_aware, epi_solve
+export make_epi_aware
 
 include("docstrings.jl")
 include("make_epi_aware.jl")

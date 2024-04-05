@@ -18,7 +18,7 @@
     end
 end
 
-@testitem "Test case: check _apply_method" begin
+@testitem "Test case: check apply_method" begin
     using Turing, Suppressor, HypothesisTests
 
     @model function basic_normal()
@@ -35,7 +35,7 @@ end
 
     #Test that does good job finding simple distribution
     @suppress begin
-        best_pf = _apply_method(method, mdl)
+        best_pf = apply_method(mdl, method)
         pathfinder_samples = best_pf.draws |> vec
         ks_test_pval = ExactOneSampleKSTest(pathfinder_samples, Normal(0.0, 1)) |>
                        pvalue
