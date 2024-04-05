@@ -64,7 +64,7 @@ I_t = generated_quantities(latent_inf, θ)
 ```
 
 "
-@kwdef struct DirectInfections{S <: Sampleable} <: AbstractEpiModel
+@kwdef struct DirectInfections{S <: Sampleable} <: AbstractTuringEpiModel
     "`Epidata` object."
     data::EpiData
     "Prior distribution for the initialisation of the infections. Default is `Normal()`."

@@ -77,7 +77,7 @@ unobserved infections.
 I_t = generated_quantities(latent_inf, θ)
 ```
 "
-@kwdef struct Renewal{S <: Sampleable} <: EpiAwareBase.AbstractEpiModel
+@kwdef struct Renewal{S <: Sampleable} <: EpiAwareBase.AbstractTuringEpiModel
     data::EpiData
     initialisation_prior::S = Normal()
 end

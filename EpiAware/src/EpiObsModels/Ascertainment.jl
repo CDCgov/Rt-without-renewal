@@ -2,14 +2,14 @@
 The `Ascertainment` struct represents an observation model that incorporates ascertainment bias. It is parametrized by two types: `M` which represents the underlying observation model, and `T` which represents the latent model.
 
 # Constructors
-- `Ascertainment(model::M, latentmodel::T; link::F = exp) where {M <: AbstractObservationModel, T <: AbstractLatentModel, F <: Function}`: Constructs a new `Ascertainment` object with the specified `model`, `latentmodel`, and `link` function. `link` is a named keyword and defaults to `exp`.
-- `Ascertainment(model::M, latentmodel::T, link::F = exp) where {M <: AbstractObservationModel, T <: AbstractLatentModel, F <: Function}`: Constructs a new `Ascertainment` object with the specified `model`, `latentmodel`, and `link` function.
+- `Ascertainment(model::M, latentmodel::T; link::F = exp) where {M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel, F <: Function}`: Constructs a new `Ascertainment` object with the specified `model`, `latentmodel`, and `link` function. `link` is a named keyword and defaults to `exp`.
+- `Ascertainment(model::M, latentmodel::T, link::F = exp) where {M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel, F <: Function}`: Constructs a new `Ascertainment` object with the specified `model`, `latentmodel`, and `link` function.
 
 # Examples
 ```julia
 using EpiAware, Turing
 
-struct Scale <: AbstractLatentModel
+struct Scale <: AbstractTuringLatentModel
 end
 
 @model function EpiAware.generate_latent(model::Scale, n::Int)
@@ -24,8 +24,8 @@ rand(gen_obs)
 ```
 "
 @kwdef struct Ascertainment{
-    M <: AbstractObservationModel, T <: AbstractLatentModel, F <: Function} <:
-              AbstractObservationModel
+    M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel, F <: Function} <:
+              AbstractTuringObservationModel
     "The underlying observation model."
     model::M
     "The latent model."

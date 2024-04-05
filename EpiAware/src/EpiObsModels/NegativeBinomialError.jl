@@ -1,6 +1,6 @@
 @doc raw"
 
-The `NegativeBinomialError` struct represents an observation model for negative binomial errors. It is a subtype of `AbstractObservationModel`.
+The `NegativeBinomialError` struct represents an observation model for negative binomial errors. It is a subtype of `AbstractTuringObservationModel`.
 
 ## Constructors
 - `NegativeBinomialError(; cluster_factor_prior::Distribution = HalfNormal(0.1), pos_shift::AbstractFloat = 1e-6)`: Constructs a `NegativeBinomialError` object with default values for the cluster factor prior and positive shift.
@@ -15,7 +15,7 @@ rand(nb_model)
 ```
 "
 struct NegativeBinomialError{S <: Sampleable, T <: AbstractFloat} <:
-       AbstractObservationModel
+       generate_epiware
     "The prior distribution for the cluster factor."
     cluster_factor_prior::S
     "The positive shift value."

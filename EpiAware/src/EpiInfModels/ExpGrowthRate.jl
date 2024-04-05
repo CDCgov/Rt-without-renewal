@@ -64,7 +64,7 @@ unobserved infections.
 I_t = generated_quantities(latent_inf, θ)
 ```
 "
-@kwdef struct ExpGrowthRate{S <: Sampleable} <: AbstractEpiModel
+@kwdef struct ExpGrowthRate{S <: Sampleable} <: AbstractTuringEpiModel
     data::EpiData
     initialisation_prior::S = Normal()
 end

@@ -2,7 +2,7 @@
     using Distributions
 
     # Define a dummy observation model for testing
-    struct DummyObservationModel <: AbstractObservationModel end
+    struct DummyObservationModel <: AbstractTuringObservationModel end
     dummy_model = DummyObservationModel()
 
     # Test case 1

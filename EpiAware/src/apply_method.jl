@@ -1,34 +1,17 @@
 """
-Run the `EpiAware` algorithm to estimate the parameters of an epidemiological model.
+Apply the condition to the model by fixing the specified parameters and conditioning on the others.
 
 # Arguments
-- `epiproblem::EpiProblem`: An `EpiProblem` object specifying the epidemiological problem.
-- `method::EpiMethod`: An `EpiMethod` object specifying the inference method.
-- `data`: The observed data used for inference.
-
-# Keyword Arguments
-- `fix_parameters::NamedTuple`: A `NamedTuple` of fixed parameters for the model.
-- `condition_parameters::NamedTuple`: A `NamedTuple` of conditioned parameters for the
-    model.
-- `kwargs...`: Additional keyword arguments passed to the inference methods.
+- `model::Model`: The model to be conditioned.
+- `fix_parameters::NamedTuple`: The parameters to be fixed.
+- `condition_parameters::NamedTuple`: The parameters to be conditioned on.
 
 # Returns
-- A `NamedTuple` with a `samples` field which is the output of applying methods and a
-    `model` field with the model used. Optionally, a `gens` field with the
-        generated quantities from the model if that makes sense with the inference method.
+- `_model`: The conditioned model.
 """
-function EpiAwareBase.apply_method(epiproblem::EpiProblem, method::AbstractEpiMethod, data;
-        fix_parameters::NamedTuple = NamedTuple(),
-        condition_parameters::NamedTuple = NamedTuple(),
-        kwargs...)
-
-    # Create the model
-    model = make_epi_aware(epiproblem, data)
-
-    # Fix and condition the model
+function EpiAwareBase.condition_model(
+        model::Model, fix_parameters::NamedTuple, condition_parameters::NamedTuple)
     _model = fix(model, fix_parameters)
     _model = condition(_model, condition_parameters)
-
-    # Run the inference and return observables
-    apply_method(_model, method; kwargs...)
+    return _model
 end

@@ -1,5 +1,5 @@
 
-@testitem "`make_epi_aware` with direct infections and RW latent process runs" begin
+@testitem "`generate_epiware` with direct infections and RW latent process runs" begin
     using Distributions, Turing, DynamicPPL
     # Define test inputs
     y_t = missing # Data will be generated from the model

@@ -1,16 +1,26 @@
 abstract type AbstractModel end
 
 """
-The abstract supertype for all structs that define a model for generating unobserved/latent
-infections.
+The abstract supertype for all structs that define a model for generating
+unobserved/latent infections.
 """
 abstract type AbstractEpiModel <: AbstractModel end
+
+"""
+A abstract type representing a Turing-based epidemiological model.
+"""
+abstract type AbstractTuringEpiModel <: AbstractEpiModel end
 
 """
 The abstract supertype for all structs that define a model for generating a latent process
 used in `EpiAware` models.
 """
 abstract type AbstractLatentModel <: AbstractModel end
+
+"""
+A abstract type representing a Turing-based Latent model.
+"""
+abstract type AbstractTuringLatentModel <: AbstractLatentModel end
 
 """
 An abstract type representing a broadcast rule.
@@ -21,6 +31,11 @@ abstract type AbstractBroadcastRule end
 A type representing an abstract observation model that is a subtype of `AbstractModel`.
 """
 abstract type AbstractObservationModel <: AbstractModel end
+
+"""
+A abstract type representing a Turing-based observation model.
+"""
+abstract type AbstractTuringObservationModel <: AbstractObservationModel end
 
 """
 Abstract supertype for all `EpiAware` problems.

@@ -230,7 +230,7 @@ md"
 md"
 ## Generate cases from the `EpiAware` model
 
-Having chosen an `EpiModel`, `LatentModel` and `ObservationModel`, we can implement the model as a [`Turing`](https://turinglang.org/dev/) model using  `make_epi_aware`.
+Having chosen an `EpiModel`, `LatentModel` and `ObservationModel`, we can implement the model as a [`Turing`](https://turinglang.org/dev/) model using  `generate_epiware`.
 
 By giving `missing` to the first argument, we indicate that case data will be _generated_ from the model rather than treated as fixed.
 "
@@ -267,7 +267,7 @@ md"
 "
 
 # ╔═╡ abeff860-58c3-4644-9325-66ffd4446b6d
-full_epi_solve_mdl = make_epi_aware(missing, time_horizon;
+full_epi_solve_mdl = generate_epiware(missing, time_horizon;
     epi_model = epi_model,
     latent_model = rwp,
     observation_model = obs_model)
@@ -307,7 +307,7 @@ let
 end
 
 # ╔═╡ 4e26d535-00a6-4541-984c-3887cac35291
-inference_epi_solve_mdl = make_epi_aware(generated_obs, time_horizon;
+inference_epi_solve_mdl = generate_epiware(generated_obs, time_horizon;
     epi_model = epi_model,
     latent_model = rwp,
     observation_model = obs_model)
@@ -338,7 +338,7 @@ We now make the model but fixing the initial condition of the random walk to be 
 # ╔═╡ b4033728-b321-4100-8194-1fd9fe2d268d
 
 inference_mdl = fix(
-    make_epi_aware(truth_data, time_horizon; epi_model = epi_model,
+    generate_epiware(truth_data, time_horizon; epi_model = epi_model,
         latent_model = rwp, observation_model = obs_model),
     (rw_init = 0.0,)
 )

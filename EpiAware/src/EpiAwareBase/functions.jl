@@ -36,9 +36,20 @@ function apply_method(model, method::AbstractEpiMethod, prev_result = nothing;
     return nothing
 end
 
-"""
+@doc raw"
+Condition a model on fixed (i.e to a value) and conditioned (i.e to data) parameters.
+
+# Returns
+- `model`: The conditioned model.
+"
+function condition_model(model, fix_parameters, condition_parameters)
+    @info "No concrete implementation for `condition_model` is defined."
+    return model
+end
+
+@doc raw"
 Generate observables from a given model and solution default to just returning the solution.
-"""
+"
 function generate_observables(model, solution)
     (samples = solution,)
 end
