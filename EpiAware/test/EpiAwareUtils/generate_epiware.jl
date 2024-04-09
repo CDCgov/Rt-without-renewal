@@ -25,8 +25,7 @@
 
     # Create full epi model and sample from it
     test_mdl = generate_epiaware(
-        y_t, time_horizon;
-        epi_model = epi_model,
+        y_t, time_horizon, epi_model,
         latent_model = rwp,
         observation_model = obs_model
     )
@@ -62,8 +61,8 @@ end
 
     # Create full epi model and sample from it
     test_mdl = generate_epiaware(y_t,
-        time_horizon;
-        epi_model = epi_model,
+        time_horizon,
+        epi_model;
         latent_model = rwp,
         observation_model = obs_model)
 
@@ -101,8 +100,8 @@ end
 
     # Create full epi model and sample from it
     test_mdl = generate_epiaware(y_t,
-        time_horizon;
-        epi_model = epi_model,
+        time_horizon,
+        epi_model;
         latent_model = rwp,
         observation_model = obs_model
     )

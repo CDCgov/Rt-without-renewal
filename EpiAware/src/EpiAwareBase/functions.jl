@@ -50,6 +50,6 @@ end
 @doc raw"
 Generate observables from a given model and solution default to just returning the solution.
 "
-function generate_observables(model, solution)
+function generated_observables(model, solution)
     (samples = solution,)
 end

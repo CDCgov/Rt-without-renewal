@@ -24,7 +24,7 @@ sampled random variables along with generated quantities.
 "
 function _apply_direct_sample(model, method, n_samples::Vector{<:Real})
     solution = sample(model, Turing.Prior(), n_samples)
-    return generate_observables(model, solution)
+    return generated_observables(model, solution)
 end
 
 @doc raw"
@@ -32,5 +32,5 @@ Sample the model directly using rand and return a single set of sampled random v
 "
 function _apply_direct_sample(model, method, n_samples::Nothing)
     solution = rand(model)
-    return generate_observables(model, solution)
+    return generated_observables(model, solution)
 end

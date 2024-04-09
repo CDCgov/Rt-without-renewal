@@ -12,7 +12,7 @@ Generate an epi-aware model given the observed data and model specifications.
 A `DynamicPPPL.Model` object.
 "
 @model function EpiAwareBase.generate_epiaware(
-        y_t, time_steps, epi_model::AbstractTuringEpiModel,
+        y_t, time_steps, epi_model::AbstractTuringEpiModel;
         latent_model::AbstractTuringLatentModel, observation_model::AbstractTuringObservationModel)
     # Latent process
     @submodel Z_t, latent_model_aux = generate_latent(latent_model, time_steps)
@@ -50,7 +50,7 @@ end
 @doc raw"
 Generate observables from a given model and solution including generated quantities.
 "
-function EpiAwareBase.generate_observables(
+function EpiAwareBase.generated_observables(
         model::Model, solution::Union{Chains, NamedTuple})
     gens = generated_quantities(model, solution)
     (samples = solution, gens = gens, model = model)
