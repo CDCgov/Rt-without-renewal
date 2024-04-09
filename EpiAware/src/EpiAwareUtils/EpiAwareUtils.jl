@@ -6,7 +6,7 @@ module EpiAwareUtils
 using ..EpiAwareBase
 
 using DataFramesMeta: DataFrame, @rename!
-using DynamicPPL: Model
+using DynamicPPL: Model, fix, condition
 using MCMCChains: Chains
 using Random: AbstractRNG
 

@@ -35,7 +35,7 @@ function EpiAwareBase.generate_epiaware(epiproblem::EpiProblem, data)
     y_t = data.y_t
     time_steps = epiproblem.tspan[end] - epiproblem.tspan[1] + 1
 
-    generate_epiaware(y_t, time_steps; epiproblem.epi_model,
+    generate_epiaware(y_t, time_steps, epiproblem.epi_model;
         epiproblem.latent_model, epiproblem.observation_model)
 end
 
