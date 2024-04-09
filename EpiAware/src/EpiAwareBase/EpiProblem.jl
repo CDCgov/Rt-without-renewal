@@ -58,10 +58,10 @@ Run the `EpiAware` algorithm to estimate the parameters of an epidemiological mo
     `model` field with the model used. Optionally, a `gens` field with the
         generated quantities from the model if that makes sense with the inference method.
 """
-function EpiAwareBase.apply_method(epiproblem::EpiProblem,
-        method::AbstractEpiMethod, data;
+function apply_method(epiproblem::EpiProblem,
+        method::AbstractEpiMethod, data,
         fix_parameters::NamedTuple = NamedTuple(),
-        condition_parameters::NamedTuple = NamedTuple(),
+        condition_parameters::NamedTuple = NamedTuple();
         kwargs...)
 
     # Create the model
@@ -70,5 +70,5 @@ function EpiAwareBase.apply_method(epiproblem::EpiProblem,
     cond_model = condition_model(model, fix_parameters, condition_parameters)
 
     # Run the inference and return observables
-    return apply_method(_model, method; kwargs...)
+    return apply_method(cond_model, method; kwargs...)
 end

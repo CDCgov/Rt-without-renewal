@@ -19,10 +19,10 @@ function broadcast_n(broadcast_rule::AbstractBroadcastRule, latent, n, period)
 end
 
 """
-Apply the inference/generative method `method` to the `DynamicPPL.Model` object `mdl`.
+Apply the inference/generative method `method` to the `AbstractEpiModel` object `mdl`.
 
 # Arguments
-- `model`: The model to apply the method to.
+- `model::AbstractEpiModel`: The model to apply the method to.
 - `method::AbstractEpiMethod`: The epidemiological method to apply.
 - `prev_result`: The previous result of the method.
 - `kwargs`: Additional keyword arguments passed to the method.
@@ -30,8 +30,8 @@ Apply the inference/generative method `method` to the `DynamicPPL.Model` object 
 # Returns
 - `nothing`: If no concrete implementation is defined for the given `method`.
 """
-function apply_method(model, method::AbstractEpiMethod, prev_result = nothing;
-        kwargs...)
+function apply_method(model::AbstractEpiModel, method::AbstractEpiMethod,
+        prev_result = nothing; kwargs...)
     @info "No concrete implementation for `apply_method` is defined."
     return nothing
 end
