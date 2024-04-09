@@ -23,8 +23,10 @@ include("docstrings.jl")
 include("censored_pmf.jl")
 include("HalfNormal.jl")
 include("scan.jl")
-include("DirectSample.jl")
+include("generate_epiaware.jl")
 include("generate_observables.jl")
+include("condition_model.jl")
+include("DirectSample.jl")
 include("post-inference.jl")
 
 end

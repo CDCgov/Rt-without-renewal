@@ -86,12 +86,12 @@ struct DiffLatentModel{M <: AbstractTuringLatentModel, P <: Distribution}
     d::Int
 
     function DiffLatentModel(
-            model::AbstractTurinLatentModel, init_prior::Distribution; d::Int)
+            model::AbstractTuringLatentModel, init_prior::Distribution; d::Int)
         init_priors = fill(init_prior, d)
         return DiffLatentModel(; model = model, init_priors = init_priors)
     end
 
-    function DiffLatentModel(; model::AbstractTurinLatentModel,
+    function DiffLatentModel(; model::AbstractTuringLatentModel,
             init_priors::Vector{D} where {D <: Distribution} = [Normal()])
         d = length(init_priors)
         init_prior = _expand_dist(init_priors)
@@ -99,7 +99,7 @@ struct DiffLatentModel{M <: AbstractTuringLatentModel, P <: Distribution}
     end
 
     function DiffLatentModel(
-            model::AbstractTurinLatentModel, init_prior::Distribution, d::Int)
+            model::AbstractTuringLatentModel, init_prior::Distribution, d::Int)
         @assert d>0 "d must be greater than 0"
         @assert d==length(init_prior) "d must be equal to the length of init_prior"
         new{typeof(model), typeof(init_prior)}(model, init_prior, d)
