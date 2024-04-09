@@ -6,9 +6,9 @@ The `LatentDelay` struct represents an observation model that introduces a laten
 - `pmf::T`: The probability mass function (PMF) representing the delay distribution.
 
 ## Constructors
-- `LatentDelay(model::M, distribution::C; D = 15, Δd = 1.0) where {M <: generate_epiware, C <: ContinuousDistribution}`: Constructs a `LatentDelay` object with the given underlying observation model and continuous distribution. The `D` parameter specifies the number of discrete delay intervals, and the `Δd` parameter specifies the width of each delay interval.
+- `LatentDelay(model::M, distribution::C; D = 15, Δd = 1.0) where {M <: AbstractTuringObservationModel, C <: ContinuousDistribution}`: Constructs a `LatentDelay` object with the given underlying observation model and continuous distribution. The `D` parameter specifies the number of discrete delay intervals, and the `Δd` parameter specifies the width of each delay interval.
 
-- `LatentDelay(model::M, pmf::T) where {M <: generate_epiware, T <: AbstractVector{<:Real}}`: Constructs a `LatentDelay` object with the given underlying observation model and delay PMF.
+- `LatentDelay(model::M, pmf::T) where {M <: AbstractTuringObservationModel, T <: AbstractVector{<:Real}}`: Constructs a `LatentDelay` object with the given underlying observation model and delay PMF.
 
 ## Examples
 ```julia
@@ -18,19 +18,20 @@ obs_model = generate_observations(obs, missing, fill(10, 10))
 rand(obs_model)
 ```
 "
-struct LatentDelay{M <: generate_epiware, T <: AbstractVector{<:Real}} <:
-       generate_epiware
+struct LatentDelay{M <: AbstractTuringObservationModel, T <: AbstractVector{<:Real}} <:
+       AbstractTuringObservationModel
     model::M
     pmf::T
 
     function LatentDelay(model::M, distribution::C; D = 15,
-            Δd = 1.0) where {M <: generate_epiware, C <: ContinuousDistribution}
+            Δd = 1.0) where {
+            M <: AbstractTuringObservationModel, C <: ContinuousDistribution}
         pmf = censored_pmf(distribution; Δd = Δd, D = D)
         return LatentDelay(model, pmf)
     end
 
     function LatentDelay(model::M,
-            pmf::T) where {M <: generate_epiware, T <: AbstractVector{<:Real}}
+            pmf::T) where {M <: AbstractTuringObservationModel, T <: AbstractVector{<:Real}}
         @assert all(pmf .>= 0) "Delay interval must be non-negative"
         @assert isapprox(sum(pmf), 1) "Delay interval must sum to 1"
         new{typeof(model), typeof(pmf)}(model, pmf)

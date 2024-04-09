@@ -12,9 +12,10 @@ Create an epi-aware model using the specified epi_model, latent_model, and obser
 - `nothing`
 "
 function generate_epiware(y_t, time_steps; epi_model::AbstractEpiModel,
-    latent_model::AbstractLatentModel, observation_model::AbstractObservationModel)
+        latent_model::AbstractLatentModel, observation_model::AbstractObservationModel)
     @info "No concrete implementation for `generate_epiware` is defined."
-return nothing
+    return nothing
+end
 
 @doc raw"
 Constructor function for unobserved/latent infections based on the type of

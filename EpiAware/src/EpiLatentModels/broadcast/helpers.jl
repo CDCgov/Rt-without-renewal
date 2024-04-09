@@ -2,24 +2,24 @@
 Constructs a `BroadcastLatentModel` appropriate for modelling the day of the week for a given `AbstractTuringLatentModel`.
 
 # Arguments
-- `model::generate_epiware`: The latent model to be repeated.
+- `model::AbstractTuringLatentModel`: The latent model to be repeated.
 
 # Returns
 - `BroadcastLatentModel`: The broadcast latent model.
 "
-function dayofweek(model::generate_epiware)
+function dayofweek(model::AbstractTuringLatentModel)
     return BroadcastLatentModel(model, 7, RepeatEach())
 end
 
 @doc raw"
-Constructs a `BroadcastLatentModel` appropriate for modelling piecewise constant weekly processes for a given `generate_epiware`.
+Constructs a `BroadcastLatentModel` appropriate for modelling piecewise constant weekly processes for a given `AbstractTuringLatentModel`.
 
 # Arguments
-- `model::generate_epiware`: The latent model to be repeated.
+- `model::AbstractTuringLatentModel`: The latent model to be repeated.
 
 # Returns
 - `BroadcastLatentModel`: The broadcast latent model.
 "
-function weekly(model::generate_epiware)
+function weekly(model::AbstractTuringLatentModel)
     return BroadcastLatentModel(model, 7, RepeatBlock())
 end

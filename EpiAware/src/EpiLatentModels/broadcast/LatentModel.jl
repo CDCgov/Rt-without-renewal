@@ -19,7 +19,7 @@ rand(gen_block_model)
 "
 struct BroadcastLatentModel{
     M <: AbstractTuringLatentModel, P <: Integer, B <: AbstractBroadcastRule} <:
-       generate_epiware
+       AbstractTuringLatentModel
     "The underlying latent model."
     model::M
     "The period of the broadcast."
@@ -28,12 +28,14 @@ struct BroadcastLatentModel{
     broadcast_rule::B
 
     function BroadcastLatentModel(model::M; period::Integer,
-            broadcast_rule::B) where {M <: generate_epiware, B <: AbstractBroadcastRule}
+            broadcast_rule::B) where {
+            M <: AbstractTuringLatentModel, B <: AbstractBroadcastRule}
         BroadcastLatentModel(model, period, broadcast_rule)
     end
 
     function BroadcastLatentModel(model::M, period::Integer,
-            broadcast_rule::B) where {M <: generate_epiware, B <: AbstractBroadcastRule}
+            broadcast_rule::B) where {
+            M <: AbstractTuringLatentModel, B <: AbstractBroadcastRule}
         @assert period>0 "period must be greater than 0"
         new{typeof(model), typeof(period), typeof(broadcast_rule)}(
             model, period, broadcast_rule)

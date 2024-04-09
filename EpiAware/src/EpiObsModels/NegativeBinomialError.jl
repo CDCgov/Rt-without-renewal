@@ -15,7 +15,7 @@ rand(nb_model)
 ```
 "
 struct NegativeBinomialError{S <: Sampleable, T <: AbstractFloat} <:
-       generate_epiware
+       AbstractTuringObservationModel
     "The prior distribution for the cluster factor."
     cluster_factor_prior::S
     "The positive shift value."
