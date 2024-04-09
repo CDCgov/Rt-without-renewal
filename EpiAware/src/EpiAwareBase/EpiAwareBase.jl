@@ -29,7 +29,7 @@ export EpiProblem, EpiMethod
 ### Functions ###
 
 # Export model generating functions
-export generate_epiaware, generate_latent, generate_latent_infs, generate_observations
+export generate_latent, generate_latent_infs, generate_observations, generate_epiaware
 
 # Export support functions
 export broadcast_rule, broadcast_n, condition_model, generate_observables

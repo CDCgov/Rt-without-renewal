@@ -53,7 +53,7 @@ DelayObservations"]
 
 E["Turing model constructor
 ---------------------
-generate_epiware"]
+generate_epiaware"]
 
 G[Posterior draws]
 H[Posterior checking]

@@ -31,11 +31,11 @@ Generate an epi-aware model given an `EpiProblem` and data.
 # Returns
 A tuple containing the generated quantities of the epi-aware model.
 "
-function EpiAwareBase.generate_epiware(epiproblem::EpiProblem, data)
+function EpiAwareBase.generate_epiaware(epiproblem::EpiProblem, data)
     y_t = data.y_t
     time_steps = epiproblem.tspan[end] - epiproblem.tspan[1] + 1
 
-    generate_epiware(y_t, time_steps; epiproblem.epi_model,
+    generate_epiaware(y_t, time_steps; epiproblem.epi_model,
         epiproblem.latent_model, epiproblem.observation_model)
 end
 
