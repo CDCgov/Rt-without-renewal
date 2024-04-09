@@ -72,9 +72,32 @@ This function applies the steps defined by an `EpiMethod` object to a `Model` ob
 - `prev_result`: The result obtained after applying the steps.
 "
 function EpiAwareBase.apply_method(
-        model::Model, method::EpiMethod, prev_result = nothing; kwargs...)
+        model::Model, method::EpiMethod, prev_result; kwargs...)
     for pre_sampler in method.pre_sampler_steps
         prev_result = apply_method(model, pre_sampler, prev_result; kwargs...)
     end
     apply_method(model, method.sampler, prev_result; kwargs...)
+end
+
+function EpiAwareBase.apply_method(
+        model::Model, method::EpiMethod; kwargs...)
+    apply_method(model, method.sampler, nothing; kwargs...)
+end
+
+@doc raw"
+Apply the inference/generative method `method` to the `Model` object `mdl`.
+
+# Arguments
+- `model::AbstractEpiModel`: The model to apply the method to.
+- `method::AbstractEpiMethod`: The epidemiological method to apply.
+- `prev_result`: The previous result of the method.
+- `kwargs`: Additional keyword arguments passed to the method.
+
+# Returns
+- `nothing`: If no concrete implementation is defined for the given `method`.
+"
+function EpiAwareBase.apply_method(model::Model, method::AbstractEpiMethod,
+        prev_result = nothing; kwargs...)
+    @info "No concrete implementation for `apply_method` is defined."
+    return nothing
 end

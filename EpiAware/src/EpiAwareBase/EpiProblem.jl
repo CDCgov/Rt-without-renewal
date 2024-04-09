@@ -59,9 +59,9 @@ Run the `EpiAware` algorithm to estimate the parameters of an epidemiological mo
         generated quantities from the model if that makes sense with the inference method.
 """
 function apply_method(epiproblem::EpiProblem,
-        method::AbstractEpiMethod, data,
+        method::AbstractEpiMethod, data;
         fix_parameters::NamedTuple = NamedTuple(),
-        condition_parameters::NamedTuple = NamedTuple();
+        condition_parameters::NamedTuple = NamedTuple(),
         kwargs...)
 
     # Create the model
