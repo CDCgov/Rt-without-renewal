@@ -1,4 +1,4 @@
-"""
+@doc raw"
 Defines an inference/generative modelling problem for case data.
 
 `EpiProblem` wraps the underlying components of an epidemiological model:
@@ -7,7 +7,7 @@ Defines an inference/generative modelling problem for case data.
 - `observation_model`: An observation model for observed cases.
 
 Along with a `tspan` tuple for the time span of the case data.
-"""
+"
 @kwdef struct EpiProblem{
     E <: AbstractEpiModel, L <: AbstractLatentModel, O <: AbstractObservationModel} <:
               AbstractEpiProblem

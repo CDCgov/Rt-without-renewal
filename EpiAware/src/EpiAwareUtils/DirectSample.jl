@@ -15,15 +15,15 @@ Implements direct sampling from a `Turing` model.
 "
 function EpiAwareBase.apply_method(
         model::Model, method::DirectSample, prev_result = nothing; kwargs...)
-    _apply_direct_sample(model, method, method.n_samples)
+    _apply_direct_sample(model, method, method.n_samples; kwargs...)
 end
 
 @doc raw"
 Sample the model directly using `Turing.Prior()` and a `NamedTuple` of the
 sampled random variables along with generated quantities.
 "
-function _apply_direct_sample(model, method, n_samples::Vector{<:Real})
-    solution = sample(model, Turing.Prior(), n_samples)
+function _apply_direct_sample(model, method, n_samples::Int; kwargs...)
+    solution = sample(model, Turing.Prior(), n_samples; kwargs...)
 end
 
 @doc raw"

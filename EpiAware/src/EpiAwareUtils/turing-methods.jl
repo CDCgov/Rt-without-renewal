@@ -81,7 +81,7 @@ end
 
 function EpiAwareBase.apply_method(
         model::Model, method::EpiMethod; kwargs...)
-    apply_method(model, method.sampler, nothing; kwargs...)
+    apply_method(model, method, nothing; kwargs...)
 end
 
 @doc raw"

@@ -50,6 +50,6 @@ end
 @doc raw"
 Generate observables from a given model and solution default to just returning the solution.
 "
-function generated_observables(model, solution)
-    (samples = solution,)
+function generated_observables(model::AbstractEpiModel, solution)
+    (samples = solution, gens = (), model = model)
 end

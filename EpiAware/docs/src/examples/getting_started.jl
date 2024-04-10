@@ -432,7 +432,7 @@ let
     parameters_to_plot = (:σ_RW, :cluster_factor)
 
     plts = map(parameters_to_plot) do name
-        var_samples = sol.samples[name] |> vec
+        var_samples = sol[name] |> vec
         histogram(var_samples,
             bins = 50,
             norm = :pdf,
@@ -469,7 +469,7 @@ let
                 for t in (n + 1):length(true_infections)]
     true_Rt = true_infections[(n + 1):end] ./ Rt_denom
 
-    predicted_Rt = mapreduce(hcat, sol.gens) do gen
+    predicted_Rt = mapreduce(hcat, generated_quantities(inference_model, sol)) do gen
         _It = gen.I_t
         _Rt_denom = [dot(reverse(epi_model.data.gen_int), _It[(t - n):(t - 1)])
                      for t in (n + 1):length(_It)]
