@@ -253,12 +253,12 @@ sampled_epidemic = apply_method(epi_prob, DirectSample(), nodata;
 
 # ╔═╡ 952add1d-80dc-48af-bc5c-d77be0788580
 let
-    plot(sampled_epidemic.gens.I_t,
+    plot(sampled_epidemic.generated.I_t,
         label = "I_t",
         xlabel = "Time",
         ylabel = "Infections",
         title = "Generated Infections")
-    scatter!(sampled_epidemic.gens.generated_y_t, lab = "Cases")
+    scatter!(sampled_epidemic.generated.generated_y_t, lab = "Cases")
 end
 
 # ╔═╡ d0f86fa7-7439-4adc-a58f-1c53cd01162e
@@ -339,7 +339,7 @@ num_threads = Threads.nthreads()
 
 # ╔═╡ 35b8f89b-683f-469d-b638-e7b0e2d8cdf1
 sampling_method = EpiMethod(
-    pre_sampler_steps = [ManyPathfinder(nruns = 20, maxiters = 100)],
+    pre_sampler_steps = [ManyPathfinder(nruns = 100, maxiters = 1000)],
     sampler = NUTSampler(adtype = AutoReverseDiff(true),
         ndraws = 1000,
         nchains = num_threads,
@@ -391,11 +391,12 @@ Because we are using synthetic data we can also plot the model predictions for t
 # ╔═╡ e9df22b8-8e4d-4ab7-91ea-c01f2239b3e5
 let
     post_check_y_t = mapreduce(
-        hcat, generated_quantities(inference_model, sol)) do gen
+        hcat, generated_quantities(inference_model, sol.samples)) do gen
         gen.generated_y_t
     end
 
-    predicted_I_t = mapreduce(hcat, generated_quantities(inference_model, sol)) do gen
+    predicted_I_t = mapreduce(
+        hcat, generated_quantities(inference_model, sol.samples)) do gen
         gen.I_t
     end
 
@@ -409,12 +410,12 @@ let
         c = :green)
 
     p2 = plot(predicted_I_t, c = :grey, alpha = 0.05, lab = "")
-    scatter!(p2, sampled_epidemic.gens.I_t,
+    scatter!(p2, sampled_epidemic.generated.I_t,
         lab = "Actual infections",
         xlabel = "Time",
         ylabel = "Unobserved Infections",
         title = "Post. predictions: infections",
-        ylims = (-0.5, maximum(sampled_epidemic.gens.I_t) * 1.5),
+        ylims = (-0.5, maximum(sampled_epidemic.generated.I_t) * 1.5),
         c = :red)
 
     plot(p1, p2,
@@ -432,7 +433,7 @@ let
     parameters_to_plot = (:σ_RW, :cluster_factor)
 
     plts = map(parameters_to_plot) do name
-        var_samples = sol[name] |> vec
+        var_samples = sol.samples[name] |> vec
         histogram(var_samples,
             bins = 50,
             norm = :pdf,
@@ -463,13 +464,14 @@ Here we spaghetti plot posterior sampled time-varying reproductive numbers again
 # ╔═╡ 15b9f37f-8d5f-460d-8c28-d7f2271fd099
 let
     n = epi_model.data.len_gen_int
-    true_infections = sampled_epidemic.gens.I_t
+    true_infections = sampled_epidemic.generated.I_t
 
     Rt_denom = [dot(reverse(epi_model.data.gen_int), true_infections[(t - n):(t - 1)])
                 for t in (n + 1):length(true_infections)]
     true_Rt = true_infections[(n + 1):end] ./ Rt_denom
 
-    predicted_Rt = mapreduce(hcat, generated_quantities(inference_model, sol)) do gen
+    predicted_Rt = mapreduce(
+        hcat, generated_quantities(inference_model, sol.samples)) do gen
         _It = gen.I_t
         _Rt_denom = [dot(reverse(epi_model.data.gen_int), _It[(t - n):(t - 1)])
                      for t in (n + 1):length(_It)]
