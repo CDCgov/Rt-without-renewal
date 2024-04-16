@@ -79,6 +79,18 @@ function EpiAwareBase.apply_method(
     apply_method(model, method.sampler, prev_result; kwargs...)
 end
 
+@doc raw"
+Apply a method to a mode without previous results
+
+# Arguments
+- `model::Model`: The model to apply the method to.
+- `method::EpiMethod`: The method to apply.
+- `kwargs...`: Additional keyword arguments.
+
+# Returns
+- The result of applying the method to the model.
+
+"
 function EpiAwareBase.apply_method(
         model::Model, method::EpiMethod; kwargs...)
     apply_method(model, method, nothing; kwargs...)
