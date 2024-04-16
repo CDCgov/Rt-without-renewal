@@ -24,7 +24,7 @@ export AbstractEpiMethod, AbstractEpiOptMethod, AbstractEpiSamplingMethod
 
 ### Structs ###
 
-export EpiProblem, EpiMethod
+export EpiProblem, EpiMethod, EpiAwareObservables
 
 ### Functions ###
 
@@ -35,7 +35,7 @@ export generate_latent, generate_latent_infs, generate_observations, generate_ep
 export broadcast_rule, broadcast_n, condition_model, generated_observables
 
 # Export methods functions
-export apply_method
+export apply_method, _apply_method
 
 include("docstrings.jl")
 include("types.jl")
@@ -43,5 +43,7 @@ include("functions.jl")
 include("generate_models.jl")
 include("EpiProblem.jl")
 include("EpiMethod.jl")
+include("EpiAwareObservables.jl")
+include("apply_method.jl")
 
 end

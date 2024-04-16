@@ -19,7 +19,7 @@ If `prev_result` is a vector of real numbers, then the `ManyPathfinder` method i
 with the initial values set to `prev_result`. Otherwise, the `ManyPathfinder` method is run
 with default initial values generated.
 "
-function EpiAwareBase.apply_method(
+function EpiAwareBase._apply_method(
         model::Model, method::ManyPathfinder, prev_result = nothing; kwargs...)
     _apply_pathfinder(model, method, prev_result; kwargs...)
 end

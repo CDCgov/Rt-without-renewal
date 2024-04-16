@@ -22,16 +22,17 @@ end
     end
 
     mdl = test_mdl(missing)
-    gen_obs = generated_observables(mdl, rand(mdl))
+    gen_obs = generated_observables(mdl, missing, rand(mdl))
 
-    @test typeof(gen_obs) <: NamedTuple
-    @test fieldnames(typeof(gen_obs)) == (:samples, :gens, :model)
+    @test typeof(gen_obs) <: EpiAwareObservables
+    @test fieldnames(typeof(gen_obs)) == (:model, :data, :samples, :generated)
     @test fieldnames(typeof(gen_obs.samples)) == (:x, :y)
-    @test gen_obs.gens == sum(gen_obs.samples)
+    @test gen_obs.generated == sum(gen_obs.samples)
     @test gen_obs.model == mdl
+    @test ismissing(gen_obs.data)
 end
 
-@testitem "apply_method function for Turing" begin
+@testitem "apply_method and _apply_method function for Turing" begin
     using Turing, Distributions, DynamicPPL
 
     @model function test_model()
@@ -39,7 +40,7 @@ end
     end
     struct CustomSampler <: AbstractEpiSamplingMethod end
 
-    function EpiAware.EpiAwareBase.apply_method(
+    function EpiAware.EpiAwareBase._apply_method(
             model::Model, method::CustomSampler, prev_result = nothing; kwargs...)
         return isnothing(prev_result) ? "x" : prev_result * ", x"
     end
@@ -49,7 +50,7 @@ end
 
     struct CustomOpt <: AbstractEpiOptMethod end
 
-    function EpiAware.EpiAwareBase.apply_method(
+    function EpiAware.EpiAwareBase._apply_method(
             model::Model, method::CustomOpt, prev_result = nothing; kwargs...)
         return isnothing(prev_result) ? "z" : prev_result * ", z"
     end
@@ -58,7 +59,7 @@ end
 
     @testset "with optimization steps" begin
         em = EpiMethod([co, co], cs)
-        @test EpiAwareBase.apply_method(model, em) == "z, z, x"
-        @test EpiAwareBase.apply_method(model, em, "y") == "y, z, z, x"
+        @test EpiAwareBase._apply_method(model, em) == "z, z, x"
+        @test EpiAwareBase._apply_method(model, em, "y") == "y, z, z, x"
     end
 end

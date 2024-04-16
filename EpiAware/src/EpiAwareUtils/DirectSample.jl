@@ -13,7 +13,7 @@ end
 @doc raw"
 Implements direct sampling from a `Turing` model.
 "
-function EpiAwareBase.apply_method(
+function EpiAwareBase._apply_method(
         model::Model, method::DirectSample, prev_result = nothing; kwargs...)
     _apply_direct_sample(model, method, method.n_samples; kwargs...)
 end

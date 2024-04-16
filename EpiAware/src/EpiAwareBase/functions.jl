@@ -30,9 +30,9 @@ Apply the inference/generative method `method` to the `AbstractEpiModel` object 
 # Returns
 - `nothing`: If no concrete implementation is defined for the given `method`.
 """
-function apply_method(model::AbstractEpiModel, method::AbstractEpiMethod,
+function _apply_method(model::AbstractEpiModel, method::AbstractEpiMethod,
         prev_result = nothing; kwargs...)
-    @info "No concrete implementation for `apply_method` is defined."
+    @info "No concrete implementation for `_apply_method` is defined."
     return nothing
 end
 
@@ -45,11 +45,4 @@ Condition a model on fixed (i.e to a value) and conditioned (i.e to data) parame
 function condition_model(model, fix_parameters, condition_parameters)
     @info "No concrete implementation for `condition_model` is defined."
     return model
-end
-
-@doc raw"
-Generate observables from a given model and solution default to just returning the solution.
-"
-function generated_observables(model::AbstractEpiModel, solution)
-    (samples = solution, gens = (), model = model)
 end

@@ -7,7 +7,7 @@
     end
 end
 
-@testitem "NUTSampler _apply_method" begin
+@testitem "NUTSampler __apply_method" begin
     using Turing, Suppressor, HypothesisTests
     @model function test_mdl()
         x ~ Normal(0, 1)
@@ -15,7 +15,7 @@ end
     nuts_method = NUTSampler(ndraws = 2_000)
     mdl = test_mdl()
     @suppress begin
-        chn = apply_method(mdl, nuts_method)
+        chn = _apply_method(mdl, nuts_method)
         samples = chn[:x] |> vec
         ks_test_pval = ExactOneSampleKSTest(samples, Normal(0.0, 1)) |>
                        pvalue
@@ -23,7 +23,7 @@ end
     end
 end
 
-@testitem "NUTSampler apply_method with Pathfinder initialisation" begin
+@testitem "NUTSampler _apply_method with Pathfinder initialisation" begin
     using Turing, Suppressor, HypothesisTests
     @model function test_mdl()
         x ~ Normal(0, 1)
@@ -38,8 +38,8 @@ end
     mdl = test_mdl()
 
     @suppress begin
-        best_pf = apply_method(mdl, pf_method)
-        chn = apply_method(mdl, nuts_method, best_pf)
+        best_pf = _apply_method(mdl, pf_method)
+        chn = _apply_method(mdl, nuts_method, best_pf)
         samples = chn[:x] |> vec
         ks_test_pval = ExactOneSampleKSTest(samples, Normal(0.0, 1)) |>
                        pvalue

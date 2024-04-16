@@ -6,8 +6,8 @@
     @test ds.n_samples == nothing
 end
 
-# Test apply_method function
-@testitem "DirectSample apply_method function" begin
+# Test _apply_method function
+@testitem "DirectSample _apply_method function" begin
     using Turing, Distributions
     # Define a simple model for testing
     @model function test_model()
@@ -15,10 +15,10 @@ end
     end
     model = test_model()
     ds = DirectSample(10)
-    result = apply_method(model, ds; progress = false)
+    result = _apply_method(model, ds; progress = false)
     @test typeof(result) <: MCMCChains.Chains
 
     ds = DirectSample(nothing)
-    result = apply_method(model, ds)
+    result = _apply_method(model, ds)
     @test typeof(result) <: NamedTuple
 end
