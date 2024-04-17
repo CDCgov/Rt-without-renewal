@@ -53,3 +53,22 @@ function generate_observations(obs_model::AbstractObservationModel,
     @info "No concrete implementation for generate_observations is defined."
     return nothing
 end
+
+@doc raw"
+Create an epi-aware model using the specified epi_model, latent_model, and observation_model.
+
+# Arguments
+- `y_t`: The observed data.
+- `time_steps`: The time steps.
+- `epi_model`: An abstract epi model.
+- `latent_model`: An abstract latent model.
+- `observation_model`: An abstract observation model.
+
+# Returns
+- `nothing`
+"
+function generate_epiaware(y_t, time_step, epi_model::AbstractEpiModel,
+        latent_model::AbstractLatentModel, observation_model::AbstractObservationModel)
+    @info "No concrete implementation for `generate_epiaware` is defined."
+    return nothing
+end

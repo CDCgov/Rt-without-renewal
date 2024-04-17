@@ -1,6 +1,6 @@
 @testitem "Test Ascertainment constructor" begin
     using Turing
-    struct Scale <: AbstractLatentModel
+    struct Scale <: AbstractTuringLatentModel
     end
 
     @model function EpiAware.generate_latent(model::Scale, n::Int)
@@ -22,7 +22,7 @@ end
 # make a test based on above example
 @testitem "Test Ascertainment generate_observations" begin
     using Turing, DynamicPPL
-    struct Scale <: AbstractLatentModel end
+    struct Scale <: AbstractTuringLatentModel end
 
     @model function EpiAware.generate_latent(model::Scale, n::Int)
         scale = 0.1

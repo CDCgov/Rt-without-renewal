@@ -19,7 +19,7 @@ flowchart LR
 A["Underlying GI
 Bijector"]
 
-EpiModel["AbstractEpiModel
+EpiModel["AbstractTuringEpiModel
 ----------------------
 Choice of target
 for latent process:
@@ -40,7 +40,7 @@ Obs. cases y_t"]
 
 LatentProcPriors["Latent process priors"]
 
-LatentProc["AbstractLatentModel
+LatentProc["AbstractTuringLatentModel
 ---------------------
 RandomWalk"]
 
@@ -53,7 +53,7 @@ DelayObservations"]
 
 E["Turing model constructor
 ---------------------
-make_epi_aware"]
+generate_epiaware"]
 
 G[Posterior draws]
 H[Posterior checking]

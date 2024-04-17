@@ -1,5 +1,5 @@
 
-@testitem "`make_epi_aware` with direct infections and RW latent process runs" begin
+@testitem "`generate_epiaware` with direct infections and RW latent process runs" begin
     using Distributions, Turing, DynamicPPL
     # Define test inputs
     y_t = missing # Data will be generated from the model
@@ -24,9 +24,8 @@
     )
 
     # Create full epi model and sample from it
-    test_mdl = make_epi_aware(
-        y_t, time_horizon;
-        epi_model = epi_model,
+    test_mdl = generate_epiaware(
+        y_t, time_horizon, epi_model,
         latent_model = rwp,
         observation_model = obs_model
     )
@@ -38,7 +37,7 @@
     @test length(gen.I_t) == time_horizon
 end
 
-@testitem "`make_epi_aware` with Exp growth rate and RW latent process runs" begin
+@testitem "`generate_epiaware` with Exp growth rate and RW latent process runs" begin
     using Distributions, Turing, DynamicPPL
     # Define test inputs
     y_t = missing# rand(1:10, 365) # Data will be generated from the model
@@ -61,9 +60,9 @@ end
     )
 
     # Create full epi model and sample from it
-    test_mdl = make_epi_aware(y_t,
-        time_horizon;
-        epi_model = epi_model,
+    test_mdl = generate_epiaware(y_t,
+        time_horizon,
+        epi_model;
         latent_model = rwp,
         observation_model = obs_model)
 
@@ -76,7 +75,7 @@ end
     @test length(gens[1].I_t) == time_horizon
 end
 
-@testitem "`make_epi_aware` with Renewal and RW latent process runs" begin
+@testitem "`generate_epiaware` with Renewal and RW latent process runs" begin
     using Distributions, Turing, DynamicPPL
     # Define test inputs
     y_t = missing# rand(1:10, 365) # Data will be generated from the model
@@ -100,9 +99,9 @@ end
     )
 
     # Create full epi model and sample from it
-    test_mdl = make_epi_aware(y_t,
-        time_horizon;
-        epi_model = epi_model,
+    test_mdl = generate_epiaware(y_t,
+        time_horizon,
+        epi_model;
         latent_model = rwp,
         observation_model = obs_model
     )

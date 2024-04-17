@@ -16,10 +16,10 @@ export EpiData, DirectInfections, ExpGrowthRate, Renewal
 export R_to_r, r_to_R
 
 include("docstrings.jl")
-include("epidata.jl")
-include("directinfections.jl")
-include("expgrowthrate.jl")
-include("renewal.jl")
+include("EpiData.jl")
+include("DirectInfections.jl")
+include("ExpGrowthRate.jl")
+include("Renewal.jl")
 include("utils.jl")
 
 end

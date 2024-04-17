@@ -1,4 +1,4 @@
-"""
+@doc raw"
 The `EpiData` struct represents epidemiological data used in infectious disease modeling.
 
 ## Constructors
@@ -31,8 +31,7 @@ gen_distribution = Uniform(0.0, 10.0)
 data = EpiData(;gen_distribution
     D_gen = 10.0)
 ```
-
-"""
+"
 struct EpiData{T <: Real, F <: Function}
     "Discrete generation interval."
     gen_int::Vector{T}

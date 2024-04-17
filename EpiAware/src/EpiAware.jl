@@ -11,7 +11,7 @@ An epidemiological model in `EpiAware` consists of composable structs with core 
     types. The core types are:
 1. `AbstractModel`: This overarching type is used to abstract `Turing` models and is
     inherited by the other abstract types we use.
-2. `AbstractEpiModel`: Subtypes of this abstract type represent different models for the
+2. `AbstractTuringEpiModel`: Subtypes of this abstract type represent different models for the
      spread of an infectious disease. Each model type has a corresponding
      `make_epi_aware` function that constructs a `Turing` model for fitting the
          model to data. Implemented concrete subtypes:
@@ -34,7 +34,7 @@ An epidemiological model in `EpiAware` consists of composable structs with core 
 module EpiAware
 
 # Non-submodule imports
-using Turing, DocStringExtensions, Reexport
+using Turing, DocStringExtensions, Reexport, DynamicPPL, MCMCChains
 
 # Submodule imports
 include("EpiAwareBase/EpiAwareBase.jl")
@@ -55,17 +55,6 @@ include("EpiObsModels/EpiObsModels.jl")
 include("EpiInference/EpiInference.jl")
 @reexport using .EpiInference
 
-#Export problems
-export EpiProblem
-
-#Export inference methods
-export EpiMethod
-
-#Export functions
-export make_epi_aware
-
 include("docstrings.jl")
-include("epiawareproblem.jl")
-include("make_epi_aware.jl")
 
 end

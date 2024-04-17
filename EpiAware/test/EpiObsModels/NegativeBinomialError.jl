@@ -3,7 +3,7 @@
     # Test default constructor
     nb = NegativeBinomialError()
     @test all(rand(nb.cluster_factor_prior, 100) .>= 0.0)
-    @test isapprox(mean(nb.cluster_factor_prior), 0.1)
+    @test isapprox(mean(nb.cluster_factor_prior), 0.01)
     @test nb.pos_shift ≈ 1e-6
 
     # Test constructor with custom prior

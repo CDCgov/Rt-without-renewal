@@ -19,7 +19,7 @@ rand(ar_model)
 ```
 "
 struct AR{D <: Sampleable, S <: Sampleable, I <: Sampleable, P <: Int} <:
-       AbstractLatentModel
+       AbstractTuringLatentModel
     "Prior distribution for the damping coefficients."
     damp_prior::D
     "Prior distribution for the standard deviation."

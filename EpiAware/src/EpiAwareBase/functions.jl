@@ -17,3 +17,32 @@ function broadcast_n(broadcast_rule::AbstractBroadcastRule, latent, n, period)
     @info "No concrete implementation for broadcast_n is defined."
     return nothing
 end
+
+"""
+Apply the inference/generative method `method` to the `AbstractEpiModel` object `mdl`.
+
+# Arguments
+- `model::AbstractEpiModel`: The model to apply the method to.
+- `method::AbstractEpiMethod`: The epidemiological method to apply.
+- `prev_result`: The previous result of the method.
+- `kwargs`: Additional keyword arguments passed to the method.
+
+# Returns
+- `nothing`: If no concrete implementation is defined for the given `method`.
+"""
+function _apply_method(model::AbstractEpiModel, method::AbstractEpiMethod,
+        prev_result = nothing; kwargs...)
+    @info "No concrete implementation for `_apply_method` is defined."
+    return nothing
+end
+
+@doc raw"
+Condition a model on fixed (i.e to a value) and conditioned (i.e to data) parameters.
+
+# Returns
+- `model`: The conditioned model.
+"
+function condition_model(model, fix_parameters, condition_parameters)
+    @info "No concrete implementation for `condition_model` is defined."
+    return model
+end

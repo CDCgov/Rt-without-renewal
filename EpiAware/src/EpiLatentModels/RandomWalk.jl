@@ -49,7 +49,7 @@ unobserved infections.
 Z_t, _ = generated_quantities(rw_model, θ)
 ```
 "
-@kwdef struct RandomWalk{D <: Sampleable, S <: Sampleable} <: AbstractLatentModel
+@kwdef struct RandomWalk{D <: Sampleable, S <: Sampleable} <: AbstractTuringLatentModel
     init_prior::D = Normal()
     std_prior::S = HalfNormal(0.25)
 end

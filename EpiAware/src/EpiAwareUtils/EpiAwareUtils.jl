@@ -6,13 +6,14 @@ module EpiAwareUtils
 using ..EpiAwareBase
 
 using DataFramesMeta: DataFrame, @rename!
-using Turing: Chains
+using DynamicPPL: Model, fix, condition
+using MCMCChains: Chains
 using Random: AbstractRNG
 
-using Distributions, DocStringExtensions, QuadGK, Statistics
+using Distributions, DocStringExtensions, QuadGK, Statistics, Turing
 
 #Export Structures
-export HalfNormal
+export HalfNormal, DirectSample
 
 #Export functions
 export scan, spread_draws, censored_pmf
@@ -21,6 +22,8 @@ include("docstrings.jl")
 include("censored_pmf.jl")
 include("HalfNormal.jl")
 include("scan.jl")
+include("turing-methods.jl")
+include("DirectSample.jl")
 include("post-inference.jl")
 
 end
