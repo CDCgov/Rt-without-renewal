@@ -285,7 +285,7 @@ We fix these parameters using `fix`, and generate a random epidemic.
 "
 
 # ╔═╡ 7e0e6012-8648-4f84-a25a-8b0138c4b72a
-cond_generative_model = fix(full_model, (rw_init = 0,))
+cond_generative_model = fix(full_model, fixed_parameters)
 
 # ╔═╡ b20c28be-7b07-410c-a33b-ea5ad6828c12
 random_epidemic = rand(cond_generative_model)
