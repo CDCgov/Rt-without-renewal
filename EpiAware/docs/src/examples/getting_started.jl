@@ -214,7 +214,7 @@ We also set up the inference to occur over 100 days.
 "
 
 # ╔═╡ c7580ae6-0db5-448e-8b20-4dd6fcdb1ae0
-time_horizon = 30
+time_horizon = 100
 
 # ╔═╡ 0aa3fcbd-0831-45b8-9a2c-7ffbabf5895f
 md"
@@ -331,15 +331,15 @@ We now make the model but fixing the initial condition of the random walk to be 
 
 # ╔═╡ b4033728-b321-4100-8194-1fd9fe2d268d
 inference_model = full_model |>
-                  model -> fix(model, (rw_init = 0.0,)) |>
+                  model -> fix(model, fixed_parameters) |>
                            model -> condition(model, (y_t = truth_data))
 
 # ╔═╡ fa37466d-fe1f-4bb3-b558-5673135aea07
-num_threads = Threads.nthreads()
+num_threads = min(10, Threads.nthreads())
 
 # ╔═╡ 35b8f89b-683f-469d-b638-e7b0e2d8cdf1
 sampling_method = EpiMethod(
-    pre_sampler_steps = [ManyPathfinder(nruns = 100, maxiters = 1000)],
+    pre_sampler_steps = [ManyPathfinder(nruns = 100, maxiters = 100)],
     sampler = NUTSampler(adtype = AutoReverseDiff(true),
         ndraws = 1000,
         nchains = num_threads,
