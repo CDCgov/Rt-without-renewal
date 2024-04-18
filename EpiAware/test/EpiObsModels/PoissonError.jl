@@ -3,11 +3,11 @@
     # Test default constructor
     poi = PoissonError()
     @test poi.pos_shift ≈ zero(Float64)
-    poi_float = PoissonError(; pos_shift = 0f0)
+    poi_float = PoissonError(; pos_shift = 0.0f0)
     @test poi_float.pos_shift ≈ zero(Float32)
 
     # Test constructor with pos_shift
-    poi2 = PoissonError(;pos_shift = 1e-3)
+    poi2 = PoissonError(; pos_shift = 1e-3)
     @test poi2.pos_shift ≈ 1e-3
 end
 
