@@ -36,7 +36,7 @@ end
     samples = sample(fix_model, Prior(), 1000; progress = false)
 
     obs_samples = samples |>
-                  chn -> mapreduce(vcat, generated_quantities(fix_model, chn)) do gen
+        chn -> mapreduce(vcat, generated_quantities(fix_model, chn)) do gen
         gen[1]
     end
 
