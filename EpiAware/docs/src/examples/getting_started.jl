@@ -463,19 +463,11 @@ Here we spaghetti plot posterior sampled time-varying reproductive numbers again
 
 # ╔═╡ 15b9f37f-8d5f-460d-8c28-d7f2271fd099
 let
-    n = epi_model.data.len_gen_int
-    true_infections = sampled_epidemic.generated.I_t
-
-    Rt_denom = [dot(reverse(epi_model.data.gen_int), true_infections[(t - n):(t - 1)])
-                for t in (n + 1):length(true_infections)]
-    true_Rt = true_infections[(n + 1):end] ./ Rt_denom
+    true_Rt = expected_Rt(epi_model.data, true_infections)
 
     predicted_Rt = mapreduce(
         hcat, generated_quantities(inference_model, sol.samples)) do gen
-        _It = gen.I_t
-        _Rt_denom = [dot(reverse(epi_model.data.gen_int), _It[(t - n):(t - 1)])
-                     for t in (n + 1):length(_It)]
-        Rt = _It[(n + 1):end] ./ _Rt_denom
+        Rt = expected_Rt(epi_model.data, gen.I_t)
     end
 
     plt = plot((n + 1):epi_prob.tspan[2], predicted_Rt, c = :grey, alpha = 0.05, lab = "")
