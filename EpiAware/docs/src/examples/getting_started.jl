@@ -72,6 +72,8 @@ And $\mu_t$ is an external importation of infection process.
 ```math
 C_t \sim \text{NegBin}(\text{mean} = I_t,~ \text{overdispersion} = \phi).
 ```
+
+In the examples below we are going to largely recreate the _Mishra et al_ model, whilst emphasing that each component of the overall epidemiological model is, itself, a stand alone model that can be sampled from.
 "
 
 # ╔═╡ 104f4d16-7433-4a2d-89e7-288a9b223563
@@ -168,24 +170,24 @@ end
 
 # ╔═╡ 12fd3bd5-657e-4b1a-aa88-6063419aaceb
 md"
-In this note, we are going to treat $R_t$ as varying weekly.
+In this note, we are going to treat $R_t$ as varying every two days. The reason for this is to 1) reduce the effective number of parameters, and 2) showcase the `BroadcastLatentModel` wrapper.
 
-In `EpiAware` we set this behaviour by wrapping a `LatentModel` in a `BroadcastLatentModel`. This allows us to set the broadcasting period and type. In this case we broadcast each latent process value over $7$ days in a `RepeatBlock`.
+In `EpiAware` we set this behaviour by wrapping a `LatentModel` in a `BroadcastLatentModel`. This allows us to set the broadcasting period and type. In this case we broadcast each latent process value over $2$ days in a `RepeatBlock`.
 "
 
 # ╔═╡ 61eac666-9fe4-4918-bd3f-68e89275d07a
-weekly_ar = BroadcastLatentModel(ar, 7, RepeatBlock())
+twod_ar = BroadcastLatentModel(ar, 2, RepeatBlock())
 
 # ╔═╡ 5a96e7e9-0376-4365-8eb1-b2fad9be8fef
 let
     n_samples = 100
-    weekly_ar_mdl = generate_latent(weekly_ar, 30)
-    wkly_ar_mdl_samples = mapreduce(hcat, 1:n_samples) do _
-        θ = rand(weekly_ar_mdl) #Sample unconditionally the underlying parameters of the model
-        gen = generated_quantities(weekly_ar_mdl, θ)[1]
+    twod_ar_mdl = generate_latent(twod_ar, 30)
+    twod_ar_mdl_samples = mapreduce(hcat, 1:n_samples) do _
+        θ = rand(twod_ar_mdl) #Sample unconditionally the underlying parameters of the model
+        gen = generated_quantities(twod_ar_mdl, θ)[1]
     end
 
-    plot(wkly_ar_mdl_samples,
+    plot(twod_ar_mdl_samples,
         lab = "",
         c = :grey,
         alpha = 0.25,
@@ -300,7 +302,7 @@ In `EpiAware`, we default to a prior on $\sqrt{1/\phi}$ because this quantity ha
 "
 
 # ╔═╡ 714908a1-dc85-476f-a99f-ec5c95a78b60
-obs = NegativeBinomialError(cluster_factor_prior = HalfNormal(0.05))
+obs = NegativeBinomialError(cluster_factor_prior = HalfNormal(0.15))
 
 # ╔═╡ dacb8094-89a4-404a-8243-525c0dbfa482
 md"
@@ -362,9 +364,9 @@ The `tspan` set the range of the time index for the models.
 
 # ╔═╡ eaad5f46-e928-47c2-90ec-2cca3871c75d
 epi_prob = EpiProblem(epi_model = epi,
-    latent_model = weekly_ar,
+    latent_model = twod_ar,
     observation_model = obs,
-    tspan = (30, 120))
+    tspan = (45, 80))
 
 # ╔═╡ 2678f062-36ec-40a3-bd85-7b57a08fd809
 md"
@@ -434,10 +436,16 @@ We can spaghetti plot generated case data from the version of the model _which h
 Because we are using synthetic data we can also plot the model predictions for the _unobserved_ infections and check that (at least in this example) we were able to capture some unobserved/latent variables in the process accurate.
 
 We find that the `EpiAware` model recovers the main finding in _Mishra et al_; that the $R_t$ in South Korea peaked at a very high value ($R_t \sim 10$ at peak) before rapidly dropping below 1 in early March 2020.
+
+Note that, in reality, the peak $R_t$ found here and in _Mishra et al) is unrealistically high, this might be due to a combination of:
+- A mis-estimated generation interval/serial interval distribution.
+- An ascertainment rate that was, in reality, changing over time.
+
+In a future note, we'll demonstrate having a time-varying ascertainment rate.
 "
 
 # ╔═╡ 8b557bf1-f3dd-4f42-a250-ce965412eb32
-plt_full = let
+let
     C = south_korea_data.y_t
     D = south_korea_data.dates
     gens = inference_results.generated
@@ -493,8 +501,6 @@ md"
 ### Parameter inference
 
 We can interrogate the sampled chains directly from the `samples` field of the `inference_results` object.
-
-We find that all $(num_threads) chains converge onto the same posterior distribution. The negative binomial cluster factor was found to be much larger than the prior belief. This is probably because we used a weekly time-varying reproductive number, and therefore extra observation dispersion was required to account for the large discontinuous changes in Feb-March 2020. In contrast, there was no posterior information sufficient to move the AR auto-regression parameters away from their priors.
 "
 
 # ╔═╡ ff21c9ec-1581-405f-8db1-0f522b5bc296
@@ -547,55 +553,55 @@ let
 end
 
 # ╔═╡ Cell order:
-# ╠═a59d977c-0178-11ef-0063-83e30e0cf9f0
-# ╠═34a06b3b-799b-48c5-bd08-1e57151f51ec
-# ╠═8a8d5682-2f89-443b-baf0-d4d3b134d311
-# ╠═9161ab72-5c39-4a67-9762-e19f1c54c7fd
-# ╠═1642dbda-4915-4e29-beff-bca592f3ec8d
-# ╠═104f4d16-7433-4a2d-89e7-288a9b223563
-# ╠═d201c82b-8efd-41e2-96d7-4f5e0c67088c
+# ╟─a59d977c-0178-11ef-0063-83e30e0cf9f0
+# ╟─34a06b3b-799b-48c5-bd08-1e57151f51ec
+# ╟─8a8d5682-2f89-443b-baf0-d4d3b134d311
+# ╟─9161ab72-5c39-4a67-9762-e19f1c54c7fd
+# ╟─1642dbda-4915-4e29-beff-bca592f3ec8d
+# ╟─104f4d16-7433-4a2d-89e7-288a9b223563
+# ╟─d201c82b-8efd-41e2-96d7-4f5e0c67088c
 # ╠═c88bbbd6-0101-4c04-97c9-c5887ef23999
-# ╠═40352cd6-3592-438b-b5d8-f56dcb1a4d27
-# ╠═31ee2757-0409-45df-b193-60c552797a3d
+# ╟─40352cd6-3592-438b-b5d8-f56dcb1a4d27
+# ╟─31ee2757-0409-45df-b193-60c552797a3d
 # ╠═2bf22866-b785-4ee0-953d-ac990a197561
-# ╠═25e25125-8587-4451-8600-9b55a04dbcd9
-# ╠═fbe117b7-a0b8-4604-a5dd-e71a0a1a4fc3
-# ╠═9f84dec1-70f1-442e-8bef-a9494921549e
+# ╟─25e25125-8587-4451-8600-9b55a04dbcd9
+# ╟─fbe117b7-a0b8-4604-a5dd-e71a0a1a4fc3
+# ╟─9f84dec1-70f1-442e-8bef-a9494921549e
 # ╠═51a82a62-2c59-43c9-8562-69d15a7edfdd
-# ╠═d3938381-01b7-40c6-b369-a456ff6dba72
-# ╠═12fd3bd5-657e-4b1a-aa88-6063419aaceb
+# ╟─d3938381-01b7-40c6-b369-a456ff6dba72
+# ╟─12fd3bd5-657e-4b1a-aa88-6063419aaceb
 # ╠═61eac666-9fe4-4918-bd3f-68e89275d07a
-# ╠═5a96e7e9-0376-4365-8eb1-b2fad9be8fef
-# ╠═6a9e871f-a2fa-4e41-af89-8b0b3c3b5b4b
+# ╟─5a96e7e9-0376-4365-8eb1-b2fad9be8fef
+# ╟─6a9e871f-a2fa-4e41-af89-8b0b3c3b5b4b
 # ╠═c1fc1929-0624-45c0-9a89-86c8479b2675
 # ╠═99c9ba2c-20a5-4c7f-94d2-272d6c9d5904
-# ╠═71d08f7e-c409-4fbe-b154-b21d09010683
-# ╠═4a2b5cf1-623c-4fe7-8365-49fb7972af5a
+# ╟─71d08f7e-c409-4fbe-b154-b21d09010683
+# ╟─4a2b5cf1-623c-4fe7-8365-49fb7972af5a
 # ╠═9e49d451-946b-430b-bcdb-1ef4bba55a4b
 # ╠═8487835e-d430-4300-bd7c-e33f5769ee32
-# ╠═2119319f-a2ef-4c96-82c4-3c7eaf40d2e0
-# ╠═51b5d5b6-3ad3-4967-ad1d-b1caee201fcb
+# ╟─2119319f-a2ef-4c96-82c4-3c7eaf40d2e0
+# ╟─51b5d5b6-3ad3-4967-ad1d-b1caee201fcb
 # ╠═9e564a6e-f521-41e8-8604-6a9d73af9ba7
 # ╠═72bdb47d-4967-4f20-9ae5-01f82e7b32c5
-# ╠═7a6d4b14-58d3-40c1-81f2-713c830f875f
-# ╠═c8ef8a60-d087-4ae9-ae92-abeea5afc7ae
+# ╟─7a6d4b14-58d3-40c1-81f2-713c830f875f
+# ╟─c8ef8a60-d087-4ae9-ae92-abeea5afc7ae
 # ╠═714908a1-dc85-476f-a99f-ec5c95a78b60
-# ╠═dacb8094-89a4-404a-8243-525c0dbfa482
+# ╟─dacb8094-89a4-404a-8243-525c0dbfa482
 # ╠═d45f34e2-64f0-4828-ae0d-7b4cb3a3287d
 # ╠═2e0e8bf3-f34b-44bc-aa2d-046e1db6ee2d
 # ╠═55c639f6-b47b-47cf-a3d6-547e793c72bc
-# ╠═c3a62dda-e054-4c8c-b1b8-ba1b5c4447b3
-# ╠═de5d96f0-4df6-4cc3-9f1d-156176b2b676
-# ╠═a06065e1-0e20-4cf8-8d5a-2d588da20bee
+# ╟─c3a62dda-e054-4c8c-b1b8-ba1b5c4447b3
+# ╟─de5d96f0-4df6-4cc3-9f1d-156176b2b676
+# ╟─a06065e1-0e20-4cf8-8d5a-2d588da20bee
 # ╠═eaad5f46-e928-47c2-90ec-2cca3871c75d
-# ╠═2678f062-36ec-40a3-bd85-7b57a08fd809
+# ╟─2678f062-36ec-40a3-bd85-7b57a08fd809
 # ╠═58f6f0bd-f1e4-459f-84b0-8d89831c8d7b
 # ╠═88b43e23-1e06-4716-b284-76e8afc6171b
-# ╠═92333a96-5c9b-46e1-9a8f-f1890831066b
+# ╟─92333a96-5c9b-46e1-9a8f-f1890831066b
 # ╠═c7140b20-e030-4dc4-97bc-0efc0ff59631
-# ╠═9970adfd-ee88-4598-87a3-ffde5297031c
+# ╟─9970adfd-ee88-4598-87a3-ffde5297031c
 # ╠═660a8511-4dd1-4788-9c14-fdd604bf83ad
-# ╠═5e6f505b-49fe-4ff4-ac2e-f6adcd445569
-# ╠═8b557bf1-f3dd-4f42-a250-ce965412eb32
-# ╠═c05ed977-7a89-4ac8-97be-7078d69fce9f
-# ╠═ff21c9ec-1581-405f-8db1-0f522b5bc296
+# ╟─5e6f505b-49fe-4ff4-ac2e-f6adcd445569
+# ╟─8b557bf1-f3dd-4f42-a250-ce965412eb32
+# ╟─c05ed977-7a89-4ac8-97be-7078d69fce9f
+# ╟─ff21c9ec-1581-405f-8db1-0f522b5bc296
