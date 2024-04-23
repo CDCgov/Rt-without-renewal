@@ -18,8 +18,8 @@ makedocs(; sitename = "EpiAware.jl",
     format = Documenter.HTML(
         prettyurls = get(ENV, "CI", nothing) == "true",
         mathengine = Documenter.MathJax3(),
-        size_threshold = 600 * 2^10,
-        size_threshold_warn = 200 * 2^10
+        size_threshold = 6000 * 2^10,
+        size_threshold_warn = 2000 * 2^10
     )
 )
 
