@@ -1,10 +1,10 @@
 ### A Pluto.jl notebook ###
-# v0.19.40
+# v0.19.39
 
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ c593a2a0-d7f5-11ee-0931-d9f65ae84a72
+# ╔═╡ 34a06b3b-799b-48c5-bd08-1e57151f51ec
 # hideall
 let
     docs_dir = dirname(dirname(@__DIR__))
@@ -16,12 +16,12 @@ let
     Pkg.instantiate()
 end;
 
-# ╔═╡ da479d8d-1312-4b98-b0af-5be52dffaf3f
+# ╔═╡ 1642dbda-4915-4e29-beff-bca592f3ec8d
 begin
     using EpiAware
     using Turing
     using Distributions
-    using StatsPlots
+    using StatsPlots, StatsPlots.PlotMeasures
     using Random
     using DynamicPPL
     using Statistics
@@ -29,526 +29,579 @@ begin
     using LinearAlgebra
     using Transducers
     using ReverseDiff
+    using DelimitedFiles
+    using Dates
     Random.seed!(1)
 end
 
-# ╔═╡ 3ebc8384-f73d-4597-83a7-07a3744fed61
+# ╔═╡ a59d977c-0178-11ef-0063-83e30e0cf9f0
+begin
+    data = readdlm("south_korea_data.csv2", ','; header = true)
+    dates = data[1][:, 2] .|> Date
+    daily_cases = data[1][:, 3] .|> Integer
+end;
+
+# ╔═╡ 8a8d5682-2f89-443b-baf0-d4d3b134d311
 md"
 # Getting started with `EpiAware`
 
 This tutorial introduces the basic functionality of `EpiAware`. `EpiAware` is a package for making inferences on epidemiological case/determined infection data using a model-based approach.
 
-In this tutorial we consider a time series of case data and make inference on the underlying unobserved infections that generated the case data along with the implied time-varying reproduction number.
+It is common to conceptualise the generative process of public health data, e.g a time series of reported cases of an infectious pathogen, in a modular way. For example, it is common to abstract the underlying latent infection process away from downstream issues of observation, or to treat quanitites such as the time-varying reproduction number as being itself generated as a random process.
+
+`EpiAware` is built using the [`DynamicPPL`](https://github.com/TuringLang/DynamicPPL.jl) probabilistic programming domain-specific language, which is part of the [`Turing`](https://turinglang.org/dev/docs/using-turing/guide/) PPL. The structural concept behind `EpiAware` is that each module of an epidemiological model is a self-contained `Turing` [`Model`](https://turinglang.org/DynamicPPL.jl/stable/api/#DynamicPPL.Model-Tuple{}); that is each module is an object that can be conditioned on observable data and sampled from. A complete `EpiAware` model is the composition of these objects using the [`@submodel`](https://turinglang.org/DynamicPPL.jl/stable/api/#DynamicPPL.@submodel) macro.
 "
 
-# ╔═╡ 5a84e8fd-81ef-4a42-ae26-1b30c8909a63
+# ╔═╡ 9161ab72-5c39-4a67-9762-e19f1c54c7fd
 md"
-## Overview
-The models we consider are discrete-time $t = 1,\dots, T$ with a latent random process, $Z_t$ generating stochasticity in the number of new infections $I_t$ at each time step. Observations are treated as downstream random variables determined by the actual infections and a model of infection to observation delay.
+## Example: Early COVID-19 case data in South Korea
 
+To demonstrate `EpiAware` we largely recreate an epidemiological model presented in [On the derivation of the renewal equation from an age-dependent branching process: an epidemic modelling perspective, _Mishra et al_ (2020)](https://arxiv.org/abs/2006.16487). _Mishra et al_ consider test-confirmed cases of COVID-19 in South Korea between January to July 2020. The components of the epidemilogical model they consider are:
+
+- The log-time varying reproductive number $\log R_t$ is modelled as an AR(2) process.
+- The latent infection ($I_t$) generating process is a renewal model:
+```math
+I_t = \mu_t + R_t \sum_{s\geq 1} I_{t-s} g_s.
+```
+Where $g_t$ is a daily discretisation of the probability mass function of an estimated serial interval distribution:
+```math
+G \sim \text{Gamma}(6.5,0.62).
+```
+And $\mu_t$ is an external importation of infection process.
+- Observed cases $C_t$ are distributed around latent infections with negative binomial errors:
+```math
+C_t \sim \text{NegBin}(\text{mean} = I_t,~ \text{overdispersion} = \phi).
+```
+
+In the examples below we are going to largely recreate the _Mishra et al_ model, whilst emphasing that each component of the overall epidemiological model is, itself, a stand alone model that can be sampled from.
 "
 
-# ╔═╡ 3dc17e20-c9e8-46f2-9c87-b8ebc7c18486
+# ╔═╡ 104f4d16-7433-4a2d-89e7-288a9b223563
 md"
-#### Mathematical definition
-Let the parameters of the model be ``\theta = (\theta_Z, \theta_I, \theta_O)``, then the overall infection observation process is:
+### Time-varying reproduction number as a `LatentModel` type
+
+`EpiAware` exposes a `LatentModel` type system; the purpose of which is to define stochastic processes which can be interpreted as generating time-varying parameters/quantities of interest.
+
+In the _Mishra et al_ model the log-time varying reproductive number is _a priori_ assumed to evolve as an auto-regressive process, AR(2):
 
 ```math
 \begin{align}
-Z_\cdot &\sim \mathcal{P}(\mathbb{R}^T) | \theta_Z, \\
-I_0 &\sim f_0(\theta_I), \\
-I_t &\sim g_I(\{I_s, Z_s\}_{s < t}, \theta_{I}), \\
-y_t &\sim f_O(\{I_s\}_{s \leq t}, \theta_{O}).
+Z_t &= \log R_t, \\
+Z_t &= \rho_1 Z_{t-1} + \rho_2 Z_{t-2} + \epsilon_t, \\
+\epsilon_t &\sim \text{Normal}(0, \sigma).
 \end{align}
 ```
-
-Where $\mathcal{P}(\mathbb{R}^T) | \theta_Z$ is a parametric process on $\mathbb{R}^T$. $f_0$ and $f_O$ are parametric distributions on, respectively, the initial number of infections and the observed case data conditional on underlying infections. $g_I$ is distribution of new infections conditional on infections and latent process in the past. Note that we assume that new infections are conditional on the strict past, whereas new observations can depend on infections on the same time step.
 "
 
-# ╔═╡ 0eb5dcf0-8fba-437f-8947-d73c4b2f47f0
+# ╔═╡ d201c82b-8efd-41e2-96d7-4f5e0c67088c
 md"
-#### Code structure outline
-
-An `EpiAware` model in code is created from three modular components:
-
-- A `LatentModel`: This defines the model for $Z_\cdot$. This chooses $\mathcal{P}(\mathbb{R}^T) | \theta_Z$.
-- An `EpiModel`: This defines a generative process for infections conditional on the latent process. This chooses $f_0(\theta_I)$, and $g_I(\{I_s, Z_s\}_{s < t}, \theta_{I})$.
-- An `ObservationModel`: This defines the observation model. This chooses $f_O({I_s}_{s \leq t}, \theta_{O})$
-
-We can bundle these three modular components into an `EpiProblem` struct along with a `tspan` field that defines how long the process last for. In this case,
-```julia
-tspan = (1, T)
-```
+`EpiAware` gives a concrete subtype `AR <: AbstractLatentModel` which defines this behaviour of the latent model. The user can supply the priors for $\rho_1,\rho_2$, wich we call `damp_priors`, as well as for $\sigma$ (`std_prior`) and the initial values $Z_1, Z_2$ (`init_priors`).
 "
 
-# ╔═╡ 9c5453f5-f98d-4cd4-b50b-95af0b82fd0d
+# ╔═╡ c88bbbd6-0101-4c04-97c9-c5887ef23999
+ar = AR(
+    damp_priors = [truncated(Normal(0.8, 0.05), 0, 1),
+        truncated(Normal(0.05, 0.05), 0, 1)],
+    std_prior = HalfNormal(1.0),
+    init_priors = [Normal(-1.0, 0.1), Normal(-1.0, 0.1)]
+)
+
+# ╔═╡ 40352cd6-3592-438b-b5d8-f56dcb1a4d27
 md"
-## Model definition
+The priors here are based on _Mishra et al_, note that we have decreased the _a priori_ belief in the correlation parameter $\rho_1$.
 "
 
-# ╔═╡ 767beffd-1ef5-4e6c-9ac6-edb52e60fb44
+# ╔═╡ 31ee2757-0409-45df-b193-60c552797a3d
 md"
-## Direct infection `EpiModel`
+##### `Turing` model interface
 
-This is a simple model where the unobserved log-infections are directly generated by the latent process $Z$.
-```math
-\log I_t = \log I_0 + Z_t.
-```
+As mentioned above, we can use this instance of the `AR` latent model to construct a `Turing` `Model` which implements the probabilistic behaviour determined by `ar`.
 
-As discussed above, we still ask for a defined generation interval, which can be used to calculate $\mathcal{R}_t$.
-
+We do this with the constructor function `generate_latent` which combines `ar` with a number of time steps to generate for (in this case we choose 30).
 "
 
-# ╔═╡ f067284f-a1a6-44a6-9b79-f8c2de447673
+# ╔═╡ 2bf22866-b785-4ee0-953d-ac990a197561
+ar_mdl = generate_latent(ar, 30)
+
+# ╔═╡ 25e25125-8587-4451-8600-9b55a04dbcd9
 md"
-The `EpiData` constructor performs double interval censoring to convert our _continuous_ estimate of the generation interval into a discretized version. We also implement right truncation using the keyword `D_gen`.
+We can sample from this model, which is useful for model diagnostic and prior predictive checking.
 "
 
-# ╔═╡ 9e43cbe3-94de-44fc-a788-b9c7adb34218
-truth_GI = Gamma(2, 5)
+# ╔═╡ fbe117b7-a0b8-4604-a5dd-e71a0a1a4fc3
+plt_ar_sample = let
+    n_samples = 100
+    ar_mdl_samples = mapreduce(hcat, 1:n_samples) do _
+        θ = rand(ar_mdl) #Sample unconditionally the underlying parameters of the model
+        gen = generated_quantities(ar_mdl, θ)[1]
+    end
 
-# ╔═╡ c0662d48-4b54-4b6d-8c91-ddf4b0e3aa43
+    plot(ar_mdl_samples,
+        lab = "",
+        c = :grey,
+        alpha = 0.25,
+        title = "$(n_samples) draws from the AR(2) model",
+        ylabel = "Log Rt")
+end
+
+# ╔═╡ 9f84dec1-70f1-442e-8bef-a9494921549e
+md"
+And we can sample from this model with some parameters conditioned, for example with $\sigma = 0$. In this case the AR process is an initial perturbation model with return to baseline.
+"
+
+# ╔═╡ 51a82a62-2c59-43c9-8562-69d15a7edfdd
+cond_ar_mdl = ar_mdl | (σ_AR = 0.0,)
+
+# ╔═╡ d3938381-01b7-40c6-b369-a456ff6dba72
+let
+    n_samples = 100
+    ar_mdl_samples = mapreduce(hcat, 1:n_samples) do _
+        θ = rand(cond_ar_mdl) #Sample unconditionally the underlying parameters of the model
+        gen = generated_quantities(cond_ar_mdl, θ)[1]
+    end
+
+    plot(ar_mdl_samples,
+        lab = "",
+        c = :grey,
+        alpha = 0.25,
+        title = "AR(2) model conditioned on sigma = 0",
+        ylabel = "Log Rt")
+end
+
+# ╔═╡ 12fd3bd5-657e-4b1a-aa88-6063419aaceb
+md"
+In this note, we are going to treat $R_t$ as varying every two days. The reason for this is to 1) reduce the effective number of parameters, and 2) showcase the `BroadcastLatentModel` wrapper.
+
+In `EpiAware` we set this behaviour by wrapping a `LatentModel` in a `BroadcastLatentModel`. This allows us to set the broadcasting period and type. In this case we broadcast each latent process value over $2$ days in a `RepeatBlock`.
+"
+
+# ╔═╡ 61eac666-9fe4-4918-bd3f-68e89275d07a
+twod_ar = BroadcastLatentModel(ar, 2, RepeatBlock())
+
+# ╔═╡ 5a96e7e9-0376-4365-8eb1-b2fad9be8fef
+let
+    n_samples = 100
+    twod_ar_mdl = generate_latent(twod_ar, 30)
+    twod_ar_mdl_samples = mapreduce(hcat, 1:n_samples) do _
+        θ = rand(twod_ar_mdl) #Sample unconditionally the underlying parameters of the model
+        gen = generated_quantities(twod_ar_mdl, θ)[1]
+    end
+
+    plot(twod_ar_mdl_samples,
+        lab = "",
+        c = :grey,
+        alpha = 0.25,
+        title = "$(n_samples) draws from the weekly AR(2) model",
+        ylabel = "Log Rt")
+end
+
+# ╔═╡ 6a9e871f-a2fa-4e41-af89-8b0b3c3b5b4b
+md"
+## The Renewal model as an `EpiModel` type
+
+`EpiAware` has an `EpiModel` type system which we use to set the behaviour of the latent infection model. In this case we want to implement a renewal model.
+
+To construct an `EpiModel` we need to supply some fixed data for the model contained in an `EpiData` object. The `EpiData` constructor performs double interval censoring to convert our _continuous_ estimate of the generation interval into a discretized version $g_t$. We also implement right truncation using the keyword `D_gen`.
+
+"
+
+# ╔═╡ c1fc1929-0624-45c0-9a89-86c8479b2675
+truth_GI = Gamma(6.5, 0.62)
+
+# ╔═╡ 99c9ba2c-20a5-4c7f-94d2-272d6c9d5904
 model_data = EpiData(gen_distribution = truth_GI,
-    D_gen = 10.0)
+    D_gen = 14.0)
 
-# ╔═╡ 6639e66f-7725-4976-81b2-6472419d1a62
-log_I0_prior = Normal(log(100.0), 1.0)
-
-# ╔═╡ 6fbdd8e6-2323-4352-9185-1f31a9cf9012
-epi_model = DirectInfections(model_data, log_I0_prior)
-
-# ╔═╡ 5a0d5ab8-e985-4126-a1ac-58fe08beee38
-md"
-## Random walk `LatentModel`
-
-As an example, we choose the latent process as a random walk with parameters $\theta_Z$:
-
-- ``Z_0``: Initial position.
-- ``\sigma^2_{Z}``: The step-size variance.
-
-Conditional on the parameters the random walk is then generated by white noise:
-```math
-\begin{align}
-Z_t &= Z_0 + \sigma_{RW} \sum_{t= 1}^T \epsilon_t, \\
-\epsilon_t &\sim \mathcal{N}(0,1).
-\end{align}
-```
-
-In `EpiAware` we provide a constructor for random walk latent models with priors for $\theta_Z$. We choose priors,
-```math
-\begin{align}
-Z_0 &\sim \mathcal{N}(0,1),\\
-\sigma_{RW} &\sim \text{HalfNormal}(0.1 * \sqrt{\pi / 2})).
-\end{align}
-```
-"
-
-# ╔═╡ 56ae496b-0094-460b-89cb-526627991717
-rwp = EpiAware.RandomWalk(
-    init_prior = Normal(),
-    std_prior = EpiAware.EpiLatentModels.HalfNormal(0.1))
-
-# ╔═╡ fd72094f-1b95-4d07-a8b0-ef47dc560dfc
-md"
-We can supply a prior for the initial log_infections.
-"
-
-# ╔═╡ df5e59f8-3185-4bed-9cca-7c266df17cec
-md"
-And construct the `EpiModel`.
-"
-
-# ╔═╡ 10c750db-6d00-4ef6-9caa-3cf7b3c0d711
-latent = generate_latent_infs(epi_model, 20)
-
-# ╔═╡ 45b287b8-22b5-4f09-9a93-51df82477b01
-rand(latent)
-
-# ╔═╡ 5e62a50a-71f4-4902-b1c9-fdf51fe145fa
-md"
-
-
-### Delayed Observations `ObservationModel`
-
-The observation model is a negative binomial distribution parameterised with mean $\mu$ and 'successes' parameter $r$. The standard deviation _relative_ to the mean $\sigma_{\text{rel}} = \sigma / \mu$ for negative binomial observations is,
-
-```math
-\sigma_{\text{rel}} =(1/\sqrt{\mu}) + (1 / \sqrt{r}).
-```
-It is standard to use a half-t distribution for standard deviation priors (e.g. as argued in this [paper](http://www.stat.columbia.edu/~gelman/research/published/taumain.pdf)); we specialise this to a Half-Normal prior and use an _a priori_ assumption that a typical observation fluctuation around the mean (when the mean is $\sim\mathcal{O}(10^2)$) would be 1%, which is close to Poisson noise.
-
-This implies a standard deviation prior,
-```math
-1 / \sqrt{r} \sim \text{HalfNormal}\Big(0.01 ~\sqrt{{\pi \over 2}}\Big).
-```
-The $\sqrt{{\pi \over 2}}$ factor ensures the correct prior mean (see [here](https://en.wikipedia.org/wiki/Half-normal_distribution)).
-
-The expected observed cases are delayed infections. Delays are implemented as the action of a sparse kernel on the infections $I(t)$.
-
-```math
-y_t \sim \text{NegBinomial}\Big(\mu = \sum_{s\geq 0} K[t, t-s] I(s), r\Big). \\
-```
-"
-
-# ╔═╡ 448669bc-99f4-4823-b15e-fcc9040ba31b
-obs_model = LatentDelay(
-    NegativeBinomialError(cluster_factor_prior = HalfNormal(0.01)),
-    fill(0.25, 4)
-)
-
-# ╔═╡ 28a7a049-87d6-4ff1-ac1e-bcbb7ffb90c9
-md"
-## `EpiProblem`
-
-"
-
-# ╔═╡ 420dcccc-3eb6-4c33-9393-8135426b9372
-epi_prob = EpiProblem(epi_model = epi_model,
-    latent_model = rwp,
-    observation_model = obs_model,
-    tspan = (1, 100))
-
-# ╔═╡ e813d547-6100-4c43-b84c-8cebe306bda8
-md"
-We also set up the inference to occur over 100 days.
-"
-
-# ╔═╡ c7580ae6-0db5-448e-8b20-4dd6fcdb1ae0
-time_horizon = 100
-
-# ╔═╡ 0aa3fcbd-0831-45b8-9a2c-7ffbabf5895f
-md"
-We choose a simple observation model where infections are observed 0, 1, 2, 3 days later with equal probability.
-"
-
-# ╔═╡ 9926eb3e-ecea-4eb8-9b2c-3b5e3a563723
-md"
-## `Solution` method
-"
-
-# ╔═╡ e49713e8-4840-4083-8e3f-fc52d791be7b
-md"
-## Generate cases from the `EpiAware` model
-
-Having chosen an `EpiModel`, `LatentModel` and `ObservationModel`, we can implement the model as a [`Turing`](https://turinglang.org/dev/) model using  `generate_epiaware`.
-
-By giving `missing` to the first argument, we indicate that case data will be _generated_ from the model rather than treated as fixed.
-"
-
-# ╔═╡ 2437902b-0aee-4c0a-a420-8f22083a29fb
-md"
-### Using `apply_method`
-"
-
-# ╔═╡ b287d321-39ba-4e52-9951-57642635d568
-nodata = (y_t = missing,)
-
-# ╔═╡ 36b34fd2-2891-42ca-b5dc-abb482e516ee
-fixed_parameters = (rw_init = 0.0, init_incidence = log(100.0))
-
-# ╔═╡ bc6c19fb-efec-4a59-b120-b4ee99306634
-sampled_epidemic = apply_method(epi_prob, DirectSample(), nodata;
-    fix_parameters = fixed_parameters
-)
-
-# ╔═╡ 952add1d-80dc-48af-bc5c-d77be0788580
+# ╔═╡ 71d08f7e-c409-4fbe-b154-b21d09010683
 let
-    plot(sampled_epidemic.generated.I_t,
-        label = "I_t",
-        xlabel = "Time",
-        ylabel = "Infections",
-        title = "Generated Infections")
-    scatter!(sampled_epidemic.generated.generated_y_t, lab = "Cases")
+    bar(model_data.gen_int,
+        fillalpha = 0.5,
+        lw = 0,
+        lab = "Discretized next gen pmf",
+        xticks = 0:14,
+        xlabel = "Days",
+        title = "Continuous and discrete generation intervals")
+    plot!(truth_GI, lab = "Continuous serial interval")
 end
 
-# ╔═╡ d0f86fa7-7439-4adc-a58f-1c53cd01162e
+# ╔═╡ 4a2b5cf1-623c-4fe7-8365-49fb7972af5a
 md"
-### Direct interaction with `Turing` model
+The user also needs to specify a prior for the log incidence at time zero, $\log I_0$. The initial _history_ of latent infections $I_{-1}, I_{-2},\dots$ is constructed as
+```math
+I_t = e^{rt} I_0,\qquad t = 0, -1, -2,...
+```
+Where the exponential growth rate $r$ is determined by the initial reproductive number $R_1$ via the solution to the implicit equation,
+```math
+R_1 = 1 \Big{/} \sum_{t\geq 1} e^{-rt} g_t
+```
 "
 
-# ╔═╡ abeff860-58c3-4644-9325-66ffd4446b6d
-full_model = generate_epiaware(missing, time_horizon,
-    epi_model;
-    latent_model = rwp,
-    observation_model = obs_model)
+# ╔═╡ 9e49d451-946b-430b-bcdb-1ef4bba55a4b
+log_I0_prior = Normal(log(1.0), 1.0)
 
-# ╔═╡ 821628fb-8044-48b0-aa4f-0b7b57a2f45a
+# ╔═╡ 8487835e-d430-4300-bd7c-e33f5769ee32
+epi = Renewal(model_data, log_I0_prior)
+
+# ╔═╡ 2119319f-a2ef-4c96-82c4-3c7eaf40d2e0
 md"
-We choose some fixed parameters:
-- Initial incidence is 100.
-- In the direct infection model, the initial incidence and in the initial value of the random walk form a non-identifiable pair. Therefore, we fix $Z_0 = 0$.
+_NB: We don't implement a background infection rate in this model._
 "
 
-# ╔═╡ 0aadd9e3-7f91-4b45-9663-67d11335f0d0
+# ╔═╡ 51b5d5b6-3ad3-4967-ad1d-b1caee201fcb
 md"
-We fix these parameters using `fix`, and generate a random epidemic.
+##### `Turing` model interface
+
+As mentioned above, we can use this instance of the `Renewal` latent infection model to construct a `Turing` `Model` which implements the probabilistic behaviour determined by `epi`.
+
+We do this with the constructor function `generate_latent_infs` which combines `epi` with a provided $\log R_t$ time series.
+
+Here we choose an example where $R_t$ decreases from $R_t = 3$ to $R_t = 0.5$ over the course of 30 days.
 "
 
-# ╔═╡ 7e0e6012-8648-4f84-a25a-8b0138c4b72a
-cond_generative_model = fix(full_model, fixed_parameters)
+# ╔═╡ 9e564a6e-f521-41e8-8604-6a9d73af9ba7
+R_t_fixed = [0.5 + 2.5 / (1 + exp(t - 15)) for t in 1:30]
 
-# ╔═╡ b20c28be-7b07-410c-a33b-ea5ad6828c12
-random_epidemic = rand(cond_generative_model)
+# ╔═╡ 72bdb47d-4967-4f20-9ae5-01f82e7b32c5
+latent_inf_mdl = generate_latent_infs(epi, log.(R_t_fixed))
 
-# ╔═╡ d073e63b-62da-4743-ace0-78ef7806bc0b
-true_infections = generated_quantities(cond_generative_model, random_epidemic).I_t
+# ╔═╡ 7a6d4b14-58d3-40c1-81f2-713c830f875f
+plt_epi = let
+    n_samples = 100
+    epi_mdl_samples = mapreduce(hcat, 1:n_samples) do _
+        θ = rand(latent_inf_mdl) #Sample unconditionally the underlying parameters of the model
+        gen = generated_quantities(latent_inf_mdl, θ)
+    end
 
-# ╔═╡ a04f3c1b-7e11-4800-9c2a-9fc0021de6e7
-generated_obs = generated_quantities(cond_generative_model, random_epidemic).generated_y_t
+    p1 = plot(epi_mdl_samples,
+        lab = "",
+        c = :grey,
+        alpha = 0.25,
+        title = "$(n_samples) draws from renewal model with chosen Rt",
+        ylabel = "Latent infections"
+    )
+    p2 = plot(R_t_fixed,
+        lab = "",
+        lw = 2,
+        ylabel = "Rt"
+    )
 
-# ╔═╡ f68b4e41-ac5c-42cd-a8c2-8761d66f7543
-let
-    plot(true_infections,
-        label = "I_t",
-        xlabel = "Time",
-        ylabel = "Infections",
-        title = "Generated Infections")
-    scatter!(generated_obs, lab = "generated cases")
+    plot(p1, p2, layout = (2, 1))
 end
 
-# ╔═╡ b5bc8f05-b538-4abf-aa84-450bf2dff3d9
+# ╔═╡ c8ef8a60-d087-4ae9-ae92-abeea5afc7ae
 md"
-## Inference
-Fixing $Z_0 = 0$ for the random walk was based on inference principles; in this model $Z_0$ and $\log I_0$ are non-identifiable.
+### Negative Binomial Observations as an `ObservationModel` type
 
-However, we now treat the generated data as `truth_data` and make inference without fixing any other parameters.
+In _Mishra et al_ latent infections were assumed to occur on their observation day with negative binomial errors, this motivates using the serial interval (the time between onset of symptoms of a primary and secondary case) rather than generation interval distribution (the time between infection time of a primary and secondary case).
 
-We do the inference by MCMC/NUTS using the `Turing` NUTS sampler with default warm-up steps.
+Observation models are set in `EpiAware` as concrete subtypes of an `ObservationModel`. The Negative binomial error model without observation delays is set with a `NegativeBinomialError` struct. In _Mishra et al_ the overdispersion parameter $\phi$ sets the relationship between the mean and variance of the negative binomial errors,
+```math
+\text{var} = \text{mean} + {\text{mean}^2 \over \phi}.
+```
+In `EpiAware`, we default to a prior on $\sqrt{1/\phi}$ because this quantity has the dimensions of a standard deviation and, therefore, is easier to reason on _a priori_ beliefs.
 "
 
-# ╔═╡ 4a4c6e91-8d8f-4bbf-bb7e-a36dc281e312
+# ╔═╡ 714908a1-dc85-476f-a99f-ec5c95a78b60
+obs = NegativeBinomialError(cluster_factor_prior = HalfNormal(0.15))
+
+# ╔═╡ dacb8094-89a4-404a-8243-525c0dbfa482
 md"
-The observation model supports partially complete data. To test this we set some of the generated observations to be `missing`.
+##### `Turing` model interface
+
+We can construct a `NegativeBinomialError` model implementation as a `Turing` `Model` using `generate_observations`
+
+`Turing` uses `missing` arguments to indicate variables that are to be sampled. We use this to observe a forward model that samples observations, conditional on an underlying expected observation time series.
 "
 
-# ╔═╡ 525aa98c-d0e5-4ffa-b808-d90fc986204c
-truth_data = generated_obs
-
-# ╔═╡ 32638954-2c99-4d4e-8e03-52154030c657
+# ╔═╡ d45f34e2-64f0-4828-ae0d-7b4cb3a3287d
 md"
-We now make the model but fixing the initial condition of the random walk to be 0 and conditioning on the observed data.
+First, we set an artificial expected cases curve.
 "
 
-# ╔═╡ b4033728-b321-4100-8194-1fd9fe2d268d
-inference_model = full_model |>
-                  model -> fix(model, fixed_parameters) |>
-                           model -> condition(model, (y_t = truth_data))
+# ╔═╡ 2e0e8bf3-f34b-44bc-aa2d-046e1db6ee2d
+expected_cases = [1000 * exp(-(t - 15)^2 / (2 * 4)) for t in 1:30]
 
-# ╔═╡ fa37466d-fe1f-4bb3-b558-5673135aea07
+# ╔═╡ 55c639f6-b47b-47cf-a3d6-547e793c72bc
+obs_mdl = generate_observations(obs, missing, expected_cases)
+
+# ╔═╡ c3a62dda-e054-4c8c-b1b8-ba1b5c4447b3
+plt_obs = let
+    n_samples = 100
+    obs_mdl_samples = mapreduce(hcat, 1:n_samples) do _
+        θ = rand(obs_mdl) #Sample unconditionally the underlying parameters of the model
+        gen = generated_quantities(obs_mdl, θ)[1]
+    end
+    scatter(obs_mdl_samples,
+        lab = "",
+        c = :grey,
+        alpha = 0.25,
+        title = "$(n_samples) draws from neg. bin. obs model",
+        ylabel = "Observed cases"
+    )
+    plot!(expected_cases,
+        c = :red,
+        lw = 3,
+        lab = "Expected cases")
+end
+
+# ╔═╡ de5d96f0-4df6-4cc3-9f1d-156176b2b676
+md"A _reverse_ observation model, which samples the underlying latent infections conditional on observations would require a prior on the latent infections. This is the purpose of composing multiple models; as we'll see below the latent infection and latent $R_t$ models are informative priors on the latent infection time series underlying the observations."
+
+# ╔═╡ a06065e1-0e20-4cf8-8d5a-2d588da20bee
+md"
+## Composing models into an `EpiProblem`
+
+As mentioned above, each module of the overall epidemiological model we are interested in is a `Turing` `Model` in its own right. In this section, we compose the individual models into the full epidemiological model using the `EpiProblem` struct.
+
+The constructor for an `EpiProblem` requires:
+- An `epi_model`.
+- A `latent_model`.
+- An `observation_model`.
+- A `tspan`.
+
+The `tspan` set the range of the time index for the models.
+"
+
+# ╔═╡ eaad5f46-e928-47c2-90ec-2cca3871c75d
+epi_prob = EpiProblem(epi_model = epi,
+    latent_model = twod_ar,
+    observation_model = obs,
+    tspan = (45, 80))
+
+# ╔═╡ 2678f062-36ec-40a3-bd85-7b57a08fd809
+md"
+## Inference Methods
+
+We make inferences on the unobserved quantities, such as $R_t$ by sampling from the model conditioned on the observed data. We generate the posterior samples using the No U-Turns (NUTS) sampler.
+
+To make NUTS more robust we provide `manypathfinder`, which is built on pathfinder variational inference from [Pathfinder.jl](https://mlcolab.github.io/Pathfinder.jl/stable/). `manypathfinder` runs `nruns` pathfinder processes on the inference problem and returns the pathfinder run with maximum estimated ELBO.
+
+The composition of doing variational inference as a pre-sampler step which gets passed to NUTS initialisation is defined using the `EpiMethod` struct, where a sequence of pre-sampler steps can be be defined.
+
+`EpiMethod` also allows the specification of NUTS parameters, such as type of automatic differentiation, type of parallelism and number of parallel chains to sample.
+"
+
+# ╔═╡ 58f6f0bd-f1e4-459f-84b0-8d89831c8d7b
 num_threads = min(10, Threads.nthreads())
 
-# ╔═╡ 35b8f89b-683f-469d-b638-e7b0e2d8cdf1
-sampling_method = EpiMethod(
-    pre_sampler_steps = [ManyPathfinder(nruns = 100, maxiters = 100)],
-    sampler = NUTSampler(adtype = AutoReverseDiff(true),
-        ndraws = 1000,
+# ╔═╡ 88b43e23-1e06-4716-b284-76e8afc6171b
+inference_method = EpiMethod(
+    pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 100)],
+    sampler = NUTSampler(adtype = AutoForwardDiff(),
+        ndraws = 2000,
         nchains = num_threads,
         mcmc_parallel = MCMCThreads())
 )
 
-# ╔═╡ 9caecb83-4ffb-423f-a780-62be0963cb12
-sol = apply_method(inference_model, sampling_method)
-
-# ╔═╡ 83d2eead-8e71-4e5a-be71-59a7a5ee267c
-sol.samples
-
-# ╔═╡ 4ae1c2c1-7c5b-40c8-bdb7-f94c909a1b82
-
-# ╔═╡ 8c8d2b75-3232-4fa2-8af7-2529028be33c
-
-# ╔═╡ 183d1e45-7279-4d2c-a253-d13764ecf04d
-
-# ╔═╡ 4b19f504-28f8-4fda-a4cc-6601585cd869
+# ╔═╡ 92333a96-5c9b-46e1-9a8f-f1890831066b
 md"
-Alternatively, we could dispatch on a `EpiProblem` and optionally pass data, fixed parameters, and conditioned parameters.
+## Inference and analysis
+
+In the background of this note (see hidden top cell and short R script in this directory), we load daily reported cases from South Korea from Jan-July 2020 which were gathered using `covidregionaldata` from ECDC data archives.
+
+We supply the data as a `NamedTuple` with the `y_t` field containing the observed data, shortened to fit the chosen `tspan` of `epi_prob`.
 "
 
-# ╔═╡ 9222b436-9445-4039-abbf-25c8cddb7f63
+# ╔═╡ c7140b20-e030-4dc4-97bc-0efc0ff59631
+south_korea_data = (y_t = daily_cases[epi_prob.tspan[1]:epi_prob.tspan[2]],
+    dates = dates[epi_prob.tspan[1]:epi_prob.tspan[2]])
+
+# ╔═╡ 9970adfd-ee88-4598-87a3-ffde5297031c
 md"
-### Initialising inference
+### Sampling with `apply_method`
 
-It is possible for the default warm-up process for NUTS to get stuck in low probability or otherwise degenerate regions of parameter space.
+The `apply_method` function combines the elements above:
+- An `EpiProblem` object.
+- An `EpiMethod` object.
+- Data to condition the model upon.
 
-To make NUTS more robust we provide `manypathfinder`, which is built on pathfinder variational inference from [Pathfinder.jl](https://mlcolab.github.io/Pathfinder.jl/stable/). `manypathfinder` runs `nruns` pathfinder processes on the inference problem and returns the pathfinder run with maximum estimated ELBO.
-
-`manypathfinder` differs from `Pathfinder.multipathfinder`; `multipathfinder` is aimed at sampling from a potentially non-Gaussian target distribution which is first approximated as a uniformly weighted collection of normal approximations from pathfinder runs. `manypathfinder` is aimed at moving rapidly to a 'good' part of parameter space, and is robust to runs that fail.
+And returns a collection of results:
+- The epidemiological model as a `Turing` `Model`.
+- Samples from MCMC.
+- Generated quantities of the model.
 "
 
-# ╔═╡ 073a1d40-456a-450e-969f-11b23eb7fd1f
-md"
-We can use draws from the best pathfinder run to initialise NUTS.
-"
+# ╔═╡ 660a8511-4dd1-4788-9c14-fdd604bf83ad
+inference_results = apply_method(epi_prob,
+    inference_method,
+    south_korea_data
+)
 
-# ╔═╡ 30498cc7-16a5-441a-b8cd-c19b220c60c1
+# ╔═╡ 5e6f505b-49fe-4ff4-ac2e-f6adcd445569
 md"
-### Predictive plotting
+### Results and Predictive plotting
 
 We can spaghetti plot generated case data from the version of the model _which hasn't conditioned on case data_ using posterior parameters inferred from the version conditioned on observed data. This is known as _posterior predictive checking_, and is a useful diagnostic tool for Bayesian inference (see [here](http://www.stat.columbia.edu/~gelman/book/BDA3.pdf)).
 
 Because we are using synthetic data we can also plot the model predictions for the _unobserved_ infections and check that (at least in this example) we were able to capture some unobserved/latent variables in the process accurate.
+
+We find that the `EpiAware` model recovers the main finding in _Mishra et al_; that the $R_t$ in South Korea peaked at a very high value ($R_t \sim 10$ at peak) before rapidly dropping below 1 in early March 2020.
+
+Note that, in reality, the peak $R_t$ found here and in _Mishra et al) is unrealistically high, this might be due to a combination of:
+- A mis-estimated generation interval/serial interval distribution.
+- An ascertainment rate that was, in reality, changing over time.
+
+In a future note, we'll demonstrate having a time-varying ascertainment rate.
 "
 
-# ╔═╡ e9df22b8-8e4d-4ab7-91ea-c01f2239b3e5
+# ╔═╡ 8b557bf1-f3dd-4f42-a250-ce965412eb32
 let
-    post_check_y_t = mapreduce(
-        hcat, generated_quantities(inference_model, sol.samples)) do gen
+    C = south_korea_data.y_t
+    D = south_korea_data.dates
+    gens = inference_results.generated
+
+    #Unconditional model for posterior predictive sampling
+    mdl_unconditional = generate_epiaware(epi_prob, (y_t = missing,))
+    predicted_y_t = mapreduce(
+        hcat, generated_quantities(mdl_unconditional, inference_results.samples)) do gen
         gen.generated_y_t
     end
-
     predicted_I_t = mapreduce(
-        hcat, generated_quantities(inference_model, sol.samples)) do gen
+        hcat, gens) do gen
         gen.I_t
     end
-
-    p1 = plot(post_check_y_t, c = :grey, alpha = 0.05, lab = "")
-    scatter!(p1, truth_data,
-        lab = "Observed cases",
-        xlabel = "Time",
-        ylabel = "Cases",
-        title = "Post. predictive checking: cases",
-        ylims = (-0.5, maximum(truth_data) * 1.5),
-        c = :green)
-
-    p2 = plot(predicted_I_t, c = :grey, alpha = 0.05, lab = "")
-    scatter!(p2, sampled_epidemic.generated.I_t,
-        lab = "Actual infections",
-        xlabel = "Time",
-        ylabel = "Unobserved Infections",
-        title = "Post. predictions: infections",
-        ylims = (-0.5, maximum(sampled_epidemic.generated.I_t) * 1.5),
-        c = :red)
-
-    plot(p1, p2,
-        layout = (1, 2),
-        size = (700, 400))
-end
-
-# ╔═╡ fd6321b1-4c3a-4123-b0dc-c45b951e0b80
-md"
-As well as checking the posterior predictions for latent infections, we can also check how well inference recovered unknown parameters, such as the random walk variance or the cluster factor of the negative binomial observations.
-"
-
-# ╔═╡ 10d8fe24-83a6-47ac-97b7-a374481473d3
-let
-    parameters_to_plot = (:σ_RW, :cluster_factor)
-
-    plts = map(parameters_to_plot) do name
-        var_samples = sol.samples[name] |> vec
-        histogram(var_samples,
-            bins = 50,
-            norm = :pdf,
-            lw = 0,
-            fillalpha = 0.5,
-            lab = "MCMC")
-        vline!([getfield(sampled_epidemic.samples, name)], lab = "True value")
-        title!(string(name))
-    end
-    plot(plts..., layout = (2, 1))
-end
-
-# ╔═╡ 81efe8ca-b753-4a12-bafc-a887a999377b
-md"
-## Reproductive number back-calculation
-
-`EpiAware` models do not need to specify a time-varying reproductive number $\mathcal{R}_t$ to generate $I_\cdot$, however, this is often a quantity of interest. When not directly used we will typically back-calculate $\mathcal{R}_t$ from the generated infections:
-
-```math
-\mathcal{R}_t = {I_t \over \sum_{s \geq 1} g_s I_{t-s} }.
-```
-
-Where $g_s$ is a discrete generation interval. For this reason, even when not using a reproductive number approach directly, we ask for a generation interval.
-
-Here we spaghetti plot posterior sampled time-varying reproductive numbers against the actual.
-"
-
-# ╔═╡ 15b9f37f-8d5f-460d-8c28-d7f2271fd099
-let
-    n = epi_model.data.len_gen_int
-    true_infections = sampled_epidemic.generated.I_t
-
-    Rt_denom = [dot(reverse(epi_model.data.gen_int), true_infections[(t - n):(t - 1)])
-                for t in (n + 1):length(true_infections)]
-    true_Rt = true_infections[(n + 1):end] ./ Rt_denom
-
-    predicted_Rt = mapreduce(
-        hcat, generated_quantities(inference_model, sol.samples)) do gen
-        _It = gen.I_t
-        _Rt_denom = [dot(reverse(epi_model.data.gen_int), _It[(t - n):(t - 1)])
-                     for t in (n + 1):length(_It)]
-        Rt = _It[(n + 1):end] ./ _Rt_denom
+    predicted_R_t = mapreduce(
+        hcat, gens) do gen
+        exp.(gen.Z_t)
     end
 
-    plt = plot((n + 1):epi_prob.tspan[2], predicted_Rt, c = :grey, alpha = 0.05, lab = "")
-    plot!(plt, (n + 1):epi_prob.tspan[2], true_Rt,
-        lab = "true Rt",
-        xlabel = "Time",
+    p1 = plot(D, predicted_y_t, c = :grey, alpha = 0.05, lab = "")
+    scatter!(p1, D, C,
+        lab = "Actual cases",
+        ylabel = "Daily Cases",
+        title = "Post. predictive: Cases",
+        ylims = (-0.5, maximum(C) * 2),
+        c = :red
+    )
+
+    p2 = plot(D, predicted_I_t,
+        c = :grey,
+        alpha = 0.05,
+        lab = "",
+        ylabel = "Daily latent infections",
+        ylims = (-0.5, maximum(C) * 1.5),
+        title = "Prediction: Latent infections"
+    )
+
+    p3 = plot(D, predicted_R_t,
+        c = :grey,
+        alpha = 0.025,
+        lab = "",
         ylabel = "Rt",
-        title = "Post. predictions: reproductive number",
-        c = :red,
-        lw = 2)
+        title = "Prediction: Reproduction number",
+        yscale = :log10
+    )
+    hline!(p3, [1.0], lab = "Rt = 1", lw = 2, c = :blue)
+
+    plot(p1, p2, p3, layout = (3, 1), size = (500, 700), left_margin = 5mm)
+end
+
+# ╔═╡ c05ed977-7a89-4ac8-97be-7078d69fce9f
+md"
+### Parameter inference
+
+We can interrogate the sampled chains directly from the `samples` field of the `inference_results` object.
+"
+
+# ╔═╡ ff21c9ec-1581-405f-8db1-0f522b5bc296
+let
+    p1 = histogram(inference_results.samples[:cluster_factor],
+        lab = "chain " .* string.([1 2 3 4]),
+        fillalpha = 0.4,
+        lw = 0,
+        norm = :pdf,
+        title = "Posterior dist: Neg. bin. cluster factor")
+    plot!(p1, obs.cluster_factor_prior,
+        lw = 3,
+        c = :black,
+        lab = "prior")
+
+    p2 = histogram(inference_results.samples[:init_incidence],
+        lab = "chain " .* string.([1 2 3 4]),
+        fillalpha = 0.4,
+        lw = 0,
+        norm = :pdf,
+        title = "Posterior dist: log-initial incidence")
+    plot!(p2, epi.initialisation_prior,
+        lw = 3,
+        c = :black,
+        lab = "prior")
+
+    p3 = histogram(inference_results.samples["damp_AR[1]"],
+        lab = "chain " .* string.([1 2 3 4]),
+        fillalpha = 0.4,
+        lw = 0,
+        norm = :pdf,
+        title = "Posterior dist: rho_1")
+    plot!(p3, ar.damp_prior.v[1],
+        lw = 3,
+        c = :black,
+        lab = "prior")
+
+    p4 = histogram(inference_results.samples["damp_AR[2]"],
+        lab = "chain " .* string.([1 2 3 4]),
+        fillalpha = 0.4,
+        lw = 0,
+        norm = :pdf,
+        title = "Posterior dist: rho_2")
+    plot!(p4, ar.damp_prior.v[2],
+        lw = 3,
+        c = :black,
+        lab = "prior")
+
+    plot(p1, p2, p3, p4, layout = (2, 2), size = (800, 600))
 end
 
 # ╔═╡ Cell order:
-# ╠═c593a2a0-d7f5-11ee-0931-d9f65ae84a72
-# ╟─3ebc8384-f73d-4597-83a7-07a3744fed61
-# ╟─5a84e8fd-81ef-4a42-ae26-1b30c8909a63
-# ╟─3dc17e20-c9e8-46f2-9c87-b8ebc7c18486
-# ╟─0eb5dcf0-8fba-437f-8947-d73c4b2f47f0
-# ╠═9c5453f5-f98d-4cd4-b50b-95af0b82fd0d
-# ╠═da479d8d-1312-4b98-b0af-5be52dffaf3f
-# ╟─767beffd-1ef5-4e6c-9ac6-edb52e60fb44
-# ╟─f067284f-a1a6-44a6-9b79-f8c2de447673
-# ╠═9e43cbe3-94de-44fc-a788-b9c7adb34218
-# ╠═c0662d48-4b54-4b6d-8c91-ddf4b0e3aa43
-# ╠═6639e66f-7725-4976-81b2-6472419d1a62
-# ╠═6fbdd8e6-2323-4352-9185-1f31a9cf9012
-# ╠═5a0d5ab8-e985-4126-a1ac-58fe08beee38
-# ╠═56ae496b-0094-460b-89cb-526627991717
-# ╟─fd72094f-1b95-4d07-a8b0-ef47dc560dfc
-# ╟─df5e59f8-3185-4bed-9cca-7c266df17cec
-# ╠═10c750db-6d00-4ef6-9caa-3cf7b3c0d711
-# ╠═45b287b8-22b5-4f09-9a93-51df82477b01
-# ╟─5e62a50a-71f4-4902-b1c9-fdf51fe145fa
-# ╠═448669bc-99f4-4823-b15e-fcc9040ba31b
-# ╠═28a7a049-87d6-4ff1-ac1e-bcbb7ffb90c9
-# ╠═420dcccc-3eb6-4c33-9393-8135426b9372
-# ╟─e813d547-6100-4c43-b84c-8cebe306bda8
-# ╠═c7580ae6-0db5-448e-8b20-4dd6fcdb1ae0
-# ╟─0aa3fcbd-0831-45b8-9a2c-7ffbabf5895f
-# ╠═9926eb3e-ecea-4eb8-9b2c-3b5e3a563723
-# ╟─e49713e8-4840-4083-8e3f-fc52d791be7b
-# ╠═2437902b-0aee-4c0a-a420-8f22083a29fb
-# ╠═b287d321-39ba-4e52-9951-57642635d568
-# ╠═36b34fd2-2891-42ca-b5dc-abb482e516ee
-# ╠═bc6c19fb-efec-4a59-b120-b4ee99306634
-# ╠═952add1d-80dc-48af-bc5c-d77be0788580
-# ╟─d0f86fa7-7439-4adc-a58f-1c53cd01162e
-# ╠═abeff860-58c3-4644-9325-66ffd4446b6d
-# ╟─821628fb-8044-48b0-aa4f-0b7b57a2f45a
-# ╟─0aadd9e3-7f91-4b45-9663-67d11335f0d0
-# ╠═7e0e6012-8648-4f84-a25a-8b0138c4b72a
-# ╠═b20c28be-7b07-410c-a33b-ea5ad6828c12
-# ╠═d073e63b-62da-4743-ace0-78ef7806bc0b
-# ╠═a04f3c1b-7e11-4800-9c2a-9fc0021de6e7
-# ╠═f68b4e41-ac5c-42cd-a8c2-8761d66f7543
-# ╟─b5bc8f05-b538-4abf-aa84-450bf2dff3d9
-# ╟─4a4c6e91-8d8f-4bbf-bb7e-a36dc281e312
-# ╠═525aa98c-d0e5-4ffa-b808-d90fc986204c
-# ╠═32638954-2c99-4d4e-8e03-52154030c657
-# ╠═b4033728-b321-4100-8194-1fd9fe2d268d
-# ╠═fa37466d-fe1f-4bb3-b558-5673135aea07
-# ╠═35b8f89b-683f-469d-b638-e7b0e2d8cdf1
-# ╠═9caecb83-4ffb-423f-a780-62be0963cb12
-# ╠═83d2eead-8e71-4e5a-be71-59a7a5ee267c
-# ╠═4ae1c2c1-7c5b-40c8-bdb7-f94c909a1b82
-# ╠═8c8d2b75-3232-4fa2-8af7-2529028be33c
-# ╠═183d1e45-7279-4d2c-a253-d13764ecf04d
-# ╠═4b19f504-28f8-4fda-a4cc-6601585cd869
-# ╠═9222b436-9445-4039-abbf-25c8cddb7f63
-# ╟─073a1d40-456a-450e-969f-11b23eb7fd1f
-# ╟─30498cc7-16a5-441a-b8cd-c19b220c60c1
-# ╠═e9df22b8-8e4d-4ab7-91ea-c01f2239b3e5
-# ╟─fd6321b1-4c3a-4123-b0dc-c45b951e0b80
-# ╠═10d8fe24-83a6-47ac-97b7-a374481473d3
-# ╠═81efe8ca-b753-4a12-bafc-a887a999377b
-# ╠═15b9f37f-8d5f-460d-8c28-d7f2271fd099
+# ╟─a59d977c-0178-11ef-0063-83e30e0cf9f0
+# ╟─34a06b3b-799b-48c5-bd08-1e57151f51ec
+# ╟─8a8d5682-2f89-443b-baf0-d4d3b134d311
+# ╟─9161ab72-5c39-4a67-9762-e19f1c54c7fd
+# ╟─1642dbda-4915-4e29-beff-bca592f3ec8d
+# ╟─104f4d16-7433-4a2d-89e7-288a9b223563
+# ╟─d201c82b-8efd-41e2-96d7-4f5e0c67088c
+# ╠═c88bbbd6-0101-4c04-97c9-c5887ef23999
+# ╟─40352cd6-3592-438b-b5d8-f56dcb1a4d27
+# ╟─31ee2757-0409-45df-b193-60c552797a3d
+# ╠═2bf22866-b785-4ee0-953d-ac990a197561
+# ╟─25e25125-8587-4451-8600-9b55a04dbcd9
+# ╟─fbe117b7-a0b8-4604-a5dd-e71a0a1a4fc3
+# ╟─9f84dec1-70f1-442e-8bef-a9494921549e
+# ╠═51a82a62-2c59-43c9-8562-69d15a7edfdd
+# ╟─d3938381-01b7-40c6-b369-a456ff6dba72
+# ╟─12fd3bd5-657e-4b1a-aa88-6063419aaceb
+# ╠═61eac666-9fe4-4918-bd3f-68e89275d07a
+# ╟─5a96e7e9-0376-4365-8eb1-b2fad9be8fef
+# ╟─6a9e871f-a2fa-4e41-af89-8b0b3c3b5b4b
+# ╠═c1fc1929-0624-45c0-9a89-86c8479b2675
+# ╠═99c9ba2c-20a5-4c7f-94d2-272d6c9d5904
+# ╟─71d08f7e-c409-4fbe-b154-b21d09010683
+# ╟─4a2b5cf1-623c-4fe7-8365-49fb7972af5a
+# ╠═9e49d451-946b-430b-bcdb-1ef4bba55a4b
+# ╠═8487835e-d430-4300-bd7c-e33f5769ee32
+# ╟─2119319f-a2ef-4c96-82c4-3c7eaf40d2e0
+# ╟─51b5d5b6-3ad3-4967-ad1d-b1caee201fcb
+# ╠═9e564a6e-f521-41e8-8604-6a9d73af9ba7
+# ╠═72bdb47d-4967-4f20-9ae5-01f82e7b32c5
+# ╟─7a6d4b14-58d3-40c1-81f2-713c830f875f
+# ╟─c8ef8a60-d087-4ae9-ae92-abeea5afc7ae
+# ╠═714908a1-dc85-476f-a99f-ec5c95a78b60
+# ╟─dacb8094-89a4-404a-8243-525c0dbfa482
+# ╠═d45f34e2-64f0-4828-ae0d-7b4cb3a3287d
+# ╠═2e0e8bf3-f34b-44bc-aa2d-046e1db6ee2d
+# ╠═55c639f6-b47b-47cf-a3d6-547e793c72bc
+# ╟─c3a62dda-e054-4c8c-b1b8-ba1b5c4447b3
+# ╟─de5d96f0-4df6-4cc3-9f1d-156176b2b676
+# ╟─a06065e1-0e20-4cf8-8d5a-2d588da20bee
+# ╠═eaad5f46-e928-47c2-90ec-2cca3871c75d
+# ╟─2678f062-36ec-40a3-bd85-7b57a08fd809
+# ╠═58f6f0bd-f1e4-459f-84b0-8d89831c8d7b
+# ╠═88b43e23-1e06-4716-b284-76e8afc6171b
+# ╟─92333a96-5c9b-46e1-9a8f-f1890831066b
+# ╠═c7140b20-e030-4dc4-97bc-0efc0ff59631
+# ╟─9970adfd-ee88-4598-87a3-ffde5297031c
+# ╠═660a8511-4dd1-4788-9c14-fdd604bf83ad
+# ╟─5e6f505b-49fe-4ff4-ac2e-f6adcd445569
+# ╟─8b557bf1-f3dd-4f42-a250-ce965412eb32
+# ╟─c05ed977-7a89-4ac8-97be-7078d69fce9f
+# ╟─ff21c9ec-1581-405f-8db1-0f522b5bc296

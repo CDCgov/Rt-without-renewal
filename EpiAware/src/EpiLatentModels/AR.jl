@@ -83,7 +83,7 @@ Generate a latent AR series.
     @assert n>p "n must be longer than order of the autoregressive process"
 
     # Initialize the AR series with the initial values
-    ar = Vector{Float64}(undef, n)
+    ar = Vector{eltype(ϵ_t)}(undef, n)
     ar[1:p] = ar_init
 
     # Generate the rest of the AR series
