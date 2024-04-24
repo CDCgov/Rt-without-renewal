@@ -1,7 +1,7 @@
 @doc raw"
 `RepeatEach` is a struct that represents a broadcasting rule. It is a subtype of `AbstractBroadcastRule`.
 
-It repeats the latent process at each period. An example of this rule is to repeat the latent process at each day of the week (though for this we also provide the `dayofweek` helper function).
+It repeats the latent process at each period. An example of this rule is to repeat the latent process at each day of the week (though for this we also provide the `broadcast_dayofweek` helper function).
 
 ## Examples
 ```julia

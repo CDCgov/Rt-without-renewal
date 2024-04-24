@@ -1,6 +1,6 @@
-@testitem "dayofweek constructor" begin
+@testitem "broadcast_dayofweek constructor" begin
     model = RandomWalk()
-    broadcast_model = dayofweek(model)
+    broadcast_model = broadcast_dayofweek(model)
     @test typeof(broadcast_model) <: BroadcastLatentModel
     @test typeof(broadcast_model.model) <: RandomWalk
     @test broadcast_model.period == 7
