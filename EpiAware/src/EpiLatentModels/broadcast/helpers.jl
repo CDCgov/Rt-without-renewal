@@ -20,6 +20,6 @@ Constructs a `BroadcastLatentModel` appropriate for modelling piecewise constant
 # Returns
 - `BroadcastLatentModel`: The broadcast latent model.
 "
-function weekly(model::AbstractTuringLatentModel)
+function broadcast_weekly(model::AbstractTuringLatentModel)
     return BroadcastLatentModel(model, 7, RepeatBlock())
 end
