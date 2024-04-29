@@ -63,3 +63,44 @@ end
         @test EpiAwareBase._apply_method(model, em, "y") == "y, z, z, x"
     end
 end
+
+@testitem "Turing method for generate_epiaware with two latent processes" begin
+    using Distributions, Turing
+
+    # Latent model
+    damp_prior = truncated(Normal(0.0, 0.05), 0.0, 1)
+    std_prior = truncated(Normal(0.0, 0.05), 0.0, Inf)
+    init_prior = Normal()
+    ar_process = AR(damp_prior, std_prior, init_prior)
+
+    # Used again in obs model
+
+    obs_ascert = Ascertainment(PoissonError(), ar_process, exp)
+
+    #Epi model
+    gen_int = [0.2, 0.3, 0.5]
+    transformation = exp
+
+    data = EpiData(gen_int, transformation)
+    log_init_incidence_prior = Normal()
+
+    direct_inf_model = DirectInfections(data, log_init_incidence_prior)
+
+    #use generate_epiaware
+    mdl = generate_epiaware(missing, 10, direct_inf_model; latent_model = ar_process,
+        observation_model = obs_ascert)
+
+    #Check that can sample from model and has appropriate keys/variables
+    θ = rand(mdl)
+    #Both latent and obs processes should be present
+    @test haskey(θ, Symbol("obs.ϵ_t"))
+    @test haskey(θ, Symbol("latent.ϵ_t"))
+
+    #Check can sample from model prior
+    chn = sample(mdl, Prior(), 1000; progress = false)
+    @test Symbol("latent.ϵ_t[1]") ∈ keys(chn)
+    @test Symbol("obs.ϵ_t[1]") ∈ keys(chn)
+    #Check that can generate quantities
+    gens = generated_quantities(mdl, chn)
+    @test gens isa Matrix
+end
