@@ -8,6 +8,8 @@ To evaluate the role of the latent generative process in the estimation of the e
 
 In `pipeline`, we will use `EpiAware` to explore whether the inclusion of a renewal process in the latent generative process improves the estimation of Rt and other situational awareness signals. This exploration is then written as a manuscript for publication (see `manuscript` for work supporting this).
 
+To install `EpiAware`, see installation instructions in the `EpiAware` directory.
+
 ## Project Admin
 
 Name, Degrees, e-mail, CDC org (e.g., CDC/IOD/ORR/CFA)
