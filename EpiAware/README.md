@@ -102,7 +102,7 @@ In our view these packages are useful for a global environment available to othe
 
 ### `startup.jl` recommendation
 
-We recommend adding a `startup.jl` file to your Julia environment to import `Revise` and `Term` at the start of any Julia session. This file should be located in the `~/.julia/config` directory. Here is an example of a `startup.jl` file that loads the `Revise` and `Term`:
+We recommend adding a `startup.jl` file to import `Revise` and `Term` at the start of any Julia session. This file should be located in the `~/.julia/config` directory. Here is an example of a `startup.jl` file that loads the `Revise` and `Term`:
 
 ```julia
 atreplinit() do repl
