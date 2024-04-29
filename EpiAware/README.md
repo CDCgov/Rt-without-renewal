@@ -99,3 +99,27 @@ In our view these packages are useful for a global environment available to othe
 - `Documenter`: For local documentation generation (useful for testing).
 - `Pluto`: For interactive development and testing.
 - `TestEnv`: For test development.
+
+### `startup.jl` recommendation
+
+We recommend adding a `startup.jl` file to your Julia environment to import `Revise` and `Term` at the start of any Julia session. This file should be located in the `~/.julia/config` directory. Here is an example of a `startup.jl` file that loads the `Revise` and `Term`:
+
+```julia
+atreplinit() do repl
+    # Load Revise if it is installed
+    try
+        @eval using Revise
+    catch e
+        @warn "error while importing Revise" e
+    end
+    # Load Term if it is installed
+    try
+        @eval using Term
+        @eval install_term_repr()
+        @eval install_term_stacktrace()
+    catch e
+        @warn "error while importing Term" e
+    end
+end
+
+```
