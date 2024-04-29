@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.39
+# v0.19.41
 
 using Markdown
 using InteractiveUtils
@@ -505,7 +505,7 @@ We can interrogate the sampled chains directly from the `samples` field of the `
 
 # ╔═╡ ff21c9ec-1581-405f-8db1-0f522b5bc296
 let
-    p1 = histogram(inference_results.samples[:cluster_factor],
+    p1 = histogram(inference_results.samples["obs.cluster_factor"],
         lab = "chain " .* string.([1 2 3 4]),
         fillalpha = 0.4,
         lw = 0,
@@ -527,7 +527,7 @@ let
         c = :black,
         lab = "prior")
 
-    p3 = histogram(inference_results.samples["damp_AR[1]"],
+    p3 = histogram(inference_results.samples["latent.damp_AR[1]"],
         lab = "chain " .* string.([1 2 3 4]),
         fillalpha = 0.4,
         lw = 0,
@@ -538,7 +538,7 @@ let
         c = :black,
         lab = "prior")
 
-    p4 = histogram(inference_results.samples["damp_AR[2]"],
+    p4 = histogram(inference_results.samples["latent.damp_AR[2]"],
         lab = "chain " .* string.([1 2 3 4]),
         fillalpha = 0.4,
         lw = 0,
