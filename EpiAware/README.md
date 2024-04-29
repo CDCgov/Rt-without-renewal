@@ -7,6 +7,14 @@
 
 A `Julia` package for flexible and composable modeling and inference of the effective reproduction number (Rt) and other situational awareness signals in the presence of different latent generative processes and observation models.
 
+## Installation instruction
+
+Eventually, `EpiAware` is likely to added to the Julia registry. Until then, you can install it from the `/EpiAware` sub-directory of this repository by running the following command in the Julia REPL:
+
+```julia
+using Pkg; Pkg.add(url="https://github.com/CDCgov/Rt-without-renewal", subdir="EpiAware")
+```
+
 ## Model Diagram
 
 - Solid lines indicate implemented features/analysis.
@@ -81,3 +89,13 @@ H-.->I
 ## Pluto scripts
 
 We use [`Pluto.jl`](https://plutojl.org/) scripts as part of our documentation and testing. The scripts are located in `docs/src/examples` and can be run using the `Pluto.jl` package. We recommend using the version of `Pluto` that is pinned in the `Project.toml` file defining the documentation environment. An entry point to running or developing this documentation is the `docs/pluto-scripts.sh` bash shell script. Run this from the root directory of this repository.
+
+## Useful Julia packages for global environment (optional and opinionated)
+In our view these packages are useful for a global environment available to other environments (e.g. add to the `@v1.10` environment), but are not required for the `EpiAware` package to work.
+
+- `Revise`: For modifying package code and using the changes without restarting Julia session.
+- `Term`: For pretty and stylized REPL output (including error messages).
+- `JuliaFormatter`: For code formatting.
+- `Documenter`: For local documentation generation (useful for testing).
+- `Pluto`: For interactive development and testing.
+- `TestEnv`: For test development.
