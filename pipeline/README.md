@@ -5,7 +5,7 @@ An overview of the purpose of this pipeline is:
 1. Generate cases from a defined gold standard model to act as synthetic "truth" data.
 2. Build a matrix set of scenario models, defined using `EpiAware`.
 3. Run inference on each scenario model using `EpiAware`. This will be done using the No U-Turns Sampler (NUTS) algorithm.
-4. Compare inferred time-varying reproductive number and forecasts to the truth data to evaluate the performance of the inference, and/or forecast. 
+4. Compare inferred time-varying reproductive number and forecasts to the truth data to evaluate the performance of the inference, and/or forecast.
 
 ## Synthetic truth data
 
@@ -63,4 +63,4 @@ We score each scenario model in two ways:
 
 ## Running the pipeline
 
-The pipeline structure is built using [DrWatson.jl](https://github.com/JuliaDynamics/DrWatson.jl) for project management of simulation parameters/settings, saved results, and figures. Compute is done with [Dagger.jl](https://github.com/JuliaParallel/Dagger.jl) for organizing parallel computation and checkpointing of results. 
+The pipeline structure is built using [DrWatson.jl](https://github.com/JuliaDynamics/DrWatson.jl) for project management of simulation parameters/settings, saved results, and figures. Compute is done with [Dagger.jl](https://github.com/JuliaParallel/Dagger.jl) for organizing parallel computation and checkpointing of results.
