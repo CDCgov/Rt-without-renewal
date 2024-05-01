@@ -7,7 +7,7 @@ using ..EpiAwareBase
 
 using ..EpiAwareUtils: HalfNormal
 
-using Turing, Distributions, DocStringExtensions
+using Turing, Distributions, DocStringExtensions, LinearAlgebra
 
 #Export models
 export RandomWalk, AR, DiffLatentModel, BroadcastLatentModel
