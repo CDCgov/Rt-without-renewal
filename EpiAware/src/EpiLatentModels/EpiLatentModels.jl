@@ -10,7 +10,7 @@ using ..EpiAwareUtils: HalfNormal
 using Turing, Distributions, DocStringExtensions, LinearAlgebra
 
 #Export models
-export RandomWalk, AR, DiffLatentModel, BroadcastLatentModel
+export Intercept, RandomWalk, AR, DiffLatentModel, BroadcastLatentModel
 
 # Export broadcast rules
 export RepeatEach, RepeatBlock
@@ -19,6 +19,7 @@ export RepeatEach, RepeatBlock
 export dayofweek, weekly
 
 include("docstrings.jl")
+include("Intercept.jl")
 include("RandomWalk.jl")
 include("AR.jl")
 include("DiffLatentModel.jl")
