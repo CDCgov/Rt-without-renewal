@@ -16,8 +16,8 @@ end
     @test all(x -> x == int_model_out[1], int_model_out)
 
     int_samples = sample(int_model, Prior(), 1000; progress = false) |>
-        chn -> get(chn, :intercept).intercept |>
-        vec
+                  chn -> get(chn, :intercept).intercept |>
+                         vec
 
     ks_test_pval = ExactOneSampleKSTest(int_samples, Normal(0.1, 1)) |> pvalue
     @test ks_test_pval > 1e-6
