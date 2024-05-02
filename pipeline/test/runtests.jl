@@ -1,17 +1,8 @@
 using DrWatson, Test
-@quickactivate "pipeline"
+@quickactivate "Analysis pipeline"
 
-# Here you include files using `srcdir`
-# include(srcdir("file.jl"))
+# Load analysis module
+include(srcdir("AnalysisPipeline.jl"))
 
-# Run test suite
-println("Starting tests")
-ti = time()
-
-@testset "pipeline tests" begin
-    @test 1 == 1
-end
-
-ti = time() - ti
-println("\nTest took total time of:")
-println(round(ti / 60, digits = 3), " minutes")
+#run tests
+include("test_SimulationConfig.jl");

@@ -64,3 +64,11 @@ We score each scenario model in two ways:
 ## Running the pipeline
 
 The pipeline structure is built using [DrWatson.jl](https://github.com/JuliaDynamics/DrWatson.jl) for project management of simulation parameters/settings, saved results, and figures. Compute is done with [Dagger.jl](https://github.com/JuliaParallel/Dagger.jl) for organizing parallel computation and checkpointing of results.
+
+## Running pipeline tests
+
+To run the tests for the pipeline, run the following command in the Julia REPL with the root directory as the working directory:
+
+```julia
+include("pipeline/test/runtests.jl")
+```
