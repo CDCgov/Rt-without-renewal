@@ -12,7 +12,7 @@ end
     int_model = generate_latent(int, 10)
     int_model_out = int_model()
     @test length(int_model_out) == 10
-    @teest int_model_out[1]
+    @test int_model_out[1]
     @test all(x -> x == int_model_out[1], int_model_out)
 
     int_samples = sample(int_model, Prior(), 1000; progress = false) |>
