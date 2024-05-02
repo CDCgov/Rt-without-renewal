@@ -7,7 +7,7 @@ Constructs a `BroadcastLatentModel` appropriate for modelling the day of the wee
 # Returns
 - `BroadcastLatentModel`: The broadcast latent model.
 "
-function dayofweek(model::AbstractTuringLatentModel)
+function broadcast_dayofweek(model::AbstractTuringLatentModel)
     return BroadcastLatentModel(model, 7, RepeatEach())
 end
 
@@ -20,6 +20,6 @@ Constructs a `BroadcastLatentModel` appropriate for modelling piecewise constant
 # Returns
 - `BroadcastLatentModel`: The broadcast latent model.
 "
-function weekly(model::AbstractTuringLatentModel)
+function broadcast_weekly(model::AbstractTuringLatentModel)
     return BroadcastLatentModel(model, 7, RepeatBlock())
 end
