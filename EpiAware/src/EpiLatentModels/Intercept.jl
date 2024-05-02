@@ -16,7 +16,8 @@ int_model = generate_latent(int, 10)
 rand(int_model)
 ```
 "
-@kwdef struct Intercept{D <: Sampleable} <: AbstractTuringLatentModel
+struct Intercept{D <: Sampleable} <: AbstractTuringLatentModel
+    "Prior distribution for the intercept."
     intercept_prior::D
 end
 
