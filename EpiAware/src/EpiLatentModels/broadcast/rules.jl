@@ -52,7 +52,7 @@ end
 @doc raw"
 `RepeatBlock` is a struct that represents a broadcasting rule. It is a subtype of `AbstractBroadcastRule`.
 
-It repeats the latent process in blocks of size `period`. An example of this rule is to repeat the latent process in blocks of size 7 to model a weekly process (though for this we also provide the `weekly` helper function).
+It repeats the latent process in blocks of size `period`. An example of this rule is to repeat the latent process in blocks of size 7 to model a weekly process (though for this we also provide the `broadcast_weekly` helper function).
 
 ## Examples
 ```julia

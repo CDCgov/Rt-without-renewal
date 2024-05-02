@@ -16,7 +16,7 @@ export Intercept, RandomWalk, AR, DiffLatentModel, BroadcastLatentModel
 export RepeatEach, RepeatBlock
 
 # Export helper functions
-export dayofweek, weekly
+export broadcast_dayofweek, broadcast_weekly
 
 include("docstrings.jl")
 include("Intercept.jl")
