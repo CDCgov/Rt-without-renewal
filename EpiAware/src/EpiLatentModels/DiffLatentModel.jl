@@ -22,7 +22,7 @@ terms ``Z_1, \ldots, Z_d`` are inferred.
     Constructs a `DiffLatentModel` for `d`-fold differencing with `latentmodel` as the
     undifferenced latent process. All initial terms have common prior
     `init_prior_distribution`.
-- `DiffLatentModel(;undiffmodel, init_priors::Vector{D} where {D <: Distribution})`
+- `DiffLatentModel(;model, init_priors::Vector{D} where {D <: Distribution})`
     Constructs a `DiffLatentModel` for `d`-fold differencing with `latentmodel` as the
     undifferenced latent process. The `d` initial terms have priors given by the vector
     `init_priors`, therefore `length(init_priors)` sets `d`.
