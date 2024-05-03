@@ -1,22 +1,31 @@
 """
 A configuration struct for truth simulation to compare to inference.
+
+NB: This config assumes Gamma distributed generation interval, specified by
+mean and standard deviation.
 """
 @kwdef struct TruthSimulationConfig{T <: Real, F <: Function}
     "True time-varying process. Default this is the time-varing reproductive
     number"
     truth_process::Vector{T}
-    "True generation interval distribution."
-    generation_distribution::Distribution
+    "True generation interval distribution mean."
+    gi_mean::T
+    "True generation interval distribution std."
+    gi_std::T
     "Infection-generating model type. Default is `:Renewal`."
     igp::UnionAll = Renewal
     "Maximum next generation interval when discretized. Default is 21 days."
-    D_gen::T = 21.0
+    D_gen::T = 60.0
     "Transformation function"
     transformation::F = exp
     "Delay distribution: Default is Gamma(4, 5/4)."
     delay_distribution::Distribution = Gamma(4, 5 / 4)
     "Maximum delay when discretized. Default is 15 days."
     D_obs::T = 15.0
+    "Prior for log initial infections. Default is Normal(4.6, 1e-5)."
+    log_I0_prior::Distribution = Normal(log(100.0), 1e-5)
+    "Prior for negative binomial cluster factor. Default is HalfNormal(0.1)."
+    cluster_factor_prior::Distribution = HalfNormal(0.1)
 end
 
 """
@@ -33,19 +42,24 @@ A dictionary containing the sampled infections and observations, along with othe
 """
 function simulate_or_infer(config::TruthSimulationConfig)
     #Define infection-generating model
-    model_data = EpiData(gen_distribution = config.generation_distribution,
+    shape = (config.gi_mean / config.gi_std)^2
+    scale = config.gi_std^2 / config.gi_mean
+    gen_distribution = Gamma(shape, scale)
+
+    model_data = EpiData(gen_distribution = gen_distribution,
         D_gen = config.D_gen,
         transformation = config.transformation)
 
-    log_I0_prior = Normal(log(10.0), 1e-5)
-    epi = config.igp(model_data, log_I0_prior)
+    epi = config.igp(model_data, config.log_I0_prior)
 
     # Sample infections
     inf_mdl = generate_latent_infs(epi, log.(config.truth_process))
     I_t = inf_mdl()
 
     #Define the infection conditional observation distribution
-    obs = LatentDelay(NegativeBinomialError(), config.delay_distribution; D = config.D_obs)
+    obs = LatentDelay(
+        NegativeBinomialError(cluster_factor_prior = config.cluster_factor_prior),
+        config.delay_distribution; D = config.D_obs)
 
     #Sample observations
     obs_model = generate_observations(obs, missing, I_t)
@@ -55,23 +69,6 @@ function simulate_or_infer(config::TruthSimulationConfig)
 
     return Dict("I_t" => I_t, "y_t" => yt, "cluster_factor" => θ.cluster_factor,
         "truth_process" => config.truth_process,
-        "truth_gi_mean" => mean(config.generation_distribution),
-        "truth_gi_std" => std(config.generation_distribution))
-end
-
-"""
-Method for `DrWatson.savename` which returns mean and standard deviation of the generation
-interval distribution for truth simulation
-"""
-function DrWatson.savename(config::TruthSimulationConfig, suffix::String = "")
-    dist = config.generation_distribution
-    str = "gi_mean_" * string(mean(dist)) * "_gi_std_" * string(std(dist)) * suffix
-    return str::String
-end
-
-"""
-"""
-function DrWatson.savename(
-        prefix::String, config::TruthSimulationConfig, suffix::String = "")
-    prefix * savename(config::TruthSimulationConfig, suffix)
+        "truth_gi_mean" => config.gi_mean,
+        "truth_gi_std" => config.gi_std)
 end
