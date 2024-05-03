@@ -10,7 +10,10 @@ using ..EpiAwareUtils: HalfNormal
 using Turing, Distributions, DocStringExtensions, LinearAlgebra
 
 #Export models
-export Intercept, RandomWalk, AR, CombineLatentModels, DiffLatentModel, BroadcastLatentModel
+export Intercept, RandomWalk, AR
+
+# Export tools for manipulating latent models
+export CombineLatentModels, TransformLatentModel, DiffLatentModel, BroadcastLatentModel
 
 # Export broadcast rules
 export RepeatEach, RepeatBlock
@@ -23,6 +26,7 @@ include("Intercept.jl")
 include("RandomWalk.jl")
 include("AR.jl")
 include("CombineLatentModels.jl")
+include("TransformLatentModel.jl")
 include("DiffLatentModel.jl")
 include("broadcast/LatentModel.jl")
 include("broadcast/rules.jl")

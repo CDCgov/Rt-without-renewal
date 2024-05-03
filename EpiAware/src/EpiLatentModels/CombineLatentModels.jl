@@ -1,12 +1,11 @@
 @doc raw"
 The `CombineLatentModels` struct.
 
-This struct is used to combine multiple latent models into a single latent model. The inverse link function is applied to each latent model before combining.
+This struct is used to combine multiple latent models into a single latent model.
 
 # Constructors
-- `CombineLatentModels(models::AbstractVector{<:AbstractTuringLatentModel}; inverse_link::Function = x -> x)`: Constructs a `CombineLatentModels` instance with a vector of models and a default or specified inverse link function applied uniformly to all models.
 
-- `CombineLatentModels(models::M, inverse_links::F) where {M <: AbstractVector{<:AbstractTuringLatentModel}, F <: AbstractVector{<:Function}}`: Constructs a `CombineLatentModels` instance with specified models and inverse link functions, ensuring that the number of models matches the number of inverse link functions and that there are at least two models.
+- `CombineLatentModels(models::M) where {M <: AbstractVector{<:AbstractTuringLatentModel}}`: Constructs a `CombineLatentModels` instance with specified models, ensuring that there are at least two models.
 
 # Examples
 
@@ -18,42 +17,41 @@ latent_model()
 rand(latent_model)
 ```
 "
-
-struct CombineLatentModels{
-    M <: AbstractVector{<:AbstractTuringLatentModel}, F <: AbstractVector{<:Function}} <:
-       AbstractTuringLatentModel
+@kwdef struct CombineLatentModels{M <: AbstractVector{<:AbstractTuringLatentModel}} <: AbstractTuringLatentModel
     "A vector of latent models"
     models::M
-    "The inverse link functions used to transform latent models when combining."
-    inverse_links::F
 
-    function CombineLatentModels(models::AbstractVector{<:AbstractTuringLatentModel};
-            inverse_link::Function = x -> x)
-        inverse_links = fill(inverse_link, length(models))
-        return CombineLatentModels(models, inverse_links)
-    end
-
-    function CombineLatentModels(models::M,
-            inverse_links::F) where {M <: AbstractVector{<:AbstractTuringLatentModel},
-            F <: AbstractVector{<:Function}}
-        @assert length(models)==length(inverse_links) "Number of models and links must be equal"
+    function CombineLatentModels(models::M) where {M <: AbstractVector{<:AbstractTuringLatentModel}}
         @assert length(models)>1 "At least two models are required"
-        return new{M, F}(models, inverse_links)
+        return new{AbstractVector{<:AbstractTuringLatentModel}}(models)
     end
 end
 
-@model function EpiAwareBase.generate_latent(latent_models::CombineLatentModels, n)
-    latent_aux = Array{Any}(undef, length(latent_models.models))
+@doc raw"
+Generate latent variables using a combination of multiple latent models.
 
-    @submodel latent, latent_aux[1] = generate_latent(latent_models.models[1], n)
-    transformed_latents = latent_models.inverse_links[1](latent)
-    combined_latents = transformed_latents
+# Arguments
+- `latent_models::CombineLatentModels`: An instance of the `CombineLatentModels` type representing the collection of latent models.
+- `n`: The number of latent variables to generate.
 
-    for i in 2:length(latent_models.models)
-        @submodel latent, latent_aux[i] = generate_latent(latent_models.models[i], n)
-        transformed_latents = latent_models.inverse_links[i](latent)
-        combined_latents += transformed_latents
+# Returns
+- `combined_latents`: The combined latent variables generated from all the models.
+- `latent_aux`: A tuple containing the auxiliary latent variables generated from each individual model.
+
+# Example
+"
+function EpiAwareBase.generate_latent(latent_models::CombineLatentModels, n)
+    @submodel final_latent, latent_aux = _accumulate_latents(latent_models.models, 1, fill(0.0, n), [])
+
+    return final_latent, (; latent_aux...)
+end
+
+@model function _accumulate_latents(models, index, acc_latent, acc_aux)
+    if index > length(models)
+        return acc_latent, (; acc_aux...)
+    else
+        @submodel latent, new_aux = generate_latent(models[index], n)
+        @submodel updated_latent, updated_aux = _accumulate_latents(models, index + 1, acc_latent .+ latent, (; acc_aux..., new_aux...))
+        return updated_latent,(; updated_aux...)
     end
-
-    return combined_latents, (; latent_aux...)
 end
