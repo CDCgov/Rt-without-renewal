@@ -11,6 +11,20 @@ An overview of the purpose of this pipeline is:
 
 We generate three truth data sets, each with the same time-varying reproductive number $R_t$ but with three different generation intervals $g$.
 
+### Running the truth data generation
+
+To generate the truth data, run the following command in the Julia REPL with the root directory as the working directory:
+
+```julia
+include("pipeline/scripts/truth_data_generation.jl")
+```
+
+or from the command line:
+
+```bash
+julia pipeline/scripts/truth_data_generation.jl
+```
+
 ### "Truth" Reproductive Number
 
 The baseline "truth" for the $R_t$ is piecewise constant followed by oscillating over 160 days. The values are:
@@ -26,9 +40,9 @@ The baseline "truth" for the $R_t$ is piecewise constant followed by oscillating
 ### Generation Intervals
 
 The generation intervals are:
-- *Short:* We use a Gamma(shape = 2, scale = 1), corresponding to a pathogen with a relatively short generation interval.
-- *Medium:* We use a Gamma(shape = 2, scale = 5).
-- *Long:* We use a Gamma(shape = 2, scale = 10), corresponding to a pathogen with a moderately long generation interval.
+- *Short:* We use a Gamma distribution with mean 2 days and std 2 days, corresponding to a pathogen with a relatively short generation interval.
+- *Medium:* We use a Gamma distribution with mean 10 days and std 2 day.
+- *Long:* We use a Gamma distribution with mean 20 days and std 2 day, corresponding to a pathogen with a moderately long generation interval.
 
 ## Scenario models
 
@@ -64,3 +78,11 @@ We score each scenario model in two ways:
 ## Running the pipeline
 
 The pipeline structure is built using [DrWatson.jl](https://github.com/JuliaDynamics/DrWatson.jl) for project management of simulation parameters/settings, saved results, and figures. Compute is done with [Dagger.jl](https://github.com/JuliaParallel/Dagger.jl) for organizing parallel computation and checkpointing of results.
+
+## Running pipeline tests
+
+To run the tests for the pipeline, run the following command in the Julia REPL with the root directory as the working directory:
+
+```julia
+include("pipeline/test/runtests.jl")
+```
