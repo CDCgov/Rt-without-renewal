@@ -7,7 +7,7 @@ using CSV, Dagger, DataFramesMeta, Dates, Distributions, DocStringExtensions, Dr
       EpiAware, Plots, Statistics
 
 export TruthSimulationConfig
-export simulate_or_infer
+export simulate_or_infer, savename
 
 include("docstrings.jl")
 include("TruthSimulationConfig.jl")

@@ -4,12 +4,10 @@ using DrWatson
 # include AnlysisPipeline module
 include(srcdir("AnalysisPipeline.jl"))
 
-@info(
-    """
-    Generating truth data for the `Rt-without-renewal` project.
+@info("""
+      Generating truth data for the `Rt-without-renewal` project.
 
-    ---------------------------------------------
-    Currently active project is: $(projectname())
-    Path of active project: $(projectdir())
-    """
-)
+      ---------------------------------------------
+      Currently active project is: $(projectname())
+      Path of active project: $(projectdir())
+      """)

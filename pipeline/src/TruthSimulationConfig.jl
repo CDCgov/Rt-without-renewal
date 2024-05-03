@@ -58,3 +58,20 @@ function simulate_or_infer(config::TruthSimulationConfig)
         "truth_gi_mean" => mean(config.generation_distribution),
         "truth_gi_std" => std(config.generation_distribution))
 end
+
+"""
+Method for `DrWatson.savename` which returns mean and standard deviation of the generation
+interval distribution for truth simulation
+"""
+function DrWatson.savename(config::TruthSimulationConfig, suffix::String = "")
+    dist = config.generation_distribution
+    str = "gi_mean_" * string(mean(dist)) * "_gi_std_" * string(std(dist)) * suffix
+    return str::String
+end
+
+"""
+"""
+function DrWatson.savename(
+        prefix::String, config::TruthSimulationConfig, suffix::String = "")
+    prefix * savename(config::TruthSimulationConfig, suffix)
+end
