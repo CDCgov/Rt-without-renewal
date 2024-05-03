@@ -40,9 +40,10 @@ sim_configs = Dict(:gi_mean => [2.0, 10.0, 20.0], :gi_std => 2.0) |>
 for config in sim_configs
     data, file = produce_or_load(
         simulate_or_infer, config, datadir("truth_data"); prefix = "truth_data")
-    plt_cases = scatter(1:N, data["y_t"], label = "Cases", xlabel = "Time", ylabel = "Daily cases",
+    plt_cases = scatter(
+        1:N, data["y_t"], label = "Cases", xlabel = "Time", ylabel = "Daily cases",
         title = "Cases and latent infections", legend = :bottomright)
     plot!(plt_cases, 1:N, data["I_t"], label = "True latent infections")
 
-    savefig(plt_cases, plotsdir("truth_data", savename("truth_cases", config, "png")));
+    savefig(plt_cases, plotsdir("truth_data", savename("truth_cases", config, "png")))
 end
