@@ -40,5 +40,5 @@ Generate latent variables using the specified `TransformLatentModel`.
 @model function EpiAwareBase.generate_latent(model::TransformLatentModel, n)
     @submodel untransformed, latent_aux = generate_latent(model.model, n)
     latent = model.trans_function(untransformed)
-    return latent, (; untransformed, latent_aux)
+    return latent, (; latent_aux)
 end
