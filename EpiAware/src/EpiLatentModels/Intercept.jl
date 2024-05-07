@@ -14,6 +14,7 @@ using Distributions, Turing, EpiAware
 int = Intercept(Normal(0, 1))
 int_model = generate_latent(int, 10)
 rand(int_model)
+int_model()
 ```
 "
 struct Intercept{D <: Sampleable} <: AbstractTuringLatentModel
@@ -35,5 +36,5 @@ Generate a latent intercept series.
 "
 @model function EpiAwareBase.generate_latent(latent_model::Intercept, n)
     intercept ~ latent_model.intercept_prior
-    return fill(intercept, n)
+    return fill(intercept, n), (; intercept = intercept)
 end
