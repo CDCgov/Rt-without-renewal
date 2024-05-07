@@ -1,8 +1,8 @@
 using DrWatson
 @quickactivate "Analysis pipeline"
 
-# include AnlysisPipeline module
 include(srcdir("AnalysisPipeline.jl"))
+include(scriptsdir("common_param_values.jl"))
 
 @info("""
       Running inference on truth data.
@@ -13,29 +13,26 @@ include(srcdir("AnalysisPipeline.jl"))
       """)
 
 ## Set up the truth Rt and save a plot of it
+# Set up the EpiAware models to use for inference.
 using .AnalysisPipeline, Plots, JLD2, EpiAware, Distributions
 
-wkly_ar = AR(
-    damp_priors = [truncated(Normal(0.8, 0.05), 0, 1)],
-    std_prior = HalfNormal(1.0),
-    init_priors = [Normal(0.0, 0.25)]
-) |> ar -> BroadcastLatentModel(ar, 7, RepeatBlock())
+#Common priors for initial process and std priors
+transformed_process_init_prior = Normal(0.0, 0.25)
+underlying_std_prior = HalfNormal(1.0)
 
-wkly_rw = RandomWalk(
-    std_prior = HalfNormal(1.0),
-    init_prior = Normal(0.0, 0.25)
-) |> rw -> BroadcastLatentModel(rw, 7, RepeatBlock())
+ar = AR(damp_priors = [Beta(0.5, 0.5)], std_prior = underlying_std_prior,
+    init_priors = [transformed_process_init_prior])
 
-wkly_diff_ar = AR(
-    damp_priors = [truncated(Normal(0.8, 0.05), 0, 1)],
-    std_prior = HalfNormal(1.0),
-    init_priors = [Normal(0.0, 0.25)]
-) |>
-               ar -> DiffLatentModel(; model = ar, init_priors = [Normal(0.0, 0.25)]) |>
-                     diff_ar -> BroadcastLatentModel(ar, 7, RepeatBlock())
+rw = RandomWalk(
+    std_prior = underlying_std_prior, init_prior = transformed_process_init_prior)
+
+diff_ar = DiffLatentModel(; model = ar, init_priors = [transformed_process_init_prior])
+
+wkly_ar, wkly_rw, wkly_diff_ar = [ar, rw, diff_ar] .|>
+                                 model -> BroadcastLatentModel(model, 7, RepeatBlock())
 
 ## Parameter settings
+# Rolled out to a vector of inference configurations using `dict_list`.
 sim_configs = Dict(:igp => [DirectInfections, ExpGrowthRate, Renewal],
     :latent_model => [wkly_ar, wkly_rw, wkly_diff_ar],
-    :gi_mean => [2.0, 10.0, 20.0], :gi_std => 2.0) |>
-    dict_list
+    :gi_mean => gi_means, :gi_std => gi_stds) |> dict_list

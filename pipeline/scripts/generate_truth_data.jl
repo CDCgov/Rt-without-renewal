@@ -3,6 +3,7 @@ using DrWatson
 
 # include AnlysisPipeline module
 include(srcdir("AnalysisPipeline.jl"))
+include(scriptsdir("common_param_values.jl"));
 
 @info("""
       Generating truth data for the `Rt-without-renewal` project.
@@ -13,6 +14,7 @@ include(srcdir("AnalysisPipeline.jl"))
       """)
 
 ## Set up the truth Rt and save a plot of it
+
 using .AnalysisPipeline, Plots, JLD2
 A = 0.3
 P = 30.0
@@ -30,8 +32,7 @@ savefig(plt_Rt, plotsdir("truth_data", "true_Rt"));
 
 ## Parameter settings
 
-sim_configs = Dict(:gi_mean => [2.0, 10.0, 20.0], :gi_std => 2.0) |>
-              dict_list .|>
+sim_configs = Dict(:gi_mean => gi_means, :gi_std => gi_stds) |> dict_list .|>
               d -> TruthSimulationConfig(
                   truth_process = true_Rt, gi_mean = d[:gi_mean], gi_std = d[:gi_std])
 
