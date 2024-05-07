@@ -14,7 +14,7 @@ include(scriptsdir("common_param_values.jl"))
 
 ## Set up the truth Rt and save a plot of it
 # Set up the EpiAware models to use for inference.
-using .AnalysisPipeline, Plots, JLD2, EpiAware, Distributions
+using .AnalysisPipeline, Plots, JLD2, EpiAware, Distributions, ADTypes, AbstractMCMC
 
 #Common priors for initial process and std priors
 transformed_process_init_prior = Normal(0.0, 0.25)
@@ -36,3 +36,16 @@ wkly_ar, wkly_rw, wkly_diff_ar = [ar, rw, diff_ar] .|>
 sim_configs = Dict(:igp => [DirectInfections, ExpGrowthRate, Renewal],
     :latent_model => [wkly_ar, wkly_rw, wkly_diff_ar],
     :gi_mean => gi_means, :gi_std => gi_stds) |> dict_list
+
+## Inference method
+
+num_threads = min(10, Threads.nthreads())
+
+# ╔═╡ 88b43e23-1e06-4716-b284-76e8afc6171b
+inference_method = EpiMethod(
+    pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 100)],
+    sampler = NUTSampler(adtype = AutoForwardDiff(),
+        ndraws = 2000,
+        nchains = num_threads,
+        mcmc_parallel = MCMCThreads())
+)
