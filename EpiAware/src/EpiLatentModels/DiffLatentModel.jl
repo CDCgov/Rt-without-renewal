@@ -77,7 +77,8 @@ Z_t
 ```
 
 """
-struct DiffLatentModel{M <: AbstractTuringLatentModel, P <: Distribution}
+struct DiffLatentModel{M <: AbstractTuringLatentModel, P <: Distribution} <:
+       AbstractTuringLatentModel
     "Underlying latent model for the differenced process"
     model::M
     "The prior distribution for the initial latent variables."
