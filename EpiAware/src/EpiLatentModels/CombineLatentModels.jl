@@ -17,11 +17,13 @@ latent_model()
 rand(latent_model)
 ```
 "
-@kwdef struct CombineLatentModels{M <: AbstractVector{<:AbstractTuringLatentModel}} <: AbstractTuringLatentModel
+@kwdef struct CombineLatentModels{M <: AbstractVector{<:AbstractTuringLatentModel}} <:
+              AbstractTuringLatentModel
     "A vector of latent models"
     models::M
 
-    function CombineLatentModels(models::M) where {M <: AbstractVector{<:AbstractTuringLatentModel}}
+    function CombineLatentModels(models::M) where {M <:
+                                                   AbstractVector{<:AbstractTuringLatentModel}}
         @assert length(models)>1 "At least two models are required"
         return new{AbstractVector{<:AbstractTuringLatentModel}}(models)
     end
@@ -40,18 +42,21 @@ Generate latent variables using a combination of multiple latent models.
 
 # Example
 "
-function EpiAwareBase.generate_latent(latent_models::CombineLatentModels, n)
-    @submodel final_latent, latent_aux = _accumulate_latents(latent_models.models, 1, fill(0.0, n), [])
+@model function EpiAwareBase.generate_latent(latent_models::CombineLatentModels, n)
+    @submodel final_latent, latent_aux = _accumulate_latents(
+        latent_models.models, 1, fill(0.0, n), [], n, length(latent_models.models))
 
     return final_latent, (; latent_aux...)
 end
 
-@model function _accumulate_latents(models, index, acc_latent, acc_aux)
-    if index > length(models)
+@model function _accumulate_latents(models, index, acc_latent, acc_aux, n, n_models)
+    if index > n_models
         return acc_latent, (; acc_aux...)
     else
         @submodel latent, new_aux = generate_latent(models[index], n)
-        @submodel updated_latent, updated_aux = _accumulate_latents(models, index + 1, acc_latent .+ latent, (; acc_aux..., new_aux...))
-        return updated_latent,(; updated_aux...)
+        @submodel updated_latent, updated_aux = _accumulate_latents(
+            models, index + 1, acc_latent .+ latent,
+            (; acc_aux..., new_aux...), n, n_models)
+        return updated_latent, (; updated_aux...)
     end
 end

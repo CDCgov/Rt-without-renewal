@@ -3,9 +3,20 @@ The `TransformLatentModel` struct represents a latent model that applies a trans
 
 ## Constructors
 
-- `TransformLatentModel(model::
+- `TransformLatentModel(model, trans_function)`: Constructs a `TransformLatentModel` instance with the specified latent model and transformation function.
+- `TransformLatentModel(; model, trans_function)`: Constructs a `TransformLatentModel` instance with the specified latent model and transformation function using named arguments.
+
+## Example
+
+```julia
+using EpiAware, Distributions
+trans = TransformLatentModel(Intercept(Normal(2, 0.2)), x -> x .|> exp)
+trans_model = generate_latent(trans, 5)
+trans_model()
+```
 "
-@kwdef struct TransformLatentModel{M <: AbstractTuringLatentModel, F <: Function} <: AbstractTuringLatentModel
+@kwdef struct TransformLatentModel{M <: AbstractTuringLatentModel, F <: Function} <:
+              AbstractTuringLatentModel
     "The latent model to transform."
     model::M
     "The transformation function."
@@ -27,8 +38,7 @@ Generate latent variables using the specified `TransformLatentModel`.
 
 """
 @model function EpiAwareBase.generate_latent(model::TransformLatentModel, n)
-    @submodel latent, latent_aux = generate_latent(model.model, n)
-    transformed = model.trans_function(latent)
-
-    return transformed, (; latent_aux...)
+    @submodel untransformed, latent_aux = generate_latent(model.model, n)
+    latent = model.trans_function(untransformed)
+    return latent, (; untransformed, latent_aux)
 end
