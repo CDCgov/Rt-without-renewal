@@ -6,6 +6,7 @@ This struct is used to combine multiple latent models into a single latent model
 # Constructors
 
 - `CombineLatentModels(models::M) where {M <: AbstractVector{<:AbstractTuringLatentModel}}`: Constructs a `CombineLatentModels` instance with specified models, ensuring that there are at least two models.
+- `CombineLatentModels(; models::M) where {M <: AbstractVector{<:AbstractTuringLatentModel}}`: Constructs a `CombineLatentModels` instance with specified models, ensuring that there are at least two models.
 
 # Examples
 
@@ -14,7 +15,6 @@ using EpiAware, Distributions
 combined_model = CombineLatentModels([Intercept(Normal(2, 0.2)), AR()])
 latent_model = generate_latent(combined_model, 10)
 latent_model()
-rand(latent_model)
 ```
 "
 @kwdef struct CombineLatentModels{M <: AbstractVector{<:AbstractTuringLatentModel}} <:
