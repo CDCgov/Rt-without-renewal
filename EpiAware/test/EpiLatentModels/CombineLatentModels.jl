@@ -10,11 +10,6 @@ end
 
 @testitem "CombineLatentModels generate_latent method works as expected" begin
     using Turing
-    struct Scale <: AbstractTuringLatentModel end
-    @model function EpiAware.EpiAwareBase.generate_latent(model::Scale, n::Int)
-        scale = 1
-        return scale_vect = fill(scale, n), (; scale)
-    end
 
     struct NextScale <: AbstractTuringLatentModel end
 
@@ -23,7 +18,7 @@ end
         return scale_vect = fill(scale, n), (; nscale = scale)
     end
 
-    s = Scale()
+    s = FixedIntercept(1)
     ns = NextScale()
     comb = CombineLatentModels([s, ns])
     comb_model = generate_latent(comb, 5)
@@ -32,6 +27,6 @@ end
     @test typeof(comb_model) <: DynamicPPL.Model
     @test length(comb_model_out[1]) == 5
     @test all(comb_model_out[1] .== fill(3.0, 5))
-    @test comb_model_out[2].scale == 1.0
+    @test comb_model_out[2].intercept == 1.0
     @test comb_model_out[2].nscale == 2.0
 end
