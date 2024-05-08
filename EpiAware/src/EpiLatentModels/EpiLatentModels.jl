@@ -10,7 +10,7 @@ using ..EpiAwareUtils: HalfNormal
 using Turing, Distributions, DocStringExtensions, LinearAlgebra
 
 #Export models
-export Intercept, RandomWalk, AR
+export FixedIntercept, Intercept, RandomWalk, AR
 
 # Export tools for manipulating latent models
 export CombineLatentModels, TransformLatentModel, DiffLatentModel, BroadcastLatentModel
