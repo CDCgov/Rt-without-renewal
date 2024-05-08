@@ -1,30 +1,46 @@
-@kwdef struct InferenceConfig{T <: Real, F <: Function}
+@kwdef struct InferenceConfig{
+    T <: Real, F <: Function, I, L, E <: AbstractEpiMethod} where {I, L},
+L
     "Assumed generation interval distribution mean."
     gi_mean::T
     "Assumed generation interval distribution std."
     gi_std::T
     "Infection-generating model type."
-    igp::UnionAll
+    igp::I
     "Latent model type."
-    latent_model::UnionAll
+    latent_model::L
     "Case data"
     case_data::Vector{Integer}
     "Time to fit on"
     tspan::Tuple{Integer, Integer}
     "Inference method."
-    epimethod::AbstractEpiMethod
+    epimethod::E
     "Maximum next generation interval when discretized."
-    D_gen::T = T(60.0)
+    D_gen::T
     "Transformation function"
     transformation::F = exp
     "Delay distribution: Default is Gamma(4, 5/4)."
     delay_distribution::Distribution = Gamma(4, 5 / 4)
     "Maximum delay when discretized. Default is 15 days."
-    D_obs::T = T(15.0)
+    D_obs::T
     "Prior for log initial infections. Default is Normal(4.6, 1e-5)."
     log_I0_prior::Distribution = Normal(log(100.0), 1e-5)
     "Prior for negative binomial cluster factor. Default is HalfNormal(0.1)."
     cluster_factor_prior::Distribution = HalfNormal(0.1)
+
+    function InferenceConfig(; gi_mean, gi_std, igp, latent_model, case_data, tspan,
+            epimethod, delay_distribution = Gamma(4, 5 / 4),
+            log_I0_prior = Normal(log(100.0), 1e-5),
+            cluster_factor_prior = HalfNormal(0.1),
+            transformation = exp)
+        D_gen = gi_mean + 4 * gi_std
+        D_obs = mean(delay_distribution) + 4 * std(delay_distribution)
+
+        new{eltype(gi_mean), typeof(transformation),
+            typeof(igp), typeof(latent_model), typeof{E}}(
+            gi_mean, gi_std, igp, latent_model, case_data, tspan, epimethod,
+            D_gen, transformation, delay_distribution, D_obs, log_I0_prior, cluster_factor_prior)
+    end
 end
 
 function simulate_or_infer(config::InferenceConfig)
