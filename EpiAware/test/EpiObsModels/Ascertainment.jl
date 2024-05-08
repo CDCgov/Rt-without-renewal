@@ -13,8 +13,6 @@ end
 # make a test based on above example
 @testitem "Test Ascertainment generate_observations" begin
     using Turing, DynamicPPL
-
-    end
     obs = Ascertainment(NegativeBinomialError(), FixedIntercept(0.1), x -> x)
     gen_obs = generate_observations(obs, missing, fill(100, 10))
     samples = sample(gen_obs, Prior(), 100; progress = false)
