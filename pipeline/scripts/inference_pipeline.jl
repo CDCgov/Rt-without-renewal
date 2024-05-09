@@ -1,38 +1,45 @@
 using DrWatson
 @quickactivate "Analysis pipeline"
 
+# Include the AnalysisPipeline module
 include(srcdir("AnalysisPipeline.jl"))
-include(scriptsdir("common_param_values.jl"))
+
+# Include the common inference scenarios
+include(scriptsdir("common_scenarios.jl"))
 
 @info("""
       Running inference on truth data.
-
       ---------------------------------------------
       Currently active project is: $(projectname())
       Path of active project: $(projectdir())
+
       """)
 
-## Set up the truth Rt and save a plot of it
-# Set up the EpiAware models to use for inference.
-using .AnalysisPipeline, Plots, JLD2, EpiAware, Distributions
+## Inference methods
+using JLD2
 
-#Common priors for initial process and std priors
-transformed_process_init_prior = Normal(0.0, 0.25)
-underlying_std_prior = HalfNormal(1.0)
+for filename in readdir(datadir("truth_data"))
+    # Load the truth data
+    D = JLD2.load(joinpath(datadir("truth_data"), filename))
 
-ar = AR(damp_priors = [Beta(0.5, 0.5)], std_prior = underlying_std_prior,
-    init_priors = [transformed_process_init_prior])
+    # Extract the gi_mean value from the filename
+    _, truth_data_vals = parse_savename(filename)
+    truth_data_gi_mean = truth_data_vals["gi_mean"]
 
-rw = RandomWalk(
-    std_prior = underlying_std_prior, init_prior = transformed_process_init_prior)
+    # Set up and run the inference scenarios
+    for d in sim_configs
+        config = InferenceConfig(d[:igp], d[:latent_model];
+            gi_mean = d[:gi_mean],
+            gi_std = d[:gi_std],
+            case_data = D["y_t"],
+            tspan = inference_tspan,
+            epimethod = inference_method
+        )
+        prfx = "observables" * "_igp_" * string(d[:igp]) * "_latentmodel_" *
+               naming_scheme[d[:latent_model]] * "_truth_gi_mean_" *
+               string(truth_data_gi_mean)
 
-diff_ar = DiffLatentModel(; model = ar, init_priors = [transformed_process_init_prior])
-
-wkly_ar, wkly_rw, wkly_diff_ar = [ar, rw, diff_ar] .|>
-                                 model -> BroadcastLatentModel(model, 7, RepeatBlock())
-
-## Parameter settings
-# Rolled out to a vector of inference configurations using `dict_list`.
-sim_configs = Dict(:igp => [DirectInfections, ExpGrowthRate, Renewal],
-    :latent_model => [wkly_ar, wkly_rw, wkly_diff_ar],
-    :gi_mean => gi_means, :gi_std => gi_stds) |> dict_list
+        data, file = produce_or_load(
+            simulate_or_infer, config, datadir("epiaware_observables"); prefix = prfx)
+    end
+end

@@ -6,10 +6,11 @@ module AnalysisPipeline
 using CSV, Dagger, DataFramesMeta, Dates, Distributions, DocStringExtensions, DrWatson,
       EpiAware, Plots, Statistics
 
-export TruthSimulationConfig
+export TruthSimulationConfig, InferenceConfig
 export simulate_or_infer, savename
 
 include("docstrings.jl")
 include("TruthSimulationConfig.jl")
+include("InferenceConfig.jl")
 
 end
