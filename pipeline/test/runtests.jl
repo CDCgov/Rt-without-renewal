@@ -7,3 +7,4 @@ include(srcdir("AnalysisPipeline.jl"))
 #run tests
 include("test_SimulationConfig.jl");
 include("test_TruthSimulationConfig.jl");
+include("test_InferenceConfig.jl");

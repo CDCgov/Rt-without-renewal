@@ -1,3 +1,4 @@
+
 @testitem "CombineLatentModels constructor works as expected" begin
     using Distributions: Normal
     int = Intercept(Normal(0, 1))
@@ -8,6 +9,7 @@
 end
 
 @testitem "CombineLatentModels generate_latent method works as expected: FixedIntecept + custom" begin
+@testitem "CombineLatentModels generate_latent method works as expected" begin
     using Turing
 
     struct NextScale <: AbstractTuringLatentModel end

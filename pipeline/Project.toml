@@ -2,6 +2,8 @@ name = "Analysis pipeline"
 authors = ["Sam Abbott", "Sam Brand", "Zach Susswein"]
 
 [deps]
+ADTypes = "47edcb42-4c32-4615-8424-f2b9edc5f35b"
+AbstractMCMC = "80f14c24-f653-4e6a-9b94-39d6b0f70001"
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 Dagger = "d58978e5-989f-55fb-8d15-ea34adc7bf54"
 DataFramesMeta = "1313f7d8-7da2-5740-9ea0-a2ca25f37964"
