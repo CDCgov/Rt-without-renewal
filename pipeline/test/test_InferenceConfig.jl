@@ -61,13 +61,13 @@ end
     idx = rand(1:length(sim_configs))
 
     config = sim_configs[idx] |>
-        d -> InferenceConfig(d[:igp], d[:latent_model];
-            gi_mean = d[:gi_mean],
-            gi_std = d[:gi_std],
-            case_data = fill(100, 100), # Fake constant case data
-            tspan = (1,25),
-            epimethod = inference_method
-        )
+             d -> InferenceConfig(d[:igp], d[:latent_model];
+        gi_mean = d[:gi_mean],
+        gi_std = d[:gi_std],
+        case_data = fill(100, 100), # Fake constant case data
+        tspan = (1, 25),
+        epimethod = inference_method
+    )
 
     # Call the simulate_or_infer function
     inference_results = simulate_or_infer(config)

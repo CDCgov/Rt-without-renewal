@@ -31,7 +31,8 @@ diff_ar = DiffLatentModel(; model = ar, init_priors = [transformed_process_init_
 wkly_ar, wkly_rw, wkly_diff_ar = [ar, rw, diff_ar] .|>
                                  model -> BroadcastLatentModel(model, 7, RepeatBlock())
 
-naming_scheme = Dict(wkly_ar => "wkly_ar", wkly_rw => "wkly_rw", wkly_diff_ar => "wkly_diff_ar")
+naming_scheme = Dict(
+    wkly_ar => "wkly_ar", wkly_rw => "wkly_rw", wkly_diff_ar => "wkly_diff_ar")
 
 ## Parameter settings
 # Rolled out to a vector of inference configurations using `dict_list`.

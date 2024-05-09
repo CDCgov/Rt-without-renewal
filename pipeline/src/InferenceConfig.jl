@@ -46,7 +46,7 @@ struct InferenceConfig{T, F, I, L, E}
         D_obs = mean(delay_distribution) + 4 * std(delay_distribution)
 
         new{typeof(gi_mean), typeof(transformation),
-        typeof(igp), typeof(latent_model), typeof(epimethod)}(
+            typeof(igp), typeof(latent_model), typeof(epimethod)}(
             gi_mean, gi_std, igp, latent_model, case_data, tspan, epimethod,
             D_gen, transformation, delay_distribution, D_obs, log_I0_prior, cluster_factor_prior)
     end
