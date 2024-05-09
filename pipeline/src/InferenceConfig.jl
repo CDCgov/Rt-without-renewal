@@ -93,5 +93,5 @@ function simulate_or_infer(config::InferenceConfig)
         config.epimethod,
         (y_t = config.case_data[idxs],)
     )
-    return inference_results
+    return Dict("inference_results" => inference_results)
 end

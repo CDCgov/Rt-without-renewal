@@ -37,11 +37,24 @@
 end
 
 @testset "simulate_or_infer: Inference runs" begin
+    using Distributions, .AnalysisPipeline, EpiAware, ADTypes, AbstractMCMC
+
     @info "Running inference test on fake data."
 
     include(srcdir("AnalysisPipeline.jl"))
     include(scriptsdir("common_param_values.jl"))
     include(scriptsdir("common_scenarios.jl"))
+
+    # Inference method
+    num_threads = min(10, Threads.nthreads())
+
+    inference_method = EpiMethod(
+        pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 100)],
+        sampler = NUTSampler(adtype = AutoForwardDiff(),
+            ndraws = 2000,
+            nchains = num_threads,
+            mcmc_parallel = MCMCThreads())
+    )
 
     # Create the InferenceConfig object on a randomly selected simulation configuration
     # With fake constant case data
