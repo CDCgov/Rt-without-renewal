@@ -2,7 +2,7 @@ using DrWatson
 @quickactivate "Analysis pipeline"
 
 include(srcdir("AnalysisPipeline.jl"))
-include(scriptsdir("common_param_values.jl"))
+include(scriptsdir("common_param_values.jl"));
 
 @info("""
       Setting up list of inference scenarios.
@@ -14,7 +14,7 @@ include(scriptsdir("common_param_values.jl"))
 
 ## Set up the truth Rt and save a plot of it
 # Set up the EpiAware models to use for inference.
-using .AnalysisPipeline, Plots, JLD2, EpiAware, Distributions
+using .AnalysisPipeline, Plots, EpiAware, Distributions, ADTypes, AbstractMCMC
 
 #Common priors for initial process and std priors
 transformed_process_init_prior = Normal(0.0, 0.25)
@@ -36,6 +36,19 @@ naming_scheme = Dict(
 
 ## Parameter settings
 # Rolled out to a vector of inference configurations using `dict_list`.
+
 sim_configs = Dict(:igp => [DirectInfections, ExpGrowthRate, Renewal],
     :latent_model => [wkly_ar, wkly_rw, wkly_diff_ar],
     :gi_mean => gi_means, :gi_std => gi_stds) |> dict_list
+
+#Common thread count
+num_threads = min(10, Threads.nthreads());
+
+#Common inference method
+inference_method = EpiMethod(
+    pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 100)],
+    sampler = NUTSampler(adtype = AutoForwardDiff(),
+        ndraws = 2000,
+        nchains = num_threads,
+        mcmc_parallel = MCMCThreads())
+)

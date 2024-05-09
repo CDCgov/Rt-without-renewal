@@ -6,22 +6,9 @@
 
       """)
 
-using EpiAware
 # Common generation interval values
 gi_means = [2.0, 10.0, 20.0];
 gi_stds = [2.0];
-
-#Common thread count
-num_threads = min(10, Threads.nthreads());
-
-#Common inference method
-inference_method = EpiMethod(
-    pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 100)],
-    sampler = NUTSampler(adtype = AutoForwardDiff(),
-        ndraws = 2000,
-        nchains = num_threads,
-        mcmc_parallel = MCMCThreads())
-)
 
 #True Rt
 A = 0.3

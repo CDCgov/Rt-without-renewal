@@ -3,8 +3,7 @@ using DrWatson
 
 # Include the AnalysisPipeline module
 include(srcdir("AnalysisPipeline.jl"))
-# Include the common parameter values
-include(scriptsdir("common_param_values.jl"))
+
 # Include the common inference scenarios
 include(scriptsdir("common_scenarios.jl"))
 
@@ -17,7 +16,7 @@ include(scriptsdir("common_scenarios.jl"))
       """)
 
 ## Inference methods
-using Distributions, .AnalysisPipeline, EpiAware, JLD2, ADTypes, AbstractMCMC
+using JLD2
 
 for filename in readdir(datadir("truth_data"))
     # Load the truth data
