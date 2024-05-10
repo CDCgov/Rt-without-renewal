@@ -62,7 +62,7 @@ truth_data_scenarios = map(truth_data_config_structs) do truth_data_config_struc
     plot_truth_data(truthdata, truth_data_config_struct)
 
     # Run the inference scenarios
-    inference_scenarios = map(inference_configs[end:end]) do inference_config
+    map(inference_configs[end:end]) do inference_config
         config = InferenceConfig(inference_config["igp"], inference_config["latent_model"];
             gi_mean = inference_config["gi_mean"],
             gi_std = inference_config["gi_std"],
@@ -76,7 +76,7 @@ truth_data_scenarios = map(truth_data_config_structs) do truth_data_config_struc
             latent_models_names[inference_config["latent_model"]] * "_truth_gi_mean_" *
                string(truth_data_config_struct.gi_mean)
 
-        inference_resultes, inferencefile = produce_or_load(
+        inference_results, inferencefile = produce_or_load(
                 simulate_or_infer, config, datadir("epiaware_observables"); prefix = prfx)
         return nothing
     end
