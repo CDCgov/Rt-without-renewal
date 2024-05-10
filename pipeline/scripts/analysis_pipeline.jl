@@ -62,7 +62,7 @@ truth_data_scenarios = map(truth_data_config_structs) do truth_data_config_struc
     plot_truth_data(truthdata, truth_data_config_struct)
 
     # Run the inference scenarios
-    map(inference_configs[end:end]) do inference_config
+    map(inference_configs) do inference_config
         config = InferenceConfig(inference_config["igp"], inference_config["latent_model"];
             gi_mean = inference_config["gi_mean"],
             gi_std = inference_config["gi_std"],
