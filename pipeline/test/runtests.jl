@@ -5,6 +5,7 @@ using DrWatson, Test
 include(srcdir("AnalysisPipeline.jl"))
 
 #run tests
+include("default_returning_functions.jl");
 include("test_SimulationConfig.jl");
 include("test_TruthSimulationConfig.jl");
 include("test_InferenceConfig.jl");
