@@ -83,5 +83,3 @@ truth_data_scenarios = map(truth_data_config_structs) do truth_data_config_struc
 
     return truthdata
 end
-
-# Run the loop over inference jobs
