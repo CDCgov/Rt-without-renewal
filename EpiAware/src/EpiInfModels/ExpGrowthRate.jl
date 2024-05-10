@@ -22,9 +22,9 @@ where ``g`` is a transformation function and the unconstrained initial infection
 
 - `ExpGrowthRate(; data, initialisation_prior)`.
 
-## Example usage with `generate_latent_infs`
+## Example usage with `generate_infections`
 
-`generate_latent_infs` can be used to construct a `Turing` model for the latent infections
+`generate_infections` can be used to construct a `Turing` model for the latent infections
 conditional on the sample path of a latent process. In this example, we generate a sample
 of a white noise latent process.
 
@@ -43,13 +43,13 @@ data = EpiData(gen_int, g)
 exp_growth_model = ExpGrowthRate(data = data, initialisation_prior = Normal())
 ```
 
-Then, we can use `generate_latent_infs` to construct a Turing model for the unobserved
+Then, we can use `generate_infections` to construct a Turing model for the unobserved
 infection generation model set by the type of `direct_inf_model`.
 
 ```julia
 # Construct a Turing model
 Z_t = randn(100) * 0.05
-latent_inf = generate_latent_infs(exp_growth_model, Z_t)
+latent_inf = generate_infections(exp_growth_model, Z_t)
 ```
 
 Now we can use the `Turing` PPL API to sample underlying parameters and generate the
@@ -70,11 +70,11 @@ I_t = generated_quantities(latent_inf, θ)
 end
 
 @doc raw"
-Implement the `generate_latent_infs` function for the `ExpGrowthRate` model.
+Implement the `generate_infections` function for the `ExpGrowthRate` model.
 
 ## Example usage with `ExpGrowthRate` type of model for unobserved infection process
 
-`generate_latent_infs` can be used to construct a `Turing` model for the latent infections
+`generate_infections can be used to construct a `Turing` model for the latent infections
 conditional on the sample path of a latent process. In this example, we generate a sample
 of a white noise latent process.
 
@@ -93,13 +93,13 @@ data = EpiData(gen_int, g)
 exp_growth_model = ExpGrowthRate(data = data, initialisation_prior = Normal())
 ```
 
-Then, we can use `generate_latent_infs` to construct a Turing model for the unobserved
+Then, we can use `generate_infections` to construct a Turing model for the unobserved
 infection generation model set by the type of `direct_inf_model`.
 
 ```julia
 # Construct a Turing model
 Z_t = randn(100) * 0.05
-latent_inf = generate_latent_infs(exp_growth_model, Z_t)
+latent_inf = generate_infections(exp_growth_model, Z_t)
 ```
 
 Now we can use the `Turing` PPL API to sample underlying parameters and generate the
@@ -114,7 +114,7 @@ unobserved infections.
 I_t = generated_quantities(latent_inf, θ)
 ```
 "
-@model function EpiAwareBase.generate_latent_infs(epi_model::ExpGrowthRate, rt)
+@model function EpiAwareBase.generate_infections(epi_model::ExpGrowthRate, rt)
     init_incidence ~ epi_model.initialisation_prior
     return exp.(init_incidence .+ cumsum(rt))
 end

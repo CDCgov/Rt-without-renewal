@@ -5,14 +5,14 @@
     @test isnothing(generate_latent(TestLatentModel(), missing))
 end
 
-@testitem "generate_latent_infs function: default" begin
+@testitem "generate_infections function: default" begin
     latent_model = [0.1, 0.2, 0.3]
     init_incidence = 10.0
 
     struct TestEpiModel <: EpiAware.EpiAwareBase.AbstractEpiModel
     end
 
-    @test isnothing(generate_latent_infs(TestEpiModel(), latent_model))
+    @test isnothing(generate_infectionsestEpiModel(), latent_model))
 end
 
 @testitem "Testing generate_observations default" begin

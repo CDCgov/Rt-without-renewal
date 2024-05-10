@@ -1,4 +1,4 @@
-@testitem "generate_latent_infs dispatched on ExpGrowthRate" begin
+@testitem "generate_infections dispatched on ExpGrowthRate" begin
     using Distributions, Turing, HypothesisTests, DynamicPPL
     gen_int = [0.2, 0.3, 0.5]
     transformation = exp
@@ -14,7 +14,7 @@
 
     #Check log_init is sampled from the correct distribution
     sample_init_inc = sample(
-        generate_latent_infs(rt_model, rt), Prior(), 1000; progress = false) |>
+        generate_infections(rt_model, rt), Prior(), 1000; progress = false) |>
                       chn -> chn[:init_incidence] |>
                              Array |>
                              vec
@@ -23,7 +23,7 @@
     @test ks_test_pval > 1e-6 #Very unlikely to fail if the model is correctly implemented
 
     #Check that the generated incidence is correct given correct initialisation
-    mdl_incidence = generated_quantities(generate_latent_infs(rt_model, rt),
+    mdl_incidence = generated_quantities(generate_infectionsmodel, rt),
         (init_incidence = log_init,))
     @test mdl_incidence ≈ recent_incidence
 end

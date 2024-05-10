@@ -253,7 +253,7 @@ md"
 
 As mentioned above, we can use this instance of the `Renewal` latent infection model to construct a `Turing` `Model` which implements the probabilistic behaviour determined by `epi`.
 
-We do this with the constructor function `generate_latent_infs` which combines `epi` with a provided $\log R_t$ time series.
+We do this with the constructor function `generate_infections` which combines `epi` with a provided $\log R_t$ time series.
 
 Here we choose an example where $R_t$ decreases from $R_t = 3$ to $R_t = 0.5$ over the course of 30 days.
 "
@@ -262,7 +262,7 @@ Here we choose an example where $R_t$ decreases from $R_t = 3$ to $R_t = 0.5$ ov
 R_t_fixed = [0.5 + 2.5 / (1 + exp(t - 15)) for t in 1:30]
 
 # ╔═╡ 72bdb47d-4967-4f20-9ae5-01f82e7b32c5
-latent_inf_mdl = generate_latent_infs(epi, log.(R_t_fixed))
+latent_inf_mdl = generate_infections(epi, log.(R_t_fixed))
 
 # ╔═╡ 7a6d4b14-58d3-40c1-81f2-713c830f875f
 plt_epi = let

@@ -24,7 +24,7 @@
     @test generate_infs(recent_incidence, Rt) == expected_output
 end
 
-@testitem "generate_latent_infs dispatched on Renewal" begin
+@testitem "generate_infections dispatched on Renewal" begin
     using Distributions, Turing, HypothesisTests, DynamicPPL, LinearAlgebra
     gen_int = [0.2, 0.3, 0.5]
     transformation = exp
@@ -40,7 +40,7 @@ end
     initial_incidence = [1.0, 1.0, 1.0]#aligns with initial exp growth rate of 0.
 
     #Check log_init is sampled from the correct distribution
-    @time sample_init_inc = sample(generate_latent_infs(renewal_model, log_Rt),
+    @time sample_init_inc = sample(generate_infections(renewal_model, log_Rt),
         Prior(), 1000; progress = false) |>
                             chn -> chn[:init_incidence] |>
                                    Array |>
@@ -52,7 +52,7 @@ end
     #Check that the generated incidence is correct given correct initialisation
     #Check first three days "by hand"
     mdl_incidence = generated_quantities(
-        generate_latent_infs(renewal_model,
+        generate_infections(renewal_model,
             log_Rt), (init_incidence = 0.0,))
 
     day1_incidence = dot(initial_incidence, gen_int) * Rt[1]

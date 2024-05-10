@@ -1,4 +1,4 @@
-@testitem "generate_latent_infs dispatched on DirectInfections" begin
+@testitem "generate_infectionsdispatched on DirectInfections" begin
     using Distributions, Turing, HypothesisTests, DynamicPPL
     gen_int = [0.2, 0.3, 0.5]
     transformation = exp
@@ -14,7 +14,7 @@
 
     #Check log_init is sampled from the correct distribution
     sample_init_inc = sample(
-        generate_latent_infs(direct_inf_model, log_incidence),
+        generate_infections(direct_inf_model, log_incidence),
         Prior(), 1000; progress = false) |>
                       chn -> chn[:init_incidence] |>
                              Array |>
@@ -25,7 +25,7 @@
 
     #Check that the generated incidence is correct given correct initialisation
     mdl_incidence = generated_quantities(
-        generate_latent_infs(direct_inf_model,
+        generate_infectionsirect_inf_model,
             log_incidence),
         (init_incidence = log_init_scale,))
 

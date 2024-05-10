@@ -35,9 +35,9 @@ number.
 
 - `Renewal(; data, initialisation_prior)`.
 
-## Example usage with `generate_latent_infs`
+## Example usage with `generate_infections`
 
-`generate_latent_infs` can be used to construct a `Turing` model for the latent infections
+`generate_infections` can be used to construct a `Turing` model for the latent infections
 conditional on the sample path of a latent process. In this example, we generate a sample
 of a white noise latent process.
 
@@ -56,13 +56,13 @@ data = EpiData(gen_int, g)
 renewal_model = Renewal(data = data, initialisation_prior = Normal())
 ```
 
-Then, we can use `generate_latent_infs` to construct a Turing model for the unobserved
+Then, we can use `generate_infections` to construct a Turing model for the unobserved
 infection generation model set by the type of `direct_inf_model`.
 
 ```julia
 # Construct a Turing model
 Z_t = randn(100) * 0.05
-latent_inf = generate_latent_infs(renewal_model, Z_t)
+latent_inf = generate_infections(renewal_model, Z_t)
 ```
 
 Now we can use the `Turing` PPL API to sample underlying parameters and generate the
@@ -112,11 +112,11 @@ function (epi_model::Renewal)(recent_incidence, Rt)
 end
 
 @doc raw"
-Implement the `generate_latent_infs` function for the `Renewal` model.
+Implement the `generate_infections` function for the `Renewal` model.
 
 ## Example usage with `Renewal` type of model for unobserved infection process
 
-`generate_latent_infs` can be used to construct a `Turing` model for the latent infections
+`generate_infections` can be used to construct a `Turing` model for the latent infections
 conditional on the sample path of a latent process. In this example, we generate a sample
 of a white noise latent process.
 
@@ -135,13 +135,13 @@ data = EpiData(gen_int, g)
 renewal_model = Renewal(data = data, initialisation_prior = Normal())
 ```
 
-Then, we can use `generate_latent_infs` to construct a Turing model for the unobserved
+Then, we can use `generate_infections` to construct a Turing model for the unobserved
 infection generation model set by the type of `renewal_model`.
 
 ```julia
 # Construct a Turing model
 Z_t = randn(100) * 0.05
-latent_inf = generate_latent_infs(renewal_model, Z_t)
+latent_inf = generate_infections(renewal_model, Z_t)
 ```
 
 Now we can use the `Turing` PPL API to sample underlying parameters and generate the
@@ -156,7 +156,7 @@ unobserved infections.
 I_t = generated_quantities(latent_inf, θ)
 ```
 "
-@model function EpiAwareBase.generate_latent_infs(epi_model::Renewal, _Rt)
+@model function EpiAwareBase.generate_infectionsepi_model::Renewal, _Rt)
     init_incidence ~ epi_model.initialisation_prior
     I₀ = epi_model.data.transformation(init_incidence)
     Rt = epi_model.data.transformation.(_Rt)

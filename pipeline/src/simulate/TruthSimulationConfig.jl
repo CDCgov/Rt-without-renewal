@@ -51,7 +51,7 @@ function simulate(config::TruthSimulationConfig)
     epi = config.igp(model_data, config.log_I0_prior)
 
     # Sample infections
-    inf_mdl = generate_latent_infs(epi, log.(config.truth_process))
+    inf_mdl = generate_infections(epi, log.(config.truth_process))
     I_t = inf_mdl()
 
     #Define the infection conditional observation distribution
