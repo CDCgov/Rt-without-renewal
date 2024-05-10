@@ -12,7 +12,7 @@ export TruthSimulationConfig, InferenceConfig
 
 # Exported functions
 export simulate_or_infer, default_gi_params, default_Rt, default_tspan, default_priors,
-       default_epiaware_models, default_inference_method
+       default_epiaware_models, default_inference_method, make_truth_data_configs
 
 include("docstrings.jl")
 include("default_gi_params.jl")
@@ -21,6 +21,7 @@ include("default_tspan.jl")
 include("default_priors.jl")
 include("default_epiaware_models.jl")
 include("default_inference_method.jl")
+include("make_truth_data_configs.jl")
 include("TruthSimulationConfig.jl")
 include("InferenceConfig.jl")
 
