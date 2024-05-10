@@ -454,7 +454,7 @@ let
     mdl_unconditional = generate_epiaware(epi_prob, (y_t = missing,))
     predicted_y_t = mapreduce(
         hcat, generated_quantities(mdl_unconditional, inference_results.samples)) do gen
-        gen.generated_y_t
+        gen.gen_y_t
     end
     predicted_I_t = mapreduce(
         hcat, gens) do gen
