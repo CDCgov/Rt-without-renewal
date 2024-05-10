@@ -73,11 +73,11 @@ truth_data_scenarios = map(truth_data_config_structs) do truth_data_config_struc
         # produce or load inference results
 
         prfx = "observables" * "_igp_" * string(inference_config["igp"]) * "_latentmodel_" *
-            latent_models_names[inference_config["latent_model"]] * "_truth_gi_mean_" *
+               latent_models_names[inference_config["latent_model"]] * "_truth_gi_mean_" *
                string(truth_data_config_struct.gi_mean)
 
         inference_results, inferencefile = produce_or_load(
-                simulate_or_infer, config, datadir("epiaware_observables"); prefix = prfx)
+            simulate_or_infer, config, datadir("epiaware_observables"); prefix = prfx)
         return nothing
     end
 

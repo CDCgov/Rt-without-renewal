@@ -38,7 +38,7 @@ Plot and save the plot of the true Rt values over time.
 """
 function plot_Rt(true_Rt)
     plt_Rt = plot(true_Rt, label = "True Rt", xlabel = "Time", ylabel = "Rt",
-        title = "True Rt", legend = :topright);
+        title = "True Rt", legend = :topright)
 
     if !isdir(plotsdir("truth_data"))
         mkdir(plotsdir("truth_data"))

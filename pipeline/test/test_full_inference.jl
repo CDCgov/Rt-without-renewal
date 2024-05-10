@@ -2,7 +2,7 @@
     using DrWatson, .AnalysisPipeline, EpiAware
     @quickactivate "Analysis pipeline"
 
-    include(srcdir("AnalysisPipeline.jl"));
+    include(srcdir("AnalysisPipeline.jl"))
 
     default_gi_param_dict = default_gi_params()
     true_Rt = default_Rt()
@@ -23,12 +23,12 @@
         gi_mean = inference_config["gi_mean"],
         gi_std = inference_config["gi_std"],
         case_data = fill(100, 28),
-        tspan = (1,28),
+        tspan = (1, 28),
         epimethod = inference_method
     )
 
     inference_results, inferencefile = produce_or_load(
-            simulate_or_infer, config, datadir("epiaware_observables"); prefix = "test")
+        simulate_or_infer, config, datadir("epiaware_observables"); prefix = "test")
 
     @test inference_results["inference_results"] isa EpiAwareObservables
 end
