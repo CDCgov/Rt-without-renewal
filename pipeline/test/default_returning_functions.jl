@@ -45,3 +45,18 @@ end
     @test haskey(models_dict, "wkly_diff_ar")
     @test valtype(models_dict) <: BroadcastLatentModel
 end
+
+@testset "default_inference_method: constructor and defaults" begin
+    using .AnalysisPipeline, EpiAware, ADTypes, AbstractMCMC
+
+    method = default_inference_method()
+    @test length(method.pre_sampler_steps) == 1
+    @test method.pre_sampler_steps[1] isa ManyPathfinder
+    @test method.pre_sampler_steps[1].nruns == 4
+    @test method.pre_sampler_steps[1].maxiters == 100
+    @test method.sampler isa NUTSampler
+    @test method.sampler.adtype == AutoForwardDiff()
+    @test method.sampler.ndraws == 2000
+    @test method.sampler.nchains == min(10, Threads.nthreads())
+    @test method.sampler.mcmc_parallel == MCMCThreads()
+end
