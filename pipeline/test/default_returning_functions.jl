@@ -34,3 +34,14 @@ end
     # Check if the values are all distributions
     @test valtype(priors_dict) <: Distribution
 end
+
+@testset "default_epiaware_models: generates a dict with correct keys and latent models" begin
+    using .AnalysisPipeline, EpiAware
+
+    models_dict = default_epiaware_models()
+
+    @test haskey(models_dict, "wkly_ar")
+    @test haskey(models_dict, "wkly_rw")
+    @test haskey(models_dict, "wkly_diff_ar")
+    @test valtype(models_dict) <: BroadcastLatentModel
+end
