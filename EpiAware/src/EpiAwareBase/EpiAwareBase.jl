@@ -11,7 +11,8 @@ using DocStringExtensions
 export AbstractModel, AbstractEpiModel, AbstractLatentModel, AbstractObservationModel
 
 # Export Turing-based models
-export AbstractTuringEpiModel, AbstractTuringLatentModel, AbstractTuringObservationModel
+export AbstractTuringEpiModel, AbstractTuringLatentModel, AbstractTuringIntercept,
+       AbstractTuringObservationModel
 
 # Export support types
 export AbstractBroadcastRule
