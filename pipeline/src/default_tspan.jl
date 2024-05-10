@@ -10,6 +10,6 @@ Compute the default time span for the Rt calculation.
 """
 function default_tspan(; backhorizon = 21)
     N = length(default_Rt())
-    @assert backhorizon < N "Backhorizon must be less than the length of the default Rt."
+    @assert backhorizon<N "Backhorizon must be less than the length of the default Rt."
     return (1, N - backhorizon)
 end
