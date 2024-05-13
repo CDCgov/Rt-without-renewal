@@ -15,7 +15,7 @@ models_dict::Dict{String, LatentModel}
     - "wkly_diff_ar": Weekly differenced autoregressive model
 """
 function default_epiaware_models()
-    prior_dict = default_priors()
+    prior_dict = default_latent_model_priors()
 
     ar = AR(damp_priors = [prior_dict["damp_param_prior"]],
         std_prior = prior_dict["std_prior"],
