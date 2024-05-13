@@ -1,6 +1,4 @@
 """
-    plot_truth_data(data, config)
-
 Plot the true cases and latent infections.
 
 # Arguments
@@ -10,23 +8,21 @@ Plot the true cases and latent infections.
 # Returns
 - `plt_cases`: The plot object representing the cases and latent infections.
 """
-function plot_truth_data(data, config)
+function plot_truth_data(data, config; plotsname = "truth_data")
     plt_cases = scatter(
         data["y_t"], label = "Cases", xlabel = "Time", ylabel = "Daily cases",
         title = "Cases and latent infections", legend = :bottomright)
     plot!(plt_cases, data["I_t"], label = "True latent infections")
 
-    if !isdir(plotsdir("truth_data"))
-        mkdir(plotsdir("truth_data"))
+    if !isdir(plotsdir(plotsname))
+        mkdir(plotsdir(plotsname))
     end
 
-    savefig(plt_cases, plotsdir("truth_data", savename("truth_cases", config, "png")))
+    savefig(plt_cases, plotsdir(plotsname, savename(plotsname, config, "png")))
     return plt_cases
 end
 
 """
-    plot_Rt(true_Rt)
-
 Plot and save the plot of the true Rt values over time.
 
 # Arguments
