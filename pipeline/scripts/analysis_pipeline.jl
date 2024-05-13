@@ -46,14 +46,14 @@ inference_configs = make_inference_configs(
     gi_stds = default_gi_param_dict["gi_stds"])
 
 # Produce and save the truth data
-truth_data_scenarios = map(truth_data_configs[1:1]) do truth_data_config
+truth_data_scenarios = map(truth_data_configs) do truth_data_config
     @info "Running truth data scenario with GI mean: $(truth_data_config["gi_mean"])"
     # generate truth data
     truthdata, truthfile = generate_truthdata_from_config(
         truth_data_config; plot = true)
 
     # Run the inference scenarios
-    map(inference_configs[1:1]) do inference_config
+    map(inference_configs) do inference_config
         @info "Running inference scenario with IGP: $(inference_config["igp"]), latent model: " *
               latent_models_names[inference_config["latent_model"]]
         inference_results, inferencefile = generate_inference_results(
