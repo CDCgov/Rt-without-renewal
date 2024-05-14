@@ -20,7 +20,7 @@ end
 
 @testset "generate_truthdata_from_config" begin
     truth_data_config = Dict("gi_mean" => 0.5, "gi_std" => 0.1)
-    truthdata, truthfile = generate_truthdata_from_config(truth_data_config)
+    truthdata = generate_truthdata_from_config(truth_data_config)
 
     @test haskey(truthdata, "I_t")
     @test haskey(truthdata, "y_t")
@@ -28,5 +28,4 @@ end
     @test haskey(truthdata, "truth_process")
     @test haskey(truthdata, "truth_gi_mean")
     @test haskey(truthdata, "truth_gi_std")
-    @test typeof(truthfile) == String
 end

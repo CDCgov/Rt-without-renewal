@@ -57,6 +57,14 @@ end
     @test method.sampler isa NUTSampler
     @test method.sampler.adtype == AutoForwardDiff()
     @test method.sampler.ndraws == 2000
-    @test method.sampler.nchains == min(10, Threads.nthreads())
-    @test method.sampler.mcmc_parallel == MCMCThreads()
+    @test method.sampler.nchains == 2
+    @test method.sampler.mcmc_parallel == MCMCSerial()
+end
+
+@testset "Test default_latent_models_names" begin
+    using .AnalysisPipeline
+
+    modelnames = default_latent_models_names()
+    @test length(modelnames) == 3
+    @test modelnames isa Dict
 end

@@ -22,5 +22,5 @@ function generate_truthdata_from_config(
     if plot
         plot_truth_data(truthdata, config)
     end
-    return truthdata, truthfile
+    return truthdata
 end
