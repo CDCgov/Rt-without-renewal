@@ -11,7 +11,7 @@ using CSV, Dagger, DataFramesMeta, Dates, Distributions, DocStringExtensions, Dr
 export TruthSimulationConfig, InferenceConfig
 
 # Exported functions
-export simulate_or_infer, default_gi_params, default_Rt, default_tspan,
+export simulate, infer, default_gi_params, default_Rt, default_tspan,
        default_latent_model_priors, default_epiaware_models, default_inference_method,
        default_latent_models_names, make_truth_data_configs, make_inference_configs,
        generate_truthdata_from_config, generate_inference_results, plot_truth_data, plot_Rt

@@ -29,6 +29,6 @@ function generate_inference_results(truthdata, inference_config; tspan, inferenc
            string(truth_data_config["gi_mean"])
 
     inference_results, inferencefile = produce_or_load(
-        simulate_or_infer, config, datadir(datadir_name); prefix = prfx)
+        infer, config, datadir(datadir_name); prefix = prfx)
     return inference_results, inferencefile
 end

@@ -1,10 +1,10 @@
-@testset "simulate_or_infer: simulate runs" begin
+@testset "simulate runs" begin
     using Distributions, .AnalysisPipeline, EpiAware
     # Define a mock TruthSimulationConfig object for testing
     config = TruthSimulationConfig(
         truth_process = fill(1.5, 10), gi_mean = 2.0, gi_std = 2.0)
-    # Test the simulate_or_infer function
-    result = simulate_or_infer(config)
+    # Test the simulate function
+    result = simulate(config)
 
     @test haskey(result, "I_t")
     @test haskey(result, "y_t")
