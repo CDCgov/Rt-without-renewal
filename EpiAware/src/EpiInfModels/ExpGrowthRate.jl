@@ -64,9 +64,9 @@ unobserved infections.
 I_t = generated_quantities(latent_inf, θ)
 ```
 "
-@kwdef struct ExpGrowthRate{S <: Sampleable} <: AbstractTuringEpiModel
+@kwdef struct ExpGrowthRate{S <: Sampleable, L <: AbstractTuringLatentModel} <: AbstractTuringEpiModel
     data::EpiData
-    initialisation_prior::S = Normal()
+    latent_model::L = Intercept()
 end
 
 @doc raw"
@@ -114,7 +114,9 @@ unobserved infections.
 I_t = generated_quantities(latent_inf, θ)
 ```
 "
-@model function EpiAwareBase.generate_infections(epi_model::ExpGrowthRate, rt)
-    init_incidence ~ epi_model.initialisation_prior
+@model function EpiAwareBase.generate_infections(epi_model::ExpGrowthRate, n)
+    @submodel untrans_inf, inf_aux = generate_latent(DiffLatentModel(epi_model.latent_model), n)
+
+    infs = exp.(untrans_inf)
     return exp.(init_incidence .+ cumsum(rt))
 end
