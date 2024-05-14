@@ -64,11 +64,11 @@ I_t = generated_quantities(latent_inf, θ)
 ```
 
 "
-@kwdef struct DirectInfections{S <: Sampleable} <: AbstractTuringEpiModel
+@kwdef struct DirectInfections{S <: Sampleable, M::AbstractTuringLatentModel, F::Function} <: AbstractTuringEpiModel
     "`Epidata` object."
     data::EpiData
-    "Prior distribution for the initialisation of the infections. Default is `Normal()`."
-    initialisation_prior::S = Normal()
+    latent_model::M = Intercept()
+    transformation::F = exp
 end
 
 """
@@ -88,7 +88,7 @@ g = exp
 data = EpiData(gen_int, g)
 
 # Create a DirectInfections model
-direct_inf_model = DirectInfections(data = data, initialisation_prior = Normal())
+direct_inf_model = DirectInfections(data = data, latent_model = RandomWalk())
 ```
 
 Then, we can use `generate_infections` to construct a Turing model for the unobserved
@@ -96,8 +96,7 @@ infection generation model set by the type of `direct_inf_model`.
 
 ```julia
 # Construct a Turing model
-Z_t = randn(100)
-latent_inf = generate_infections(direct_inf_model, Z_t)
+latent_inf = generate_infections(direct_inf_model, 20)
 ```
 Now we can use the `Turing` PPL API to sample underlying parameters and generate the
 unobserved infections.
@@ -110,7 +109,8 @@ unobserved infections.
 I_t = generated_quantities(latent_inf, θ)
 ```
 """
-@model function EpiAwareBase.generate_infections(epi_model::DirectInfections, Z_t)
-    init_incidence ~ epi_model.initialisation_prior
-    return epi_model.data.transformation.(init_incidence .+ Z_t)
+@model function EpiAwareBase.generate_infections(epi_model::DirectInfections, n)
+    @submodel untrans_inf, inf_aux = generate_latent(epi_model.latent_model, n)
+    inf = epi_model.data.transformation.(untrans_inf)
+    return inf, (; inf_aux)
 end
