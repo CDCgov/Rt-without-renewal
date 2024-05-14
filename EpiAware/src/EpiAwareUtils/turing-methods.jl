@@ -12,13 +12,10 @@ A `DynamicPPPL.Model` object.
 "
 @model function EpiAwareBase.generate_epiaware(
         y_t, time_steps, epi_model::AbstractTuringEpiModel;
-        latent_model::AbstractTuringLatentModel, observation_model::AbstractTuringObservationModel)
-    # Latent process
-    @submodel prefix="latent" Z_t, latent_aux=generate_latent(
-        latent_model, time_steps)
+        observation_model::AbstractTuringObservationModel)
 
     # Transform into infections
-    @submodel I_t, I_t_aux =generate_infections(epi_model, n)
+    @submodel prefix="inf" I_t, I_t_aux=generate_infections(epi_model, n)
 
     # Predictive distribution of ascertained cases
     @submodel prefix="obs" gen_y_t, gen_y_t_aux=generate_observations(
@@ -26,7 +23,7 @@ A `DynamicPPPL.Model` object.
 
     # Generate quantities
     return (;
-        gen_y_t, I_t, process_aux = merge(latent_aux, I_t_aux, gen_y_t_aux))
+        gen_y_t, I_t, process_aux = merge(I_t_aux, gen_y_t_aux))
 end
 
 """

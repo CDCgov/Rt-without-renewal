@@ -14,7 +14,7 @@ function generate_infections(epi_model::AbstractEpiModel, n)
 end
 
 @doc raw"
-Constructor function for a latent process path ``Z_t`` of length `n`.
+Constructor function for a latent process path `Z_t` of length `n`.
 
 The `generate_latent` function implements a model of generating a latent process. Which
 model for generating the latent process infections is implemented is set by the type of
