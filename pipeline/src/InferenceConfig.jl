@@ -64,7 +64,7 @@ to make inference on and model configuration.
 - `inference_results`: The results of the simulation or inference.
 
 """
-function simulate_or_infer(config::InferenceConfig)
+function infer(config::InferenceConfig)
     #Define infection-generating model
     shape = (config.gi_mean / config.gi_std)^2
     scale = config.gi_std^2 / config.gi_mean

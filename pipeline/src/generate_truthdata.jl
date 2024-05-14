@@ -1,5 +1,5 @@
 """
-Generate truth data from a configuration file. It does this by converting the configuration dictionary into a `TruthSimulationConfig` object and then calling the `simulate_or_infer` function to generate the truth data.
+Generate truth data from a configuration file. It does this by converting the configuration dictionary into a `TruthSimulationConfig` object and then calling the `simulate` function to generate the truth data.
 
 # Arguments
 - `truth_data_config`: A dictionary containing the configuration parameters for generating truth data.
@@ -18,7 +18,7 @@ function generate_truthdata_from_config(
         truth_process = true_Rt, gi_mean = truth_data_config["gi_mean"],
         gi_std = truth_data_config["gi_std"])
     truthdata, truthfile = produce_or_load(
-        simulate_or_infer, config, datadir(datadir_str); prefix = prefix)
+        simulate, config, datadir(datadir_str); prefix = prefix)
     if plot
         plot_truth_data(truthdata, config)
     end

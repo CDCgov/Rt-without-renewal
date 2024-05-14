@@ -29,8 +29,6 @@ mean and standard deviation.
 end
 
 """
-    simulate_or_infer(config::TruthSimulationConfig)
-
 Simulates or infers the truth process and observations based on the given configuration.
 
 # Arguments
@@ -40,7 +38,7 @@ Simulates or infers the truth process and observations based on the given config
 A dictionary containing the sampled infections and observations, along with other relevant information.
 
 """
-function simulate_or_infer(config::TruthSimulationConfig)
+function simulate(config::TruthSimulationConfig)
     #Define infection-generating model
     shape = (config.gi_mean / config.gi_std)^2
     scale = config.gi_std^2 / config.gi_mean
