@@ -68,3 +68,17 @@ end
     @test length(modelnames) == 3
     @test modelnames isa Dict
 end
+
+@testset "default_truthdata_configs" begin
+    using .AnalysisPipeline
+    @testset "default_truthdata_configs should return a dictionary" begin
+        config_dicts = default_truthdata_configs()
+        @test eltype(config_dicts) <: Dict
+    end
+
+    @testset "default_truthdata_configs should contain gi_mean and gi_std keys" begin
+        config_dicts = default_truthdata_configs()
+        @test all(config_dicts .|> config -> haskey(config, "gi_mean"))
+        @test all(config_dicts .|> config -> haskey(config, "gi_std"))
+    end
+end
