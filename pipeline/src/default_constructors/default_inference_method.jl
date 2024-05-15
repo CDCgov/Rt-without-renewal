@@ -18,7 +18,7 @@ An `EpiMethod` object with the specified settings.
 """
 function default_inference_method(; max_threads::Integer = 10, ndraws::Integer = 2000,
         mcmc_ensemble::AbstractMCMC.AbstractMCMCEnsemble = MCMCSerial(),
-        nruns_pthf::Integer = 4, maxiters_pthf::Integer = 100, nchains::Integer = 2)
+        nruns_pthf::Integer = 4, maxiters_pthf::Integer = 100, nchains::Integer = 4)
     return EpiMethod(
         pre_sampler_steps = [ManyPathfinder(nruns = nruns_pthf, maxiters = maxiters_pthf)],
         sampler = NUTSampler(adtype = AutoForwardDiff(),

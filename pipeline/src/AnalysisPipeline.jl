@@ -21,25 +21,22 @@ export AbstractEpiAwarePipeline, EpiAwarePipeline, RtwithoutRenewalPipeline,
 # Exported functions
 export simulate, infer, default_gi_params, default_Rt, default_tspan,
        default_latent_model_priors, default_epiaware_models, default_inference_method,
-       default_latent_models_names, default_truthdata_configs, make_truth_data_configs,
-       make_inference_configs,
-       generate_truthdata_from_config, generate_inference_results, plot_truth_data, plot_Rt
+       default_latent_models_names, default_truthdata_configs, default_inference_configs,
+       make_truth_data_configs, make_inference_configs, generate_truthdata_from_config,
+       generate_inference_results, plot_truth_data, plot_Rt, make_truthdata, make_inference,
+       make_pipeline
 
 include("docstrings.jl")
 include("pipelinetypes.jl")
-include("default_constructors/default_gi_params.jl")
-include("default_constructors/default_Rt.jl")
-include("default_constructors/default_tspan.jl")
-include("default_constructors/default_latent_model_priors.jl")
-include("default_constructors/default_epiaware_models.jl")
-include("default_constructors/default_inference_method.jl")
-include("default_constructors/default_truthdata_configs.jl")
+include("default_constructors/default_constructors.jl")
 include("make_truth_data_configs.jl")
 include("make_inference_configs.jl")
-include("default_constructors/default_latent_models_names.jl")
 include("TruthSimulationConfig.jl")
 include("InferenceConfig.jl")
 include("generate_truthdata.jl")
 include("generate_inference_results.jl")
 include("plot_functions.jl")
+include("make_truthdata.jl")
+include("make_inference.jl")
+include("make_pipeline.jl")
 end

@@ -82,3 +82,10 @@ end
         @test all(config_dicts .|> config -> haskey(config, "gi_std"))
     end
 end
+
+@testset "default inference configurations" begin
+    @testset "default_inference_configs function" begin
+        inference_configs = default_inference_configs()
+        @test eltype(inference_configs) <: Dict
+    end
+end
