@@ -18,9 +18,11 @@
     @test all(growth_up)
 end
 
-@testset "generate_truthdata_from_config" begin
+@testset "generate_truthdata" begin
+    using .AnalysisPipeline
+    pipeline = RtwithoutRenewalPipeline()
     truth_data_config = Dict("gi_mean" => 0.5, "gi_std" => 0.1)
-    truthdata = generate_truthdata_from_config(truth_data_config)
+    truthdata = generate_truthdata(truth_data_config, pipeline)
 
     @test haskey(truthdata, "I_t")
     @test haskey(truthdata, "y_t")
