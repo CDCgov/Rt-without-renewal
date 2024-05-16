@@ -11,7 +11,7 @@ using Dagger
 # Define the backend resources to use for the pipeline
 # in this case we are using distributed local workers with loaded modules
 using Distributed
-addprocs()
+pids = addprocs()
 
 @everywhere include("../src/AnalysisPipeline.jl")
 @everywhere using .AnalysisPipeline
@@ -20,4 +20,7 @@ addprocs()
 pipeline = AnalysisPipeline.EpiAwarePipeline()
 
 # Run the pipeline
-make_pipeline(pipeline)
+do_pipeline(pipeline)
+
+# Remove the workers
+rmprocs(pids)
