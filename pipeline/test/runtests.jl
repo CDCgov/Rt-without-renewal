@@ -5,9 +5,9 @@ quickactivate(@__DIR__(), "Analysis pipeline")
 include(srcdir("AnalysisPipeline.jl"));
 
 #run tests
-include("test_pipelinetypes.jl");
-include("default_returning_functions.jl");
-include("test_make_configs.jl");
-include("test_SimulationConfig.jl");
-include("test_TruthSimulationConfig.jl");
-include("test_InferenceConfig.jl");
+include("pipeline/test_pipelinetypes.jl");
+include("constructors/default_returning_functions.jl");
+include("constructors/test_constructors.jl");
+include("simulate/test_TruthSimulationConfig.jl");
+include("simulate/test_SimulationConfig.jl");
+include("infer/test_InferenceConfig.jl");
