@@ -10,7 +10,6 @@ with execution determined by available computational resources.
 """
 module AnalysisPipeline
 
-using Dates: default
 using CSV, Dagger, DataFramesMeta, Dates, Distributions, DocStringExtensions, DrWatson,
       EpiAware, Plots, Statistics, ADTypes, AbstractMCMC, Plots, JLD2
 
@@ -30,8 +29,11 @@ export make_truth_data_configs, make_inference_configs, make_tspan, make_inferen
 # Exported functions: pipeline components
 export do_truthdata, do_inference, do_pipeline
 
-export simulate, infer, generate_truthdata, generate_inference_results,
-       plot_truth_data, plot_Rt
+# Exported functions: simulate functions
+export simulate, generate_truthdata
+
+# Exported functions: infer functions
+export infer, generate_inference_results, plot_truth_data, plot_Rt
 
 include("docstrings.jl")
 include("pipeline/pipeline.jl")
