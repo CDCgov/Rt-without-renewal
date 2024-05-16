@@ -17,7 +17,7 @@ pids = addprocs()
 @everywhere using .AnalysisPipeline
 
 # Create an instance of the pipeline behaviour
-pipeline = AnalysisPipeline.EpiAwarePipeline()
+pipeline = RtwithoutRenewalPipeline()
 
 # Run the pipeline
 do_pipeline(pipeline)
