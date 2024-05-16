@@ -57,7 +57,7 @@ end
     @test method.sampler isa NUTSampler
     @test method.sampler.adtype == AutoForwardDiff()
     @test method.sampler.ndraws == 2000
-    @test method.sampler.nchains == 2
+    @test method.sampler.nchains == 4
     @test method.sampler.mcmc_parallel == MCMCSerial()
 end
 
@@ -84,8 +84,7 @@ end
 end
 
 @testset "default inference configurations" begin
-    @testset "default_inference_configs function" begin
-        inference_configs = default_inference_configs()
-        @test eltype(inference_configs) <: Dict
-    end
+    using .AnalysisPipeline
+    inference_configs = default_inference_configs()
+    @test eltype(inference_configs) <: Dict
 end
