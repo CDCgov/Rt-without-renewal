@@ -2,18 +2,20 @@
 Generate inference results based on the given configuration of inference model options.
 
 # Arguments
+- `truthdata`: The truth data used for generating inference results.
 - `inference_config`: A dictionary containing the inference configuration choices.
+- `pipeline::AbstractEpiAwarePipeline`: The pipeline object which sets pipeline
+    behavior. This is the default method.
 - `tspan`: The time span for the inference.
 - `inference_method`: The method used for inference.
-- `truth_data_config`: A dictionary containing the truth data configuration parameters. This is only
-    used to generate the file name for the inference results.
+
 
 # Returns
 - `inference_results`: The generated inference results.
-- `inferencefile`: The file path where the inference results are stored.
 """
 function generate_inference_results(
-        truthdata, inference_config; tspan, inference_method, latent_models_names,
+        truthdata, inference_config, pipeline::AbstractEpiAwarePipeline;
+        tspan, inference_method, latent_models_names,
         prfix_name = "observables", datadir_name = "epiaware_observables")
     config = InferenceConfig(inference_config["igp"], inference_config["latent_model"];
         gi_mean = inference_config["gi_mean"],
