@@ -13,12 +13,10 @@ function do_inference(truthdata, pipeline::AbstractEpiAwarePipeline)
     inference_configs = make_inference_configs(pipeline)
     tspan = make_tspan(pipeline)
     inference_method = make_inference_method(pipeline)
-    latent_models_names = make_latent_models_names(pipeline)
 
     inference_results = map(inference_configs) do inference_config
         Dagger.@spawn generate_inference_results(
-            truthdata, inference_config, pipeline; tspan,
-            inference_method, latent_models_names)
+            truthdata, inference_config, pipeline; tspan, inference_method)
     end
     return inference_results
 end

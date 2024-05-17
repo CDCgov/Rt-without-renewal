@@ -15,9 +15,10 @@ Generate inference results based on the given configuration of inference model o
 """
 function generate_inference_results(
         truthdata, inference_config, pipeline::AbstractEpiAwarePipeline;
-        tspan, inference_method, latent_models_names,
+        tspan, inference_method,
         prfix_name = "observables", datadir_name = "epiaware_observables")
-    config = InferenceConfig(inference_config["igp"], inference_config["latent_model"];
+    config = InferenceConfig(
+        inference_config["igp"], inference_config["latent_namemodels"].second;
         gi_mean = inference_config["gi_mean"],
         gi_std = inference_config["gi_std"],
         case_data = truthdata["y_t"],
@@ -27,7 +28,7 @@ function generate_inference_results(
 
     # produce or load inference results
     prfx = prfix_name * "_igp_" * string(inference_config["igp"]) * "_latentmodel_" *
-           latent_models_names[inference_config["latent_model"]] * "_truth_gi_mean_" *
+           inference_config["latent_namemodels"].first * "_truth_gi_mean_" *
            string(truthdata["truth_gi_mean"])
 
     inference_results, inferencefile = produce_or_load(
