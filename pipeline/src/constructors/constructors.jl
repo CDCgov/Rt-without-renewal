@@ -1,4 +1,3 @@
-# include("default_constructors/default_constructors.jl")
 include("make_gi_params.jl")
 include("make_inf_generating_processes.jl")
 include("make_latent_model_priors.jl")
