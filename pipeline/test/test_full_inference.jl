@@ -7,7 +7,6 @@ using Test
     using .AnalysisPipeline
     pipeline = RtwithoutRenewalPipeline()
 
-    latent_models_names = make_latent_models_names(pipeline)
     tspan = (1, 28)
     inference_method = make_inference_method(pipeline)
     truth_data_config = make_truth_data_configs(pipeline)[1]
@@ -16,6 +15,6 @@ using Test
     truthdata = Dict("y_t" => fill(100, 28), "truth_gi_mean" => 1.5)
 
     inference_results = generate_inference_results(
-        truthdata, inference_config, pipeline; tspan, inference_method, latent_models_names)
+        truthdata, inference_config, pipeline; tspan, inference_method)
     @test inference_results["inference_results"] isa EpiAwareObservables
 end
