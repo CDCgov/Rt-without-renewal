@@ -1,14 +1,16 @@
 """
-Plot the true cases and latent infections.
+Plot the true cases and latent infections. This is the default method for plotting.
 
 # Arguments
 - `data`: A dictionary containing the data for plotting.
 - `config`: The configuration for the truth data scenario.
+- `pipeline::AbstractEpiAwarePipeline`: The pipeline object which sets pipeline
+    behavior.
 
 # Returns
 - `plt_cases`: The plot object representing the cases and latent infections.
 """
-function plot_truth_data(data, config; plotsname = "truth_data")
+function plot_truth_data(data, config, pipeline::AbstractEpiAwarePipeline; plotsname = "truth_data")
     plt_cases = scatter(
         data["y_t"], label = "Cases", xlabel = "Time", ylabel = "Daily cases",
         title = "Cases and latent infections", legend = :bottomright)
