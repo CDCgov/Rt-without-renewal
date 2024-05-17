@@ -8,5 +8,8 @@ A vector of dictionaries containing the mean and standard deviation values for
 
 """
 function make_truth_data_configs(pipeline::AbstractEpiAwarePipeline)
-    default_truthdata_configs()
+    gi_param_dict = make_gi_params(pipeline)
+    return Dict(
+        "gi_mean" => gi_param_dict["gi_means"], "gi_std" => gi_param_dict["gi_stds"]) |>
+           dict_list
 end

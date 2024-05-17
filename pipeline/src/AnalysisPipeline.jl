@@ -18,13 +18,12 @@ export AbstractEpiAwarePipeline, EpiAwarePipeline, RtwithoutRenewalPipeline,
        TruthSimulationConfig, InferenceConfig
 
 # Exported functions: default constructors
-export default_gi_params, default_Rt, default_tspan,
-       default_latent_model_priors, default_epiaware_models, default_inference_method,
-       default_latent_models_names, default_truthdata_configs, default_inference_configs
+# export default_gi_params, default_Rt, default_tspan, default_latent_model_priors,
+#        default_epiaware_models, default_inference_method, default_latent_models_names,
+#        default_truthdata_configs, default_inference_configs
 
 # Exported functions: constructors
-export make_truth_data_configs, make_inference_configs, make_tspan, make_inference_method,
-       make_latent_models_names
+export make_gi_params, make_inf_generating_processes, make_latent_model_priors, make_epiaware_name_model_pairs, make_Rt, make_truth_data_configs, make_inference_configs, make_tspan, make_inference_method
 
 # Exported functions: pipeline components
 export do_truthdata, do_inference, do_pipeline
