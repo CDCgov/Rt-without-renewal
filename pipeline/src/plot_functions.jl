@@ -29,12 +29,14 @@ Plot and save the plot of the true Rt values over time.
 
 # Arguments
 - `true_Rt`: An array of true Rt values.
+- `pipeline::AbstractEpiAwarePipeline`: The pipeline object which sets pipeline
+    behavior.
 
 # Returns
 - `plt_Rt`: The plot object.
 
 """
-function plot_Rt(true_Rt)
+function plot_Rt(true_Rt, pipeline::AbstractEpiAwarePipeline)
     plt_Rt = plot(true_Rt, label = "True Rt", xlabel = "Time", ylabel = "Rt",
         title = "True Rt", legend = :topright)
 
