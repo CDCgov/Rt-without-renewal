@@ -13,6 +13,7 @@ function do_inference(truthdata, pipeline::AbstractEpiAwarePipeline)
     inference_configs = make_inference_configs(pipeline)
     tspan = make_tspan(pipeline)
     inference_method = make_inference_method(pipeline)
-    inference_results = map_inference_results(inference_configs, pipeline; tspan, inference_method)
+    inference_results = map_inference_results(
+        truthdata, inference_configs, pipeline; tspan, inference_method)
     return inference_results
 end

@@ -10,7 +10,8 @@ Plot the true cases and latent infections. This is the default method for plotti
 # Returns
 - `plt_cases`: The plot object representing the cases and latent infections.
 """
-function plot_truth_data(data, config, pipeline::AbstractEpiAwarePipeline; plotsname = "truth_data")
+function plot_truth_data(
+        data, config, pipeline::AbstractEpiAwarePipeline; plotsname = "truth_data")
     plt_cases = scatter(
         data["y_t"], label = "Cases", xlabel = "Time", ylabel = "Daily cases",
         title = "Cases and latent infections", legend = :bottomright)
