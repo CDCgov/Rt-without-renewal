@@ -1,5 +1,6 @@
 """
-Compute the default Rt values over time.
+Compute the default Rt values over time for generating truth data. This is the
+default method.
 
 ## keyword Arguments
 - `A`: Amplitude of the sinusoidal variation in Rt. Default is 0.3.
@@ -9,7 +10,7 @@ Compute the default Rt values over time.
 - `true_Rt`: Array of default Rt values over time.
 
 """
-function default_Rt(; A = 0.3, P = 30.0)
+function make_Rt(pipeline::AbstractEpiAwarePipeline; A = 0.3, P = 30.0)
     ϕ = asin(-0.1 / 0.3) * P / (2 * π)
     N = 160
     true_Rt = vcat(fill(1.1, 2 * 7), fill(2.0, 2 * 7), fill(0.5, 2 * 7),
