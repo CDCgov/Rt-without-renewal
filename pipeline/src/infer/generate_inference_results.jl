@@ -35,3 +35,29 @@ function generate_inference_results(
         infer, config, datadir(datadir_name); prefix = prfx)
     return inference_results
 end
+
+"""
+Method for prior predictive modelling.
+"""
+function generate_inference_results(
+        truthdata, inference_config, pipeline::RtwithoutRenewalPriorPipeline;
+        tspan, inference_method,
+        prfix_name = "prior_observables", datadir_name = "epiaware_observables")
+    config = InferenceConfig(
+        inference_config["igp"], inference_config["latent_namemodels"].second;
+        gi_mean = inference_config["gi_mean"],
+        gi_std = inference_config["gi_std"],
+        case_data = missing,
+        tspan = tspan,
+        epimethod = inference_method
+    )
+
+    # produce or load inference results
+    prfx = prfix_name * "_igp_" * string(inference_config["igp"]) * "_latentmodel_" *
+           inference_config["latent_namemodels"].first * "_truth_gi_mean_" *
+           string(truthdata["truth_gi_mean"])
+
+    inference_results, inferencefile = produce_or_load(
+        infer, config, datadir(datadir_name); prefix = prfx)
+    return inference_results
+end

@@ -15,7 +15,7 @@ tasks from `Dagger.@spawn`.
 
 """
 function map_inference_results(
-        truthdata, inference_configs, pipeline; tspan, inference_method)
+        truthdata, inference_configs, pipeline::AbstractEpiAwarePipeline; tspan, inference_method)
     map(inference_configs) do inference_config
         Dagger.@spawn generate_inference_results(
             truthdata, inference_config, pipeline; tspan, inference_method)

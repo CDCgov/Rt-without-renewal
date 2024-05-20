@@ -17,3 +17,13 @@ function make_inference_method(pipeline::AbstractEpiAwarePipeline; ndraws::Integ
             nchains = nchains, mcmc_parallel = mcmc_ensemble)
     )
 end
+
+"""
+Method for sampling from prior predictive distribution of the model.
+"""
+function make_inference_method(pipeline::RtwithoutRenewalPriorPipeline; n_samples = 2_000)
+    return EpiMethod(
+        pre_sampler_steps = AbstractEpiOptMethod[],
+        sampler = DirectSample(n_samples = n_samples)
+    )
+end
