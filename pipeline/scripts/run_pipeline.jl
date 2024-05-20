@@ -11,10 +11,9 @@ using Dagger
 # Define the backend resources to use for the pipeline
 # in this case we are using distributed local workers with loaded modules
 using Distributed
-pids = addprocs()
+pids = addprocs(; exeflags = ["--project=$(Base.active_project())"])
 
-@everywhere include("../src/AnalysisPipeline.jl")
-@everywhere using .AnalysisPipeline
+@everywhere using AnalysisPipeline
 
 # Create an instance of the pipeline behaviour
 pipeline = RtwithoutRenewalPipeline()

@@ -1,5 +1,5 @@
 @testset "make_gi_params: returns a dictionary with correct keys" begin
-    using .AnalysisPipeline
+    using AnalysisPipeline
     pipeline = RtwithoutRenewalPipeline()
     params = make_gi_params(pipeline)
 
@@ -9,14 +9,14 @@
 end
 
 @testset "make_inf_generating_processes" begin
-    using .AnalysisPipeline, EpiAware
+    using AnalysisPipeline, EpiAware
     pipeline = RtwithoutRenewalPipeline()
     igps = make_inf_generating_processes(pipeline)
     @test igps == [DirectInfections, ExpGrowthRate, Renewal]
 end
 
 @testset "make_Rt: returns an array" begin
-    using .AnalysisPipeline
+    using AnalysisPipeline
     pipeline = RtwithoutRenewalPipeline()
 
     Rt = make_Rt(pipeline)
@@ -24,7 +24,7 @@ end
 end
 
 @testset "default_tspan: returns an Tuple{Integer, Integer}" begin
-    using .AnalysisPipeline
+    using AnalysisPipeline
     pipeline = RtwithoutRenewalPipeline()
 
     tspan = make_tspan(pipeline)
@@ -32,7 +32,7 @@ end
 end
 
 @testset "make_latent_model_priors: generates a dict with correct keys and distributions" begin
-    using .AnalysisPipeline, Distributions
+    using AnalysisPipeline, Distributions
     pipeline = RtwithoutRenewalPipeline()
 
     priors_dict = make_latent_model_priors(pipeline)
@@ -47,7 +47,7 @@ end
 end
 
 @testset "make_epiaware_name_model_pairs: generates a vector of Pairs with correct keys and latent models" begin
-    using .AnalysisPipeline, EpiAware
+    using AnalysisPipeline, EpiAware
     pipeline = RtwithoutRenewalPipeline()
 
     namemodel_vect = make_epiaware_name_model_pairs(pipeline)
@@ -57,7 +57,7 @@ end
 end
 
 @testset "make_inference_method: constructor and defaults" begin
-    using .AnalysisPipeline, EpiAware, ADTypes, AbstractMCMC
+    using AnalysisPipeline, EpiAware, ADTypes, AbstractMCMC
     pipeline = RtwithoutRenewalPipeline()
 
     method = make_inference_method(pipeline)
@@ -74,7 +74,7 @@ end
 end
 
 @testset "make_inference_method: for prior predictive checking" begin
-    using .AnalysisPipeline, EpiAware, ADTypes, AbstractMCMC
+    using AnalysisPipeline, EpiAware, ADTypes, AbstractMCMC
     pipeline = RtwithoutRenewalPriorPipeline()
 
     method = make_inference_method(pipeline)
@@ -84,7 +84,7 @@ end
 end
 
 @testset "make_truth_data_configs" begin
-    using .AnalysisPipeline
+    using AnalysisPipeline
     pipeline = RtwithoutRenewalPipeline()
     @testset "make_truth_data_configs should return a dictionary" begin
         config_dicts = make_truth_data_configs(pipeline)
@@ -99,7 +99,7 @@ end
 end
 
 @testset "default inference configurations" begin
-    using .AnalysisPipeline
+    using AnalysisPipeline
     pipeline = RtwithoutRenewalPipeline()
 
     inference_configs = make_inference_configs(pipeline)

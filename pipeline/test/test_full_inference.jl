@@ -1,10 +1,9 @@
 using Test
 @testset "run inference for random scenario with short toy data" begin
-    using DrWatson, EpiAware
-    quickactivate(@__DIR__(), "Analysis pipeline")
-    include(srcdir("AnalysisPipeline.jl"))
+    using DrWatson
+    quickactivate(@__DIR__(), "AnalysisPipeline")
 
-    using .AnalysisPipeline
+    using AnalysisPipeline
     pipeline = RtwithoutRenewalPipeline()
 
     tspan = (1, 28)

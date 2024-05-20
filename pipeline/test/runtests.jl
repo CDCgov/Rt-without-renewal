@@ -1,10 +1,7 @@
 using DrWatson, Test
-quickactivate(@__DIR__(), "Analysis pipeline")
+quickactivate(@__DIR__(), "AnalysisPipeline")
 
-# Load analysis module
-include(srcdir("AnalysisPipeline.jl"));
-
-#run tests
+# Run tests
 include("pipeline/test_pipelinetypes.jl");
 include("constructors/test_constructors.jl");
 include("simulate/test_TruthSimulationConfig.jl");
