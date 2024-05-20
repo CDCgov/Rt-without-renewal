@@ -11,10 +11,8 @@ using Dagger
 # Define the backend resources to use for the pipeline
 # in this case we are using distributed local workers with loaded modules
 using Distributed
-pids = addprocs()
+pids = addprocs(; exeflags=["--project=$(Base.active_project())"])
 
-@everywhere using Pkg
-@everywhere Pkg.activate(joinpath(@__DIR__(), ".."))
 @everywhere using AnalysisPipeline
 
 # Create an instance of the pipeline behaviour
