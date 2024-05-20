@@ -73,6 +73,16 @@ end
     @test method.sampler.mcmc_parallel == MCMCSerial()
 end
 
+@testset "make_inference_method: for prior predictive checking" begin
+    using .AnalysisPipeline, EpiAware, ADTypes, AbstractMCMC
+    pipeline = RtwithoutRenewalPriorPipeline()
+
+    method = make_inference_method(pipeline)
+
+    @test length(method.pre_sampler_steps) == 0
+    @test method.sampler isa DirectSample
+end
+
 @testset "make_truth_data_configs" begin
     using .AnalysisPipeline
     pipeline = RtwithoutRenewalPipeline()

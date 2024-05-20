@@ -13,9 +13,12 @@ module AnalysisPipeline
 using CSV, Dagger, DataFramesMeta, Dates, Distributions, DocStringExtensions, DrWatson,
       EpiAware, Plots, Statistics, ADTypes, AbstractMCMC, Plots, JLD2
 
-# Exported struct types
+# Exported pipeline types
 export AbstractEpiAwarePipeline, EpiAwarePipeline, RtwithoutRenewalPipeline,
-       TruthSimulationConfig, InferenceConfig
+       RtwithoutRenewalPriorPipeline
+
+# Exported configuration types
+export TruthSimulationConfig, InferenceConfig
 
 # Exported functions: constructors
 export make_gi_params, make_inf_generating_processes, make_latent_model_priors,
