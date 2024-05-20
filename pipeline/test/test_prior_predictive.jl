@@ -4,7 +4,7 @@ using Test
     quickactivate(@__DIR__(), "Analysis pipeline")
     include(srcdir("AnalysisPipeline.jl"))
 
-    using .AnalysisPipeline
+    using AnalysisPipeline
     pipeline = RtwithoutRenewalPriorPipeline()
 
     tspan = (1, 28)

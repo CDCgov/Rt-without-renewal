@@ -13,8 +13,9 @@ using Dagger
 using Distributed
 pids = addprocs()
 
-@everywhere include("../src/AnalysisPipeline.jl")
-@everywhere using .AnalysisPipeline
+@everywhere using Pkg
+@everywhere Pkg.activate(joinpath(@__DIR__(), ".."))
+@everywhere using AnalysisPipeline
 
 # Create an instance of the pipeline behaviour
 pipeline = RtwithoutRenewalPipeline()

@@ -1,5 +1,5 @@
 @testset "EpiAwarePipeline Tests" begin
-    using .AnalysisPipeline
+    using AnalysisPipeline
     @testset "AbstractEpiAwarePipeline" begin
         @test_throws MethodError AbstractEpiAwarePipeline()
     end

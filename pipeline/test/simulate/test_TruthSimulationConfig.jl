@@ -1,5 +1,5 @@
 @testset "simulate runs" begin
-    using Distributions, .AnalysisPipeline, EpiAware
+    using Distributions, AnalysisPipeline, EpiAware
     # Define a mock TruthSimulationConfig object for testing
     config = TruthSimulationConfig(
         truth_process = fill(1.5, 10), gi_mean = 2.0, gi_std = 2.0)
@@ -19,7 +19,7 @@
 end
 
 @testset "generate_truthdata" begin
-    using .AnalysisPipeline
+    using AnalysisPipeline
     pipeline = RtwithoutRenewalPipeline()
     truth_data_config = Dict("gi_mean" => 0.5, "gi_std" => 0.1)
     truthdata = generate_truthdata(truth_data_config, pipeline)
