@@ -1,6 +1,6 @@
 
 # Test the InferenceConfig struct constructor
-@testset "InferenceConfig" begin
+@testset "InferenceConfig: constructor function" begin
     using Distributions, EpiAwarePipeline, EpiAware
 
     struct TestLatentModel <: AbstractLatentModel
@@ -35,3 +35,22 @@
         @test config.epimethod == epimethod
     end
 end
+
+@testset "InferenceConfig: construct from all inference configurations" begin
+    using Distributions, EpiAwarePipeline
+    pipeline = RtwithoutRenewalPipeline()
+    test_data = missing
+
+    inference_configs = make_inference_configs(pipeline)
+    @test [InferenceConfig(ic, test_data) isa InferenceConfig for ic in inference_configs] |>
+          all
+end
+
+# define_epiprob(config::InferenceConfig)
+
+# @testset "define_epiprob: creates `EpiProblem`" begin
+#     using EpiAwarePipeline
+
+#     inference_configs = make_inference_configs(pipeline)
+
+# end
