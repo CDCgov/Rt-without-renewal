@@ -8,7 +8,7 @@ In this module the meaning of a _pipeline component_ is a directed-acylic-graph
 sub-type from a function with prefix `do_`. A full pipeline is a sequence of DAGs,
 with execution determined by available computational resources.
 """
-module AnalysisPipeline
+module EpiAwarePipeline
 
 using CSV, Dagger, DataFramesMeta, Dates, Distributions, DocStringExtensions, DrWatson,
       EpiAware, Plots, Statistics, ADTypes, AbstractMCMC, Plots, JLD2

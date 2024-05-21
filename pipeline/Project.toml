@@ -1,4 +1,4 @@
-name = "AnalysisPipeline"
+name = "EpiAwarePipeline"
 uuid = "66314692-3678-4cbb-b3ac-6fcb54505317"
 authors = ["Sam Abbott", "Sam Brand", "Zach Susswein"]
 

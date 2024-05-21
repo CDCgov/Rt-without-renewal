@@ -1,7 +1,7 @@
 
 # Test the InferenceConfig struct constructor
 @testset "InferenceConfig" begin
-    using Distributions, AnalysisPipeline, EpiAware
+    using Distributions, EpiAwarePipeline, EpiAware
 
     struct TestLatentModel <: AbstractLatentModel
     end

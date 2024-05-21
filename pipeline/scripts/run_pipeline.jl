@@ -13,7 +13,7 @@ using Dagger
 using Distributed
 pids = addprocs(; exeflags = ["--project=$(Base.active_project())"])
 
-@everywhere using AnalysisPipeline
+@everywhere using EpiAwarePipeline
 
 # Create an instance of the pipeline behaviour
 pipeline = RtwithoutRenewalPipeline()
