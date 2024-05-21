@@ -1,5 +1,5 @@
 using DrWatson, Test
-quickactivate(@__DIR__(), "AnalysisPipeline")
+quickactivate(@__DIR__(), "EpiAwarePipeline")
 
 # Run tests
 include("pipeline/test_pipelinetypes.jl");
