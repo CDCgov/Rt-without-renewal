@@ -1,5 +1,3 @@
-
-# Test the InferenceConfig struct constructor
 @testset "InferenceConfig: constructor function" begin
     using Distributions, EpiAwarePipeline, EpiAware
 
