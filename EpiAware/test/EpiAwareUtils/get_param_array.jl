@@ -1,5 +1,5 @@
 @testitem "test unpacking a Chains object" begin
-    using Turing, Distributions, EpiAware
+    using Turing, Distributions
 
     @model function testmodel()
         x ~ MvNormal(2, 1.0)
