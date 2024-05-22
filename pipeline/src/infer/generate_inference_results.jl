@@ -17,14 +17,9 @@ function generate_inference_results(
         truthdata, inference_config, pipeline::AbstractEpiAwarePipeline;
         tspan, inference_method,
         prfix_name = "observables", datadir_name = "epiaware_observables")
+
     config = InferenceConfig(
-        inference_config["igp"], inference_config["latent_namemodels"].second;
-        gi_mean = inference_config["gi_mean"],
-        gi_std = inference_config["gi_std"],
-        case_data = truthdata["y_t"],
-        tspan = tspan,
-        epimethod = inference_method
-    )
+        inference_config; case_data = truthdata["y_t"], tspan, epimethod = inference_method)
 
     # produce or load inference results
     prfx = prfix_name * "_igp_" * string(inference_config["igp"]) * "_latentmodel_" *
@@ -43,14 +38,9 @@ function generate_inference_results(
         truthdata, inference_config, pipeline::RtwithoutRenewalPriorPipeline;
         tspan, inference_method,
         prfix_name = "prior_observables", datadir_name = "epiaware_observables")
+
     config = InferenceConfig(
-        inference_config["igp"], inference_config["latent_namemodels"].second;
-        gi_mean = inference_config["gi_mean"],
-        gi_std = inference_config["gi_std"],
-        case_data = missing,
-        tspan = tspan,
-        epimethod = inference_method
-    )
+        inference_config; case_data = missing, tspan, epimethod = inference_method)
 
     # produce or load inference results
     prfx = prfix_name * "_igp_" * string(inference_config["igp"]) * "_latentmodel_" *

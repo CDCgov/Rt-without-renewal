@@ -32,7 +32,7 @@ export do_truthdata, do_inference, do_pipeline
 export simulate, generate_truthdata
 
 # Exported functions: infer functions
-export infer, generate_inference_results, map_inference_results
+export infer, generate_inference_results, map_inference_results, define_epiprob
 
 # Exported functions: plot functions
 export plot_truth_data, plot_Rt
