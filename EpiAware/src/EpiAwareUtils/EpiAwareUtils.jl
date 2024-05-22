@@ -9,6 +9,7 @@ using DataFramesMeta: DataFrame, @rename!
 using DynamicPPL: Model, fix, condition
 using MCMCChains: Chains
 using Random: AbstractRNG
+using Tables: rowtable
 
 using Distributions, DocStringExtensions, QuadGK, Statistics, Turing
 

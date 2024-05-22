@@ -28,16 +28,5 @@ A = get_param_array(chn)
 ```
 """
 function get_param_array(chn::Chains)
-    idxs = CartesianIndices((1:size(chn, 1), 1:size(chn, 3)))
-    param_array = map(idxs) do I
-        s = MCMCChains.get_sections(chn, :parameters) |>
-            chn -> get_params(chn[I[1], :, I[2]])
-        map(s) do x
-            # Maps repeated names of type x[1] x[2] etc into a vector
-            _s = [_x[1] for _x in x] |> Array
-            # Scalar variables come back as scalars
-            _s = size(_s) == (1, 1) ? _s[1] : _s
-        end
-    end
-    return param_array
+    rowtable(chn) |> x -> reshape(x, size(chn, 1), size(chn, 3))
 end
