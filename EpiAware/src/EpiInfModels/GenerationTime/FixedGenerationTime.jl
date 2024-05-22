@@ -32,32 +32,27 @@ data = EpiData(;gen_distribution
     D_gen = 10.0)
 ```
 "
-struct EpiData{T <: Real, F <: Function}
+struct FixedGenerationTime{T <: Real, F <: Function} <: AbstractGenerationTime
     "Discrete generation interval."
     gen_int::Vector{T}
     "Length of the discrete generation interval."
     len_gen_int::Integer
     "Transformation function defining constrained and unconstrained domain bijections."
-    transformation::F
 
-    #Inner constructors for EpiData object
-    function EpiData(gen_int,
-            transformation::Function)
+    #Inner constructors for FixedGenerationTime object
+    function FixedGenerationTime(gen_int)
         @assert all(gen_int .>= 0) "Generation interval must be non-negative"
         @assert sum(gen_int)≈1 "Generation interval must sum to 1"
 
-        new{eltype(gen_int), typeof(transformation)}(gen_int,
-            length(gen_int),
-            transformation)
+        new{eltype(gen_int)}(gen_int, length(gen_int))
     end
 
-    function EpiData(; gen_distribution::ContinuousDistribution,
+    function FixedGenerationTime(; gen_distribution::ContinuousDistribution,
             D_gen,
-            Δd = 1.0,
-            transformation::Function = exp)
+            Δd = 1.0)
         gen_int = censored_pmf(gen_distribution, Δd = Δd, D = D_gen) |>
                   p -> p[2:end] ./ sum(p[2:end])
 
-        return EpiData(gen_int, transformation)
+        return FixedGenerationTime(gen_int)
     end
 end

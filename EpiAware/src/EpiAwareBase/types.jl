@@ -12,6 +12,18 @@ A abstract type representing a Turing-based epidemiological model.
 abstract type AbstractTuringEpiModel <: AbstractEpiModel end
 
 """
+The abstract supertype for all structs that define a model for generating
+delay models.
+"""
+abstract type AbstractDelayModel <: AbstractModel end
+
+"""
+The abstract supertype for all structs that define a model for generating
+delay models using Turing.
+"""
+abstract type AbstractTuringDelayModel <: AbstractDelayModel end
+
+"""
 The abstract supertype for all structs that define a model for generating a latent process
 used in `EpiAware` models.
 """

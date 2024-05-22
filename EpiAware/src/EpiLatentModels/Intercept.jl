@@ -5,13 +5,13 @@ broadcasts a single intercept value to a length `n` latent process.
 ## Constructors
 
 - Intercept(intercept_prior)
-- Intercept(; intercept_prior)
+- Intercept(; intercept_prior) with a default `intercept_prior` of `Normal(0,1)`.
 
 ## Examples
 
 ```julia
 using Distributions, Turing, EpiAware
-int = Intercept(Normal(0, 1))
+int = Intercept()
 int_model = generate_latent(int, 10)
 rand(int_model)
 int_model()
@@ -19,7 +19,7 @@ int_model()
 "
 @kwdef struct Intercept{D <: Sampleable} <: AbstractTuringIntercept
     "Prior distribution for the intercept."
-    intercept_prior::D
+    intercept_prior::D = Normal(0, 1)
 end
 
 @doc raw"

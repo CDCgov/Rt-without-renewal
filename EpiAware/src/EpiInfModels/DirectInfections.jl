@@ -64,7 +64,8 @@ I_t = generated_quantities(latent_inf, θ)
 ```
 
 "
-@kwdef struct DirectInfections{S <: Sampleable, M::AbstractTuringLatentModel, F::Function} <: AbstractTuringEpiModel
+@kwdef struct DirectInfections{
+    S <: Sampleable, M::AbstractTuringLatentModel, F::Function} <: AbstractTuringEpiModel
     "`Epidata` object."
     data::EpiData
     latent_model::M = Intercept()
@@ -110,7 +111,7 @@ I_t = generated_quantities(latent_inf, θ)
 ```
 """
 @model function EpiAwareBase.generate_infections(epi_model::DirectInfections, n)
-    @submodel untrans_inf, inf_aux = generate_latent(epi_model.latent_model, n)
+    @submodel untrans_expected_inf, inf_aux = generate_latent(epi_model.latent_model, n)
     inf = epi_model.transformation.(untrans_inf)
     return inf, (; inf_aux)
 end
