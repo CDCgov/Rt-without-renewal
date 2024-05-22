@@ -17,7 +17,6 @@ function generate_inference_results(
         truthdata, inference_config, pipeline::AbstractEpiAwarePipeline;
         tspan, inference_method,
         prfix_name = "observables", datadir_name = "epiaware_observables")
-
     config = InferenceConfig(
         inference_config; case_data = truthdata["y_t"], tspan, epimethod = inference_method)
 
@@ -38,7 +37,6 @@ function generate_inference_results(
         truthdata, inference_config, pipeline::RtwithoutRenewalPriorPipeline;
         tspan, inference_method,
         prfix_name = "prior_observables", datadir_name = "epiaware_observables")
-
     config = InferenceConfig(
         inference_config; case_data = missing, tspan, epimethod = inference_method)
 
