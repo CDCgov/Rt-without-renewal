@@ -51,14 +51,14 @@ struct InferenceConfig{T, F, I, L, E}
             D_gen, transformation, delay_distribution, D_obs, log_I0_prior, cluster_factor_prior)
     end
 
-    function InferenceConfig(inference_config::Dict, case_data)
+    function InferenceConfig(inference_config::Dict; case_data, tspan, epimethod)
         InferenceConfig(
             inference_config["igp"], inference_config["latent_namemodels"].second;
             gi_mean = inference_config["gi_mean"],
             gi_std = inference_config["gi_std"],
             case_data = case_data,
             tspan = tspan,
-            epimethod = inference_method
+            epimethod = epimethod
         )
     end
 end
