@@ -61,7 +61,10 @@ using Test
     forecast_Z_t = mapreduce(hcat, forecast_quantities.generated) do gen
         gen.Z_t
     end
-    plt_Zt = plot(forecast_Z_t, label = "", color = :red, alpha = 0.05)
-    scatter!(plt_Zt, infer_Z_t, xlabel = "t", ylabel = "Z_t", label = "", color = :grey, alpha = 0.05)
-    display
+    plt_Zt = plot(truth_sampling.generated[1].Z_t, lw = 3, color = :black, label = "truth Z_t")
+    plot!(plt_Zt, infer_Z_t, xlabel = "t", ylabel = "Z_t", label = "", color = :grey, alpha = 0.05)
+    plot!((n_observation_steps+1):size(forecast_Z_t, 1), forecast_Z_t[(n_observation_steps+1):end,:], label = "", color = :red, alpha = 0.05)
+    vline!(plt_Zt, [n_observation_steps], label = "forecast start")
+
+    display(plt_Zt)
 end
