@@ -7,7 +7,7 @@ using ..EpiAwareBase
 
 using ..EpiAwareUtils: censored_pmf
 
-using Turing, Distributions, DocStringExtensions, LinearAlgebra
+using Turing, DocStringExtensions
 
 #Export models
 export FixedDelay
