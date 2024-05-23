@@ -86,5 +86,5 @@ function infer(config::InferenceConfig)
         config.epimethod,
         (y_t = y_t,)
     )
-    return Dict("inference_results" => inference_results)
+    return Dict("inference_results" => inference_results, "epiprob" => epi_prob)
 end

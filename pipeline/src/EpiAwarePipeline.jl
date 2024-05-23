@@ -34,6 +34,9 @@ export simulate, generate_truthdata
 # Exported functions: infer functions
 export infer, generate_inference_results, map_inference_results, define_epiprob
 
+# Exported functions: forecast functions
+export define_forecast_epiprob, generate_forecasts
+
 # Exported functions: plot functions
 export plot_truth_data, plot_Rt
 
@@ -42,5 +45,6 @@ include("pipeline/pipeline.jl")
 include("constructors/constructors.jl")
 include("simulate/simulate.jl")
 include("infer/infer.jl")
+include("forecast/forecast.jl")
 include("plot_functions.jl")
 end
