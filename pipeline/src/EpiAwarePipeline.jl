@@ -15,7 +15,7 @@ using CSV, Dagger, DataFramesMeta, Dates, Distributions, DocStringExtensions, Dr
 
 # Exported pipeline types
 export AbstractEpiAwarePipeline, EpiAwarePipeline, RtwithoutRenewalPipeline,
-       RtwithoutRenewalPriorPipeline
+       RtwithoutRenewalPriorPipeline, RtwithoutRenewalTestPipeline
 
 # Exported configuration types
 export TruthSimulationConfig, InferenceConfig
