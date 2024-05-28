@@ -55,7 +55,9 @@ using Test
     plot!(plt, forecast_qs, label = "forecast quantiles",
         color = :grey, lw = [0.5 1.5 3 1.5 0.5])
     plot!(plt, ylims = (-0.5, maximum(truthdata) * 1.25))
-    display(plt)
+    savefig(plt,
+        joinpath(@__DIR__(), "forecast_y_t.png")
+    )
 
     # Make forecast plot for Z_t
     infer_Z_t = mapreduce(hcat, inference_results["inference_results"].generated) do gen
@@ -73,5 +75,7 @@ using Test
         label = "", color = :red, alpha = 0.05)
     vline!(plt_Zt, [n_observation_steps], label = "forecast start")
 
-    display(plt_Zt)
+    savefig(plt_Zt,
+        joinpath(@__DIR__(), "forecast_Z_t.png")
+    )
 end
