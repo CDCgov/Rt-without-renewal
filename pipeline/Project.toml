@@ -1,6 +1,6 @@
 name = "EpiAwarePipeline"
 uuid = "66314692-3678-4cbb-b3ac-6fcb54505317"
-authors = ["Sam Abbott", "Sam Brand", "Zach Susswein"]
+authors = ["Sam Abbott", "Sam Brand", "Zach Susswein", "Damon Bayer"]
 
 [deps]
 ADTypes = "47edcb42-4c32-4615-8424-f2b9edc5f35b"
