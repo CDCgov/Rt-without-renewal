@@ -61,7 +61,7 @@ function generate_truthdata(
         truth_process = true_Rt, gi_mean = truth_data_config["gi_mean"],
         gi_std = truth_data_config["gi_std"])
 
-    datadir_str, io = mktemp(; cleanup=true)
+    datadir_str, io = mktemp(; cleanup = true)
     truthdata, truthfile = produce_or_load(
         simulate, config, datadir_str; prefix = prefix)
     if plot

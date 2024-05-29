@@ -65,7 +65,7 @@ function generate_inference_results(
            inference_config["latent_namemodels"].first * "_truth_gi_mean_" *
            string(truthdata["truth_gi_mean"])
 
-    datadir_name, io = mktemp(; cleanup=true)
+    datadir_name, io = mktemp(; cleanup = true)
 
     inference_results, inferencefile = produce_or_load(
         infer, config, datadir_name; prefix = prfx)
