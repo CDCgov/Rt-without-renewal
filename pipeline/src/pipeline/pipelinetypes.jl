@@ -20,5 +20,5 @@ end
 """
 The pipeline type for the Rt pipeline without renewal in test mode.
 """
-struct RtwithoutRenewalTestPipeline <: AbstractEpiAwarePipeline
+struct EpiAwareTestPipeline <: AbstractEpiAwarePipeline
 end

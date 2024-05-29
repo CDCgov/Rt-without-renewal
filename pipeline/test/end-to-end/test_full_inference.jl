@@ -4,7 +4,7 @@ using Test
     quickactivate(@__DIR__(), "EpiAwarePipeline")
 
     using EpiAwarePipeline, EpiAware
-    pipeline = RtwithoutRenewalTestPipeline()
+    pipeline = EpiAwareTestPipeline()
 
     tspan = (1, 28)
     inference_method = make_inference_method(pipeline)

@@ -11,8 +11,8 @@
         @test isa(RtwithoutRenewalPriorPipeline(), RtwithoutRenewalPriorPipeline)
         @test RtwithoutRenewalPriorPipeline <: AbstractEpiAwarePipeline
     end
-    @testset "RtwithoutRenewalTestPipeline" begin
-        @test isa(RtwithoutRenewalTestPipeline(), RtwithoutRenewalTestPipeline)
-        @test RtwithoutRenewalTestPipeline <: AbstractEpiAwarePipeline
+    @testset "EpiAwareTestPipeline" begin
+        @test isa(EpiAwareTestPipeline(), EpiAwareTestPipeline)
+        @test EpiAwareTestPipeline <: AbstractEpiAwarePipeline
     end
 end
