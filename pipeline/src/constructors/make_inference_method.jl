@@ -32,7 +32,7 @@ end
 Pipeline test mode method for sampling from prior predictive distribution of the model.
 """
 function make_inference_method(
-        pipeline::EpiAwareTestPipeline; ndraws::Integer = 2000,
+        pipeline::EpiAwareExamplePipeline; ndraws::Integer = 2000,
         mcmc_ensemble::AbstractMCMC.AbstractMCMCEnsemble = MCMCThreads(),
         nruns_pthf::Integer = 4, maxiters_pthf::Integer = 100, nchains::Integer = 4)
     return EpiMethod(
