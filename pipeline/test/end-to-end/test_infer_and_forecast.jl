@@ -19,7 +19,6 @@ using Test
     inference_config = rand(inference_configs)
 
     # Generate truth data and plot
-
     truth_sampling = generate_inference_results(
         Dict("y_t" => missing, "truth_gi_mean" => 1.5), inference_config,
         prior; tspan = tspan_gen, inference_method = make_inference_method(prior)) |>
