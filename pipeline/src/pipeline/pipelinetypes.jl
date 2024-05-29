@@ -16,3 +16,9 @@ The pipeline type for the Rt pipeline without renewal with only prior predictive
 """
 struct RtwithoutRenewalPriorPipeline <: AbstractEpiAwarePipeline
 end
+
+"""
+The pipeline type for the Rt pipeline without renewal in test mode.
+"""
+struct EpiAwareExamplePipeline <: AbstractEpiAwarePipeline
+end

@@ -3,8 +3,8 @@ using Test
     using DrWatson
     quickactivate(@__DIR__(), "EpiAwarePipeline")
 
-    using EpiAwarePipeline
-    pipeline = RtwithoutRenewalPipeline()
+    using EpiAwarePipeline, EpiAware
+    pipeline = EpiAwareExamplePipeline()
 
     tspan = (1, 28)
     inference_method = make_inference_method(pipeline)
