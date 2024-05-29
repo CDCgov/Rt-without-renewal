@@ -10,7 +10,7 @@ include("build.jl")
 build("examples")
 
 makedocs(; sitename = "EpiAware.jl",
-    authors = "Samuel Brand, Zachary Susswein, Sam Abbott, and contributors",
+    authors = "Samuel Brand, Zachary Susswein, Sam Abbott, Damon Bayer, and contributors",
     clean = true, doctest = true, linkcheck = true,
     warnonly = [:docs_block, :missing_docs, :linkcheck, :autodocs_block],
     modules = [EpiAware],
