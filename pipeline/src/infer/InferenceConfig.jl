@@ -50,6 +50,17 @@ struct InferenceConfig{T, F, I, L, E}
             gi_mean, gi_std, igp, latent_model, case_data, tspan, epimethod,
             D_gen, transformation, delay_distribution, D_obs, log_I0_prior, cluster_factor_prior)
     end
+
+    function InferenceConfig(inference_config::Dict; case_data, tspan, epimethod)
+        InferenceConfig(
+            inference_config["igp"], inference_config["latent_namemodels"].second;
+            gi_mean = inference_config["gi_mean"],
+            gi_std = inference_config["gi_std"],
+            case_data = case_data,
+            tspan = tspan,
+            epimethod = epimethod
+        )
+    end
 end
 
 """
@@ -65,34 +76,15 @@ to make inference on and model configuration.
 
 """
 function infer(config::InferenceConfig)
-    #Define infection-generating model
-    shape = (config.gi_mean / config.gi_std)^2
-    scale = config.gi_std^2 / config.gi_mean
-    gen_distribution = Gamma(shape, scale)
-
-    #Define the infection-generating process
-    model_data = EpiData(gen_distribution = gen_distribution, D_gen = config.D_gen,
-        transformation = config.transformation)
-
-    epi = config.igp(model_data, config.log_I0_prior)
-
-    #Define the infection conditional observation distribution
-    obs = LatentDelay(
-        NegativeBinomialError(cluster_factor_prior = config.cluster_factor_prior),
-        config.delay_distribution; D = config.D_obs)
-
     #Define the EpiProblem
-    epi_prob = EpiProblem(epi_model = epi,
-        latent_model = config.latent_model,
-        observation_model = obs,
-        tspan = config.tspan)
-
+    epi_prob = define_epiprob(config)
     idxs = config.tspan[1]:config.tspan[2]
+
     #Return the sampled infections and observations
     y_t = ismissing(config.case_data) ? missing : config.case_data[idxs]
     inference_results = apply_method(epi_prob,
         config.epimethod,
         (y_t = y_t,)
     )
-    return Dict("inference_results" => inference_results)
+    return Dict("inference_results" => inference_results, "epiprob" => epi_prob)
 end
