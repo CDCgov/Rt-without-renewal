@@ -85,7 +85,7 @@ Z_t, _ = generated_quantities(rw_model, θ)
 ```
 "
 @model function EpiAwareBase.generate_latent(latent_model::RandomWalk, n)
-    ϵ_t ~ MvNormal(ones(n))
+    ϵ_t ~ MvNormal(I(n))
     σ_RW ~ latent_model.std_prior
     rw_init ~ latent_model.init_prior
     rw = Vector{eltype(ϵ_t)}(undef, n)

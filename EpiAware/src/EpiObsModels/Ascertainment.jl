@@ -8,17 +8,7 @@ The `Ascertainment` struct represents an observation model that incorporates asc
 # Examples
 ```julia
 using EpiAware, Turing
-
-struct Scale <: AbstractTuringLatentModel
-end
-
-@model function EpiAware.generate_latent(model::Scale, n::Int)
-    scale = 0.1
-    scale_vect = fill(scale, n)
-    return scale_vect, (; scale = scale)
-end
-
-obs = Ascertainment(NegativeBinomialError(), Scale(), x -> x)
+obs = Ascertainment(NegativeBinomialError(), FixedIntercept(0.1), x -> x)
 gen_obs = generate_observations(obs, missing, fill(100, 10))
 rand(gen_obs)
 ```
@@ -51,7 +41,7 @@ Generates observations based on the `LatentDelay` observation model.
     @submodel expected_obs_mod, expected_aux = generate_latent(
         obs_model.latentmodel, length(Y_t))
 
-    expected_obs = Y_t .* obs_model.link(expected_obs_mod)
+    expected_obs = Y_t .* obs_model.link.(expected_obs_mod)
 
     @submodel y_t, obs_aux = generate_observations(obs_model.model, y_t, expected_obs)
     return y_t, (; expected_obs, expected_obs_mod, expected_aux..., obs_aux...)

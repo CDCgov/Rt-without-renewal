@@ -9,6 +9,7 @@
         @test diff_model.model == model
         @test diff_model.init_prior == arraydist(init_priors)
         @test diff_model.d == 2
+        @test typeof(diff_model) <: AbstractTuringLatentModel
     end
 
     @testset "Testing DiffLatentModel with single prior and d" begin
@@ -19,6 +20,7 @@
         @test diff_model.model == model
         @test diff_model.init_prior == filldist(init_prior, d)
         @test diff_model.d == d
+        @test typeof(diff_model) <: AbstractTuringLatentModel
     end
 end
 

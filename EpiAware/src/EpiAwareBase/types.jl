@@ -23,6 +23,11 @@ A abstract type representing a Turing-based Latent model.
 abstract type AbstractTuringLatentModel <: AbstractLatentModel end
 
 """
+A abstract type used to define the common interface for intercept models.
+"""
+abstract type AbstractTuringIntercept <: AbstractTuringLatentModel end
+
+"""
 An abstract type representing a broadcast rule.
 """
 abstract type AbstractBroadcastRule end
