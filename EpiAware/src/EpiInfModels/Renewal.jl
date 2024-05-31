@@ -77,7 +77,7 @@ unobserved infections.
 I_t = generated_quantities(latent_inf, θ)
 ```
 "
-@kwdef struct Renewal{S <: Sampleable} <: Base.AbstractTuringRenewal
+@kwdef struct Renewal{S <: Sampleable} <: EpiAwareBase.AbstractTuringRenewal
     data::EpiData
     initialisation_prior::S = Normal()
 end
@@ -209,7 +209,7 @@ unobserved infections.
 I_t = generated_quantities(latent_inf, θ)
 ```
 "
-@kwdef struct RenewalWithPopulation{S <: Sampleable} <: AbstractRenewal
+@kwdef struct RenewalWithPopulation{S <: Sampleable} <: EpiAwareBase.AbstractTuringRenewal
     data::EpiData
     initialisation_prior::S = Normal()
     pop_size::Float64 = 1e6
@@ -316,7 +316,8 @@ unobserved infections.
 I_t = generated_quantities(latent_inf, θ)
 ```
 "
-@model function EpiAwareBase.generate_latent_infs(epi_model::AbstractRenewal, _Rt)
+@model function EpiAwareBase.generate_latent_infs(
+        epi_model::EpiAwareBase.AbstractTuringRenewal, _Rt)
     init_incidence ~ epi_model.initialisation_prior
     I₀ = epi_model.data.transformation(init_incidence)
     Rt = epi_model.data.transformation.(_Rt)

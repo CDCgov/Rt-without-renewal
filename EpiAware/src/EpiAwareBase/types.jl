@@ -64,6 +64,6 @@ from the posterior distribution, e.g. NUTS.
 abstract type AbstractEpiSamplingMethod <: AbstractEpiMethod end
 
 """
-Abstract type for all Renewal-based infection generating models.
+Abstract type for all Turing-based Renewal infection generating models.
 """
-abstract type AbstractRenewal <: EpiAwareBase.AbstractTuringEpiModel end
+abstract type AbstractTuringRenewal <: AbstractTuringEpiModel end
