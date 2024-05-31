@@ -51,8 +51,10 @@ end
     Rt = 1.5
 
     expected_new_incidence = Rt * dot(recent_incidence, [0.2, 0.3, 0.5])
-    expected_new_recent_incidence_and_available_sus = ([expected_new_incidence; recent_incidence[1:2]], pop_size - expected_new_incidence)
-    expected_output = (expected_new_recent_incidence_and_available_sus, expected_new_incidence)
+    expected_new_recent_incidence_and_available_sus = (
+        [expected_new_incidence; recent_incidence[1:2]], pop_size - expected_new_incidence)
+    expected_output = (
+        expected_new_recent_incidence_and_available_sus, expected_new_incidence)
 
     @test generate_infs((recent_incidence, pop_size), Rt) == expected_output
 end
@@ -128,8 +130,10 @@ end
             log_Rt), (init_incidence = 0.0,))
 
     day1_incidence = dot(initial_incidence, gen_int) * Rt[1]
-    day2_incidence = ((pop_size - day1_incidence) / pop_size) * dot(initial_incidence, gen_int) * Rt[2]
-    day3_incidence = ((pop_size - day1_incidence - day2_incidence) / pop_size) * dot([day2_incidence, 1.0, 1.0], gen_int) * Rt[3]
+    day2_incidence = ((pop_size - day1_incidence) / pop_size) *
+                     dot(initial_incidence, gen_int) * Rt[2]
+    day3_incidence = ((pop_size - day1_incidence - day2_incidence) / pop_size) *
+                     dot([day2_incidence, 1.0, 1.0], gen_int) * Rt[3]
 
     @test mdl_incidence[1:3] ≈ [day1_incidence, day2_incidence, day3_incidence]
 end
