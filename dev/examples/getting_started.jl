@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.41
+# v0.19.42
 
 using Markdown
 using InteractiveUtils
@@ -240,7 +240,7 @@ R_1 = 1 \Big{/} \sum_{t\geq 1} e^{-rt} g_t
 log_I0_prior = Normal(log(1.0), 1.0)
 
 # ╔═╡ 8487835e-d430-4300-bd7c-e33f5769ee32
-epi = Renewal(model_data, log_I0_prior)
+epi = RenewalWithPopulation(model_data, log_I0_prior, 1e8)
 
 # ╔═╡ 2119319f-a2ef-4c96-82c4-3c7eaf40d2e0
 md"
@@ -387,7 +387,7 @@ num_threads = min(10, Threads.nthreads())
 # ╔═╡ 88b43e23-1e06-4716-b284-76e8afc6171b
 inference_method = EpiMethod(
     pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 100)],
-    sampler = NUTSampler(adtype = AutoForwardDiff(),
+    sampler = NUTSampler(adtype = AutoReverseDiff(true),
         ndraws = 2000,
         nchains = num_threads,
         mcmc_parallel = MCMCThreads())
