@@ -323,7 +323,7 @@ I_t = generated_quantities(latent_inf, θ)
     Rt = epi_model.data.transformation.(_Rt)
 
     init = make_renewal_init(epi_model, I₀, Rt)
-
     I_t, _ = scan(epi_model, init, Rt)
+
     return I_t
 end
