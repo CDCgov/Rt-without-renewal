@@ -88,6 +88,7 @@ expected_Rt(data, infections)
 "
 function expected_Rt(data::EpiData, infections::Vector{<:Real})
     n = data.len_gen_int
+    @assert n=length(infections) "Infections vector must be longer than the generation time maximum"
 
     denom_Rt = [dot(reverse(data.gen_int),
                     infections[(t - n):(t - 1)]
