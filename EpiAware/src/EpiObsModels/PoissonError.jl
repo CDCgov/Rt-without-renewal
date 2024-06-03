@@ -40,9 +40,10 @@ Generate observations using the `PoissonError` observation model.
     if ismissing(y_t)
         y_t = Vector{Int}(undef, length(Y_t))
     end
+    Y_y = length(y_t) - length(Y_t)
 
     for i in eachindex(y_t)
-        y_t[i] ~ Poisson(Y_t[i] + obs_model.pos_shift)
+        y_t[Y_y + i] ~ Poisson(Y_t[i] + obs_model.pos_shift)
     end
 
     return y_t, NamedTuple()
