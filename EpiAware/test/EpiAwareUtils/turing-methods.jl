@@ -75,11 +75,11 @@ end
 
     # Used again in obs model
 
-    obs_ascert = Ascertainment(PoissonError(), ar_process, exp)
+    obs_ascert = Ascertainment(PoissonError(), ar_process, x -> exp.(x))
 
     #Epi model
     gen_int = [0.2, 0.3, 0.5]
-    transformation = exp
+    transformation = x -> exp.(x)
 
     data = EpiData(gen_int, transformation)
     log_init_incidence_prior = Normal()
