@@ -19,12 +19,30 @@
     function StackObservationModels(models::Vector{<:M}) where {
             M <: AbstractTuringObservationModel
     }
-        model_names = [typeof(i) for i in 1:length(models)]
+        model_names = models .|>
+                      typeof .|>
+                      nameof .|>
+                      string
         return StackObservationModels(models, model_names)
     end
 
-    function StackObservationsModels(models::NamedTuple)
-        # use the keys of the NamedTuple as the model names
-        return StackObservationModels(values(models), keys(models))
+    function StackObservationModels(models::NamedTuple{
+            names, T}) where {names, T <: Tuple{Vararg{AbstractTuringObservationModel}}}
+        model_names = models |>
+                      keys .|>
+                      string |>
+                      collect
+        return StackObservationModels(collect(values(models)), model_names)
     end
+end
+
+@model function EpiAwareBase.generate_observations(
+        obs_model::StackObservationModels, y_t, Y_t)
+    obs = ()
+    for (model, model_name) in zip(obs_model.models, obs_model.model_names)
+        @submodel prefix=eval(model_name) obs_tmp=generate_observations(
+            model, y_t, Y_t)
+        obs = obs..., obs_tmp...
+    end
+    return obs
 end
