@@ -1,6 +1,9 @@
 @doc raw"
 The `LatentDelay` struct represents an observation model that introduces a latent delay in the observations. It is a subtype of `AbstractTuringObservationModel`.
 
+Note that the `LatentDelay` observation model shortens the observation vector by the length of the delay distribution and this is then passed to the underlying observation model. This is to prevent fitting to partially
+observed data.
+
 ## Fields
 - `model::M`: The underlying observation model.
 - `pmf::T`: The probability mass function (PMF) representing the delay distribution.
@@ -52,10 +55,20 @@ Generates observations based on the `LatentDelay` observation model.
 
 "
 @model function EpiAwareBase.generate_observations(obs_model::LatentDelay, y_t, Y_t)
-    kernel = generate_observation_kernel(obs_model.pmf, length(Y_t))
-    expected_obs = kernel * Y_t
+    if ismissing(y_t)
+        y_t = Vector{Int}(undef, length(Y_t))
+    end
+    unobs_y_t = length(obs_model.pmf)
+    nobs_Y_t = length(Y_t) - unobs_y_t + 1
+    @assert unobs_y_t<=length(y_t) "The delay PMF must be shorter than or equal to the observation vector"
 
-    @submodel y_t, obs_aux = generate_observations(obs_model.model, y_t, expected_obs)
+    kernel = generate_observation_kernel(obs_model.pmf, nobs_Y_t)
+    expected_obs = kernel * Y_t[unobs_y_t:end]
+
+    @submodel y_t_aux, obs_aux = generate_observations(
+        obs_model.model, y_t[unobs_y_t:end], expected_obs)
+
+    y_t[unobs_y_t:end] = y_t_aux
 
     return y_t, (; obs_aux...)
 end
