@@ -62,3 +62,8 @@ Abstract supertype for infence/generative methods that are based on sampling
 from the posterior distribution, e.g. NUTS.
 """
 abstract type AbstractEpiSamplingMethod <: AbstractEpiMethod end
+
+"""
+Abstract type for all Turing-based Renewal infection generating models.
+"""
+abstract type AbstractTuringRenewal <: AbstractTuringEpiModel end

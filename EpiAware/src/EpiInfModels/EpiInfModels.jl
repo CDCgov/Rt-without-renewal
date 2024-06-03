@@ -10,7 +10,7 @@ using ..EpiAwareUtils: scan, censored_pmf
 using Turing, Distributions, DocStringExtensions, LinearAlgebra
 
 #Export models
-export EpiData, DirectInfections, ExpGrowthRate, Renewal
+export EpiData, DirectInfections, ExpGrowthRate, Renewal, RenewalWithPopulation
 
 #Export functions
 export R_to_r, r_to_R, expected_Rt

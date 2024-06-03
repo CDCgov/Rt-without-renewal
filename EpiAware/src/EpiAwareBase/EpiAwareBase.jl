@@ -12,7 +12,7 @@ export AbstractModel, AbstractEpiModel, AbstractLatentModel, AbstractObservation
 
 # Export Turing-based models
 export AbstractTuringEpiModel, AbstractTuringLatentModel, AbstractTuringIntercept,
-       AbstractTuringObservationModel
+       AbstractTuringObservationModel, AbstractTuringRenewal
 
 # Export support types
 export AbstractBroadcastRule
