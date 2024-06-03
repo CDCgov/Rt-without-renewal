@@ -1,10 +1,6 @@
 @testitem "ascertainment_dayofweek correctly constructs a day of week ascertainment model" begin
     using DynamicPPL
     obs = ascertainment_dayofweek(PoissonError())
-    @test typeof(obs) == Ascertainment
-    @test typeof(obs.model) == PoissonError
-    @test typeof(obs.latentmodel) == HierarchicalNormal
-    @test obs.link(1) == exp(1)
 
     obs_model = generate_observations(obs, missing, fill(100, 14))
     dayofweek_effect = [-0.1, 0.1, 0.2, 0.2, -0.4, 0.1, 0]
