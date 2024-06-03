@@ -37,11 +37,13 @@
 end
 
 @model function EpiAwareBase.generate_observations(
-        obs_model::StackObservationModels, y_t, Y_t)
+        obs_model::StackObservationModels, y_t::NamedTuple, Y_t)
+    @assert length(obs_model.models)==length(y_t) "The number of models and observations datasets must be equal."
+    @assert obs_model.model_names==keys(y_t) .|> string |> collect "The model names must match the keys of the observation datasets."
     obs = ()
     for (model, model_name) in zip(obs_model.models, obs_model.model_names)
         @submodel prefix=eval(model_name) obs_tmp=generate_observations(
-            model, y_t, Y_t)
+            model, y_t[Symbol(model_name)], Y_t)
         obs = obs..., obs_tmp...
     end
     return obs
