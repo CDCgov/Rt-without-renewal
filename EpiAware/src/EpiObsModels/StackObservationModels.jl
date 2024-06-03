@@ -28,15 +28,6 @@ obs_model = generate_observations(obs, y_t, fill(10, 10))
 rand(obs_model)
 samples = sample(obs_model, Prior(), 100; progress = false)
 
-# extract samples for cases.y_t and deaths_y_t
-# from the chain of samples (not using generated_quantities)
-function extract_obs(samples, obs_name)
-    obs = group(samples, obs_name) |>
-          DataFrame |>
-          x -> stack(x, Not(:iteration, :chain))
-    return obs
-end
-
 cases_y_t = group(samples, \"cases.y_t\")
 cases_y_t
 
