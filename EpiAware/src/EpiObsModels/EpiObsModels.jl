@@ -7,7 +7,6 @@ using ..EpiAwareBase
 
 using ..EpiAwareUtils: censored_pmf, HalfNormal
 
-using LogExpFunctions: softmax
 using Turing, Distributions, DocStringExtensions, SparseArrays
 
 export PoissonError, NegativeBinomialError, LatentDelay, Ascertainment
