@@ -84,6 +84,7 @@ using EpiAware
 data = EpiData([0.2, 0.3, 0.5], exp)
 infections = [100, 200, 300, 400, 500]
 expected_Rt(data, infections)
+```
 "
 function expected_Rt(data::EpiData, infections::Vector{<:Real})
     n = data.len_gen_int
