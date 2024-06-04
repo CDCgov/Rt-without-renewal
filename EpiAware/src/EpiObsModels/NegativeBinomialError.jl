@@ -56,8 +56,10 @@ Generate observations using the NegativeBinomialError observation model.
         y_t = Vector{Int}(undef, length(Y_t))
     end
 
-    for i in eachindex(y_t)
-        y_t[i] ~ NegativeBinomialMeanClust(
+    Y_y = length(y_t) - length(Y_t)
+
+    for i in eachindex(Y_t)
+        y_t[Y_y + i] ~ NegativeBinomialMeanClust(
             Y_t[i] + obs_model.pos_shift, sq_cluster_factor
         )
     end

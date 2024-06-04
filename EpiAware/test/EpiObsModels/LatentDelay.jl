@@ -44,7 +44,7 @@ end
     fix_mdl = fix(mdl, (cluster_factor = neg_bin_cf,))
 
     n_samples = 1000
-    first_obs = sample(fix_mdl, Prior(), n_samples; progress = false) |>
+    first_obs = sample(mdl, Prior(), n_samples; progress = false) |>
                 chn -> generated_quantities(fix_mdl, chn) .|>
                        (gen -> gen[1][1]) |>
                        vec

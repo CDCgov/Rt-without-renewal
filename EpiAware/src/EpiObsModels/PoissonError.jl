@@ -1,6 +1,7 @@
 @doc raw"
 The `PoissonError` struct represents an observation model for Poisson errors. It
-    is a subtype of `AbstractTuringObservationModel`.
+is a subtype of `AbstractTuringObservationModel`. Note that
+when Y_t is shorter than y_t, then the first `length(y_t) - length(Y_t)` elements of y_t are assumed to be missing.
 
 ## Constructors
 - `PoissonError(; pos_shift::AbstractFloat = 0.)`: Constructs a `PoissonError`
@@ -40,9 +41,10 @@ Generate observations using the `PoissonError` observation model.
     if ismissing(y_t)
         y_t = Vector{Int}(undef, length(Y_t))
     end
+    Y_y = length(y_t) - length(Y_t)
 
     for i in eachindex(y_t)
-        y_t[i] ~ Poisson(Y_t[i] + obs_model.pos_shift)
+        y_t[Y_y + i] ~ Poisson(Y_t[i] + obs_model.pos_shift)
     end
 
     return y_t, NamedTuple()
