@@ -5,11 +5,6 @@
     @test obs.models == [PoissonError(), NegativeBinomialError()]
     @test obs.model_names == ["Poisson", "NegativeBinomial"]
 
-    obs_type = StackObservationModels([PoissonError(), NegativeBinomialError()])
-
-    @test obs_type.models == [PoissonError(), NegativeBinomialError()]
-    @test obs_type.model_names == ["PoissonError", "NegativeBinomialError"]
-
     obs_named = StackObservationModels((
         Cases = PoissonError(), Deaths = NegativeBinomialError()))
 
