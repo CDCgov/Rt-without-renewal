@@ -61,3 +61,38 @@ struct EpiData{T <: Real, F <: Function}
         return EpiData(gen_int, transformation)
     end
 end
+
+@doc raw"
+Calculate the expected Rt values based on the given `EpiData` object and infections.
+
+```math
+R_t = \frac{I_t}{\sum_{i=1}^{n} I_{t-i} g_i}
+```
+
+# Arguments
+- `data::EpiData`: An instance of the EpiData type containing generation interval data.
+- `infections::Vector{<:Real}`: A vector of infection data.
+
+# Returns
+- `exp_Rt::Vector{Float64}`: A vector of expected Rt values.
+
+## Examples
+
+```julia
+using EpiAware
+
+data = EpiData([0.2, 0.3, 0.5], exp)
+infections = [100, 200, 300, 400, 500]
+expected_Rt(data, infections)
+```
+"
+function expected_Rt(data::EpiData, infections::Vector{<:Real})
+    n = data.len_gen_int
+    @assert n<length(infections) "Infections vector must be longer than the generation time maximum"
+
+    denom_Rt = [dot(reverse(data.gen_int),
+                    infections[(t - n):(t - 1)]
+                ) for t in (n + 1):length(infections)]
+    exp_Rt = infections[(n + 1):end] ./ denom_Rt
+    return exp_Rt
+end

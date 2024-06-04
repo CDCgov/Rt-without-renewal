@@ -13,7 +13,7 @@ using Turing, Distributions, DocStringExtensions, LinearAlgebra
 export EpiData, DirectInfections, ExpGrowthRate, Renewal, RenewalWithPopulation
 
 #Export functions
-export R_to_r, r_to_R
+export R_to_r, r_to_R, expected_Rt
 
 include("docstrings.jl")
 include("EpiData.jl")
