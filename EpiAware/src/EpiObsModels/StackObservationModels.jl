@@ -10,8 +10,6 @@ each model in the stack. Note that the model names are used to prefix the parame
     - `StackObservationModels(; models::Vector{<:AbstractTuringObservationModel},
     model_names::Vector{<:AbstractString})`: Construct a `StackObservationModels` object with a vector of observation models and a
     vector of model names.
-- `StackObservationModels(models::Vector{<:AbstractTuringObservationModel})`:
-    Construct a `StackObservationModels` object with a vector of observation models. The model names are automatically generated from the observation model types.
 - `StackObservationModels(models::NamedTuple{names, T})`: Construct a
     `StackObservationModels` object with a named tuple of observation models. The model names are automatically generated from the keys of the named tuple.
 
@@ -51,16 +49,6 @@ deaths_y_t
     }
         @assert length(models)==length(model_names) "The number of models and model names must be equal."
         new{typeof(models), typeof(model_names)}(models, model_names)
-    end
-
-    function StackObservationModels(models::Vector{<:M}) where {
-            M <: AbstractTuringObservationModel
-    }
-        model_names = models .|>
-                      typeof .|>
-                      nameof .|>
-                      string
-        return StackObservationModels(models, model_names)
     end
 
     function StackObservationModels(models::NamedTuple{
