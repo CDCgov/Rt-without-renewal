@@ -8,7 +8,8 @@ Constructs a `BroadcastLatentModel` appropriate for modelling the day of the wee
 - `BroadcastLatentModel`: The broadcast latent model.
 "
 function broadcast_dayofweek(model::AbstractTuringLatentModel)
-    return BroadcastLatentModel(model, 7, RepeatEach())
+    transformed_model = TransformLatentModel(model, x -> 7 * softmax(x))
+    return BroadcastLatentModel(transformed_model, 7, RepeatEach())
 end
 
 @doc raw"

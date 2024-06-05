@@ -7,6 +7,8 @@ using ..EpiAwareBase
 
 using ..EpiAwareUtils: HalfNormal
 
+using LogExpFunctions: softmax
+
 using Turing, Distributions, DocStringExtensions, LinearAlgebra
 
 #Export models

@@ -23,6 +23,6 @@ rand(gen_obs)
 "
 function ascertainment_dayofweek(model::AbstractTuringObservationModel;
         latent_model::AbstractTuringLatentModel = HierarchicalNormal(),
-        link = x -> exp.(x))
+        link = x -> x)
     return Ascertainment(model, broadcast_dayofweek(latent_model), link)
 end
