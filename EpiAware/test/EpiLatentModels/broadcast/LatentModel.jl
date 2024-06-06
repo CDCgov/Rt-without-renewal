@@ -26,7 +26,7 @@ end
     rand_model = rand(broadcasted_model)
 
     @test length(rand_model.ϵ_t) == 2
-    fix_model = fix(broadcasted_model, (σ_RW = 1, rw_init = 1))
+    fix_model = fix(broadcasted_model, (σ_RW = 1.0, rw_init = 1.0))
     sample_model = sample(fix_model, Prior(), 100; progress = false)
     gen_model = sample_model |>
                 chn -> mapreduce(hcat, generated_quantities(fix_model, chn)) do gen
