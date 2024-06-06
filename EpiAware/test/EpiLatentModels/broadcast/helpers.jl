@@ -2,7 +2,8 @@
     model = RandomWalk()
     broadcast_model = broadcast_dayofweek(model)
     @test typeof(broadcast_model) <: BroadcastLatentModel
-    @test typeof(broadcast_model.model) <: RandomWalk
+    @test typeof(broadcast_model.model) <: TransformLatentModel
+    @test typeof(broadcast_model.model.model) <: RandomWalk
     @test broadcast_model.period == 7
     @test broadcast_model.broadcast_rule == RepeatEach()
 end
