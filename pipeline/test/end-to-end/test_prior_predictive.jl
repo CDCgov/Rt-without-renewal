@@ -1,8 +1,7 @@
 using Test
 @testset "run prior predictive modelling for random scenario" begin
     using DrWatson, EpiAware
-    quickactivate(@__DIR__(), "Analysis pipeline")
-    include(srcdir("EpiAwarePipeline.jl"))
+    quickactivate(@__DIR__(), "EpiAwarePipeline")
 
     using EpiAwarePipeline
     pipeline = RtwithoutRenewalPriorPipeline()
