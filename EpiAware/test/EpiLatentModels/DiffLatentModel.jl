@@ -37,7 +37,7 @@ end
 
     latent_model = generate_latent(diff_model, n)
     fixed_model = fix(
-        latent_model, (σ_RW = 0, rw_init = 0.0))
+        latent_model, (σ_RW = 0.0, rw_init = 0.0))
 
     n_samples = 2000
     samples = sample(fixed_model, Prior(), n_samples; progress = false) |>
