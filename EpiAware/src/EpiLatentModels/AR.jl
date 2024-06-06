@@ -75,10 +75,10 @@ Generate a latent AR series.
 "
 @model function EpiAwareBase.generate_latent(latent_model::AR, n)
     p = latent_model.p
-    ϵ_t ~ MvNormal(I(n - p))
     σ_AR ~ latent_model.std_prior
     ar_init ~ latent_model.init_prior
     damp_AR ~ latent_model.damp_prior
+    ϵ_t ~ MvNormal(n - p, one(eltype(σ_AR)))
 
     @assert n>p "n must be longer than order of the autoregressive process"
 
