@@ -2,7 +2,7 @@
     using Distributions, EpiAwarePipeline, EpiAware
     # Define a mock TruthSimulationConfig object for testing
     config = TruthSimulationConfig(
-        truth_process = fill(1.5, 10), gi_mean = 2.0, gi_std = 2.0)
+        truth_process = fill(1.5, 30), gi_mean = 2.0, gi_std = 2.0)
     # Test the simulate function
     result = simulate(config)
 
