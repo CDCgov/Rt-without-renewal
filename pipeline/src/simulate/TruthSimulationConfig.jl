@@ -55,9 +55,12 @@ function simulate(config::TruthSimulationConfig)
     I_t = inf_mdl()
 
     #Define the infection conditional observation distribution
-    obs = LatentDelay(
-        NegativeBinomialError(cluster_factor_prior = config.cluster_factor_prior),
-        config.delay_distribution; D = config.D_obs)
+
+    #Model for day-of-week relative ascertainment on logit-scale
+    dayofweek_logit_ascert = ascertainment_dayofweek(NegativeBinomialError(cluster_factor_prior = config.cluster_factor_prior))
+
+    #Model for latent delay in observations
+    obs = LatentDelay(dayofweek_logit_ascert, config.delay_distribution; D = config.D_obs)
 
     #Sample observations
     obs_model = generate_observations(obs, missing, I_t)
