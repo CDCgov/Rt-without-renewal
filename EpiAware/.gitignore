@@ -15,6 +15,7 @@ docs/build
 *.bin
 *.xls
 *.xlsx
+*.jld2
 
 # Documents
 *.doc
