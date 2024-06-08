@@ -9,7 +9,13 @@ observed data.
 - `pmf::T`: The probability mass function (PMF) representing the delay distribution.
 
 ## Constructors
-- `LatentDelay(model::M, distribution::C; D = 15, Δd = 1.0) where {M <: AbstractTuringObservationModel, C <: ContinuousDistribution}`: Constructs a `LatentDelay` object with the given underlying observation model and continuous distribution. The `D` parameter specifies the number of discrete delay intervals, and the `Δd` parameter specifies the width of each delay interval.
+- `LatentDelay(model::M, distribution::C; D = 15, Δd = 1.0)
+    where {M <: AbstractTuringObservationModel, C <: ContinuousDistribution}`: Constructs
+    a `LatentDelay` object with the given underlying observation model and continuous
+    distribution. The `D` parameter specifies the right truncation of the distribution,
+    with default `D = nothing` indicating that the distribution should be truncated at its
+    99th percentile rounded to nearest integer. The `Δd` parameter specifies the
+    width of each delay interval.
 
 - `LatentDelay(model::M, pmf::T) where {M <: AbstractTuringObservationModel, T <: AbstractVector{<:Real}}`: Constructs a `LatentDelay` object with the given underlying observation model and delay PMF.
 
@@ -26,9 +32,12 @@ struct LatentDelay{M <: AbstractTuringObservationModel, T <: AbstractVector{<:Re
     model::M
     pmf::T
 
-    function LatentDelay(model::M, distribution::C; D = 15,
+    function LatentDelay(model::M, distribution::C; D = nothing,
             Δd = 1.0) where {
             M <: AbstractTuringObservationModel, C <: ContinuousDistribution}
+        if isnothing(D)
+            D = invlogcdf(distribution, log(0.99)) |> round
+        end
         pmf = censored_pmf(distribution; Δd = Δd, D = D)
         return LatentDelay(model, pmf)
     end

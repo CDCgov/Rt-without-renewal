@@ -21,6 +21,16 @@
 
     @test obs_model.model == dummy_model
     @test length(obs_model.pmf) == D_delay
+
+    # Test case 3: check default right truncation
+    delay_distribution = Gamma(3, 15 / 3)
+    D_delay = nothing
+    Δd = 1.0
+
+    obs_model = LatentDelay(dummy_model, delay_distribution, D = D_delay, Δd = Δd)
+
+    nn_perc_rounded = invlogcdf(delay_distribution, log(0.99)) |> x -> round(Int64, x)
+    @test length(obs_model.pmf) == nn_perc_rounded
 end
 
 @testitem "Testing delay obs against theoretical properties" begin
