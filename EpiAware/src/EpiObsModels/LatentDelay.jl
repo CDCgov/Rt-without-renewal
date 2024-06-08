@@ -9,7 +9,7 @@ observed data.
 - `pmf::T`: The probability mass function (PMF) representing the delay distribution.
 
 ## Constructors
-- `LatentDelay(model::M, distribution::C; D = 15, Δd = 1.0)
+- `LatentDelay(model::M, distribution::C; D = nothing, Δd = 1.0)
     where {M <: AbstractTuringObservationModel, C <: ContinuousDistribution}`: Constructs
     a `LatentDelay` object with the given underlying observation model and continuous
     distribution. The `D` parameter specifies the right truncation of the distribution,
