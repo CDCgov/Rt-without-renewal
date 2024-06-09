@@ -68,7 +68,7 @@ Generates observations based on the `LatentDelay` observation model.
     nobs_Y_t = length(Y_t) - unobs_y_t + 1
     @assert unobs_y_t<=length(Y_t) "The delay PMF must be shorter than or equal to the observation vector"
 
-    kernel = generate_observation_kernel(obs_model.pmf, nobs_Y_t)
+    kernel = generate_observation_kernel(obs_model.pmf, nobs_Y_t, partial = true)
     expected_obs = kernel * Y_t[unobs_y_t:end]
 
     @submodel y_t, obs_aux = generate_observations(
