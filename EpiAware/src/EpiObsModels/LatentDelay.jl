@@ -64,12 +64,10 @@ Generates observations based on the `LatentDelay` observation model.
 
 "
 @model function EpiAwareBase.generate_observations(obs_model::LatentDelay, y_t, Y_t)
-    unobs_y_t = length(obs_model.pmf)
-    nobs_Y_t = length(Y_t) - unobs_y_t + 1
-    @assert unobs_y_t<=length(Y_t) "The delay PMF must be shorter than or equal to the observation vector"
+    @assert length(obs_model.pmf)<=length(Y_t) "The delay PMF must be shorter than or equal to the observation vector"
 
-    kernel = generate_observation_kernel(obs_model.pmf, nobs_Y_t, partial = true)
-    expected_obs = kernel * Y_t[unobs_y_t:end]
+    kernel = generate_observation_kernel(obs_model.pmf, length(Y_t), partial = false)
+    expected_obs = kernel * Y_t
 
     @submodel y_t, obs_aux = generate_observations(
         obs_model.model, y_t, expected_obs)
