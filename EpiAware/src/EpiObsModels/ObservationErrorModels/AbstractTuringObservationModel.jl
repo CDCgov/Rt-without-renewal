@@ -4,7 +4,7 @@ abstract type AbstractTuringObservationErrorModel <: AbstractTuringObservationMo
         obs_model::AbstractTuringObservationErrorModel,
         y_t,
         Y_t)
-    @submodel priors = generate_obs_error_priors(obs_model, y_t, Y_t)
+    @submodel priors = generate_observation_error_priors(obs_model, y_t, Y_t)
 
     if ismissing(y_t)
         y_t = Vector{Int}(undef, length(Y_t))
@@ -13,13 +13,13 @@ abstract type AbstractTuringObservationErrorModel <: AbstractTuringObservationMo
     Y_y = length(y_t) - length(Y_t)
 
     for i in eachindex(Y_t)
-        y_t[Y_y + i] ~ obs_error(obs_model, Y_t[i] + 1e-6)
+        y_t[Y_y + i] ~ obs_error(obs_model, Y_t[i])
     end
 
     return y_t, priors
 end
 
-@model function generate_obs_error_priors(
+@model function generate_observation_error_priors(
         obs_model::AbstractTuringObservationErrorModel, y_t, Y_t)
     return NamedTuple()
 end

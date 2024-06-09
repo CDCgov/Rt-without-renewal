@@ -1,6 +1,6 @@
 @doc raw"
 The `PoissonError` struct represents an observation model for Poisson errors. It
-is a subtype of `AbstractTuringObservationModel`. Note that
+is a subtype of `AbstractTuringObservationErrorModel`. Note that
 when Y_t is shorter than y_t, then the first `length(y_t) - length(Y_t)` elements of y_t are assumed to be missing.
 
 ## Constructors
@@ -15,7 +15,7 @@ poi_model = generate_observations(poi, missing, fill(10, 10))
 rand(poi_model)
 ```
 "
-struct PoissonError{T <: AbstractFloat} <: AbstractTuringObservationModel
+struct PoissonError{T <: AbstractFloat} <: AbstractTuringObservationErrorModel
     "The positive shift value."
     pos_shift::T
 
@@ -25,27 +25,6 @@ struct PoissonError{T <: AbstractFloat} <: AbstractTuringObservationModel
     end
 end
 
-@doc raw"
-Generate observations using the `PoissonError` observation model.
-
-# Arguments
-- `obs_model::PoissonError`: The observation model.
-- `y_t`: The observed values.
-- `Y_t`: The true values.
-
-# Returns
-- `y_t`: The generated observations.
-- An empty named tuple.
-"
-@model function EpiAwareBase.generate_observations(obs_model::PoissonError, y_t, Y_t)
-    if ismissing(y_t)
-        y_t = Vector{Int}(undef, length(Y_t))
-    end
-    Y_y = length(y_t) - length(Y_t)
-
-    for i in eachindex(Y_t)
-        y_t[Y_y + i] ~ Poisson(Y_t[i] + obs_model.pos_shift)
-    end
-
-    return y_t, NamedTuple()
+function obs_error(obs_model::PoissonError, Y_t)
+    return Poisson(Y_t + obs_model.pos_shift)
 end
