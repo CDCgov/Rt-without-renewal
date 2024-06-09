@@ -9,18 +9,18 @@ Generate an observation kernel matrix based on the given delay interval and time
 # Returns
 - `K::SparseMatrixCSC{Float64, Int}`: The observation kernel matrix.
 """
-function generate_observation_kernel(delay_int, time_horizon, partial = true)
+function generate_observation_kernel(delay_int, time_horizon; partial::Bool = true)
     K = zeros(eltype(delay_int), time_horizon, time_horizon) |> SparseMatrixCSC
     if (partial)
-        for i in 1:time_horizon
-            K[i, i:(i + length(delay_int))] = delay_int
-        end
-    else
         for i in 1:time_horizon, j in 1:time_horizon
             m = i - j
             if m >= 0 && m <= (length(delay_int) - 1)
                 K[i, j] = delay_int[m + 1]
             end
+        end
+    else
+        for i in 1:time_horizon
+            K[i, i:(i + length(delay_int) - 1)] = delay_int
         end
     end
     return K
