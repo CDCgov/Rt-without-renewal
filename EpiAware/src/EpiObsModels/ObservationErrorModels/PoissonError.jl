@@ -25,6 +25,6 @@ struct PoissonError{T <: AbstractFloat} <: AbstractTuringObservationErrorModel
     end
 end
 
-function obs_error(obs_model::PoissonError, Y_t)
+function observation_error(obs_model::PoissonError, Y_t)
     return Poisson(Y_t + obs_model.pos_shift)
 end
