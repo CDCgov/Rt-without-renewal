@@ -43,7 +43,7 @@ Generate observations using the `PoissonError` observation model.
     end
     Y_y = length(y_t) - length(Y_t)
 
-    for i in eachindex(y_t)
+    for i in eachindex(Y_t)
         y_t[Y_y + i] ~ Poisson(Y_t[i] + obs_model.pos_shift)
     end
 
