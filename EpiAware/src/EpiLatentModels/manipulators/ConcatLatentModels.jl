@@ -5,7 +5,7 @@ This struct is used to concatenate multiple latent models into a single latent m
 
 # Constructors
 
-- `ConcatLatentModels(models::M, no_models::Int, dimension_adapter::Function) where {M <: AbstractVector{<:AbstractTuringLatentModel}}`: Constructs a `ConcatLatentModels` instance with specified models, number of models, and dimension adapter. The default dimension adapter is `equal_dimensions`.
+- `ConcatLatentModels(models::M, no_models::Int, dimension_adapter::Function) where {M <: AbstractVector{<:AbstractTuringLatentModel}}`: Constructs a `ConcatLatentModels` instance with specified models, number of models, and dimension adapter.
 - `ConcatLatentModels(models::M, dimension_adapter::Function) where {M <: AbstractVector{<:AbstractTuringLatentModel}}`: Constructs a `ConcatLatentModels` instance with specified models and dimension adapter, ensuring that there are at least two models. The default dimension adapter is `equal_dimensions`.
 - `ConcatLatentModels(; models::M, dimension_adapter::Function) where {M <: AbstractVector{<:AbstractTuringLatentModel}}`: Constructs a `ConcatLatentModels` instance with specified models and dimension adapter, ensuring that there are at least two models. The default dimension adapter is `equal_dimensions`.
 
@@ -16,49 +16,66 @@ using EpiAware, Distributions
 combined_model = ConcatLatentModels([Intercept(Normal(2, 0.2)), AR()])
 latent_model = generate_latent(combined_model, 10)
 latent_model()
+```
 "
 struct ConcatLatentModels{
-    M <: AbstractVector{<:AbstractTuringLatentModel}, I <: Int, F <: Function} <:
+    M <: AbstractVector{<:AbstractTuringLatentModel}, N <: Int, F <: Function} <:
        AbstractTuringLatentModel
     "A vector of latent models"
     models::M
     "The number of models in the collection"
-    no_models::I
+    no_models::N
     "The dimension function for the latent variables. By default this divides the number of latent variables by the number of models and returns a vector of dimensions rounding up the first element and rounding down the rest."
-    dimension_adaptor::F = equal_dimensions
+    dimension_adaptor::F
 
-    function CombineLatentModels(models::M,
-            no_models::Int,
+    function ConcatLatentModels(models::M,
+            no_models::I,
             dimension_adaptor::F) where {
-            M <:
-            AbstractVector{<:AbstractTuringLatentModel}, I <: Int, F <: Function}
+            M <: AbstractVector{<:AbstractTuringLatentModel}, I <: Int,
+            F <: Function}
         @assert length(models)>1 "At least two models are required"
         @assert length(models)==no_models "no_models must be equal to the number of models"
         # check all dimension functions take a single n and return an integer
         check_dim = dimension_adaptor(no_models, no_models)
-        @assert all(isinteger, check_dim)
-        @assert all(x -> x > 0, check_dim)
-        @assert sum(check_dim) == no_models
-        @assert length(check_dim) == no_models
+        @assert typeof(check_dim)<:AbstractVector{Int} "Output of dimension_adaptor must be a vector of integers"
+        @assert all(x -> x > 0, check_dim) "Non-positive dimensions are not allowed"
+        @assert sum(check_dim)==no_models "Sum of dimensions must be equal to the dimension of the latent variables"
+        @assert length(check_dim)==no_models "The vector of dimensions must have the same length as the number of models"
         return new{AbstractVector{<:AbstractTuringLatentModel}, Int, Function}(
             models, no_models, dimension_adaptor)
     end
 
     function ConcatLatentModels(models::M,
-            dimension_adapter::Function = equal_dimensions) where {M <:
-                                                                   AbstractVector{<:AbstractTuringLatentModel}}
-        no_models = length(models)
+            dimension_adapter::Function) where {
+            M <: AbstractVector{<:AbstractTuringLatentModel}}
         return ConcatLatentModels(models, length(models), dimension_adapter)
     end
 
+    function ConcatLatentModels(models::M;
+            dimension_adapter::Function = equal_dimensions) where {
+            M <: AbstractVector{<:AbstractTuringLatentModel}}
+        return ConcatLatentModels(models, dimension_adapter)
+    end
+
     function ConcatLatentModels(; models::M,
-            dimension_adapter::Function = equal_dimensions) where {M <:
-                                                                   AbstractVector{<:AbstractTuringLatentModel}}
+            dimension_adapter::Function = equal_dimensions) where {
+            M <: AbstractVector{<:AbstractTuringLatentModel}}
         return ConcatLatentModels(models, dimension_adapter)
     end
 end
 
-function equal_dimensions(n::Int, m::Int)
+@doc raw"
+Return a vector of dimensions that are equal or as close as possible, given the total number of elements `n` and the number of dimensions `m`. The default
+dimension adapter for `ConcatLatentModels`.
+
+# Arguments
+- `n::Int`: The total number of elements.
+- `m::Int`: The number of dimensions.
+
+# Returns
+- `dims::AbstractVector{Int}`: A vector of dimensions, where the first element is the ceiling of `n / m` and the remaining elements are the floor of `n / m`.
+"
+function equal_dimensions(n::Int, m::Int)::AbstractVector{Int}
     return vcat(ceil(n / m), fill(floor(n / m), m - 1))
 end
 
@@ -83,7 +100,8 @@ Generate latent variables by concatenating multiple latent models.
     return final_latent, (; latent_aux...)
 end
 
-@model function _concat_latents(models, index, acc_latent, acc_aux, dims, n_models)
+@model function _concat_latents(
+        models, index::Int, acc_latent, acc_aux, dims::AbstractVector{<:Int}, n_models::Int)
     if index > n_models
         return acc_latent, (; acc_aux...)
     else
