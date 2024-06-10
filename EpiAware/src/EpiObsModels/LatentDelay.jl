@@ -70,7 +70,7 @@ Generates observations based on the `LatentDelay` observation model.
     expected_obs = kernel * Y_t
 
     @submodel y_t, obs_aux = generate_observations(
-        obs_model.model, y_t, expected_obs)
+        obs_model.model, y_t, complete_expected_obs)
 
     return y_t, (; obs_aux...)
 end

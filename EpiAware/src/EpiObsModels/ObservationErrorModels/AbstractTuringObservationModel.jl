@@ -7,13 +7,13 @@ abstract type AbstractTuringObservationErrorModel <: AbstractTuringObservationMo
     @submodel priors = generate_observation_error_priors(obs_model, y_t, Y_t)
 
     if ismissing(y_t)
-        y_t = Vector{Int}(undef, length(Y_t))
+        y_t = Vector{Union{Real, Missing}}(missing, length(Y_t))
     end
 
-    Y_y = length(y_t) - length(Y_t)
-
-    for i in eachindex(Y_t)
-        y_t[Y_y + i] ~ observation_error(obs_model, Y_t[i], priors...)
+    for i in eachindex(y_t)
+        if (!ismissing(Y_t[i]))
+            y_t[i] ~ observation_error(obs_model, Y_t[i], priors...)
+        end
     end
 
     return y_t, priors
