@@ -10,10 +10,9 @@ abstract type AbstractTuringObservationErrorModel <: AbstractTuringObservationMo
         y_t = Vector{Union{Real, Missing}}(missing, length(Y_t))
     end
 
-    for i in eachindex(y_t)
-        if (!ismissing(Y_t[i]))
-            y_t[i] ~ observation_error(obs_model, Y_t[i], priors...)
-        end
+    first_Y_t = findfirst(!ismissing, Y_t)
+    for i in first_Y_t:length(Y_t)
+        y_t[i] ~ observation_error(obs_model, Y_t[i], priors...)
     end
 
     return y_t, priors

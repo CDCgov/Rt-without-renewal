@@ -70,7 +70,7 @@ Generates observations based on the `LatentDelay` observation model.
 
     kernel = generate_observation_kernel(obs_model.pmf, length(trunc_Y_t), partial = false)
     expected_obs = kernel * trunc_Y_t
-    complete_obs = vcat(fill(missing, length(obs_model.pmf) + first_Y_t - 1), expected_obs)
+    complete_obs = vcat(fill(missing, length(obs_model.pmf) + first_Y_t - 2), expected_obs)
 
     @submodel y_t, obs_aux = generate_observations(
         obs_model.model, y_t, complete_obs)
