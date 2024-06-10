@@ -17,30 +17,25 @@ using Turing, Distributions, DocStringExtensions, LinearAlgebra
 export FixedIntercept, Intercept, RandomWalk, AR, HierarchicalNormal
 
 # Export tools for manipulating latent models
-export CombineLatentModels, ConcatLatentModels, BroadcastLatentModel
+export CombineLatentModels, TransformLatentModel, DiffLatentModel, BroadcastLatentModel
 
 # Export broadcast rules
 export RepeatEach, RepeatBlock
 
 # Export helper functions
-export broadcast_dayofweek, broadcast_weekly, equal_dimensions
-
-# Export tools for modifying latent models
-export DiffLatentModel, TransformLatentModel
+export broadcast_dayofweek, broadcast_weekly
 
 include("docstrings.jl")
-include("models/Intercept.jl")
-include("models/RandomWalk.jl")
-include("models/AR.jl")
-include("models/HierarchicalNormal.jl")
-include("modifiers/DiffLatentModel.jl")
-include("modifiers/TransformLatentModel.jl")
-include("manipulators/CombineLatentModels.jl")
-include("manipulators/ConcatLatentModels.jl")
-
-include("manipulators/broadcast/LatentModel.jl")
-include("manipulators/broadcast/rules.jl")
-include("manipulators/broadcast/helpers.jl")
+include("Intercept.jl")
+include("RandomWalk.jl")
+include("AR.jl")
+include("HierarchicalNormal.jl")
+include("CombineLatentModels.jl")
+include("TransformLatentModel.jl")
+include("DiffLatentModel.jl")
+include("broadcast/LatentModel.jl")
+include("broadcast/rules.jl")
+include("broadcast/helpers.jl")
 include("utils.jl")
 
 end
