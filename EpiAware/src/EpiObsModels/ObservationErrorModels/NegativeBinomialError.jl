@@ -35,6 +35,9 @@ struct NegativeBinomialError{S <: Sampleable, T <: AbstractFloat} <:
     end
 end
 
+@doc raw"
+Generates observation error priors based on the `NegativeBinomialError` observation model. This function generates the cluster factor prior for the negative binomial error model.
+"
 @model function generate_observation_error_priors(
         obs_model::NegativeBinomialError, Y_t, y_t)
     cluster_factor ~ obs_model.cluster_factor_prior
@@ -42,6 +45,9 @@ end
     return (; sq_cluster_factor)
 end
 
+@doc raw"
+This function generates the observation error model based on the negative binomial error model with a positive shift. It dispatches to the `NegativeBinomialMeanClust` distribution.
+"
 function observation_error(obs_model::NegativeBinomialError, Y_t, sq_cluster_factor)
     return NegativeBinomialMeanClust(Y_t + obs_model.pos_shift,
         sq_cluster_factor)
