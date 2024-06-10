@@ -32,7 +32,7 @@
     gen = generated_quantities(test_mdl, rand(test_mdl))
 
     #Check model sampled
-    @test eltype(gen.generated_y_t) <: Int
+    @test eltype(gen.generated_y_t) <: Union{Missing, Real}
     @test eltype(gen.I_t) <: AbstractFloat
     @test length(gen.I_t) == time_horizon
 end
@@ -70,7 +70,7 @@ end
     gens = generated_quantities(test_mdl, chn)
 
     #Check model sampled
-    @test eltype(gens[1].generated_y_t) <: Int
+    @test eltype(gens[1].generated_y_t) <: Union{Missing, Real}
     @test eltype(gens[1].I_t) <: AbstractFloat
     @test length(gens[1].I_t) == time_horizon
 end
@@ -110,7 +110,7 @@ end
     gens = generated_quantities(test_mdl, chn)
 
     #Check model sampled
-    @test eltype(gens[1].generated_y_t) <: Int
+    @test eltype(gens[1].generated_y_t) <: Union{Missing, Real}
     @test eltype(gens[1].I_t) <: AbstractFloat
     @test length(gens[1].I_t) == time_horizon
 end
