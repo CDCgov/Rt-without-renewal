@@ -15,6 +15,8 @@ Generates observations from an observation error model. It provides support for 
 
     if ismissing(y_t)
         y_t = Vector{Union{Real, Missing}}(missing, length(Y_t))
+    else
+        @assert length(y_t)==length(Y_t) "The observation vector and expected observation vector must have the same length."
     end
 
     for i in findfirst(!ismissing, Y_t):length(Y_t)
