@@ -3,7 +3,7 @@
     # Test default constructor
     nb = NegativeBinomialError()
     @test typeof(nb) <: NegativeBinomialError
-    @test typeof(nb) <: TuringObservationErrorModel
+    @test typeof(nb) <: AbstractTuringObservationErrorModel
     @test all(rand(nb.cluster_factor_prior, 100) .>= 0.0)
     @test isapprox(mean(nb.cluster_factor_prior), 0.01)
 

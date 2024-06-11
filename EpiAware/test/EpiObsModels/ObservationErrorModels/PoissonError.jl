@@ -1,9 +1,9 @@
 @testitem "PoissonErrorConstructor" begin
     using Distributions
     # Test default constructor
-    poi = PoissonError
+    poi = PoissonError()
     @test typeof(poi) <: PoissonError
-    @test typeof(poi) <: TuringObservationErrorModel
+    @test typeof(poi) <: AbstractTuringObservationErrorModel
 end
 
 @testitem "Testing PoissonError against theoretical properties" begin
