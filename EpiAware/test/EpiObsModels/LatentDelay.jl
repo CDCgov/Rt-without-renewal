@@ -117,3 +117,35 @@ end
         end
     end
 end
+
+@testitem "Test LatenDelay generate_observations function" begin
+    using DynamicPPL
+    struct TestObs <: AbstractTuringObservationModel end
+
+    @model function EpiAwareBase.generate_observations(obs_model::TestObs, y_t, Y_t)
+        return Y_t, (;)
+    end
+
+    delay_int = [0.2, 0.3, 0.5]
+    obs_model = LatentDelay(TestObs(), delay_int)
+
+    I_t = [10.0, 20.0, 30.0, 40.0, 50.0]
+    expected_obs = [23.0, 33.0, 43.0]
+
+    @testset "Test with entirely missing data" begin
+        mdl = generate_observations(obs_model, missing, I_t)
+        @test mdl()[1] == expected_obs
+    end
+
+    @testset "Test with missing data defined as a vector" begin
+        mdl = generate_observations(
+            obs_model, [missing, missing, missing, missing, missing], I_t)
+        @test mdl()[1] == expected_obs
+    end
+
+    @testset "Test with data" begin
+        pois_obs_model = LatentDelay(PoissonError(), delay_int)
+        mdl = generate_observations(pois_obs_model, [10.0, 20.0, 30.0, 40.0, 50.0], I_t)
+        @test mdl()[1] == [10.0, 20.0, 30.0, 40.0, 50]
+    end
+end
