@@ -24,4 +24,6 @@
         @test abs(draw[1] - 20) > 0
         @test isapprox(draw[1], 20, atol = 1e-3)
     end
+
+    @test_throws AssertionError generate_observations(obs_model, vcat(1, I_t), I_t)()
 end
