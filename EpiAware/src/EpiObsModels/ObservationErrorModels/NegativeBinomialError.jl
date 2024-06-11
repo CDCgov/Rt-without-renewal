@@ -3,8 +3,8 @@
 The `NegativeBinomialError` struct represents an observation model for negative binomial errors. It is a subtype of `AbstractTuringObservationModel`.
 
 ## Constructors
-- `NegativeBinomialError(; cluster_factor_prior::Distribution = HalfNormal(0.1), pos_shift::AbstractFloat = 1e-6)`: Constructs a `NegativeBinomialError` object with default values for the cluster factor prior and positive shift.
-- `NegativeBinomialError(cluster_factor_prior::Distribution; pos_shift::AbstractFloat = 1e-6)`: Constructs a `NegativeBinomialError` object with a specified cluster factor prior and default value for the positive shift.
+- `NegativeBinomialError(; cluster_factor_prior::Distribution = HalfNormal(0.1))`: Constructs a `NegativeBinomialError` object with default values for the cluster factor prior.
+- `NegativeBinomialError(cluster_factor_prior::Distribution)`: Constructs a `NegativeBinomialError` object with a specified cluster factor prior.
 
 ## Examples
 ```julia
@@ -14,25 +14,10 @@ nb_model = generate_observations(nb, missing, fill(10, 10))
 rand(nb_model)
 ```
 "
-struct NegativeBinomialError{S <: Sampleable, T <: AbstractFloat} <:
-       AbstractTuringObservationErrorModel
+@kwdef struct NegativeBinomialError{S <: Sampleable, T <: AbstractFloat} <:
+              AbstractTuringObservationErrorModel
     "The prior distribution for the cluster factor."
-    cluster_factor_prior::S
-    "The positive shift value."
-    pos_shift::T
-
-    function NegativeBinomialError(;
-            cluster_factor_prior::Distribution = HalfNormal(0.01),
-            pos_shift::AbstractFloat = 1e-6)
-        new{typeof(cluster_factor_prior), typeof(pos_shift)}(
-            cluster_factor_prior, pos_shift)
-    end
-
-    function NegativeBinomialError(cluster_factor_prior::Distribution;
-            pos_shift::AbstractFloat = 1e-6)
-        new{typeof(cluster_factor_prior), typeof(pos_shift)}(
-            cluster_factor_prior, pos_shift)
-    end
+    cluster_factor_prior::S = HalfNormal(0.01)
 end
 
 @doc raw"
@@ -49,6 +34,6 @@ end
 This function generates the observation error model based on the negative binomial error model with a positive shift. It dispatches to the `NegativeBinomialMeanClust` distribution.
 "
 function observation_error(obs_model::NegativeBinomialError, Y_t, sq_cluster_factor)
-    return NegativeBinomialMeanClust(Y_t + obs_model.pos_shift,
+    return NegativeBinomialMeanClust(Y_t,
         sq_cluster_factor)
 end

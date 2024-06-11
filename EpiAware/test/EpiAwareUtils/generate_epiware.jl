@@ -1,10 +1,8 @@
-
 @testitem "`generate_epiaware` with direct infections and RW latent process runs" begin
     using Distributions, Turing, DynamicPPL
     # Define test inputs
     y_t = missing # Data will be generated from the model
     data = EpiData([0.2, 0.3, 0.5], exp)
-    pos_shift = 1e-6
     time_horizon = 100
 
     #Define the epi_model
@@ -42,7 +40,6 @@ end
     # Define test inputs
     y_t = missing# rand(1:10, 365) # Data will be generated from the model
     data = EpiData([0.2, 0.3, 0.5], exp)
-    pos_shift = 1e-6
 
     #Define the epi_model
     epi_model = ExpGrowthRate(data, Normal())
@@ -56,7 +53,7 @@ end
     #Define the observation model - no delay model
     time_horizon = 5
     obs_model = NegativeBinomialError(
-        truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0); pos_shift
+        truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0)
     )
 
     # Create full epi model and sample from it
@@ -80,7 +77,6 @@ end
     # Define test inputs
     y_t = missing# rand(1:10, 365) # Data will be generated from the model
     data = EpiData([0.2, 0.3, 0.5], exp)
-    pos_shift = 1e-6
 
     #Define the epi_model
     epi_model = Renewal(data, Normal())
@@ -94,8 +90,7 @@ end
     #Define the observation model - no delay model
     time_horizon = 5
     obs_model = NegativeBinomialError(
-        truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0);
-        pos_shift
+        truncated(Gamma(5, 0.05 / 5), 1e-3, 1.0)
     )
 
     # Create full epi model and sample from it
