@@ -9,6 +9,8 @@ using ..EpiAwareUtils: HalfNormal
 
 using LogExpFunctions: softmax
 
+using FillArrays: Fill
+
 using Turing, Distributions, DocStringExtensions, LinearAlgebra
 
 #Export models
