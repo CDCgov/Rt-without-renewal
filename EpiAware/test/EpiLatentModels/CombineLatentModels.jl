@@ -34,6 +34,7 @@ end
     using Turing
     using Distributions: Normal
     using HypothesisTests: ExactOneSampleKSTest, pvalue
+    using LinearAlgebra: Diagonal
 
     int = Intercept(Normal(0, 1))
     ar = AR()
@@ -56,7 +57,7 @@ end
     # Fit no-slope linear regression as a model test
     @model function no_slope_linear_regression(y)
         @submodel y_pred, θ = generate_latent(comb, n)
-        y ~ MvNormal(y_pred, ones(n))
+        y ~ MvNormal(y_pred, Diagonal(ones(n)))
     end
 
     ns_regression_mdl = no_slope_linear_regression(y) |
