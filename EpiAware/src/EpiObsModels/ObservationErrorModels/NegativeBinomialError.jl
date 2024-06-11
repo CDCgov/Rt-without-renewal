@@ -14,7 +14,7 @@ nb_model = generate_observations(nb, missing, fill(10, 10))
 rand(nb_model)
 ```
 "
-@kwdef struct NegativeBinomialError{S <: Sampleable, T <: AbstractFloat} <:
+@kwdef struct NegativeBinomialError{S <: Sampleable} <:
               AbstractTuringObservationErrorModel
     "The prior distribution for the cluster factor."
     cluster_factor_prior::S = HalfNormal(0.01)

@@ -15,7 +15,7 @@ It dispatches to the `observation_error` function to generate the observation er
         @assert length(y_t)==length(Y_t) "The observation vector and expected observation vector must have the same length."
     end
 
-    pad_Y_t = Y_t + 1e-6
+    pad_Y_t = Y_t .+ 1e-6
 
     for i in findfirst(!ismissing, Y_t):length(Y_t)
         y_t[i] ~ observation_error(obs_model, pad_Y_t[i], priors...)

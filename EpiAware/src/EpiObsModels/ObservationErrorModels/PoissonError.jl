@@ -13,7 +13,7 @@ poi_model = generate_observations(poi, missing, fill(10, 10))
 rand(poi_model)
 ```
 "
-struct PoissonError{T <: AbstractFloat} <: AbstractTuringObservationErrorModel
+struct PoissonError <: AbstractTuringObservationErrorModel
 end
 
 @doc raw"
