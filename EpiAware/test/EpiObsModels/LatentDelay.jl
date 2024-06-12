@@ -130,17 +130,19 @@ end
     obs_model = LatentDelay(TestObs(), delay_int)
 
     I_t = [10.0, 20.0, 30.0, 40.0, 50.0]
-    expected_obs = [23.0, 33.0, 43.0]
+    expected_obs = [missing, missing, 23.0, 33.0, 43.0]
 
     @testset "Test with entirely missing data" begin
         mdl = generate_observations(obs_model, missing, I_t)
-        @test mdl()[1] == expected_obs
+        @test mdl()[1][3:end] == expected_obs[3:end]
+        @test sum(mdl()[1] .|> ismissing) == 2
     end
 
     @testset "Test with missing data defined as a vector" begin
         mdl = generate_observations(
             obs_model, [missing, missing, missing, missing, missing], I_t)
-        @test mdl()[1] == expected_obs
+        @test mdl()[1][3:end] == expected_obs[3:end]
+        @test sum(mdl()[1] .|> ismissing) == 2
     end
 
     @testset "Test with data" begin

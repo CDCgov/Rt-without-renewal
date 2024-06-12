@@ -2,20 +2,19 @@
     using Distributions
     # Test default constructor
     nb = NegativeBinomialError()
+    @test typeof(nb) <: NegativeBinomialError
+    @test typeof(nb) <: AbstractTuringObservationErrorModel
     @test all(rand(nb.cluster_factor_prior, 100) .>= 0.0)
     @test isapprox(mean(nb.cluster_factor_prior), 0.01)
-    @test nb.pos_shift ≈ 1e-6
 
     # Test constructor with custom prior
     prior = Gamma(2.0, 1.0)
     nb = NegativeBinomialError(prior)
     @test nb.cluster_factor_prior == prior
-    @test nb.pos_shift ≈ 1e-6
 
-    # Test constructor with custom prior and pos_shift
-    nb = NegativeBinomialError(prior; pos_shift = 1e-3)
+    # Test constructor with custom prior
+    nb = NegativeBinomialError(prior)
     @test nb.cluster_factor_prior == prior
-    @test nb.pos_shift ≈ 1e-3
 end
 
 @testitem "Testing NegativeBinomialError against theoretical properties" begin
@@ -27,7 +26,7 @@ end
     α = 0.2  # Cluster factor (dispersion parameter)
 
     # Define the observation model
-    nb_obs_model = NegativeBinomialError(pos_shift = 0.0)
+    nb_obs_model = NegativeBinomialError()
 
     # Generate observations from the model
     Y_t = fill(μ, n)  # True values

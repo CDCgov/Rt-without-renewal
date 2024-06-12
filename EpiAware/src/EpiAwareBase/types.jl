@@ -43,6 +43,12 @@ A abstract type representing a Turing-based observation model.
 abstract type AbstractTuringObservationModel <: AbstractObservationModel end
 
 """
+The abstract supertype for all structs that defines a Turing-based model for
+generating observation errors.
+"""
+abstract type AbstractTuringObservationErrorModel <: AbstractTuringObservationModel end
+
+"""
 Abstract supertype for all `EpiAware` problems.
 """
 abstract type AbstractEpiProblem end

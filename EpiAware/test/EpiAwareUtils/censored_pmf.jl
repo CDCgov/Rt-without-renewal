@@ -45,4 +45,14 @@
         dist = Exponential(1.0)
         @test_throws AssertionError censored_pmf(dist, Δd = 1.0, D = 3.5)
     end
+
+    @testset "Test case 7: testing default choice of D" begin
+        dist = Exponential(1.0)
+        pmf = censored_pmf(dist, Δd = 1.0)
+        #Check the normalisation constant is > 0.99 for analytical solution
+        expected_pmf_uncond = [exp(-1)
+                               [(1 - exp(-1)) * (exp(1) - 1) * exp(-s)
+                                for s in 1:length(pmf)]]
+        @test sum(expected_pmf_uncond) > 0.99
+    end
 end

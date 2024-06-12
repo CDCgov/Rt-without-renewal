@@ -52,7 +52,7 @@ struct EpiData{T <: Real, F <: Function}
     end
 
     function EpiData(; gen_distribution::ContinuousDistribution,
-            D_gen,
+            D_gen = nothing,
             Δd = 1.0,
             transformation::Function = exp)
         gen_int = censored_pmf(gen_distribution, Δd = Δd, D = D_gen) |>

@@ -11,8 +11,11 @@ using ..EpiLatentModels: HierarchicalNormal, broadcast_dayofweek
 
 using Turing, Distributions, DocStringExtensions, SparseArrays
 
-# Observation models
+# Observation error models
 export PoissonError, NegativeBinomialError
+
+# Observation error model functions
+export generate_observation_error_priors, observation_error
 
 # Observation model modifiers
 export LatentDelay, Ascertainment, StackObservationModels
@@ -25,8 +28,9 @@ include("LatentDelay.jl")
 include("ascertainment/Ascertainment.jl")
 include("ascertainment/helpers.jl")
 include("StackObservationModels.jl")
-include("PoissonError.jl")
-include("NegativeBinomialError.jl")
+include("ObservationErrorModels/methods.jl")
+include("ObservationErrorModels/NegativeBinomialError.jl")
+include("ObservationErrorModels/PoissonError.jl")
 include("utils.jl")
 
 end
