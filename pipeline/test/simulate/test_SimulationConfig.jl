@@ -3,13 +3,18 @@
 @testset "TruthSimulationConfig" begin
     using Distributions, EpiAwarePipeline, EpiAware
     gi = Gamma(2, 2)
+    normed_daily_ascertainment = [fill(1.0, 5); fill(0.5, 2)] |> x -> 7 * x / sum(x)
     config = TruthSimulationConfig(
-        truth_process = [0.5, 0.8, 1.2], gi_mean = 3.0, gi_std = 2.0)
+        truth_process = [0.5, 0.8, 1.2], gi_mean = 3.0, gi_std = 2.0, daily_ascertainment = normed_daily_ascertainment,
+        cluster_factor = 0.1, I0 = 100.0)
 
     @testset "truth_Rt" begin
         @test config.truth_process == [0.5, 0.8, 1.2]
         @test config.gi_mean == 3.0
         @test config.gi_std == 2.0
+        @test config.daily_ascertainment == normed_daily_ascertainment
+        @test config.cluster_factor == 0.1
+        @test config.I0 == 100.0
         @test config.igp == Renewal
     end
 end
