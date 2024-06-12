@@ -11,7 +11,8 @@ with execution determined by available computational resources.
 module EpiAwarePipeline
 
 using CSV, Dagger, DataFramesMeta, Dates, Distributions, DocStringExtensions, DrWatson,
-      EpiAware, Plots, Statistics, ADTypes, AbstractMCMC, Plots, JLD2, MCMCChains, Turing
+      EpiAware, Plots, Statistics, ADTypes, AbstractMCMC, Plots, JLD2, MCMCChains, Turing,
+      DynamicPPL, LogExpFunctions
 
 # Exported pipeline types
 export AbstractEpiAwarePipeline, EpiAwarePipeline, RtwithoutRenewalPipeline,
