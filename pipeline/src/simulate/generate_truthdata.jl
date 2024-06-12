@@ -22,10 +22,12 @@ the `simulate` function to generate the truth data. This is the default method.
 function generate_truthdata(
         truth_data_config, pipeline::AbstractEpiAwarePipeline; plot = true,
         datadir_str = "truth_data", prefix = "truth_data")
-    true_Rt = make_Rt(pipeline)
+    default_params = make_default_params(pipeline)
     config = TruthSimulationConfig(
-        truth_process = true_Rt, gi_mean = truth_data_config["gi_mean"],
-        gi_std = truth_data_config["gi_std"])
+        truth_process = default_params["Rt"], gi_mean = truth_data_config["gi_mean"],
+        gi_std = truth_data_config["gi_std"], logit_daily_ascertainment = default_params["logit_daily_ascertainment"],
+        cluster_factor = default_params["cluster_factor"], I0 = default_params["I0"])
+
     truthdata, truthfile = produce_or_load(
         simulate, config, datadir(datadir_str); prefix = prefix)
     if plot
@@ -55,15 +57,17 @@ which saves to a temporary directory, which is deleted after the function call.
 - `truthfile`: The file path where the truth data is saved.
 """
 function generate_truthdata(
-        truth_data_config, pipeline::EpiAwareExamplePipeline; plot = true, prefix = "truth_data")
-    true_Rt = make_Rt(pipeline)
+        truth_data_config, pipeline::EpiAwareExamplePipeline; plot = true,
+        prefix = "truth_data")
+    default_params = make_default_params(pipeline)
     config = TruthSimulationConfig(
-        truth_process = true_Rt, gi_mean = truth_data_config["gi_mean"],
-        gi_std = truth_data_config["gi_std"])
+        truth_process = default_params["Rt"], gi_mean = truth_data_config["gi_mean"],
+        gi_std = truth_data_config["gi_std"], logit_daily_ascertainment = default_params["logit_daily_ascertainment"],
+        cluster_factor = default_params["cluster_factor"], I0 = default_params["I0"])
+    datadir_str = mktempdir()
 
-    datadir_str, io = mktemp(; cleanup = true)
     truthdata, truthfile = produce_or_load(
-        simulate, config, datadir_str; prefix = prefix)
+        simulate, config, datadir(datadir_str); prefix = prefix)
     if plot
         plot_truth_data(truthdata, config, pipeline)
     end

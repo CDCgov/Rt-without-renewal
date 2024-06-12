@@ -27,14 +27,17 @@ end
 
 @testset "generate_truthdata" begin
     using EpiAwarePipeline
+
     pipeline = EpiAwareExamplePipeline()
-    truth_data_config = Dict("gi_mean" => 0.5, "gi_std" => 0.1)
+    truth_data_config = Dict("gi_mean" => 2.5, "gi_std" => 1.5)
     truthdata = generate_truthdata(truth_data_config, pipeline)
 
     @test haskey(truthdata, "I_t")
     @test haskey(truthdata, "y_t")
-    @test haskey(truthdata, "cluster_factor")
+    @test haskey(truthdata, "truth_cluster_factor")
     @test haskey(truthdata, "truth_process")
     @test haskey(truthdata, "truth_gi_mean")
     @test haskey(truthdata, "truth_gi_std")
+    @test haskey(truthdata, "truth_daily_ascertainment")
+    @test haskey(truthdata, "truth_I0")
 end
