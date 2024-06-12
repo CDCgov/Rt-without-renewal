@@ -2,7 +2,6 @@
 # Test the TruthSimulationConfig struct constructor
 @testset "TruthSimulationConfig" begin
     using Distributions, EpiAwarePipeline, EpiAware, LogExpFunctions
-    gi = Gamma(2, 2)
     logit_daily_ascertainment = [fill(1.0, 5); fill(0.5, 2)]
     normed_daily_ascertainment = logit_daily_ascertainment |> x -> 7 * softmax(x)
     config = TruthSimulationConfig(
