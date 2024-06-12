@@ -13,8 +13,8 @@ observed data.
     where {M <: AbstractTuringObservationModel, C <: ContinuousDistribution}`: Constructs
     a `LatentDelay` object with the given underlying observation model and continuous
     distribution. The `D` parameter specifies the right truncation of the distribution,
-    with default `D = nothing` indicating that the distribution should be truncated at its
-    99th percentile rounded to nearest integer. The `Δd` parameter specifies the
+    with default `D = nothing` indicates that the distribution should be truncated
+    at its 99th percentile rounded to nearest multiple of `Δd`. The `Δd` parameter specifies the
     width of each delay interval.
 
 - `LatentDelay(model::M, pmf::T) where {M <: AbstractTuringObservationModel, T <: AbstractVector{<:Real}}`: Constructs a `LatentDelay` object with the given underlying observation model and delay PMF.
@@ -35,9 +35,6 @@ struct LatentDelay{M <: AbstractTuringObservationModel, T <: AbstractVector{<:Re
     function LatentDelay(model::M, distribution::C; D = nothing,
             Δd = 1.0) where {
             M <: AbstractTuringObservationModel, C <: ContinuousDistribution}
-        if isnothing(D)
-            D = invlogcdf(distribution, log(0.99)) |> round
-        end
         pmf = censored_pmf(distribution; Δd = Δd, D = D)
         return LatentDelay(model, pmf)
     end

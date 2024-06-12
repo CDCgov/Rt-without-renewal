@@ -50,7 +50,9 @@ for double censored delays is then found using simple differencing on the CDF.
 Arguments:
 - `dist`: The distribution from which to create the PMF.
 - `Δd`: The step size for discretizing the domain. Default is 1.0.
-- `D`: The upper bound of the domain. Must be greater than `Δd`.
+- `D`: The upper bound of the domain. Must be greater than `Δd`. Default `D = nothing`
+indicates that the distribution should be truncated at its 99th percentile rounded
+to nearest multiple of `Δd`.
 
 Returns:
 - A vector representing the PMF.
@@ -58,12 +60,19 @@ Returns:
 Raises:
 - `AssertionError` if the minimum value of `dist` is negative.
 - `AssertionError` if `Δd` is not positive.
-- `AssertionError` if `D` is not greater than `Δd`.
+- `AssertionError` if `D` is shorter than `Δd`.
+- `AssertionError` if `D` is not a multiple of `Δd`.
 """
-function censored_pmf(dist::Distribution; Δd = 1.0, D)
+function censored_pmf(dist::Distribution; Δd = 1.0, D = nothing)
     @assert minimum(dist)>=0.0 "Distribution must be non-negative."
     @assert Δd>0.0 "Δd must be positive."
-    @assert D>Δd "D must be greater than Δd."
+
+    if isnothing(D)
+        x_99 = invlogcdf(dist, log(0.99))
+        D = round(Int64, x_99 / Δd) * Δd
+    end
+
+    @assert D>=Δd "D can't be shorter than Δd."
 
     ts = 0.0:Δd:D |> collect
 
