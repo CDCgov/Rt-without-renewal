@@ -12,20 +12,18 @@ mean and standard deviation.
     gi_mean::T
     "True generation interval distribution std."
     gi_std::T
+    "True day of week relative ascertainment."
+    logit_daily_ascertainment::Vector{T}
+    "True cluster factor."
+    cluster_factor::T
+    "True initial infections."
+    I0::T
     "Infection-generating model type. Default is `:Renewal`."
     igp::UnionAll = Renewal
-    "Maximum next generation interval when discretized. Default is 21 days."
-    D_gen::T = 60.0
     "Transformation function"
     transformation::F = exp
     "Delay distribution: Default is Gamma(4, 5/4)."
     delay_distribution::Distribution = Gamma(4, 5 / 4)
-    "Maximum delay when discretized. Default is 15 days."
-    D_obs::T = 15.0
-    "Prior for log initial infections. Default is Normal(4.6, 1e-5)."
-    log_I0_prior::Distribution = Normal(log(100.0), 1e-5)
-    "Prior for negative binomial cluster factor. Default is HalfNormal(0.1)."
-    cluster_factor_prior::Distribution = HalfNormal(0.1)
 end
 
 """
@@ -45,31 +43,40 @@ function simulate(config::TruthSimulationConfig)
     gen_distribution = Gamma(shape, scale)
 
     model_data = EpiData(gen_distribution = gen_distribution,
-        D_gen = config.D_gen,
         transformation = config.transformation)
 
-    epi = config.igp(model_data, config.log_I0_prior)
+    #Sample infections NB: prior is arbitrary because I0 is fixed.
+    epi = config.igp(model_data, Normal(log(config.I0), 0.01))
 
-    # Sample infections
-    inf_mdl = generate_latent_infs(epi, log.(config.truth_process))
+    inf_mdl = generate_latent_infs(epi, log.(config.truth_process)) |>
+              mdl -> fix(mdl, (init_incidence = log(config.I0),))
     I_t = inf_mdl()
 
     #Define the infection conditional observation distribution
 
     #Model for day-of-week relative ascertainment on logit-scale
-    dayofweek_logit_ascert = ascertainment_dayofweek(NegativeBinomialError(cluster_factor_prior = config.cluster_factor_prior))
+    #NB: prior is arbitrary because cluster factor is fixed.
+    dayofweek_logit_ascert = ascertainment_dayofweek(NegativeBinomialError(cluster_factor_prior = HalfNormal(config.cluster_factor)))
 
     #Model for latent delay in observations
-    obs = LatentDelay(dayofweek_logit_ascert, config.delay_distribution; D = config.D_obs)
+    obs = LatentDelay(dayofweek_logit_ascert, config.delay_distribution)
 
-    #Sample observations
-    obs_model = generate_observations(obs, missing, I_t)
-    yt, θ = obs_model()
+    #Sample observations with fixed values of underlying logit relative ascertainment
+    obs_model = generate_observations(obs, missing, I_t) |>
+                mdl -> fix(mdl,
+        (std = 1.0, cluster_factor = config.cluster_factor,
+            ϵ_t = config.logit_daily_ascertainment))
+
+    y_t, θ = obs_model()
 
     #Return the sampled infections and observations
 
-    return Dict("I_t" => I_t, "y_t" => yt, "cluster_factor" => θ.cluster_factor,
+    return Dict("I_t" => I_t, "y_t" => y_t,
         "truth_process" => config.truth_process,
         "truth_gi_mean" => config.gi_mean,
-        "truth_gi_std" => config.gi_std)
+        "truth_gi_std" => config.gi_std,
+        "truth_daily_ascertainment" => 7 * softmax(config.logit_daily_ascertainment),
+        "truth_I0" => config.I0,
+        "truth_cluster_factor" => config.cluster_factor
+    )
 end
