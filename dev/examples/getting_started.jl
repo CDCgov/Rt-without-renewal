@@ -201,16 +201,14 @@ md"
 
 `EpiAware` has an `EpiModel` type system which we use to set the behaviour of the latent infection model. In this case we want to implement a renewal model.
 
-To construct an `EpiModel` we need to supply some fixed data for the model contained in an `EpiData` object. The `EpiData` constructor performs double interval censoring to convert our _continuous_ estimate of the generation interval into a discretized version $g_t$. We also implement right truncation using the keyword `D_gen`.
-
+To construct an `EpiModel` we need to supply some fixed data for the model contained in an `EpiData` object. The `EpiData` constructor performs double interval censoring to convert our _continuous_ estimate of the generation interval into a discretized version $g_t$. We also implement right truncation, the default is rounding the 99th percentile of the generation interval distribution, but this can be controlled using the keyword `D_gen`.
 "
 
 # ╔═╡ c1fc1929-0624-45c0-9a89-86c8479b2675
 truth_GI = Gamma(6.5, 0.62)
 
 # ╔═╡ 99c9ba2c-20a5-4c7f-94d2-272d6c9d5904
-model_data = EpiData(gen_distribution = truth_GI,
-    D_gen = 14.0)
+model_data = EpiData(gen_distribution = truth_GI)
 
 # ╔═╡ 71d08f7e-c409-4fbe-b154-b21d09010683
 let
