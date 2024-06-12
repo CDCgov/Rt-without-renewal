@@ -12,20 +12,18 @@ mean and standard deviation.
     gi_mean::T
     "True generation interval distribution std."
     gi_std::T
+    "True day of week relative ascertainment."
+    daily_ascertainment::Vector{T}
+    "True cluster factor."
+    cluster_factor::T
+    "True initial infections."
+    I0::T
     "Infection-generating model type. Default is `:Renewal`."
     igp::UnionAll = Renewal
-    "Maximum next generation interval when discretized. Default is 21 days."
-    D_gen::T = 60.0
     "Transformation function"
     transformation::F = exp
     "Delay distribution: Default is Gamma(4, 5/4)."
     delay_distribution::Distribution = Gamma(4, 5 / 4)
-    "Maximum delay when discretized. Default is 15 days."
-    D_obs::T = 15.0
-    "Prior for log initial infections. Default is Normal(4.6, 1e-5)."
-    log_I0_prior::Distribution = Normal(log(100.0), 1e-5)
-    "Prior for negative binomial cluster factor. Default is HalfNormal(0.1)."
-    cluster_factor_prior::Distribution = HalfNormal(0.1)
 end
 
 """
