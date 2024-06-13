@@ -22,6 +22,7 @@ latent_model()
               AbstractTuringLatentModel
     "A vector of latent models"
     models::M
+    "A vector of prefixes for the latent models"
     prefixes::P
 
     function CombineLatentModels(models::M,
