@@ -9,3 +9,4 @@ include("simulate/test_SimulationConfig.jl");
 include("infer/test_InferenceConfig.jl");
 include("infer/test_define_epiprob.jl");
 include("forecast/test_forecast.jl");
+include("scoring/test_score_parameters.jl");
