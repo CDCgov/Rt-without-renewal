@@ -4,9 +4,9 @@ The `CombineLatentModels` struct.
 This struct is used to combine multiple latent models into a single latent model.
 
 # Constructors
-
-- `CombineLatentModels(models::M) where {M <: AbstractVector{<:AbstractTuringLatentModel}}`: Constructs a `CombineLatentModels` instance with specified models, ensuring that there are at least two models.
-- `CombineLatentModels(; models::M) where {M <: AbstractVector{<:AbstractTuringLatentModel}}`: Constructs a `CombineLatentModels` instance with specified models, ensuring that there are at least two models.
+- `CombineLatentModels(models::M, prefixes::P) where {M <: AbstractVector{<:AbstractTuringLatentModel}, P <: AbstractVector{<:String}}`: Constructs a `CombineLatentModels` instance with specified models and prefixes, ensuring that there are at least two models and the number of models and prefixes are equal.
+- `CombineLatentModels(models::M) where {M <: AbstractVector{<:AbstractTuringLatentModel}}`: Constructs a `CombineLatentModels` instance with specified models, automatically generating prefixes for each model. The
+automatic prefixes are of the form `Combine.1`, `Combine.2`, etc.
 
 # Examples
 
@@ -17,15 +17,27 @@ latent_model = generate_latent(combined_model, 10)
 latent_model()
 ```
 "
-@kwdef struct CombineLatentModels{M <: AbstractVector{<:AbstractTuringLatentModel}} <:
+@kwdef struct CombineLatentModels{
+    M <: AbstractVector{<:AbstractTuringLatentModel}, P <: AbstractVector{<:String}} <:
               AbstractTuringLatentModel
     "A vector of latent models"
     models::M
+    prefixes::P
 
-    function CombineLatentModels(models::M) where {M <:
-                                                   AbstractVector{<:AbstractTuringLatentModel}}
+    function CombineLatentModels(models::M,
+            prefixes::P) where {
+            M <: AbstractVector{<:AbstractTuringLatentModel},
+            P <: AbstractVector{<:String}}
         @assert length(models)>1 "At least two models are required"
-        return new{AbstractVector{<:AbstractTuringLatentModel}}(models)
+        @assert length(models)==length(prefixes) "The number of models and prefixes must be equal"
+        return new{AbstractVector{<:AbstractTuringLatentModel}, AbstractVector{<:String}}(
+            models, prefixes)
+    end
+
+    function CombineLatentModels(models::M) where {
+            M <: AbstractVector{<:AbstractTuringLatentModel}}
+        prefixes = "Combine." .* string.(1:length(models))
+        return CombineLatentModels(models, prefixes)
     end
 end
 
@@ -44,19 +56,20 @@ Generate latent variables using a combination of multiple latent models.
 "
 @model function EpiAwareBase.generate_latent(latent_models::CombineLatentModels, n)
     @submodel final_latent, latent_aux = _accumulate_latents(
-        latent_models.models, 1, fill(0.0, n), [], n, length(latent_models.models))
+        latent_models.models, 1, fill(0.0, n), [], n, length(latent_models.models), latent_models.prefixes)
 
     return final_latent, (; latent_aux...)
 end
 
-@model function _accumulate_latents(models, index, acc_latent, acc_aux, n, n_models)
+@model function _accumulate_latents(
+        models, index, acc_latent, acc_aux, n, n_models, prefixes)
     if index > n_models
         return acc_latent, (; acc_aux...)
     else
-        @submodel latent, new_aux = generate_latent(models[index], n)
+        @submodel prefix=prefixes[index] latent, new_aux=generate_latent(models[index], n)
         @submodel updated_latent, updated_aux = _accumulate_latents(
             models, index + 1, acc_latent .+ latent,
-            (; acc_aux..., new_aux...), n, n_models)
+            (; acc_aux..., new_aux...), n, n_models, prefixes)
         return updated_latent, (; updated_aux...)
     end
 end
