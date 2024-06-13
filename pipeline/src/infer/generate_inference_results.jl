@@ -23,7 +23,8 @@ function generate_inference_results(
     # produce or load inference results
     prfx = prfix_name * "_igp_" * string(inference_config["igp"]) * "_latentmodel_" *
            inference_config["latent_namemodels"].first * "_truth_gi_mean_" *
-           string(truthdata["truth_gi_mean"]) * "_used_gi_mean_" * string(inference_config["gi_mean"])
+           string(truthdata["truth_gi_mean"]) * "_used_gi_mean_" *
+           string(inference_config["gi_mean"])
 
     inference_results, inferencefile = produce_or_load(
         infer, config, datadir(datadir_name); prefix = prfx)
@@ -63,7 +64,8 @@ function generate_inference_results(
     # produce or load inference results
     prfx = prfix_name * "_igp_" * string(inference_config["igp"]) * "_latentmodel_" *
            inference_config["latent_namemodels"].first * "_truth_gi_mean_" *
-           string(truthdata["truth_gi_mean"]) * "_used_gi_mean_" * string(inference_config["gi_mean"])
+           string(truthdata["truth_gi_mean"]) * "_used_gi_mean_" *
+           string(inference_config["gi_mean"])
 
     datadir_name = mktempdir()
 
@@ -75,9 +77,9 @@ end
 """
 Method for prior predictive modelling.
 """
-function generate_inference_results(inference_config, pipeline::RtwithoutRenewalPriorPipeline;
+function generate_inference_results(
+        inference_config, pipeline::RtwithoutRenewalPriorPipeline;
         tspan, prefix_name = "prior_observables")
-
     config = InferenceConfig(
         inference_config; case_data = missing, tspan, epimethod = DirectSample())
 
