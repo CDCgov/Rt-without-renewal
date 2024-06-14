@@ -8,12 +8,12 @@ The `Ascertainment` struct represents an observation model that incorporates a a
 # Examples
 ```julia
 using EpiAware, Turing
-obs = Ascertainment(NegativeBinomialError(), FixedIntercept(0.1); link = x -> x)
+obs = Ascertainment(model = NegativeBinomialError(), latent_model = FixedIntercept(0.1))
 gen_obs = generate_observations(obs, missing, fill(100, 10))
 rand(gen_obs)
 ```
 "
-@kwdef struct Ascertainment{
+struct Ascertainment{
     M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel,
     F <: Function, P <: String} <: AbstractTuringObservationModel
     "The underlying observation model."
@@ -21,8 +21,17 @@ rand(gen_obs)
     "The latent model."
     latent_model::T
     "The link function used to transform the latent model to the observed data."
-    link::F = x -> exp.(x)
-    latent_prefix::P = "Ascertainment"
+    link::F
+    latent_prefix::P
+
+    function Ascertainment(model::M,
+            latent_model::T,
+            link::F,
+            latent_prefix::P) where {
+            M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel,
+            F <: Function, P <: String}
+        return new{M, T, F, P}(model, latent_model, link, latent_prefix)
+    end
 
     function Ascertainment(model::M,
             latent_model::T;
@@ -30,7 +39,16 @@ rand(gen_obs)
             latent_prefix::P = "Ascertainment") where {
             M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel,
             F <: Function, P <: String}
-        return new{M, T, F, P}(model, latent_model, link, latent_prefix)
+        return Ascertainment(model, latent_model, link, latent_prefix)
+    end
+
+    function Ascertainment(; model::M,
+            latent_model::T,
+            link::F = x -> exp.(x),
+            latent_prefix::P = "Ascertainment") where {
+            M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel,
+            F <: Function, P <: String}
+        return Ascertainment(model, latent_model, link, latent_prefix)
     end
 end
 

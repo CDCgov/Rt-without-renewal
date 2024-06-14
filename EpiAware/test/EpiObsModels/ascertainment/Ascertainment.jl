@@ -10,8 +10,7 @@
     @test asc.link == natural
     @test asc.latent_prefix == "Ascertainment"
 
-    asc_prefix = Ascertainment(
-        model = NegativeBinomialError(), latent_model = FixedIntercept(0.1),
+    asc_prefix = Ascertainment(NegativeBinomialError(), FixedIntercept(0.1);
         link = natural, latent_prefix = "A")
     @test asc_prefix.model == NegativeBinomialError()
     @test asc_prefix.latent_model == FixedIntercept(0.1)
@@ -22,7 +21,7 @@ end
 # make a test based on above example
 @testitem "Test Ascertainment generate_observations" begin
     using Turing, DynamicPPL
-    obs = Ascertainment(NegativeBinomialError(), FixedIntercept(0.1), x -> x)
+    obs = Ascertainment(NegativeBinomialError(), FixedIntercept(0.1); link = x -> x)
     gen_obs = generate_observations(obs, missing, fill(100, 10))
     samples = sample(gen_obs, Prior(), 100; progress = false)
     gen = mapreduce(vcat, generated_quantities(gen_obs, samples)) do gen
