@@ -19,7 +19,7 @@ struct InferenceConfig{T, F, I, L, E}
     "Latent model type."
     latent_model::L
     "Case data"
-    case_data::Union{Vector{Integer, Missing}, Missing}
+    case_data::Union{Vector{Union{Integer, Missing}}, Missing}
     "Time to fit on"
     tspan::Tuple{Integer, Integer}
     "Inference method."
