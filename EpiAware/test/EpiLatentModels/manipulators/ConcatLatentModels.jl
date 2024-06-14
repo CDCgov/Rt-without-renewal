@@ -7,6 +7,7 @@
     @test concat.models == [int, ar]
     @test concat.no_models == 2
     @test concat.dimension_adaptor == equal_dimensions
+    @test concat.prefixes == ["Concat.1", "Concat.2"]
 
     function custom_dim(n::Int, no_models::Int)::Vector{Int}
         return vcat(4, equal_dimensions(n - 4, no_models - 1))
@@ -18,6 +19,14 @@
     @test concat_custom.no_models == 2
     @test concat_custom.dimension_adaptor == custom_dim
     @test concat_custom.dimension_adaptor(10, 4) == [4, 2, 2, 2]
+    @test concat_custom.prefixes == ["Concat.1", "Concat.2"]
+
+    concat_prefix = ConcatLatentModels([int, ar]; prefixes = ["Int", "AR"])
+
+    @test concat_prefix.models == [int, ar]
+    @test concat_prefix.no_models == 2
+    @test concat_prefix.dimension_adaptor == equal_dimensions
+    @test concat_prefix.prefixes == ["Int", "AR"]
 end
 
 @testitem "ConcatLatentModels generate_latent method works as expected: FixedIntecept + custom" begin
