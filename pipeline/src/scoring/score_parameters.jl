@@ -16,7 +16,7 @@ function _score(df)
     @rput df
     R"""
     library(scoringutils)
-    result = df |> as_forecast() |> score() |> summarize_scores(by = "parameter")
+    result = df |> as_forecast() |> score()
     """
     @rget result
     return result
