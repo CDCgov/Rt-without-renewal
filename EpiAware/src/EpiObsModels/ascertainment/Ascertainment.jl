@@ -1,27 +1,39 @@
 @doc raw"
-The `Ascertainment` struct represents an observation model that incorporates ascertainment bias. It is parametrized by two types: `M` which represents the underlying observation model, and `T` which represents the latent model.
+The `Ascertainment` struct represents an observation model that incorporates a ascertainment model.
 
 # Constructors
-- `Ascertainment(model::M, latentmodel::T; link::F = exp) where {M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel, F <: Function}`: Constructs a new `Ascertainment` object with the specified `model`, `latentmodel`, and `link` function. `link` is a named keyword and defaults to `exp`.
-- `Ascertainment(model::M, latentmodel::T, link::F = exp) where {M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel, F <: Function}`: Constructs a new `Ascertainment` object with the specified `model`, `latentmodel`, and `link` function.
+- `Ascertainment(model::M, latentmodel::T, link::F, latent_prefix::P) where {M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel, F <: Function, P <: String}`: Constructs an `Ascertainment` instance with the specified observation model, latent model, link function, and latent prefix.
+- `Ascertainment(; model::M, latentmodel::T, link::F, latent_prefix::P) where {M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel, F <: Function, P <: String}`: Constructs an `Ascertainment` instance with the specified observation model, latent model, link function, and latent prefix.
 
 # Examples
 ```julia
 using EpiAware, Turing
-obs = Ascertainment(NegativeBinomialError(), FixedIntercept(0.1), x -> x)
+obs = Ascertainment(NegativeBinomialError(), FixedIntercept(0.1); link = x -> x)
 gen_obs = generate_observations(obs, missing, fill(100, 10))
 rand(gen_obs)
 ```
 "
 @kwdef struct Ascertainment{
-    M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel, F <: Function} <:
+    M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel, F <: Function, P <:
+                                                                                        String} <:
               AbstractTuringObservationModel
     "The underlying observation model."
     model::M
     "The latent model."
     latentmodel::T
     "The link function used to transform the latent model to the observed data."
-    link::F = x -> x .|> exp
+    link::F = x -> exp.(x)
+    latent_prefix::P = "Ascertainment"
+
+    function Ascertainment(model::M,
+            latentmodel::T;
+            link::F = x -> exp.(x),
+            latent_prefix::P = "Ascertainment") where {
+            M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel, F <:
+                                                                                 Function, P <:
+                                                                                           String}
+        return new{M, T, F, P}(model, latentmodel, link, latent_prefix)
+    end
 end
 
 @doc raw"
@@ -38,7 +50,7 @@ Generates observations based on the `LatentDelay` observation model.
 - `obs_aux`: Additional observation-related variables.
 "
 @model function EpiAwareBase.generate_observations(obs_model::Ascertainment, y_t, Y_t)
-    @submodel expected_obs_mod, expected_aux = generate_latent(
+    @submodel prefix=obs_model.latent_prefix expected_obs_mod, expected_aux=generate_latent(
         obs_model.latentmodel, length(Y_t))
 
     expected_obs = Y_t .* obs_model.link(expected_obs_mod)

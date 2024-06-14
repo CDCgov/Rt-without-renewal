@@ -75,7 +75,7 @@ end
 
     # Used again in obs model
 
-    obs_ascert = Ascertainment(PoissonError(), ar_process, x -> exp.(x))
+    obs_ascert = Ascertainment(PoissonError(), ar_process; link = x -> exp.(x))
 
     #Epi model
     gen_int = [0.2, 0.3, 0.5]
