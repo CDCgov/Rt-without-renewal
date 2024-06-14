@@ -18,12 +18,12 @@ terms ``Z_1, \ldots, Z_d`` are inferred.
 
 ## Constructors
 
-- `DiffLatentModel(latentmodel, init_prior_distribution::Distribution; d::Int)`
-    Constructs a `DiffLatentModel` for `d`-fold differencing with `latentmodel` as the
+- `DiffLatentModel(latent_model, init_prior_distribution::Distribution; d::Int)`
+    Constructs a `DiffLatentModel` for `d`-fold differencing with `latent_model` as the
     undifferenced latent process. All initial terms have common prior
     `init_prior_distribution`.
 - `DiffLatentModel(;model, init_priors::Vector{D} where {D <: Distribution})`
-    Constructs a `DiffLatentModel` for `d`-fold differencing with `latentmodel` as the
+    Constructs a `DiffLatentModel` for `d`-fold differencing with `latent_model` as the
     undifferenced latent process. The `d` initial terms have priors given by the vector
     `init_priors`, therefore `length(init_priors)` sets `d`.
 

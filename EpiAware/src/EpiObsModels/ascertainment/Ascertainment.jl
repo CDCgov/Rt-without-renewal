@@ -2,8 +2,8 @@
 The `Ascertainment` struct represents an observation model that incorporates a ascertainment model.
 
 # Constructors
-- `Ascertainment(model::M, latentmodel::T, link::F, latent_prefix::P) where {M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel, F <: Function, P <: String}`: Constructs an `Ascertainment` instance with the specified observation model, latent model, link function, and latent prefix.
-- `Ascertainment(; model::M, latentmodel::T, link::F, latent_prefix::P) where {M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel, F <: Function, P <: String}`: Constructs an `Ascertainment` instance with the specified observation model, latent model, link function, and latent prefix.
+- `Ascertainment(model::M, latent_model::T, link::F, latent_prefix::P) where {M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel, F <: Function, P <: String}`: Constructs an `Ascertainment` instance with the specified observation model, latent model, link function, and latent prefix.
+- `Ascertainment(; model::M, latent_model::T, link::F, latent_prefix::P) where {M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel, F <: Function, P <: String}`: Constructs an `Ascertainment` instance with the specified observation model, latent model, link function, and latent prefix.
 
 # Examples
 ```julia
@@ -20,19 +20,19 @@ rand(gen_obs)
     "The underlying observation model."
     model::M
     "The latent model."
-    latentmodel::T
+    latent_model::T
     "The link function used to transform the latent model to the observed data."
     link::F = x -> exp.(x)
     latent_prefix::P = "Ascertainment"
 
     function Ascertainment(model::M,
-            latentmodel::T;
+            latent_model::T;
             link::F = x -> exp.(x),
             latent_prefix::P = "Ascertainment") where {
             M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel, F <:
                                                                                  Function, P <:
                                                                                            String}
-        return new{M, T, F, P}(model, latentmodel, link, latent_prefix)
+        return new{M, T, F, P}(model, latent_model, link, latent_prefix)
     end
 end
 
@@ -51,7 +51,7 @@ Generates observations based on the `LatentDelay` observation model.
 "
 @model function EpiAwareBase.generate_observations(obs_model::Ascertainment, y_t, Y_t)
     @submodel prefix=obs_model.latent_prefix expected_obs_mod, expected_aux=generate_latent(
-        obs_model.latentmodel, length(Y_t))
+        obs_model.latent_model, length(Y_t))
 
     expected_obs = Y_t .* obs_model.link(expected_obs_mod)
 
