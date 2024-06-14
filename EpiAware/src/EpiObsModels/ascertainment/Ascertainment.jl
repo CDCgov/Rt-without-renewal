@@ -14,9 +14,8 @@ rand(gen_obs)
 ```
 "
 @kwdef struct Ascertainment{
-    M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel, F <: Function, P <:
-                                                                                        String} <:
-              AbstractTuringObservationModel
+    M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel,
+    F <: Function, P <: String} <: AbstractTuringObservationModel
     "The underlying observation model."
     model::M
     "The latent model."
@@ -29,9 +28,8 @@ rand(gen_obs)
             latent_model::T;
             link::F = x -> exp.(x),
             latent_prefix::P = "Ascertainment") where {
-            M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel, F <:
-                                                                                 Function, P <:
-                                                                                           String}
+            M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel,
+            F <: Function, P <: String}
         return new{M, T, F, P}(model, latent_model, link, latent_prefix)
     end
 end
