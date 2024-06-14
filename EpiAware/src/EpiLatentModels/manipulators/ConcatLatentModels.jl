@@ -6,7 +6,7 @@ This struct is used to concatenate multiple latent models into a single latent m
 # Constructors
 
 - `ConcatLatentModels(models::M, no_models::I, dimension_adaptor::F, prefixes::P) where {M <: AbstractVector{<:AbstractTuringLatentModel}, I <: Int, F <: Function, P <: AbstractVector{String}}`: Constructs a `ConcatLatentModels` instance with specified models, number of models, dimension adaptor, and prefixes.
-- `ConcatLatentModels(models::M, dimension_adaptor::F) where {M <: AbstractVector{<:AbstractTuringLatentModel}, F <: Function}`: Constructs a `ConcatLatentModels` instance with specified models and dimension adaptor. The number of models is automatically determined as are the prefixes (of the form `Concat.1`, `Concat.2`, etc.).
+- `ConcatLatentModels(models::M, dimension_adaptor::F; prefixes::P = \"Concat.\" * string.(1:length(models))) where {M <: AbstractVector{<:AbstractTuringLatentModel}, F <: Function}`: Constructs a `ConcatLatentModels` instance with specified models and dimension adaptor. The number of models is automatically determined as are the prefixes (of the form `Concat.1`, `Concat.2`, etc.) by default.
 - `ConcatLatentModels(models::M; dimension_adaptor::Function, prefixes::P) where {M <: AbstractVector{<:AbstractTuringLatentModel}, P <: AbstractVector{String}}`: Constructs a `ConcatLatentModels` instance with specified models, dimension adaptor, prefixes, and automatically determines the number of models.The default dimension adaptor is `equal_dimensions`. The default prefixes are of the form `Concat.1`, `Concat.2`, etc.
 - `ConcatLatentModels(; models::M, dimension_adaptor::Function, prefixes::P) where {M <: AbstractVector{<:AbstractTuringLatentModel}, P <: AbstractVector{String}}`: Constructs a `ConcatLatentModels` instance with specified models, dimension adaptor, prefixes, and automatically determines the number of models. The default dimension adaptor is `equal_dimensions`. The default prefixes are of the form `Concat.1`, `Concat.2`, etc.
 
@@ -21,7 +21,7 @@ latent_model()
 "
 struct ConcatLatentModels{
     M <: AbstractVector{<:AbstractTuringLatentModel}, N <: Int, F <: Function, P <:
-                                                                               AbstractVector{String}} <:
+                                                                               AbstractVector{<:String}} <:
        AbstractTuringLatentModel
     "A vector of latent models"
     models::M
@@ -36,7 +36,7 @@ struct ConcatLatentModels{
             no_models::I,
             dimension_adaptor::F, prefixes::P) where {
             M <: AbstractVector{<:AbstractTuringLatentModel}, I <: Int,
-            F <: Function, P <: AbstractVector{String}}
+            F <: Function, P <: AbstractVector{<:String}}
         @assert length(models)>1 "At least two models are required"
         @assert length(models)==no_models "no_models must be equal to the number of models"
         # check all dimension functions take a single n and return an integer
@@ -46,34 +46,31 @@ struct ConcatLatentModels{
         @assert length(prefixes)==no_models "The number of models and prefixes must be equal"
         return new{
             AbstractVector{<:AbstractTuringLatentModel}, Int, Function,
-            P <: AbstractVector{String}}(
+            AbstractVector{<:String}}(
             models, no_models, dimension_adaptor, prefixes)
     end
 
-    function ConcatLatentModels(models::M,
-            dimension_adaptor::Function, prefixes) where {
+    function ConcatLatentModels(models::M, dimension_adaptor::Function;
+            prefixes = nothing) where {
             M <: AbstractVector{<:AbstractTuringLatentModel}}
         no_models = length(models)
-        if isempty(prefixes)
-            new_prefixes = "Concat." .* string.(1:no_models)
-        else
-            new_prefixes = prefixes
+        if isnothing(prefixes)
+            prefixes = "Concat." .* string.(1:no_models)
         end
-        return ConcatLatentModels(models, no_models, dimension_adaptor, new_prefixes)
+        return ConcatLatentModels(models, no_models, dimension_adaptor, prefixes)
     end
 
     function ConcatLatentModels(models::M;
-            dimension_adaptor::Function = equal_dimensions, prefixes = "Concat." .*
-                                                                       string.(1:length(models))) where {
+            dimension_adaptor::Function = equal_dimensions,
+            prefixes = nothing) where {
             M <: AbstractVector{<:AbstractTuringLatentModel}}
-        return ConcatLatentModels(models, dimension_adaptor, prefixes)
+        return ConcatLatentModels(models, dimension_adaptor; prefixes = prefixes)
     end
 
     function ConcatLatentModels(; models::M,
-            dimension_adaptor::Function = equal_dimensions, prefixes = "Concat" .*
-                                                                       string(1:length(models))) where {
+            dimension_adaptor::Function = equal_dimensions, prefixes = nothing) where {
             M <: AbstractVector{<:AbstractTuringLatentModel}}
-        return ConcatLatentModels(models, dimension_adaptor, prefixes)
+        return ConcatLatentModels(models, dimension_adaptor; prefixes = prefixes)
     end
 end
 
