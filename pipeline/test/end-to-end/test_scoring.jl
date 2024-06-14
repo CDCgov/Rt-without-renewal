@@ -1,4 +1,4 @@
-using DrWatson
+using DrWatson, Test
 quickactivate(@__DIR__(), "EpiAwarePipeline")
 
 @testset "run inference for random scenario and do scoring" begin
@@ -30,7 +30,7 @@ quickactivate(@__DIR__(), "EpiAwarePipeline")
     truth_Rt = expected_Rt(truth_sampling["epiprob"].epi_model.data,
         truth_sampling["inference_results"].generated.I_t)
     plt_Rt = plot(truth_Rt, xlabel = "t", ylabel = "R_t", label = "truth Rt")
-    vline!(plt_Rt, [n_observation_steps + missing_padding + 0.5], label = "forecast start")
+    vline!(plt_Rt, [tspan_inf[2] + 0.5], label = "forecast start")
 
     ##
     ## Run inference
@@ -56,7 +56,7 @@ quickactivate(@__DIR__(), "EpiAwarePipeline")
         end
     end
     plt = scatter(truthdata, xlabel = "t", ylabel = "y_t", label = "truth data")
-    vline!(plt, [n_observation_steps + missing_padding + 0.5], label = "forecast start")
+    vline!(plt, [tspan_inf[2] + 0.5], label = "forecast start")
     plot!(plt, forecast_qs, label = "forecast quantiles",
         color = :grey, lw = [0.5 1.5 3 1.5 0.5])
     plot!(plt, ylims = (-0.5, maximum(truthdata) * 1.25))
