@@ -37,7 +37,8 @@ function make_inference_method(
         nruns_pthf::Integer = 4, maxiters_pthf::Integer = 100, nchains::Integer = 4)
     return EpiMethod(
         pre_sampler_steps = [ManyPathfinder(nruns = nruns_pthf, maxiters = maxiters_pthf)],
-        sampler = NUTSampler(adtype = AutoForwardDiff(), ndraws = ndraws,
+        sampler = NUTSampler(
+            target_acceptance = 0.9, adtype = AutoForwardDiff(), ndraws = ndraws,
             nchains = nchains, mcmc_parallel = mcmc_ensemble)
     )
 end

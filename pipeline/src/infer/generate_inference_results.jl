@@ -23,7 +23,8 @@ function generate_inference_results(
     # produce or load inference results
     prfx = prfix_name * "_igp_" * string(inference_config["igp"]) * "_latentmodel_" *
            inference_config["latent_namemodels"].first * "_truth_gi_mean_" *
-           string(truthdata["truth_gi_mean"])
+           string(truthdata["truth_gi_mean"]) * "_used_gi_mean_" *
+           string(inference_config["gi_mean"])
 
     inference_results, inferencefile = produce_or_load(
         infer, config, datadir(datadir_name); prefix = prfx)
@@ -63,9 +64,10 @@ function generate_inference_results(
     # produce or load inference results
     prfx = prfix_name * "_igp_" * string(inference_config["igp"]) * "_latentmodel_" *
            inference_config["latent_namemodels"].first * "_truth_gi_mean_" *
-           string(truthdata["truth_gi_mean"])
+           string(truthdata["truth_gi_mean"]) * "_used_gi_mean_" *
+           string(inference_config["gi_mean"])
 
-    datadir_name, io = mktemp(; cleanup = true)
+    datadir_name = mktempdir()
 
     inference_results, inferencefile = produce_or_load(
         infer, config, datadir_name; prefix = prfx)
@@ -76,16 +78,17 @@ end
 Method for prior predictive modelling.
 """
 function generate_inference_results(
-        truthdata, inference_config, pipeline::RtwithoutRenewalPriorPipeline;
-        tspan, inference_method,
-        prfix_name = "prior_observables", datadir_name = "epiaware_observables")
+        inference_config, pipeline::RtwithoutRenewalPriorPipeline;
+        tspan, prefix_name = "prior_observables")
     config = InferenceConfig(
-        inference_config; case_data = missing, tspan, epimethod = inference_method)
+        inference_config; case_data = missing, tspan, epimethod = DirectSample())
 
     # produce or load inference results
-    prfx = prfix_name * "_igp_" * string(inference_config["igp"]) * "_latentmodel_" *
+    prfx = prefix_name * "_igp_" * string(inference_config["igp"]) * "_latentmodel_" *
            inference_config["latent_namemodels"].first * "_truth_gi_mean_" *
-           string(truthdata["truth_gi_mean"])
+           string(inference_config["gi_mean"])
+
+    datadir_name = mktempdir()
 
     inference_results, inferencefile = produce_or_load(
         infer, config, datadir(datadir_name); prefix = prfx)

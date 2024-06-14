@@ -12,7 +12,7 @@ module EpiAwarePipeline
 
 using CSV, Dagger, DataFramesMeta, Dates, Distributions, DocStringExtensions, DrWatson,
       EpiAware, Plots, Statistics, ADTypes, AbstractMCMC, Plots, JLD2, MCMCChains, Turing,
-      DynamicPPL, LogExpFunctions
+      DynamicPPL, LogExpFunctions, RCall
 
 # Exported pipeline types
 export AbstractEpiAwarePipeline, EpiAwarePipeline, RtwithoutRenewalPipeline,
@@ -38,6 +38,9 @@ export infer, generate_inference_results, map_inference_results, define_epiprob
 # Exported functions: forecast functions
 export define_forecast_epiprob, generate_forecasts
 
+# Exported functions: scoring functions
+export score_parameters
+
 # Exported functions: plot functions
 export plot_truth_data, plot_Rt
 
@@ -47,5 +50,6 @@ include("constructors/constructors.jl")
 include("simulate/simulate.jl")
 include("infer/infer.jl")
 include("forecast/forecast.jl")
+include("scoring/score_parameters.jl")
 include("plot_functions.jl")
 end

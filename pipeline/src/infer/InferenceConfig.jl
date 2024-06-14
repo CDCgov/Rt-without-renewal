@@ -19,7 +19,7 @@ struct InferenceConfig{T, F, I, L, E}
     "Latent model type."
     latent_model::L
     "Case data"
-    case_data::Union{Vector{Integer, Missing}, Missing}
+    case_data::Union{Vector{Union{Integer, Missing}}, Missing}
     "Time to fit on"
     tspan::Tuple{Integer, Integer}
     "Inference method."
@@ -84,7 +84,7 @@ function infer(config::InferenceConfig)
     y_t = ismissing(config.case_data) ? missing : config.case_data[idxs]
     inference_results = apply_method(epi_prob,
         config.epimethod,
-        (y_t = y_t,)
+        (y_t = y_t,);
     )
     return Dict("inference_results" => inference_results, "epiprob" => epi_prob)
 end
