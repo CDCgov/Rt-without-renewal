@@ -5,7 +5,7 @@ module EpiLatentModels
 
 using ..EpiAwareBase
 
-using ..EpiAwareUtils: HalfNormal
+using ..EpiAwareUtils: HalfNormal, prefix_submodel
 
 using LogExpFunctions: softmax
 
@@ -26,7 +26,7 @@ export RepeatEach, RepeatBlock
 export broadcast_dayofweek, broadcast_weekly, equal_dimensions
 
 # Export tools for modifying latent models
-export DiffLatentModel, TransformLatentModel
+export DiffLatentModel, TransformLatentModel, PrefixLatentModel
 
 include("docstrings.jl")
 include("models/Intercept.jl")
@@ -35,9 +35,9 @@ include("models/AR.jl")
 include("models/HierarchicalNormal.jl")
 include("modifiers/DiffLatentModel.jl")
 include("modifiers/TransformLatentModel.jl")
+include("modifiers/PrefixLatentModel.jl")
 include("manipulators/CombineLatentModels.jl")
 include("manipulators/ConcatLatentModels.jl")
-
 include("manipulators/broadcast/LatentModel.jl")
 include("manipulators/broadcast/rules.jl")
 include("manipulators/broadcast/helpers.jl")

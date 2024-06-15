@@ -18,15 +18,19 @@ export PoissonError, NegativeBinomialError
 export generate_observation_error_priors, observation_error
 
 # Observation model modifiers
-export LatentDelay, Ascertainment, StackObservationModels
+export LatentDelay, Ascertainment, PrefixObservationModel
+
+# Observation model manipulators
+export StackObservationModels
 
 # helper functions
 export ascertainment_dayofweek
 
 include("docstrings.jl")
-include("LatentDelay.jl")
-include("ascertainment/Ascertainment.jl")
-include("ascertainment/helpers.jl")
+include("modifiers/LatentDelay.jl")
+include("modifiers/ascertainment/Ascertainment.jl")
+include("modifiers/ascertainment/helpers.jl")
+include("modifiers/PrefixObservationModel.jl")
 include("StackObservationModels.jl")
 include("ObservationErrorModels/methods.jl")
 include("ObservationErrorModels/NegativeBinomialError.jl")
