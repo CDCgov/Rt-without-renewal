@@ -1,7 +1,7 @@
 include("make_gi_params.jl")
 include("make_inf_generating_processes.jl")
 include("make_latent_model_priors.jl")
-include("make_epiaware_name_model_pairs.jl")
+include("make_epiaware_name_latentmodel_pairs.jl")
 include("make_inference_method.jl")
 include("make_truth_data_configs.jl")
 include("make_inference_configs.jl")
