@@ -16,12 +16,12 @@ Generate inference results based on the given configuration of inference model o
 function generate_inference_results(
         truthdata, inference_config, pipeline::AbstractEpiAwarePipeline;
         tspan, inference_method,
-        prfix_name = "observables", datadir_name = "epiaware_observables")
+        prefix_name = "observables", datadir_name = "epiaware_observables")
     config = InferenceConfig(
         inference_config; case_data = truthdata["y_t"], tspan, epimethod = inference_method)
 
     # produce or load inference results
-    prfx = prfix_name * "_igp_" * string(inference_config["igp"]) * "_latentmodel_" *
+    prfx = prefix_name * "_igp_" * string(inference_config["igp"]) * "_latentmodel_" *
            inference_config["latent_namemodels"].first * "_truth_gi_mean_" *
            string(truthdata["truth_gi_mean"])
 
@@ -31,7 +31,7 @@ function generate_inference_results(
 end
 
 """
-Generate inference results for examples, saving results in a temporary directory
+Generate inference results for examples/test mode, saving results in a temporary directory
 which is deleted after the function call.
 
 # Arguments
@@ -50,22 +50,16 @@ which is deleted after the function call.
 """
 function generate_inference_results(
         truthdata, inference_config, pipeline::EpiAwareExamplePipeline;
-        tspan, inference_method, prfix_name = "observables")
-    config = InferenceConfig(
-        inference_config["igp"], inference_config["latent_namemodels"].second;
-        gi_mean = inference_config["gi_mean"],
-        gi_std = inference_config["gi_std"],
-        case_data = truthdata["y_t"],
-        tspan = tspan,
-        epimethod = inference_method
-    )
+        tspan, inference_method, prefix_name = "testmode_observables")
+    config = InferenceConfig(inference_config; case_data = truthdata["y_t"],
+        tspan = tspan, epimethod = inference_method)
 
     # produce or load inference results
-    prfx = prfix_name * "_igp_" * string(inference_config["igp"]) * "_latentmodel_" *
+    prfx = prefix_name * "_igp_" * string(inference_config["igp"]) * "_latentmodel_" *
            inference_config["latent_namemodels"].first * "_truth_gi_mean_" *
            string(truthdata["truth_gi_mean"])
 
-    datadir_name, io = mktemp(; cleanup = true)
+    datadir_name = mktempdir(; cleanup = true)
 
     inference_results, inferencefile = produce_or_load(
         infer, config, datadir_name; prefix = prfx)
