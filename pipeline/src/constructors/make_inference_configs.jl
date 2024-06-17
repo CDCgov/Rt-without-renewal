@@ -10,13 +10,14 @@ Create inference configurations for the given pipeline. This is the default meth
 """
 function make_inference_configs(pipeline::AbstractEpiAwarePipeline)
     gi_param_dict = make_gi_params(pipeline)
-    namemodel_vect = make_epiaware_name_model_pairs(pipeline)
+    namemodel_vect = make_epiaware_name_latentmodel_pairs(pipeline)
     igps = make_inf_generating_processes(pipeline)
     obs = make_observation_model(pipeline)
+    priors = make_model_priors(pipeline)
 
-    inference_configs = Dict(
-        "igp" => igps, "latent_namemodels" => namemodel_vect, "observation_model" => obs,
-        "gi_mean" => gi_param_dict["gi_means"], "gi_std" => gi_param_dict["gi_stds"]) |>
+    inference_configs = Dict("igp" => igps, "latent_namemodels" => namemodel_vect,
+        "observation_model" => obs, "gi_mean" => gi_param_dict["gi_means"],
+        "gi_std" => gi_param_dict["gi_stds"], "log_I0_prior" => priors["log_I0_prior"]) |>
                         dict_list
 
     return inference_configs
