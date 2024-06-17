@@ -75,7 +75,7 @@ function infer(config::InferenceConfig)
     y_t = ismissing(config.case_data) ? missing : config.case_data[idxs]
     inference_results = apply_method(epi_prob,
         config.epimethod,
-        (y_t = y_t,)
+        (y_t = y_t,);
     )
     return Dict("inference_results" => inference_results, "epiprob" => epi_prob)
 end
