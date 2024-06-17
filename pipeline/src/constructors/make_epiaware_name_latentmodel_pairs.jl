@@ -10,7 +10,7 @@ A dictionary containing the name-model pairs.
 
 """
 function make_epiaware_name_latentmodel_pairs(pipeline::AbstractEpiAwarePipeline)
-    prior_dict = make_latent_model_priors(pipeline)
+    prior_dict = make_model_priors(pipeline)
 
     ar = AR(damp_priors = [prior_dict["damp_param_prior"]],
         std_prior = prior_dict["std_prior"],
