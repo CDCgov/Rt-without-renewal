@@ -5,7 +5,7 @@ using Test
     quickactivate(@__DIR__(), "EpiAwarePipeline")
 
     using EpiAwarePipeline, EpiAware, Plots, Statistics
-    pipeline = RtwithoutRenewalPipeline()
+    pipeline = EpiAwareExamplePipeline()
     prior = RtwithoutRenewalPriorPipeline()
 
     # Set up data generation on a random scenario
@@ -48,7 +48,11 @@ using Test
     end
     forecast_qs = mapreduce(hcat, [0.025, 0.25, 0.5, 0.75, 0.975]) do q
         map(eachrow(forecast_y_t)) do row
-            quantile(row, q)
+            if any(ismissing, row)
+                return missing
+            else
+                quantile(row, q)
+            end
         end
     end
     plot!(plt, forecast_qs, label = "forecast quantiles",
