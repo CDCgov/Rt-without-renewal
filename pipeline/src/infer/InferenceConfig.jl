@@ -1,64 +1,55 @@
 """
-The `InferenceConfig` struct represents the configuration parameters for the
-    inference process from case data.
+Inference configuration struct for specifying the parameters and models used in the inference process.
 
-## Constructors
-- `InferenceConfig(igp, latent_model; gi_mean, gi_std, case_data, tspan,
-    epimethod, delay_distribution = Gamma(4, 5 / 4), log_I0_prior = Normal(log(100.0), 1e-5),
-    cluster_factor_prior = HalfNormal(0.1), transformation = exp)`: Create a new
-        `InferenceConfig` object with the specified parameters.
+# Fields
+- `gi_mean::T`: Assumed generation interval distribution mean.
+- `gi_std::T`: Assumed generation interval distribution standard deviation.
+- `igp::I`: Infection-generating model type.
+- `latent_model::L`: Latent model type.
+- `observation_model::O`: Observation model type.
+- `case_data::Union{Vector{Union{Integer, Missing}}, Missing}`: Case data.
+- `tspan::Tuple{Integer, Integer}`: Time range to fit on.
+- `epimethod::E`: Inference method.
+- `transformation::F`: Transformation function.
+- `log_I0_prior::Distribution`: Prior for log initial infections. Default is `Normal(log(100.0), 1e-5)`.
+
+# Constructors
+- `InferenceConfig(igp, latent_model, observation_model; gi_mean, gi_std, case_data, tspan, epimethod, transformation = exp)`: Constructs an `InferenceConfig` object with the specified parameters.
+- `InferenceConfig(inference_config::Dict; case_data, tspan, epimethod)`: Constructs an `InferenceConfig` object from a dictionary of configuration values.
 
 """
-struct InferenceConfig{T, F, I, L, E}
-    "Assumed generation interval distribution mean."
+struct InferenceConfig{T, F, I, L, O, E}
     gi_mean::T
-    "Assumed generation interval distribution std."
     gi_std::T
-    "Infection-generating model type."
     igp::I
-    "Latent model type."
     latent_model::L
-    "Case data"
+    observation_model::O
     case_data::Union{Vector{Union{Integer, Missing}}, Missing}
-    "Time to fit on"
     tspan::Tuple{Integer, Integer}
-    "Inference method."
     epimethod::E
-    "Maximum next generation interval when discretized."
-    D_gen::T
-    "Transformation function"
     transformation::F
-    "Delay distribution: Default is Gamma(4, 5/4)."
-    delay_distribution::Distribution
-    "Maximum delay when discretized. Default is 15 days."
-    D_obs::T
-    "Prior for log initial infections. Default is Normal(4.6, 1e-5)."
     log_I0_prior::Distribution
-    "Prior for negative binomial cluster factor. Default is HalfNormal(0.1)."
-    cluster_factor_prior::Distribution
 
-    function InferenceConfig(igp, latent_model; gi_mean, gi_std, case_data, tspan,
-            epimethod, delay_distribution = Gamma(4, 5 / 4),
-            log_I0_prior = Normal(log(100.0), 1e-5),
-            cluster_factor_prior = HalfNormal(0.1),
-            transformation = exp)
-        D_gen = gi_mean + 4 * gi_std
-        D_obs = mean(delay_distribution) + 4 * std(delay_distribution)
-
+    function InferenceConfig(igp, latent_model, observation_model; gi_mean, gi_std,
+            case_data, tspan, epimethod, transformation = exp, log_I0_prior)
         new{typeof(gi_mean), typeof(transformation),
-            typeof(igp), typeof(latent_model), typeof(epimethod)}(
-            gi_mean, gi_std, igp, latent_model, case_data, tspan, epimethod,
-            D_gen, transformation, delay_distribution, D_obs, log_I0_prior, cluster_factor_prior)
+            typeof(igp), typeof(latent_model), typeof(observation_model), typeof(epimethod)}(
+            gi_mean, gi_std, igp, latent_model, observation_model,
+            case_data, tspan, epimethod, transformation, log_I0_prior)
     end
 
-    function InferenceConfig(inference_config::Dict; case_data, tspan, epimethod)
+    function InferenceConfig(
+            inference_config::Dict; case_data, tspan, epimethod)
         InferenceConfig(
-            inference_config["igp"], inference_config["latent_namemodels"].second;
+            inference_config["igp"],
+            inference_config["latent_namemodels"].second,
+            inference_config["observation_model"];
             gi_mean = inference_config["gi_mean"],
             gi_std = inference_config["gi_std"],
             case_data = case_data,
             tspan = tspan,
-            epimethod = epimethod
+            epimethod = epimethod,
+            log_I0_prior = inference_config["log_I0_prior"]
         )
     end
 end

@@ -13,14 +13,16 @@ standard deviation 0.25.
 - `"damp_param_prior"`: A beta distribution with shape parameters 0.5 and 0.5.
 
 """
-function make_latent_model_priors(pipeline::AbstractEpiAwarePipeline)
+function make_model_priors(pipeline::AbstractEpiAwarePipeline)
     transformed_process_init_prior = Normal(0.0, 0.25)
     std_prior = HalfNormal(0.25)
     damp_param_prior = Beta(0.5, 0.5)
+    log_I0_prior = Normal(log(100.0), 1e-5)
 
     return Dict(
         "transformed_process_init_prior" => transformed_process_init_prior,
         "std_prior" => std_prior,
-        "damp_param_prior" => damp_param_prior
+        "damp_param_prior" => damp_param_prior,
+        "log_I0_prior" => log_I0_prior
     )
 end
