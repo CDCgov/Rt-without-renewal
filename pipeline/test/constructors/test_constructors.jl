@@ -31,11 +31,11 @@ end
     @test tspan isa Tuple{Integer, Integer}
 end
 
-@testset "make_latent_model_priors: generates a dict with correct keys and distributions" begin
+@testset "make_model_priors: generates a dict with correct keys and distributions" begin
     using EpiAwarePipeline, Distributions
     pipeline = EpiAwareExamplePipeline()
 
-    priors_dict = make_latent_model_priors(pipeline)
+    priors_dict = make_model_priors(pipeline)
 
     # Check if the priors dictionary is constructed correctly
     @test haskey(priors_dict, "transformed_process_init_prior")
@@ -46,11 +46,11 @@ end
     @test valtype(priors_dict) <: Distribution
 end
 
-@testset "make_epiaware_name_model_pairs: generates a vector of Pairs with correct keys and latent models" begin
+@testset "make_epiaware_name_latentmodel_pairs: generates a vector of Pairs with correct keys and latent models" begin
     using EpiAwarePipeline, EpiAware
     pipeline = EpiAwareExamplePipeline()
 
-    namemodel_vect = make_epiaware_name_model_pairs(pipeline)
+    namemodel_vect = make_epiaware_name_latentmodel_pairs(pipeline)
 
     @test first.(namemodel_vect) == ["wkly_ar", "wkly_rw", "wkly_diff_ar"]
     @test all([model isa BroadcastLatentModel for model in last.(namemodel_vect)])
@@ -108,18 +108,46 @@ end
 
 @testset "make_default_params" begin
     using EpiAwarePipeline
-    # Mock pipeline object
-    struct MockPipeline <: AbstractEpiAwarePipeline end
-    pipeline = MockPipeline()
+    pipeline = RtwithoutRenewalPipeline()
 
     # Expected default parameters
     expected_params = Dict(
         "Rt" => make_Rt(pipeline),
         "logit_daily_ascertainment" => [zeros(5); -0.5 * ones(2)],
         "cluster_factor" => 0.05,
-        "I0" => 100.0
+        "I0" => 100.0,
+        "α_delay" => 4.0,
+        "θ_delay" => 5.0 / 4.0
     )
 
     # Test the make_default_params function
     @test make_default_params(pipeline) == expected_params
+end
+
+@testset "make_delay_distribution" begin
+    pipeline = RtwithoutRenewalPipeline()
+    delay_distribution = make_delay_distribution(pipeline)
+    @test delay_distribution isa Distribution
+    @test delay_distribution isa Gamma
+    @test delay_distribution.α == 4.0
+    @test delay_distribution.θ == 5.0 / 4.0
+end
+
+@testset "make_observation_model" begin
+    using EpiAware
+    # Mock pipeline object
+    pipeline = RtwithoutRenewalPipeline()
+    default_params = make_default_params(pipeline)
+    obs = make_observation_model(pipeline)
+
+    # Test case 1: Check if the returned object is of type LatentDelay
+    @testset "Returned object type" begin
+        @test obs isa LatentDelay
+    end
+
+    # Test case 2: Check if the default parameters are correctly passed to ascertainment_dayofweek
+    @testset "Default parameters" begin
+        @test obs.model.model.cluster_factor_prior ==
+              HalfNormal(default_params["cluster_factor"])
+    end
 end
