@@ -33,7 +33,8 @@ struct Ascertainment{
         if (latent_prefix != "")
             latent_model = PrefixLatentModel(latent_model, latent_prefix)
         end
-        return new{M, T, F, P}(model, latent_model, link, latent_prefix)
+        return new{M, AbstractTuringLatentModel, F, P}(
+            model, latent_model, link, latent_prefix)
     end
 
     function Ascertainment(model::M,

@@ -2,13 +2,17 @@
     using Distributions: Normal
     int = Intercept(Normal(0, 1))
     ar = AR()
+    prefix_int = PrefixLatentModel(int, "Combine.1")
+    prefix_ar = PrefixLatentModel(ar, "Combine.2")
     comb = CombineLatentModels([int, ar])
     @test typeof(comb) <: AbstractTuringLatentModel
-    @test comb.models == [int, ar]
+    @test comb.models == [prefix_int, prefix_ar]
     @test comb.prefixes == ["Combine.1", "Combine.2"]
 
     comb = CombineLatentModels([int, ar], ["Int", "AR"])
-    @test comb.models == [int, ar]
+    prefix_int = PrefixLatentModel(int, "Int")
+    prefix_ar = PrefixLatentModel(ar, "AR")
+    @test comb.models == [prefix_int, prefix_ar]
     @test comb.prefixes == ["Int", "AR"]
 end
 

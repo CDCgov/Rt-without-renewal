@@ -48,12 +48,10 @@ deaths_y_t
             N <: AbstractString
     }
         @assert length(models)==length(model_names) "The number of models and model names must be equal."
-        for i in eachindex(models)
-            if (model_names[i] != "")
-                models[i] = PrefixObservationModel(models[i], model_names[i])
-            end
-        end
-        new{typeof(models), typeof(model_names)}(models, model_names)
+        wrapped_models = [PrefixObservationModel(models[i], model_names[i])
+                          for i in eachindex(models)]
+        new{AbstractVector{<:AbstractTuringObservationModel}, typeof(model_names)}(
+            wrapped_models, model_names)
     end
 
     function StackObservationModels(models::NamedTuple{

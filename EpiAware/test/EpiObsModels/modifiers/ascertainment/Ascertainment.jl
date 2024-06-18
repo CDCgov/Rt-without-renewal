@@ -6,14 +6,14 @@
 
     asc = Ascertainment(NegativeBinomialError(), FixedIntercept(0.1); link = natural)
     @test asc.model == NegativeBinomialError()
-    @test asc.latent_model == FixedIntercept(0.1)
+    @test asc.latent_model == PrefixLatentModel(FixedIntercept(0.1), "Ascertainment")
     @test asc.link == natural
     @test asc.latent_prefix == "Ascertainment"
 
     asc_prefix = Ascertainment(NegativeBinomialError(), FixedIntercept(0.1);
         link = natural, latent_prefix = "A")
     @test asc_prefix.model == NegativeBinomialError()
-    @test asc_prefix.latent_model == FixedIntercept(0.1)
+    @test asc_prefix.latent_model == PrefixLatentModel(FixedIntercept(0.1), "A")
     @test asc_prefix.link == natural
     @test asc_prefix.latent_prefix == "A"
 end
