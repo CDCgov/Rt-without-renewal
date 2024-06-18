@@ -16,3 +16,22 @@ function do_truthdata(pipeline::AbstractEpiAwarePipeline)
     end
     return truthdata_from_configs
 end
+
+"""
+Generate truth data for the EpiAwarePipeline. This is example mode.
+
+# Arguments
+- `pipeline::EpiAwareExamplePipeline`: The EpiAwarePipeline object.
+
+# Returns
+An array of truth data generated from the given pipeline.
+
+"""
+function do_truthdata(pipeline::EpiAwareExamplePipeline)
+    truth_data_configs = [rand(make_truth_data_configs(pipeline))]
+    truthdata_from_configs = map(truth_data_configs) do truth_data_config
+        return Dagger.@spawn cache=true generate_truthdata(
+            truth_data_config, pipeline; plot = true)
+    end
+    return truthdata_from_configs
+end
