@@ -1,5 +1,5 @@
 """
-Create a dictionary of truth data configurations for `pipeline <: AbstractEpiAwarePipeline`.
+Create a vector of truth data configurations for `pipeline <: AbstractEpiAwarePipeline`.
     This is the default method.
 
 # Returns
@@ -12,4 +12,15 @@ function make_truth_data_configs(pipeline::AbstractEpiAwarePipeline)
     return Dict(
         "gi_mean" => gi_param_dict["gi_means"], "gi_std" => gi_param_dict["gi_stds"]) |>
            dict_list
+end
+
+"""
+Create a vector of truth data configurations for `pipeline <: AbstractEpiAwarePipeline`.
+This is the example method, which only returns a randomly selected truth data configuration.
+"""
+function make_truth_data_configs(pipeline::EpiAwareExamplePipeline)
+    gi_param_dict = make_gi_params(pipeline)
+    return Dict(
+        "gi_mean" => gi_param_dict["gi_means"], "gi_std" => gi_param_dict["gi_stds"]) |>
+           dict_list |> list -> [rand(list)]
 end
