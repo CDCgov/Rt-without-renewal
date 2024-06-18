@@ -5,7 +5,7 @@ module EpiObsModels
 
 using ..EpiAwareBase
 
-using ..EpiAwareUtils: censored_pmf, HalfNormal
+using ..EpiAwareUtils: censored_pmf, HalfNormal, prefix_submodel
 
 using ..EpiLatentModels: HierarchicalNormal, broadcast_dayofweek
 
