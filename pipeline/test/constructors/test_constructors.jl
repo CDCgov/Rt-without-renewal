@@ -117,12 +117,12 @@ end
 
     @testset "make_inference_configs should contain igp, latent_namemodels, observation_model, gi_mean, gi_std, and log_I0_prior keys" begin
         inference_configs = make_inference_configs(pipeline)
-        @test inference_configs .|> (config -> haskey(config, "igp") )|> all
-        @test inference_configs .|> (config -> haskey(config, "latent_namemodels") )|> all
-        @test inference_configs .|> (config -> haskey(config, "observation_model") )|> all
-        @test inference_configs .|> (config -> haskey(config, "gi_mean") )|> all
-        @test inference_configs .|> (config -> haskey(config, "gi_std") )|> all
-        @test inference_configs .|> (config -> haskey(config, "log_I0_prior") )|> all
+        @test inference_configs .|> (config -> haskey(config, "igp")) |> all
+        @test inference_configs .|> (config -> haskey(config, "latent_namemodels")) |> all
+        @test inference_configs .|> (config -> haskey(config, "observation_model")) |> all
+        @test inference_configs .|> (config -> haskey(config, "gi_mean")) |> all
+        @test inference_configs .|> (config -> haskey(config, "gi_std")) |> all
+        @test inference_configs .|> (config -> haskey(config, "log_I0_prior")) |> all
     end
 
     @testset "make_inference_configs should return a vector of length 1 for EpiAwareExamplePipeline" begin

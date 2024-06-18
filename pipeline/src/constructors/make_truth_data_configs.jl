@@ -21,6 +21,6 @@ This is the example method, which only returns a randomly selected truth data co
 function make_truth_data_configs(pipeline::EpiAwareExamplePipeline)
     gi_param_dict = make_gi_params(pipeline)
     return Dict(
-        "gi_mean" => gi_param_dict["gi_means"], "gi_std" => gi_param_dict["gi_stds"]) |>
+               "gi_mean" => gi_param_dict["gi_means"], "gi_std" => gi_param_dict["gi_stds"]) |>
            dict_list |> list -> [rand(list)]
 end
