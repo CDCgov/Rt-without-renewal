@@ -31,7 +31,7 @@ struct Ascertainment{
             M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel,
             F <: Function, P <: String}
         if (latent_prefix != "")
-            latent_model = PrefixLatentModel(model, latent_prefix)
+            latent_model = PrefixLatentModel(latent_model, latent_prefix)
         end
         return new{M, T, F, P}(model, latent_model, link, latent_prefix)
     end
