@@ -7,7 +7,7 @@ using ..EpiAwareBase
 
 using ..EpiAwareUtils: censored_pmf, HalfNormal, prefix_submodel
 
-using ..EpiLatentModels: HierarchicalNormal, broadcast_dayofweek
+using ..EpiLatentModels: HierarchicalNormal, broadcast_dayofweek, PrefixLatentModel
 
 using Turing, Distributions, DocStringExtensions, SparseArrays
 

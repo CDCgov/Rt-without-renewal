@@ -44,6 +44,11 @@ struct ConcatLatentModels{
         @assert typeof(check_dim)<:AbstractVector{Int} "Output of dimension_adaptor must be a vector of integers"
         @assert length(check_dim)==no_models "The vector of dimensions must have the same length as the number of models"
         @assert length(prefixes)==no_models "The number of models and prefixes must be equal"
+        for i in eachindex(models)
+            if (prefixes[i] != "")
+                models[i] = PrefixLatentModel(models[i], prefixes[i])
+            end
+        end
         return new{
             AbstractVector{<:AbstractTuringLatentModel}, Int, Function,
             AbstractVector{<:String}}(
@@ -108,22 +113,21 @@ Generate latent variables by concatenating multiple latent models.
     @assert sum(dims)==n "Sum of dimensions must be equal to the dimension of the latent variables"
 
     @submodel final_latent, latent_aux = _concat_latents(
-        latent_models.models, 1, [], [], dims, latent_models.no_models, latent_models.prefixes)
+        latent_models.models, 1, [], [], dims, latent_models.no_models)
 
     return final_latent, (; latent_aux...)
 end
 
 @model function _concat_latents(
         models, index::Int, acc_latent, acc_aux,
-        dims::AbstractVector{<:Int}, n_models::Int, prefixes)
+        dims::AbstractVector{<:Int}, n_models::Int)
     if index > n_models
         return acc_latent, (; acc_aux...)
     else
-        @submodel prefix=prefixes[index] latent, new_aux=generate_latent(
-            models[index], dims[index])
+        @submodel latent, new_aux = generate_latent(models[index], dims[index])
         @submodel updated_latent, updated_aux = _concat_latents(
             models, index + 1, vcat(acc_latent, latent),
-            (; acc_aux..., new_aux...), dims, n_models, prefixes)
+            (; acc_aux..., new_aux...), dims, n_models)
         return updated_latent, (; updated_aux...)
     end
 end

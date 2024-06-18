@@ -1,5 +1,5 @@
 @doc raw"
-The `Ascertainment` struct represents an observation model that incorporates a ascertainment model.
+The `Ascertainment` struct represents an observation model that incorporates a ascertainment model. If a `latent_prefix`is supplied the `latent_model` is wrapped in a call to `PrefixLatentModel`.
 
 # Constructors
 - `Ascertainment(model::M, latent_model::T, link::F, latent_prefix::P) where {M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel, F <: Function, P <: String}`: Constructs an `Ascertainment` instance with the specified observation model, latent model, link function, and latent prefix.
@@ -30,6 +30,9 @@ struct Ascertainment{
             latent_prefix::P) where {
             M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel,
             F <: Function, P <: String}
+        if (latent_prefix != "")
+            latent_model = PrefixLatentModel(model, prefix)
+        end
         return new{M, T, F, P}(model, latent_model, link, latent_prefix)
     end
 
@@ -66,7 +69,7 @@ Generates observations based on the `LatentDelay` observation model.
 - `obs_aux`: Additional observation-related variables.
 "
 @model function EpiAwareBase.generate_observations(obs_model::Ascertainment, y_t, Y_t)
-    @submodel prefix=obs_model.latent_prefix expected_obs_mod, expected_aux=generate_latent(
+    @submodel expected_obs_mod, expected_aux = generate_latent(
         obs_model.latent_model, length(Y_t))
 
     expected_obs = Y_t .* obs_model.link(expected_obs_mod)
