@@ -20,7 +20,8 @@ end
     inference_results_tsk = make_inference()
     inference_results = fetch.(inference_results_tsk)
     @test length(inference_results) == 1
-    @test all([result["inference_results"] isa EpiAwareObservables for result in inference_results])
+    @test all([result["inference_results"] isa EpiAwareObservables
+               for result in inference_results])
 end
 
 @testset "do_pipeline test: just run" begin
