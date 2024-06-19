@@ -4,9 +4,10 @@ on:
   pull_request:
   merge_group:
 
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   Benchmark:
     runs-on: ubuntu-latest
