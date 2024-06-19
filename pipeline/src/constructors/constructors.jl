@@ -1,3 +1,4 @@
+include("selector.jl")
 include("make_gi_params.jl")
 include("make_inf_generating_processes.jl")
 include("make_model_priors.jl")

@@ -20,5 +20,6 @@ function make_inference_configs(pipeline::AbstractEpiAwarePipeline)
         "gi_std" => gi_param_dict["gi_stds"], "log_I0_prior" => priors["log_I0_prior"]) |>
                         dict_list
 
-    return inference_configs
+    selected_inference_configs = _selector(inference_configs, pipeline)
+    return selected_inference_configs
 end
