@@ -20,7 +20,13 @@ jobs:
       - uses: julia-actions/setup-julia@v1
       - uses: julia-actions/cache@v1
       - name: Instal dependencies
-        run: julia --project=benchmark -e 'using Pkg; Pkg.instantiate()'
+        run: |
+            julia --project=benchmark -e '
+            using Pkg;
+            Pkg.develop("../Rt-without-renewal");
+            Pkg.develop("./EpiAware");
+            Pkg.develop("./pipeline");
+            Pkg.instantiate()'
       - name: Run benchmarks
         run: julia --project=benchmark -e 'using BenchmarkCI; BenchmarkCI.judge(; baseline = "origin/main")'
       - name: Post results
