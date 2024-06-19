@@ -23,8 +23,8 @@ jobs:
         run: |
             julia --project=benchmark -e '
             using Pkg;
-            Pkg.develop(path = "./EpiAware");
-            Pkg.develop(path = "./pipeline");
+            Pkg.develop("./EpiAware");
+            Pkg.develop("./EpiAwarePipeline");
             Pkg.develop(path = "../Rt-without-renewal");
             Pkg.instantiate()'
       - name: Run benchmarks
