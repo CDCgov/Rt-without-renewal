@@ -19,11 +19,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v1
       - uses: julia-actions/cache@v1
-      - name: Build EpiAware
-        run: julia --project=EpiAware -e 'using Pkg; Pkg.build()'
-      - name: Build EpiAwarePipeline
-        run: julia --project=EpiAwarePipeline -e 'using Pkg; Pkg.build()'
-      - uses: julia-actions/julia-buildpkg@v1
       - name: Run benchmarks
         run: julia --project=benchmark -e 'using BenchmarkCI; BenchmarkCI.judge(; baseline = "origin/main")'
       - name: Post results
