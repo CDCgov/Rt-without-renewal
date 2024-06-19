@@ -20,6 +20,8 @@ jobs:
       - uses: julia-actions/setup-julia@v1
       - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
+      - name: Setup benchmark environment
+        run: julia --project=benchmark -e 'using Pkg; Pkg.instantiate()'
       - name: Run benchmarks
         run: julia --project=benchmark -e 'using BenchmarkCI; BenchmarkCI.judge()'
       - name: Post results
