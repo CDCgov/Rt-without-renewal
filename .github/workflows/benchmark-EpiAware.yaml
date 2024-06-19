@@ -1,0 +1,28 @@
+name: Run EpiAware benchmarks
+
+on:
+  pull_request:
+  merge_group:
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+jobs:
+  Benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: EpiAware
+          sparse-checkout-cone-mode: false
+      - name: Move EpiAware to root
+        run: mv EpiAware/* .
+      - uses: julia-actions/setup-julia@v1
+      - uses: julia-actions/cache@v1
+      - uses: julia-actions/julia-buildpkg@v1
+      - name: Run benchmarks
+        run: julia --project=benchmark -e 'using BenchmarkCI; BenchmarkCI.judge()'
+      - name: Post results
+        run: julia --project=benchmark -e 'using BenchmarkCI; BenchmarkCI.postjudge()'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
