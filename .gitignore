@@ -385,3 +385,7 @@ docs/site/
 
 #Ignore generated Pluto notebooks
 EpiAware/docs/src/examples/*.md
+
+# benchmark ignore
+/.benchmarkci
+/benchmark/*.json

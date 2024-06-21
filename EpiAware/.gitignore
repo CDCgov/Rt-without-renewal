@@ -42,3 +42,7 @@ docs/build
 *.zip
 
 .DS_Store
+
+# benchmark ignore
+/.benchmarkci
+/benchmark/*.json

@@ -1,0 +1,36 @@
+name: Run benchmarks
+
+on:
+  pull_request:
+    paths:
+      - 'EpiAware/**'
+  merge_group:
+    paths:
+      - 'EpiAware/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  Benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v1
+      - uses: julia-actions/cache@v1
+      - name: Install dependencies
+        run: |
+          julia --project=benchmark -e 'using Pkg;
+          Pkg.rm("EpiAware");
+          Pkg.rm("EpiAwarePipeline");
+          Pkg.resolve();
+          Pkg.instantiate();
+          Pkg.develop(path = "./EpiAware");
+          Pkg.develop(path = "./pipeline")'
+      - name: Run benchmarks
+        run: julia --project=benchmark -e 'using BenchmarkCI; BenchmarkCI.judge(; baseline = "origin/main")'
+      - name: Post results
+        run: julia --project=benchmark -e 'using BenchmarkCI; BenchmarkCI.postjudge()'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
