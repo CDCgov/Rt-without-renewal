@@ -7,6 +7,8 @@
 
 A `Julia` package for flexible and composable modeling and inference of the effective reproduction number (Rt) and other situational awareness signals in the presence of different latent generative processes and observation models.
 
+Test
+
 ## Installation instruction
 
 Eventually, `EpiAware` is likely to be added to the Julia registry. Until then, you can install it from the `/EpiAware` sub-directory of this repository by running the following command in the Julia REPL:
