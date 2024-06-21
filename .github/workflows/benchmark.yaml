@@ -22,11 +22,11 @@ jobs:
       - name: Install dependencies
         run: |
           julia --project=benchmark -e 'using Pkg;
-          Pkg.remove("EpiAware");
-          Pkg.remove("EpiAwarePipeline");
+          Pkg.rm("EpiAware");
+          Pkg.rm("EpiAwarePipeline");
+          Pkg.instantiate();
           Pkg.develop("./EpiAware");
-          Pkg.develop("./pipeline");
-          Pkg.instantiate()'
+          Pkg.develop("./pipeline")'
       - name: Run benchmarks
         run: julia --project=benchmark -e 'using BenchmarkCI; BenchmarkCI.judge(; baseline = "origin/main")'
       - name: Post results
