@@ -24,6 +24,7 @@ jobs:
           julia --project=benchmark -e 'using Pkg;
           Pkg.rm("EpiAware");
           Pkg.rm("EpiAwarePipeline");
+          Pkg.resolve();
           Pkg.instantiate();
           Pkg.develop("./EpiAware");
           Pkg.develop("./pipeline")'
