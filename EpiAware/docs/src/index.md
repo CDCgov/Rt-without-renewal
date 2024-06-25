@@ -18,7 +18,7 @@ See the [Index](@ref main-index) for the complete list of documented functions a
 
 ```@contents
 Pages = [
-    "man/contributing.md",
+    "man/getting-started-julia.md",
 ]
 Depth = 1
 ```
