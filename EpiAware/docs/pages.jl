@@ -1,7 +1,7 @@
 pages = [
     "EpiAware.jl: Real-time epidemic monitoring" => "index.md",
     "Manual" => Any[
-        "Getting started with Julia" => "man/getting-started-julia.md",
+        "Getting Started with using Julia in Projects" => "man/getting-started-julia.md",
         "Examples" => [
             "Getting started" => "examples/getting_started.md"
         ]
