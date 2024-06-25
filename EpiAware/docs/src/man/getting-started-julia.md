@@ -16,8 +16,13 @@ If you are familar with other languages with tooling for technical computing (e.
 **Table of Contents**
 - [Julia Installation with Juliaup](#julia-installation-with-juliaup)
 - [Basic usage of Juliaup](#basic-usage-of-juliaup)
-  - [Add a specfic version of Julia](#add-a-specfic-version-of-julia)
-- [Introduction to Julia environments](#introduction-to-julia-environments)
+- [Basic usage for Julia environments](#basic-usage-for-julia-environments)
+- [Using the Julia REPL in projects](#using-the-julia-repl-in-projects)
+- [Recommended packages for the primary Julia environment](#recommended-packages-for-the-primary-julia-environment)
+- [Developing a Julia project from VS-Code](#developing-a-julia-project-from-vs-code)
+- [Literate programming with Julia](#literate-programming-with-julia)
+
+
 
 ## Julia Installation with Juliaup
 
