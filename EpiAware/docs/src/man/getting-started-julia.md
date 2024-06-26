@@ -1,15 +1,6 @@
 # Getting Started with using Julia in Projects
 
-Julia is a programming language aimed at technical computing. This guide will help you set up Julia on your system according to our recommended best practices. This isn't a guide to learning the Julia programming language, but rather a guide to setting up your system to use Julia effectively in project workflows.
-
-If you want to learn more about the Julia programming language, we recommend the following resources:
-
-- [Julia Documentation - getting started](https://docs.julialang.org/en/v1/manual/getting-started/).
-- [Julia Academy](https://juliaacademy.com/).
-- [Julia learning resources](https://julialang.org/learning/).
-- [JuliaHub](https://juliahub.com/).
-- [Julia Discourse](https://discourse.julialang.org/).
-- [Julia Slack](https://julialang.slack.com/).
+Julia is a programming language aimed at technical computing. This guide is aimed at helping you set up Julia on your system according to our recommended best practices. 
 
 If you are familar with other languages with tooling for technical computing (e.g. `R`, `MATLAB`, `Python`) these [noteworthy differences](https://docs.julialang.org/en/v1/manual/noteworthy-differences/) may be useful.
 
@@ -22,7 +13,17 @@ If you are familar with other languages with tooling for technical computing (e.
 - [Developing a Julia project from VS-Code](#developing-a-julia-project-from-vs-code)
 - [Literate programming with Julia](#literate-programming-with-julia)
 
+## What this guide is and isn't
+This isn't a guide to learning the Julia programming language. Instead we providing an opinionated guide to setting up your system to use Julia effectively in project workflows aimed at people with familiarity with Julia but have maybe only developed projects in other languages (e.g. `R`, `MATLAB`, `Python`).
 
+If you want to learn more about the Julia programming language, we recommend the following resources:
+
+- [Julia Documentation - getting started](https://docs.julialang.org/en/v1/manual/getting-started/).
+- [Julia Academy](https://juliaacademy.com/).
+- [Julia learning resources](https://julialang.org/learning/).
+- [JuliaHub](https://juliahub.com/).
+- [Julia Discourse](https://discourse.julialang.org/).
+- [Julia Slack](https://julialang.slack.com/).
 
 ## Julia Installation with Juliaup
 
@@ -73,9 +74,9 @@ The [_environment_](https://docs.julialang.org/en/v1/manual/code-loading/#Enviro
 
 The most common usage of environments is to create a new [_explicit_ environment](https://docs.julialang.org/en/v1/manual/code-loading/#Environments) for a project in a directory. This creates a `Project.toml` file in the directory that specifies the dependencies for the project and a `Manifest.toml` file that specifies the exact versions of the dependencies, and their underlying dependencies. We'll discuss how to set up a new environment for a project in the [REPL section](#using-the-julia-repl).
 
-Julia environments can be [stacked](https://docs.julialang.org/en/v1/manual/code-loading/#Environment-stacks). This means that you can have a _primary_ environment that is used by default, and then _secondary_ environments that are used when you activate them. This is useful when you want common packages to be available to all projects, but also want to isolate projects from each other.
+Julia environments can be [stacked](https://docs.julialang.org/en/v1/manual/code-loading/#Environment-stacks). This means that you can have a _primary_ environment embedded in the stacked environment, along with _secondary_ environment(s) that define common packages to be available to many projects.
 
-Most commonly the environment for a Julia installation is the primary environment, and you can add packages to this environment that you want to be available to all projects as we'll show in the [REPL section](#using-the-julia-repl).
+From a project development point of view, most commonly the project environment will be the primary environment, isolated from other project environments. And the environment of the Julia version installation (e.g. the `@v1.10` env) will be a secondary environment because its in the default `LOAD_PATH` [Julia environmental variable](https://docs.julialang.org/en/v1/manual/environment-variables/#Environment-Variables). You can add packages to the Julia version environment that you want to be available to all projects as we'll show in the [REPL section](#using-the-julia-repl). See section [Recommended packages for the primary Julia environment](#recommended-packages-for-the-primary-julia-environment) for our recommendations.
 
 ## Using the Julia REPL in projects
 
@@ -92,7 +93,9 @@ using Pkg
 Pkg.add("OrdinaryDiffEq")
 ```
 
-However, you can also use the package manager interactively from the REPL. For example, to install the `OrdinaryDiffEq` package from the REPL you can switch to package mode by typing `]` and then type `add OrdinaryDiffEq`. To exit package mode, type `backspace`.
+However, you can also use the package manager interactively from the REPL. In our opinion, this is the more common usage of package management in Julia project development.
+
+For example, to install the `OrdinaryDiffEq` package from the REPL you can switch to package mode by typing `]` and then type `add OrdinaryDiffEq`. To exit package mode, type `backspace`.
 
 ```julia-repl
 julia> ]
