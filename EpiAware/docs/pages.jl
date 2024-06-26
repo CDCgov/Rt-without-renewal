@@ -1,7 +1,7 @@
 pages = [
     "EpiAware.jl: Real-time epidemic monitoring" => "index.md",
     "Manual" => Any[
-        "Guide" => "man/guide.md",
+        "Getting Started with using Julia in Projects" => "man/getting-started-julia.md",
         "Examples" => [
             "Getting started" => "examples/getting_started.md"
         ]
@@ -10,7 +10,7 @@ pages = [
         "Public API" => "lib/public.md"
     ],
     "Developers" => [
-        "Contributing" => "contributing.md",
+        "Contributing" => "man/contributing.md",
         "Release checklist" => "checklist.md",
         "Internals" => "lib/internals.md"
     ],
