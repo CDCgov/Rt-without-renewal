@@ -1,6 +1,6 @@
 # Getting Started with using Julia in Projects
 
-Julia is a programming language aimed at technical computing. This guide is aimed at helping you set up Julia on your system according to our recommended best practices. 
+Julia is a programming language aimed at technical computing. This guide is aimed at helping you set up Julia on your system according to our recommended best practices.
 
 If you are familar with other languages with tooling for technical computing (e.g. `R`, `MATLAB`, `Python`) these [noteworthy differences](https://docs.julialang.org/en/v1/manual/noteworthy-differences/) may be useful.
 
