@@ -14,10 +14,12 @@ function make_inference_configs(pipeline::AbstractEpiAwarePipeline)
     igps = make_inf_generating_processes(pipeline)
     obs = make_observation_model(pipeline)
     priors = make_model_priors(pipeline)
+    default_params = make_default_params(pipeline)
 
     inference_configs = Dict("igp" => igps, "latent_namemodels" => namemodel_vect,
         "observation_model" => obs, "gi_mean" => gi_param_dict["gi_means"],
-        "gi_std" => gi_param_dict["gi_stds"], "log_I0_prior" => priors["log_I0_prior"]) |>
+        "gi_std" => gi_param_dict["gi_stds"], "log_I0_prior" => priors["log_I0_prior"],
+        "lookahead" => default_params["lookahead"]) |>
                         dict_list
 
     selected_inference_configs = _selector(inference_configs, pipeline)
