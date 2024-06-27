@@ -18,6 +18,7 @@
     epimethod = TestMethod()
     case_data = [10, 20, 30, 40, 50]
     tspan = (1, 5)
+    lookahead = 10
     @testset "config_parameters back from constructor" begin
         config = InferenceConfig(igp, latent_model, observation_model;
             gi_mean = gi_mean,
@@ -25,7 +26,8 @@
             case_data = case_data,
             tspan = tspan,
             epimethod = epimethod,
-            log_I0_prior = Normal(log(100.0), 1e-5)
+            log_I0_prior = Normal(log(100.0), 1e-5),
+            lookahead = lookahead
         )
 
         @test config.gi_mean == gi_mean

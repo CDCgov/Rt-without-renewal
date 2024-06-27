@@ -9,12 +9,12 @@
 end
 
 @testset "do_inference tests" begin
-    using EpiAwarePipeline
+    using EpiAwarePipeline, Dagger
     pipeline = EpiAwareExamplePipeline()
 
     function make_inference()
         truthdata = do_truthdata(pipeline)
-        do_inference(truthdata[1:1], pipeline)
+        do_inference(truthdata[1], pipeline)
     end
 
     inference_results_tsk = make_inference()

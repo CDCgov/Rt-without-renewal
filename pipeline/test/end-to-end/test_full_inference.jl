@@ -13,7 +13,8 @@ using Test
     inference_config = rand(inference_configs)
     truthdata = Dict("y_t" => fill(100, 28), "truth_gi_mean" => 1.5)
 
-    inference_results = generate_inference_results(
+    results = generate_inference_results(
         truthdata, inference_config, pipeline; tspan, inference_method)
-    @test inference_results["inference_results"] isa EpiAwareObservables
+    @test results["inference_results"] isa EpiAwareObservables
+    @test results["forecast_results"] isa EpiAwareObservables
 end
