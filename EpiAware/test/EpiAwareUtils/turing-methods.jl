@@ -75,7 +75,7 @@ end
 
     # Used again in obs model
 
-    obs_ascert = Ascertainment(PoissonError(), ar_process, x -> exp.(x))
+    obs_ascert = Ascertainment(PoissonError(), ar_process; link = x -> exp.(x))
 
     #Epi model
     gen_int = [0.2, 0.3, 0.5]
@@ -87,19 +87,21 @@ end
     direct_inf_model = DirectInfections(data, log_init_incidence_prior)
 
     #use generate_epiaware
-    mdl = generate_epiaware(missing, 10, direct_inf_model; latent_model = ar_process,
-        observation_model = obs_ascert)
+    mdl = generate_epiaware(
+        missing, 10, direct_inf_model;
+        latent_model = ar_process, observation_model = obs_ascert
+    )
 
     #Check that can sample from model and has appropriate keys/variables
     θ = rand(mdl)
     #Both latent and obs processes should be present
-    @test haskey(θ, Symbol("obs.ϵ_t"))
+    @test haskey(θ, Symbol("obs.Ascertainment.ϵ_t"))
     @test haskey(θ, Symbol("latent.ϵ_t"))
 
     #Check can sample from model prior
     chn = sample(mdl, Prior(), 1000; progress = false)
     @test Symbol("latent.ϵ_t[1]") ∈ keys(chn)
-    @test Symbol("obs.ϵ_t[1]") ∈ keys(chn)
+    @test Symbol("obs.Ascertainment.ϵ_t[1]") ∈ keys(chn)
     #Check that can generate quantities
     gens = generated_quantities(mdl, chn)
     @test gens isa Matrix

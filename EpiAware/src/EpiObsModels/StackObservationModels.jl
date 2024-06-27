@@ -1,7 +1,7 @@
 @doc raw"
 
 A stack of observation models that are looped over to generate observations for
-each model in the stack. Note that the model names are used to prefix the parameters in each model (so if I have a model named `cases` and a parameter `y_t`, the parameter in the model will be `cases.y_t`).
+each model in the stack. Note that the model names are used to prefix the parameters in each model (so if I have a model named `cases` and a parameter `y_t`, the parameter in the model will be `cases.y_t`). Inside the constructor `PrefixObservationModel` is wrapped around each observation model.
 
 ## Constructors
 
@@ -48,7 +48,10 @@ deaths_y_t
             N <: AbstractString
     }
         @assert length(models)==length(model_names) "The number of models and model names must be equal."
-        new{typeof(models), typeof(model_names)}(models, model_names)
+        wrapped_models = [PrefixObservationModel(models[i], model_names[i])
+                          for i in eachindex(models)]
+        new{AbstractVector{<:AbstractTuringObservationModel}, typeof(model_names)}(
+            wrapped_models, model_names)
     end
 
     function StackObservationModels(models::NamedTuple{
@@ -77,7 +80,7 @@ Generate observations from a stack of observation models. Assumes a 1 to 1 mappi
 
     obs = ()
     for (model, model_name) in zip(obs_model.models, obs_model.model_names)
-        @submodel prefix=eval(model_name) obs_tmp=generate_observations(
+        @submodel obs_tmp = generate_observations(
             model, y_t[Symbol(model_name)], Y_t[Symbol(model_name)])
         obs = obs..., obs_tmp...
     end

@@ -2,13 +2,17 @@
     obs = StackObservationModels(
         [PoissonError(), NegativeBinomialError()], ["Poisson", "NegativeBinomial"])
 
-    @test obs.models == [PoissonError(), NegativeBinomialError()]
+    prefix_p = PrefixObservationModel(PoissonError(), "Poisson")
+    prefix_n = PrefixObservationModel(NegativeBinomialError(), "NegativeBinomial")
+    @test obs.models == [prefix_p, prefix_n]
     @test obs.model_names == ["Poisson", "NegativeBinomial"]
 
     obs_named = StackObservationModels((
         Cases = PoissonError(), Deaths = NegativeBinomialError()))
 
-    @test obs_named.models == [PoissonError(), NegativeBinomialError()]
+    prefix_p = PrefixObservationModel(PoissonError(), "Cases")
+    prefix_n = PrefixObservationModel(NegativeBinomialError(), "Deaths")
+    @test obs_named.models == [prefix_p, prefix_n]
     @test obs_named.model_names == ["Cases", "Deaths"]
 end
 

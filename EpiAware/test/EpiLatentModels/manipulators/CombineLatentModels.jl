@@ -2,9 +2,18 @@
     using Distributions: Normal
     int = Intercept(Normal(0, 1))
     ar = AR()
+    prefix_int = PrefixLatentModel(int, "Combine.1")
+    prefix_ar = PrefixLatentModel(ar, "Combine.2")
     comb = CombineLatentModels([int, ar])
     @test typeof(comb) <: AbstractTuringLatentModel
-    @test comb.models == [int, ar]
+    @test comb.models == [prefix_int, prefix_ar]
+    @test comb.prefixes == ["Combine.1", "Combine.2"]
+
+    comb = CombineLatentModels([int, ar], ["Int", "AR"])
+    prefix_int = PrefixLatentModel(int, "Int")
+    prefix_ar = PrefixLatentModel(ar, "AR")
+    @test comb.models == [prefix_int, prefix_ar]
+    @test comb.prefixes == ["Int", "AR"]
 end
 
 @testitem "CombineLatentModels generate_latent method works as expected: FixedIntecept + custom" begin
@@ -43,7 +52,8 @@ end
     comb_model = generate_latent(comb, n)
 
     # Test constant if conditioning on zero residuals
-    no_residual_mdl = comb_model | (ϵ_t = zeros(n - 1), ar_init = [0.0])
+    no_residual_mdl = comb_model |
+                      (var"Combine.2.ϵ_t" = zeros(n - 1), var"Combine.2.ar_init" = [0.0])
     y_const, θ_const = no_residual_mdl()
 
     @test all(y_const .== fill(θ_const.intercept, n))
@@ -51,7 +61,9 @@ end
     # Check against linear regression by conditioning on normal residuals
     # Generate data
     fix_intercept = 0.5
-    normal_res_mdl = comb_model | (damp_AR = [0.0], σ_AR = 1.0, intercept = fix_intercept)
+    normal_res_mdl = comb_model |
+                     (var"Combine.2.damp_AR" = [0.0], var"Combine.2.σ_AR" = 1.0,
+        var"Combine.1.intercept" = fix_intercept)
     y, θ = normal_res_mdl()
 
     # Fit no-slope linear regression as a model test
@@ -61,7 +73,8 @@ end
     end
 
     ns_regression_mdl = no_slope_linear_regression(y) |
-                        (damp_AR = [0.0], σ_AR = 1.0, ϵ_t = zeros(n - 1), ar_init = [0.0])
+                        (var"Combine.2.damp_AR" = [0.0], var"Combine.2.σ_AR" = 1.0,
+        var"Combine.2.ϵ_t" = zeros(n - 1), var"Combine.2.ar_init" = [0.0])
     chain = sample(ns_regression_mdl, NUTS(), 5000, progress = false)
 
     # Theoretical posterior distribution for intercept
@@ -76,7 +89,7 @@ end
     post_var = var(int.intercept_prior) / (n * var(int.intercept_prior) + 1)
     post_dist = Normal(post_mean, sqrt(post_var))
 
-    samples = get(chain, :intercept).intercept |> vec
+    samples = get(chain, :var"Combine.1.intercept").var"Combine.1.intercept" |> vec
     ks_test_pval = ExactOneSampleKSTest(samples, post_dist) |> pvalue
     @test ks_test_pval > 1e-6
 end
