@@ -142,7 +142,8 @@ end
         "cluster_factor" => 0.05,
         "I0" => 100.0,
         "α_delay" => 4.0,
-        "θ_delay" => 5.0 / 4.0
+        "θ_delay" => 5.0 / 4.0,
+        "lookahead" => 21
     )
 
     # Test the make_default_params function

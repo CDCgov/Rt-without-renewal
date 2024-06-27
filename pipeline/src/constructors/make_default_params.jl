@@ -21,11 +21,13 @@ function make_default_params(pipeline::AbstractEpiAwarePipeline)
     I0 = 100.0
     α_delay = 4.0
     θ_delay = 5.0 / 4.0
+    lookahead = 21
     return Dict(
         "Rt" => Rt,
         "logit_daily_ascertainment" => logit_daily_ascertainment,
         "cluster_factor" => cluster_factor,
         "I0" => I0,
         "α_delay" => α_delay,
-        "θ_delay" => θ_delay)
+        "θ_delay" => θ_delay,
+        "lookahead" => lookahead)
 end
