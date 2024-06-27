@@ -18,7 +18,7 @@ Inference configuration struct for specifying the parameters and models used in 
 - `InferenceConfig(inference_config::Dict; case_data, tspan, epimethod)`: Constructs an `InferenceConfig` object from a dictionary of configuration values.
 
 """
-struct InferenceConfig{T, F, I, L, O, E}
+struct InferenceConfig{T, F, I, L, O, E, D <: Distribution, X <: Integer}
     gi_mean::T
     gi_std::T
     igp::I
@@ -28,14 +28,16 @@ struct InferenceConfig{T, F, I, L, O, E}
     tspan::Tuple{Integer, Integer}
     epimethod::E
     transformation::F
-    log_I0_prior::Distribution
+    log_I0_prior::D
+    lookahead::X
 
     function InferenceConfig(igp, latent_model, observation_model; gi_mean, gi_std,
-            case_data, tspan, epimethod, transformation = exp, log_I0_prior)
+            case_data, tspan, epimethod, transformation = exp, log_I0_prior, lookahead)
         new{typeof(gi_mean), typeof(transformation),
-            typeof(igp), typeof(latent_model), typeof(observation_model), typeof(epimethod)}(
+            typeof(igp), typeof(latent_model), typeof(observation_model),
+            typeof(epimethod), typeof(log_I0_prior), typeof(lookahead)}(
             gi_mean, gi_std, igp, latent_model, observation_model,
-            case_data, tspan, epimethod, transformation, log_I0_prior)
+            case_data, tspan, epimethod, transformation, log_I0_prior, lookahead)
     end
 
     function InferenceConfig(
@@ -49,7 +51,8 @@ struct InferenceConfig{T, F, I, L, O, E}
             case_data = case_data,
             tspan = tspan,
             epimethod = epimethod,
-            log_I0_prior = inference_config["log_I0_prior"]
+            log_I0_prior = inference_config["log_I0_prior"],
+            lookahead = inference_config["lookahead"]
         )
     end
 end
@@ -68,14 +71,19 @@ to make inference on and model configuration.
 """
 function infer(config::InferenceConfig)
     #Define the EpiProblem
-    epi_prob = define_epiprob(config)
+    epiprob = define_epiprob(config)
     idxs = config.tspan[1]:config.tspan[2]
 
     #Return the sampled infections and observations
     y_t = ismissing(config.case_data) ? missing : config.case_data[idxs]
-    inference_results = apply_method(epi_prob,
+    inference_results = apply_method(epiprob,
         config.epimethod,
         (y_t = y_t,);
     )
-    return Dict("inference_results" => inference_results, "epiprob" => epi_prob)
+
+    forecast_results = generate_forecasts(
+        inference_results.samples, inference_results.data, epiprob, config.lookahead)
+
+    return Dict("inference_results" => inference_results, "epiprob" => epiprob,
+        "inference_config" => config, "forecast_results" => forecast_results)
 end
