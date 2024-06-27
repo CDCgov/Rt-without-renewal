@@ -385,7 +385,7 @@ num_threads = min(10, Threads.nthreads())
 # ╔═╡ 88b43e23-1e06-4716-b284-76e8afc6171b
 inference_method = EpiMethod(
     pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 100)],
-    sampler = NUTSampler(adtype = AutoReverseDiff(true),
+    sampler = NUTSampler(adtype = AutoReverseDiff(),
         ndraws = 2000,
         nchains = num_threads,
         mcmc_parallel = MCMCThreads())
