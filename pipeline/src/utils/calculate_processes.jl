@@ -61,7 +61,7 @@ A named tuple containing the calculated values for `log_I_t`, `rt`, and `Rt`.
 function calculate_processes(I_t, I0, pmf)
     log_I_t = _calc_log_infections(I_t)
     rt = _calc_rt(I_t, I0)
-    init_rt = sum(rt[1:min(7, length(rt))]) / min(7, length(rt))
+    init_rt = rt[1]
     Rt = _calc_Rt(I_t, I0, init_rt, pmf)
     return (; log_I_t, rt, Rt)
 end
