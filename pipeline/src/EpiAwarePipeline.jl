@@ -12,11 +12,14 @@ module EpiAwarePipeline
 
 using CSV, Dagger, DataFramesMeta, Dates, Distributions, DocStringExtensions, DrWatson,
       EpiAware, Plots, Statistics, ADTypes, AbstractMCMC, Plots, JLD2, MCMCChains, Turing,
-      DynamicPPL, LogExpFunctions, RCall
+      DynamicPPL, LogExpFunctions, RCall, LinearAlgebra
 
 # Exported pipeline types
 export AbstractEpiAwarePipeline, EpiAwarePipeline, RtwithoutRenewalPipeline,
        RtwithoutRenewalPriorPipeline, EpiAwareExamplePipeline
+
+# Exported utility functions
+export calculate_processes
 
 # Exported configuration types
 export TruthSimulationConfig, InferenceConfig
@@ -47,6 +50,7 @@ export plot_truth_data, plot_Rt
 
 include("docstrings.jl")
 include("pipeline/pipeline.jl")
+include("utils/utils.jl")
 include("constructors/constructors.jl")
 include("simulate/simulate.jl")
 include("infer/infer.jl")
