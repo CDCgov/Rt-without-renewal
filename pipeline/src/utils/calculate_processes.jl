@@ -18,9 +18,23 @@ function _calc_rt(I_t, I0)
 end
 
 """
+Internal function for seeding the infections. Method dispatches on the pipeline
+type to determine the seeding method. This is the default seeding method which
+assumes backward exponential growth with initial infections `I0` from initial
+estimate of `rt`.
+
+"""
+function _infection_seeding(I_t, I0, data::EpiData, pipeline::AbstractEpiAwarePipeline)
+    n = length(data.gen_int)
+    init_rt = _calc_rt(I_t[1:2], I0) |> x -> x[1]
+    [I0 * exp(-init_rt * (n - i)) for i in 1:n]
+end
+
+"""
 Internal function for calculating the _instantaneous_ reproduction number `Rt`
 using the method of [Fraser (2007)](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0000758).
-Left truncation in `I_t` is handled by extending the series with backwards exponential
+Left truncation handling method is determined by the pipeline type. The default
+left truncation in `I_t` is handled by extending the series with backwards exponential
 growth from the initial infections `I0` and the exponential growth rate `init_rt`.
 
 # Arguments
@@ -28,14 +42,13 @@ growth from the initial infections `I0` and the exponential growth rate `init_rt
 - `I0`: Initial infections at time zero.
 - `init_rt`: Initial exponential growth rate.
 - `data::EpiData`: An instance of the `EpiData` type containing generation interval data.
+- `pipeline::AbstractEpiAwarePipeline`: An instance of the `AbstractEpiAwarePipeline` type.
 """
-function _calc_Rt(I_t, I0, init_rt, data::EpiData)
+function _calc_Rt(I_t, I0, data::EpiData, pipeline::AbstractEpiAwarePipeline)
     @assert all(I_t .> 0) "Log infections must be positive definite."
     @assert I0>0 "Initial infections must be positive definite."
-    n = length(data.gen_int)
-    rev_pmf = reverse(data.gen_int)
-    aug_I_t = [I0 * exp(-init_rt * (n - i)) for i in 1:n] |>
-              v -> vcat(v, I_t)
+
+    aug_I_t = vcat(_infection_seeding(I_t, I0, data, pipeline), I_t)
 
     Rt = expected_Rt(data, aug_I_t)
 
@@ -58,10 +71,9 @@ from the first 7 time steps of `rt`.
 A named tuple containing the calculated values for `log_I_t`, `rt`, and `Rt`.
 
 """
-function calculate_processes(I_t, I0, pmf)
+function calculate_processes(I_t, I0, data::EpiData, pipeline::AbstractEpiAwarePipeline)
     log_I_t = _calc_log_infections(I_t)
     rt = _calc_rt(I_t, I0)
-    init_rt = rt[1]
-    Rt = _calc_Rt(I_t, I0, init_rt, pmf)
+    Rt = _calc_Rt(I_t, I0, data, pipeline)
     return (; log_I_t, rt, Rt)
 end

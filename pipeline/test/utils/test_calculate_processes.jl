@@ -8,10 +8,11 @@ using Test
     rt = randn(rng, 20)
     I_t = cumsum(rt) .+ log(I0) .|> exp
     pmf = [1.0]
+    pipeline = EpiAwareExamplePipeline()
 
     data = EpiData(pmf, exp)
 
-    result = calculate_processes(I_t, I0, data)
+    result = calculate_processes(I_t, I0, data, pipeline)
 
     # Check if the log of infections is calculated correctly
     @testset "Log of infections" begin
