@@ -9,7 +9,7 @@ If you are familar with other languages with tooling for technical computing (e.
 - [Basic usage of Juliaup](#basic-usage-of-juliaup)
 - [Basic usage for Julia environments](#basic-usage-for-julia-environments)
 - [Using the Julia REPL in projects](#using-the-julia-repl-in-projects)
-- [Recommended packages for the primary Julia environment](#recommended-packages-for-the-primary-julia-environment)
+- [Recommended packages for the "global" Julia version environment](#recommended-packages-for-the-global-julia-version-environment)
 - [Developing a Julia project from VS-Code](#developing-a-julia-project-from-vs-code)
 - [Literate programming with Julia](#literate-programming-with-julia)
 
@@ -134,9 +134,9 @@ julia> ]
 
 This will create a temporary environment, stacked with the primary environment, that is not saved to disk, and you can add packages to this environment without affecting the primary environment or any project environments. When you exit the REPL, the temporary environment will be deleted.
 
-## Recommended packages for the primary Julia environment
+## Recommended packages for the "global" Julia version environment
 
-In our view these packages are useful for the primary environment, and therefore available to other environments.
+In our view these packages are useful for your Julia version environment, e.g. `v1.10` env, which will be available to other environments.
 
 - `Revise`: For modifying package code and using the changes without restarting Julia session.
 - `Term`: For pretty and stylized REPL output (including error messages).
