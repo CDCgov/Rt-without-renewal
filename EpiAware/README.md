@@ -90,15 +90,8 @@ H-.->I
 
 We use [`Pluto.jl`](https://plutojl.org/) scripts as part of our documentation and testing. The scripts are located in `docs/src/examples` and can be run using the `Pluto.jl` package. We recommend using the version of `Pluto` that is pinned in the `Project.toml` file defining the documentation environment. An entry point to running or developing this documentation is the `docs/pluto-scripts.sh` bash shell script. Run this from the root directory of this repository.
 
-## Useful Julia packages for global environment (optional and opinionated)
-In our view these packages are useful for a global environment available to other environments (e.g. add to the `@v1.10` environment), but are not required for the `EpiAware` package to work.
-
-- `Revise`: For modifying package code and using the changes without restarting Julia session.
-- `Term`: For pretty and stylized REPL output (including error messages).
-- `JuliaFormatter`: For code formatting.
-- `Documenter`: For local documentation generation (useful for testing).
-- `Pluto`: For interactive development and testing.
-- `TestEnv`: For test development.
+## Opinionated guide to using Julia for project development
+Some user and potential contributors may not be familiar with using Julia for, or part of, project development. In documentation we give our opinions on how to use Julia for project development focussing on Julia version control with the command line tool `juliaup`, typical patterns for using stacked environments and useful settings for development using the Julia extension of VS-Code as an interactive development environment (IDE) for Julia project. Please find the documentation [here](https://cdcgov.github.io/Rt-without-renewal/dev/man/getting-started-julia/).
 
 ### `startup.jl` recommendation
 
