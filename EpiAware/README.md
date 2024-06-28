@@ -90,36 +90,5 @@ H-.->I
 
 We use [`Pluto.jl`](https://plutojl.org/) scripts as part of our documentation and testing. The scripts are located in `docs/src/examples` and can be run using the `Pluto.jl` package. We recommend using the version of `Pluto` that is pinned in the `Project.toml` file defining the documentation environment. An entry point to running or developing this documentation is the `docs/pluto-scripts.sh` bash shell script. Run this from the root directory of this repository.
 
-## Useful Julia packages for global environment (optional and opinionated)
-In our view these packages are useful for a global environment available to other environments (e.g. add to the `@v1.10` environment), but are not required for the `EpiAware` package to work.
-
-- `Revise`: For modifying package code and using the changes without restarting Julia session.
-- `Term`: For pretty and stylized REPL output (including error messages).
-- `JuliaFormatter`: For code formatting.
-- `Documenter`: For local documentation generation (useful for testing).
-- `Pluto`: For interactive development and testing.
-- `TestEnv`: For test development.
-
-### `startup.jl` recommendation
-
-We recommend adding a `startup.jl` file to import `Revise` and `Term` at the start of any Julia session. This file should be located in the `~/.julia/config` directory. Here is an example of a `startup.jl` file that loads the `Revise` and `Term`:
-
-```julia
-atreplinit() do repl
-    # Load Revise if it is installed
-    try
-        @eval using Revise
-    catch e
-        @warn "error while importing Revise" e
-    end
-    # Load Term if it is installed
-    try
-        @eval using Term
-        @eval install_term_repr()
-        @eval install_term_stacktrace()
-    catch e
-        @warn "error while importing Term" e
-    end
-end
-
-```
+## Opinionated guide to using Julia for project development
+Some user and potential contributors may not be familiar with using Julia for, or part of, project development. In documentation we give our opinions on how to use Julia for project development focussing on Julia version control with the command line tool `juliaup`, typical patterns for using stacked environments and useful settings for development using the Julia extension of VS-Code as an interactive development environment (IDE) for Julia project. Please find the documentation [here](https://cdcgov.github.io/Rt-without-renewal/dev/man/getting-started-julia/).
