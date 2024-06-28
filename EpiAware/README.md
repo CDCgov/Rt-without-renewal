@@ -92,27 +92,3 @@ We use [`Pluto.jl`](https://plutojl.org/) scripts as part of our documentation a
 
 ## Opinionated guide to using Julia for project development
 Some user and potential contributors may not be familiar with using Julia for, or part of, project development. In documentation we give our opinions on how to use Julia for project development focussing on Julia version control with the command line tool `juliaup`, typical patterns for using stacked environments and useful settings for development using the Julia extension of VS-Code as an interactive development environment (IDE) for Julia project. Please find the documentation [here](https://cdcgov.github.io/Rt-without-renewal/dev/man/getting-started-julia/).
-
-### `startup.jl` recommendation
-
-We recommend adding a `startup.jl` file to import `Revise` and `Term` at the start of any Julia session. This file should be located in the `~/.julia/config` directory. Here is an example of a `startup.jl` file that loads the `Revise` and `Term`:
-
-```julia
-atreplinit() do repl
-    # Load Revise if it is installed
-    try
-        @eval using Revise
-    catch e
-        @warn "error while importing Revise" e
-    end
-    # Load Term if it is installed
-    try
-        @eval using Term
-        @eval install_term_repr()
-        @eval install_term_stacktrace()
-    catch e
-        @warn "error while importing Term" e
-    end
-end
-
-```
