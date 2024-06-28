@@ -27,20 +27,17 @@ growth from the initial infections `I0` and the exponential growth rate `init_rt
 - `I_t`: Incident infections.
 - `I0`: Initial infections at time zero.
 - `init_rt`: Initial exponential growth rate.
-- `pmf`: Probability mass function of the generation interval distribution.
+- `data::EpiData`: An instance of the `EpiData` type containing generation interval data.
 """
-function _calc_Rt(I_t, I0, init_rt, pmf)
+function _calc_Rt(I_t, I0, init_rt, data::EpiData)
     @assert all(I_t .> 0) "Log infections must be positive definite."
     @assert I0>0 "Initial infections must be positive definite."
-    n = length(pmf)
-    rev_pmf = reverse(pmf)
+    n = length(data.gen_int)
+    rev_pmf = reverse(data.gen_int)
     aug_I_t = [I0 * exp(-init_rt * (n - i)) for i in 1:n] |>
               v -> vcat(v, I_t)
 
-    Rt = map((n + 1):length(aug_I_t)) do i
-        past_inf = @view aug_I_t[(i - n):(i - 1)]
-        aug_I_t[i] / dot(rev_pmf, past_inf)
-    end
+    Rt = expected_Rt(data, aug_I_t)
 
     return Rt
 end
