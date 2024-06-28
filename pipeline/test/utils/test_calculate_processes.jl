@@ -1,14 +1,17 @@
 using Test
 
 @testset "calculate_processes" begin
-    using EpiAwarePipeline
+    using EpiAware, EpiAwarePipeline
     using Random
     rng = MersenneTwister(1234)
     I0 = 10.0
     rt = randn(rng, 20)
     I_t = cumsum(rt) .+ log(I0) .|> exp
     pmf = [1.0]
-    result = calculate_processes(I_t, I0, pmf)
+
+    data = EpiData(pmf, exp)
+
+    result = calculate_processes(I_t, I0, data)
 
     # Check if the log of infections is calculated correctly
     @testset "Log of infections" begin
