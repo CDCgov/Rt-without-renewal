@@ -146,6 +146,31 @@ In our view these packages are useful for the primary environment, and therefore
 - `TestEnv`: For easy use of test environments for package testing.
 - `UnicodePlots`: For simple and quick plotting in the REPL without needing to install a fully featured plotting package.
 
+
+### `startup.jl` recommendation
+
+`Revise` and `Term` useful to have available in every Julia session. It is convenient to have these packages loaded automatically when you start a Julia session by adding a `startup.jl` file. This file should be located in the `~/.julia/config` directory. Here is an example of a `startup.jl` file that loads the `Revise` and `Term`:
+
+```julia
+atreplinit() do repl
+    # Load Revise if it is installed
+    try
+        @eval using Revise
+    catch e
+        @warn "error while importing Revise" e
+    end
+    # Load Term if it is installed
+    try
+        @eval using Term
+        @eval install_term_repr()
+        @eval install_term_stacktrace()
+    catch e
+        @warn "error while importing Term" e
+    end
+end
+
+```
+
 ## Developing a Julia project from VS-Code
 
 ### Julia extension for VS-Code
