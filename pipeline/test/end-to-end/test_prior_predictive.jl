@@ -15,5 +15,6 @@ using Test
 
     inference_results = generate_inference_results(
         truthdata, inference_config, pipeline; tspan, inference_method)
+
     @test inference_results["inference_results"] isa EpiAwareObservables
 end
