@@ -1,4 +1,4 @@
-# internal Documentation
+# Internal Documentation
 
 Documentation for `EpiAware.jl`'s internal interface.
 
