@@ -32,8 +32,8 @@ pages = [
         ]
     ],
     "Developers" => [
-        "Contributing" => "man/contributing.md",
-        "Release checklist" => "checklist.md"
+        "Contributing" => "developer/contributing.md",
+        "Release checklist" => "developer/checklist.md"
     ],
     "release-notes.md"
 ]
