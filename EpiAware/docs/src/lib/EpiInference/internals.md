@@ -18,6 +18,6 @@ Pages = ["internals.md"]
 ## Internal API
 
 ```@autodocs
-Modules = [EpiInference]
+Modules = [EpiAware.EpiInference]
 Public = false
 ```
