@@ -1,7 +1,7 @@
 
 """Run all Pluto notebooks (".jl" files) in `tutorials_dir` and write outputs to HTML files."""
-function build(target_subdir; _module = EpiAware)
-    target_dir = joinpath("docs", "src", target_subdir)
+function build(target_subdir)
+    target_dir = joinpath(@__DIR__, "docs", "src", target_subdir)
 
     @info "Building notebooks in $target_dir"
     # Evaluate notebooks in the same process to avoid having to recompile from scratch each time.
