@@ -7,8 +7,8 @@ using InteractiveUtils
 # ╔═╡ 34a06b3b-799b-48c5-bd08-1e57151f51ec
 # hideall
 let
-    docs_dir = joinpath(pkgdir(EpiAware), "docs")
-    pkg_dir = pkgdir(EpiAware)
+    docs_dir = dirname(dirname(dirname(dirname(@__DIR__))))
+    pkg_dir = dirname(docs_dir)
 
     using Pkg: Pkg
     Pkg.activate(docs_dir)
