@@ -1,4 +1,4 @@
-# Getting Started with using Julia for EpiAware
+# Julia for EpiAware
 
 Julia is a programming language aimed at technical computing. This guide is aimed at helping you set up Julia on your system and pointing towards resources for learning more.
 

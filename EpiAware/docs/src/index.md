@@ -2,35 +2,11 @@
 
 *Infectious disease situational awareness modelling toolkit for Julia.*
 
-A package for building and fitting situational awareness models for infectious diseases. The package is designed to be flexible and extensible, and to provide a consistent interface for fitting and simulating models.
+## Where to start
 
-## Package Features
-
-- **Flexible**: The package is designed to be flexible and extensible, and to provide a consistent interface for fitting and simulating models.
-- **Modular**: The package is designed to be modular, with a clear separation between the model and the data.
-- **Extensible**: The package is designed to be extensible, with a clear separation between the model and the data.
-- **Consistent**: The package is designed to provide a consistent interface for fitting and simulating models.
-- **Efficient**: The package is designed to be efficient, with a clear separation between the model and the data.
-
-See the [Index](@ref main-index) for the complete list of documented functions and types.
-
-## Manual Outline
-
-```@contents
-Pages = [
-    "man/getting-started-julia.md",
-]
-Depth = 1
-```
-
-## Library Outline
-
-```@contents
-Pages = ["lib/public.md", "lib/internals.md"]
-```
-
-### [Index](@id main-index)
-
-```@index
-Pages = ["lib/public.md"]
-```
+- Want to get started running code? Check out the [Getting Started Tutorials](@ref getting-started).
+- What is `EpiAware`? Check out our [Overview](@ref overview).
+- Want to see some end-to-end examples? Check out our [`EpiAware` showcase](@ref showcase).
+- Want to chat with someone about `EpiAware`? Post on our [GitHub Discussions](https://github.com/CDCgov/Rt-without-renewal/discussions).
+- Want to contribute to `EpiAware`? Check out our [Contributing Guide](@ref contributing).
+- Want to see our code? Check out our [GitHub Repository](https://github.com/CDCgov/Rt-without-renewal/tree/main/EpiAware).
