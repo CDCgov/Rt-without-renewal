@@ -3,7 +3,7 @@
 function build(target_subdir; _module = EpiAware)
     target_dir = joinpath(pkgdir(_module), "docs", "src", target_subdir)
 
-    @info "Building notebooks in $target_subdir"
+    @info "Building notebooks in $target_dir"
     # Evaluate notebooks in the same process to avoid having to recompile from scratch each time.
     # This is similar to how Documenter and Franklin evaluate code.
     # Note that things like method overrides and other global changes may leak between notebooks!
