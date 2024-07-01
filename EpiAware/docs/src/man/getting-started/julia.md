@@ -1,19 +1,17 @@
-# Getting Started with using Julia in Projects
+# Getting Started with using Julia for EpiAware
 
-Julia is a programming language aimed at technical computing. This guide is aimed at helping you set up Julia on your system according to our recommended best practices.
+Julia is a programming language aimed at technical computing. This guide is aimed at helping you set up Julia on your system and pointing towards resources for learning more.
 
-If you are familar with other languages with tooling for technical computing (e.g. `R`, `MATLAB`, `Python`) these [noteworthy differences](https://docs.julialang.org/en/v1/manual/noteworthy-differences/) may be useful.
+> [!NOTE]
+> If you are familar with other languages with tooling for technical computing (e.g. `R`, `MATLAB`, `Python`) these [noteworthy differences](https://docs.julialang.org/en/v1/manual/noteworthy-differences/) may be useful.
 
-**Table of Contents**
-- [Julia Installation with Juliaup](#julia-installation-with-juliaup)
-- [Basic usage of Juliaup](#basic-usage-of-juliaup)
-- [Basic usage for Julia environments](#basic-usage-for-julia-environments)
-- [Using the Julia REPL in projects](#using-the-julia-repl-in-projects)
-- [Recommended packages for the "global" Julia version environment](#recommended-packages-for-the-global-julia-version-environment)
-- [Developing a Julia project from VS-Code](#developing-a-julia-project-from-vs-code)
-- [Literate programming with Julia](#literate-programming-with-julia)
+```@contents
+Pages = ["man/getting-started/julia.md"]
+Depth = 3
+```
 
 ## What this guide is and isn't
+
 This isn't a guide to learning the Julia programming language. Instead we providing an opinionated guide to setting up your system to use Julia effectively in project workflows aimed at people with familiarity with Julia but have maybe only developed projects in other languages (e.g. `R`, `MATLAB`, `Python`).
 
 If you want to learn more about the Julia programming language, we recommend the following resources:
@@ -30,12 +28,11 @@ If you want to learn more about the Julia programming language, we recommend the
 1. **Download Juliaup**: This is a cross-platform installer/updater for the Julia programming language. It simplifies the process of installing and managing Julia versions. Go to the [Juliaup GitHub repository](https://github.com/JuliaLang/juliaup) or to the [official Julia website](https://julialang.org/downloads/) for installation instructions.
 2. **Verify Installation**: Open a terminal (or Command Prompt on Windows) and type `julia` to start the Julia REPL (Read-Eval-Print Loop). You should see a Julia prompt `julia>`.
 
-
 ## Basic usage of Juliaup
 
 Juliaup is a tool for managing Julia installations on your system. It allows you to install, update, and switch between different versions of Julia. Details are available at the [Juliaup GitHub repository](https://github.com/JuliaLang/juliaup), but here are some examples of common commands:
 
-### Add a specfic version of Julia
+### Add a specific version of Julia
 
 Juliaup default installs the latest release version of Julia. To install a specific version, use the `add` command followed by the version number. For example, to install Julia version 1.9.3, use the following command:
 
@@ -62,13 +59,14 @@ To see a list of all the versions of Julia installed on your system, use the fol
 ```
 
 ### Update Julia (all versions installed)
+
 This will update all versions of Julia installed on your system to their latest release versions.
 
 ```bash
 % juliaup update
 ```
 
-##  Basic usage for Julia environments
+## Usage of Julia environments
 
 The [_environment_](https://docs.julialang.org/en/v1/manual/code-loading/#Environments-1) of a Julia project determines which packages, and their version, are available to the project. This is useful when you want to ensure that a project uses a specific version of a package, or when you want to isolate the project from other projects on your system. As per other languages, Julia environments are useful for managing dependencies and ensuring reproducibility.
 
@@ -146,7 +144,6 @@ In our view these packages are useful for your Julia version environment, e.g. `
 - `TestEnv`: For easy use of test environments for package testing.
 - `UnicodePlots`: For simple and quick plotting in the REPL without needing to install a fully featured plotting package.
 
-
 ### `startup.jl` recommendation
 
 `Revise` and `Term` useful to have available in every Julia session. It is convenient to have these packages loaded automatically when you start a Julia session by adding a `startup.jl` file. This file should be located in the `~/.julia/config` directory. Here is an example of a `startup.jl` file that loads the `Revise` and `Term`:
@@ -171,12 +168,14 @@ end
 
 ```
 
-## Developing a Julia project from VS-Code
+## Developing a EpiAware-project from VS-Code
 
 ### Julia extension for VS-Code
+
 Visual Studio Code (VS-Code) is a popular code editor that supports Julia development. The [Julia extension for VS-Code](https://www.julia-vscode.org/) provides an interactive development environment that will be familiar to users of other scientific IDEs (e.g. developing `R` projects in RStudio or using the `MATLAB` application).
 
 ### Features of the Julia extension for VS-Code
+
 It is worth reading both the [VS-Code documentation](https://code.visualstudio.com/docs/languages/julia) and the [Julia extension documentation](https://www.julia-vscode.org/docs/stable/), however, here are some highlights:
 
 - **Julia REPL**: The Julia extension provides an integrated REPL in the `TERMINAL` pane that allows you to interact with Julia code directly from the editor. For example, you can run code snippets from highlighting or code blocks defined by `##` comments in the scripts.
@@ -216,12 +215,11 @@ These settings set basic code formatting and whitespace settings for Julia files
 
 The `VS-Code` command `Julia: Start REPL` will start a REPL in `TERMINAL` tab in the editor with the environment set to the project directory and the `Testing` tab will detect the defined tests for the project.
 
+## Literate programming with Julia in EpiAware
 
-## Literate programming with Julia
-
-Its common to develop technical computing projects using a literate programming style, where code and documentation are interwoven. Julia supports this style of programming through a number of packages:
+Its common to develop technical computing projects using a literate programming style, where code and documentation are interwoven. Julia supports this style of programming through a number of packages. In `EpiAware` we recommend the following:
 
 - `Pluto`: A native Julia notebook for interactive development. `Pluto` notebooks are reactive, meaning that the output of all cells are updated as input changes. Installation instructions are available [here](https://github.com/fonsp/Pluto.jl). Pluto notebook files have the extension `.jl` and can be run as scripts.
-- `IJulia`: A Julia kernel for Jupyter notebooks. Installation instructions are available [here](https://github.com/JuliaLang/IJulia.jl). A useful package for integrating `.ipynb` into a workflow is [`NBInclude.jl`](https://github.com/JuliaInterop/NBInclude.jl) which allows you to include the variables/output of a `.ipynb` notebook into a Julia script.
-- `Quarto`: [A multi-language scientific publishing system](https://quarto.org/). Quarto interfaces with Julia via `IJulia` kernel for jupyter. Julia code blocks are executed and the output is included with the markdown output in document generation. Installation instructions are available [here](https://quarto.org/docs/get-started/index.html).
-- `Weave`: A package for literate programming in Julia. `Weave` allows you to write a `.jmd` file that contains both markdown and Julia code. The Julia code is executed and the output is included in the markdown output. In our view, `Weave` is superceded by Quarto usage.
+- `Quarto`: A literate programming tool that allows you to write documents in markdown with embedded Julia code. Installation instructions are available [here](https://quarto.org/). Quarto files have the extension `.qmd`.
+
+We use `Pluto` for interactive development and `Quarto` for generating reports and academic articles. Both tools are useful for developing reproducible workflows.
