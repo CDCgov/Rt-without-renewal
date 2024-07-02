@@ -15,8 +15,9 @@ using CSV, Dagger, DataFramesMeta, Dates, Distributions, DocStringExtensions, Dr
       DynamicPPL, LogExpFunctions, RCall, LinearAlgebra
 
 # Exported pipeline types
-export AbstractEpiAwarePipeline, EpiAwarePipeline, RtwithoutRenewalPipeline,
-       RtwithoutRenewalPriorPipeline, EpiAwareExamplePipeline
+export AbstractEpiAwarePipeline, EpiAwarePipeline, AbstractRtwithoutRenewalPipeline,
+       RtwithoutRenewalPriorPipeline, EpiAwareExamplePipeline, SmoothOutbreakPipeline,
+       MeasuresOutbreakPipeline
 
 # Exported utility functions
 export calculate_processes

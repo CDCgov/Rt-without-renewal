@@ -3,9 +3,13 @@
     @testset "AbstractEpiAwarePipeline" begin
         @test_throws MethodError AbstractEpiAwarePipeline()
     end
-    @testset "RtwithoutRenewalPipeline" begin
-        @test isa(RtwithoutRenewalPipeline(), RtwithoutRenewalPipeline)
-        @test RtwithoutRenewalPipeline <: AbstractEpiAwarePipeline
+    @testset "AbstractEpiAwarePipeline" begin
+        @test_throws MethodError AbstractRtwithoutRenewalPipeline()
+    end
+
+    @testset "RtwithoutRenewalPipeline subtypes" begin
+        @test SmoothOutbreakPipeline() isa AbstractRtwithoutRenewalPipeline
+        @test MeasuresOutbreakPipeline() isa AbstractRtwithoutRenewalPipeline
     end
     @testset "RtwithoutRenewalPriorPipeline" begin
         @test isa(RtwithoutRenewalPriorPipeline(), RtwithoutRenewalPriorPipeline)
