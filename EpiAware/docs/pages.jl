@@ -15,7 +15,7 @@ pages = [
     ],
     "Showcase" => [
         "Replication" => [
-        "On the derivation of the renewal equation from an age-dependent branching process: an epidemic modelling perspective" => "showcase/replication/mishra-2020/index.md"
+        "On the derivation of the renewal equation from an age-dependent branching process: an epidemic modelling perspective" => "showcase/replications/mishra-2020/index.md"
     ]
     ],
     "What is EpiAware?" => ["overview.md"],
