@@ -20,6 +20,6 @@ Pages = ["public.md"]
 ## Public API
 
 ```@autodocs
-Modules = [EpiAware.EpiAwareBase]
+Modules = [EpiAware.EpiAwareUtils]
 Private = false
 ```
