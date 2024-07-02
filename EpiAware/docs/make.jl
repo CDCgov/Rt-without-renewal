@@ -1,5 +1,11 @@
 using Documenter
 using EpiAware
+using EpiAware.EpiAwareBase
+using EpiAware.EpiAwareUtils
+using EpiAware.EpiInference
+using EpiAware.EpiInfModels
+using EpiAware.EpiLatentModels
+using EpiAware.EpiObsModels
 using Pluto: Configuration.CompilerOptions
 using PlutoStaticHTML
 
@@ -15,7 +21,9 @@ makedocs(; sitename = "EpiAware.jl",
     authors = "Samuel Brand, Zachary Susswein, Sam Abbott, and contributors",
     clean = true, doctest = true, linkcheck = true,
     warnonly = [:docs_block, :missing_docs, :linkcheck, :autodocs_block],
-    modules = [EpiAware],
+    modules = [
+        EpiAware, EpiAware.EpiAwareBase, EpiAware.EpiAwareUtils, EpiAware.EpiInference,
+        EpiAware.EpiInfModels, EpiAware.EpiLatentModels, EpiAware.EpiObsModels],
     pages = pages,
     format = Documenter.HTML(
         prettyurls = get(ENV, "CI", nothing) == "true",
