@@ -17,10 +17,12 @@ end
 
 @testset "make_Rt: returns an array" begin
     using EpiAwarePipeline
-    pipeline = EpiAwareExamplePipeline()
 
-    Rt = make_Rt(pipeline)
-    @test Rt isa Array
+    map([EpiAwareExamplePipeline(), SmoothOutbreakPipeline(),
+        MeasuresOutbreakPipeline(), SmoothEndemicPipeline()]) do pipeline
+        Rt = make_Rt(pipeline)
+        @test Rt isa Array
+    end
 end
 
 @testset "default_tspan: returns an Tuple{Integer, Integer}" begin

@@ -8,8 +8,15 @@
     end
 
     @testset "RtwithoutRenewalPipeline subtypes" begin
-        @test SmoothOutbreakPipeline() isa AbstractRtwithoutRenewalPipeline
-        @test MeasuresOutbreakPipeline() isa AbstractRtwithoutRenewalPipeline
+        concrete_scenario_pipes = [
+            SmoothOutbreakPipeline(),
+            MeasuresOutbreakPipeline(),
+            SmoothEndemicPipeline(),
+            RoughEndemicPipeline()
+        ]
+        map(concrete_scenario_pipes) do pipeline
+            @test pipeline isa AbstractRtwithoutRenewalPipeline
+        end
     end
     @testset "RtwithoutRenewalPriorPipeline" begin
         @test isa(RtwithoutRenewalPriorPipeline(), RtwithoutRenewalPriorPipeline)

@@ -46,3 +46,17 @@ The pipeline type for the Rt pipeline for an outbreak scenario where Rt has
 """
 struct MeasuresOutbreakPipeline <: AbstractRtwithoutRenewalPipeline
 end
+
+"""
+The pipeline type for the Rt pipeline for an endemic scenario where Rt changes in
+    a smooth sinusoidal manner over time.
+"""
+struct SmoothEndemicPipeline <: AbstractRtwithoutRenewalPipeline
+end
+
+"""
+The pipeline type for the Rt pipeline for an endemic scenario where Rt changes in
+    a weekly-varying discontinuous manner over time.
+"""
+struct RoughEndemicPipeline <: AbstractRtwithoutRenewalPipeline
+end
