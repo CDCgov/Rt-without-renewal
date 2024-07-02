@@ -1,4 +1,4 @@
-[Overview of the EpiAware Software Ecosystem](@id overview)
+# [Overview of the EpiAware Software Ecosystem](@id overview)
 
 _`EpiAware`  is not a standard toolkit for infectious disease modelling._
 
