@@ -85,7 +85,7 @@ We test the following scenarios grouped by the **Outbreak**, **Endemic**, and **
 This is the list of scenarios where the initial number of infections is small but $R_t$ is initially significantly greater the 1 (e.g. $R_t > 1.5$).
 
 - _Susecptible depletion_. A smooth transition over time from $R_t > 1$ to $R_t < 0$. This represents a scenario where decrease in $R_t$ is due to greater population immunity, although it should be noted that we aren't modelling that effect mechanistically.
-- _Susecptible depletion with measures_. A sharp/discontinuous transition over time from $R_t > 1$ to $R_t < 0$, followed by a sharp transition back to $R_t > 1$ and then smooth transition to $R_t < 0$ again. This represents a scenario where initial decrease in $R_t$ is due to implementation of public health measures to reduce transmission. The sharp transition back to $R_t > 1$ is due to later relaxation of measures.
+- _Susecptible depletion with measures_. A sharp/discontinuous transition over time from $R_t > 1$ to $R_t < 1$, followed by a sharp transition back to $R_t > 1$ and then smooth transition to $R_t < 1$ again. This represents a scenario where initial decrease in $R_t$ is due to implementation of public health measures to reduce transmission. The sharp transition back to $R_t > 1$ is due to later relaxation of measures.
 - _Early outbreak_. Constant $R_t = R_0$ but for a short period.
 - _Early outbreak with random effects_. As _Early outbreak_ scenario but with white noise jitter on $R_t$.
 
@@ -94,7 +94,7 @@ This is the list of scenarios where the initial number of infections is small bu
 - _Regular variation_. A scenario with an endemic disease with sinusoidal variation in $R_t$ around 1 with some period length $P$: e.g. $R_t = 1 + \xi \sin(2 \pi (t - \phi) / P)$.
 - _Regular variation with random effects_. As _Regular variation_ scenario but with white noise jitter on $R_t$.
 
-**Miscellaneous scenario(s)**
+**Mixed scenario(s)**
 
 - _Piecewise constant with large switches_: This scenario provides both sharp changes at the start of the timeseries and more gradual transitions towards the end. $R_t$ varies according to the following schedule,
   - 1.1 for two weeks
