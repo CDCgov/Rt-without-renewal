@@ -99,6 +99,15 @@ end
 """
 Constructs the time-varying reproduction number (Rt) for a smoothly varying endemic scenario.
 
+In this context "endemic" means a scenario where the geometric average of the
+reproduction number is 1.0, that is the following holds:
+
+```math
+(\\prod_{t = 1}^n[R_t])^{1/n} = 1.
+```
+
+This implies that the long-term muliplicative growth of the infected community is 1.0.
+
 # Arguments
 - `pipeline::SmoothEndemicPipeline`: The pipeline for which Rt is constructed.
 - `N::Float64 = 70.0`: The number of time points to generate Rt for.
@@ -122,20 +131,56 @@ Rt = make_Rt(pipeline) |> Rt -> plot(Rt,
 """
 function make_Rt(
         pipeline::SmoothEndemicPipeline; N = 70.0, A = 0.1, P = 28.0)
-    Rt = map(1.0:N) do t
-        1.0 + A * sinpi(2 * t / P)
+    log_Rt = map(1.0:N) do t
+        A * sinpi(2 * t / P)
     end
-
+    Rt = exp.(log_Rt .- mean(log_Rt)) # Normalize to have geometric mean 1.0
     return Rt
 end
 
+"""
+Constructs the time-varying reproduction number (Rt) for an randomly varying endemic scenario.
+
+In this context "endemic" means a scenario where the geometric average of the
+reproduction number is 1.0, that is the following holds:
+
+```math
+(\\prod_{t = 1}^n[R_t])^{1/n} = 1.
+```
+
+This implies that the long-term muliplicative growth of the infected community is 1.0.
+
+
+
+# Arguments
+- `pipeline::RoughEndemicPipeline`: The `RoughEndemicPipeline` object for which Rt is being constructed.
+- `N_steps::Int = 10`: The number of steps to generate random values for Rt.
+- `rng::AbstractRNG = MarsenneTwister(1234)`: The random number generator to use.
+- `stride::Int = 7`: The stride length for repeating each random value.
+- `σ::Float64 = 0.05`: The standard deviation of the random values.
+
+# Returns
+- `Rt::Vector{Float64}`: The time-varying reproduction number Rt.
+
+# Example
+
+```julia
+using EpiAwarePipeline, Plots
+pipeline = RoughEndemicPipeline()
+Rt = make_Rt(pipeline) |> Rt -> plot(Rt,
+    xlabel = "Time",
+    ylabel = "Rt",
+    lab = "",
+    title = "Rough Rt path endemic scenario")
+```
+"""
 function make_Rt(
-        pipeline::RoughEndemicPipeline; N_steps = 10, rng = MarsenneTwister(1234), stride = 7, σ = 0.05)
+        pipeline::RoughEndemicPipeline; N_steps = 10, rng = MersenneTwister(1234), stride = 7, σ = 0.05)
     X = σ * randn(rng, N_steps)
-    Rt = mapreduce(vcat, X) do x
-        fill(exp(x), stride)
+    log_Rt = mapreduce(vcat, X) do x
+        fill(x, stride)
     end
-    Rt = Rt ./ mean(Rt)
+    Rt = exp.(log_Rt .- mean(log_Rt)) # Normalize to have geometric mean 1.0
 
     return Rt
 end
