@@ -1,11 +1,11 @@
 getting_started_pages = Any[
     "Installation" => "getting-started/installation.md",
     "Quickstart" => "getting-started/quickstart.md",
-    "Tips and Tricks" => "getting-started/tips-and-tricks.md",
+    "Frequently asked questions" => "getting-started/faq.md",
     "Tutorials" => [
         "Working with Julia" => "getting-started/tutorials/julia.md",
         "Introduction to EpiAware" => "getting-started/tutorials/intro.md",
-        "Epidemic modelling" => "getting-started/tutorials/epidemic-modelling.md",
+        "Modelling infections" => "getting-started/tutorials/modelling-infections.md",
         "Inference" => "getting-started/tutorials/inference.md",
         "Latent models" => "getting-started/tutorials/latent-models.md",
         "Observation models" => "getting-started/tutorials/observation-models.md"
@@ -22,8 +22,8 @@ what_is_pages = [
     "Overview" => "overview.md"
 ]
 
-module_pages = [
-    "EpiAware" => "lib/EpiAwareBase/index.md",
+module_pages = Any[
+    "EpiAwareBase" => "lib/EpiAwareBase/index.md",
     "EpiAwareUtils" => "lib/EpiAwareUtils/index.md",
     "EpiInference" => "lib/EpiInference/index.md",
     "EpiInfModels" => "lib/EpiInfModels/index.md",
@@ -41,7 +41,7 @@ developer_pages = [
 ]
 
 pages = [
-    "EpiAware.jl: Real-time epidemic monitoring" => "index.md",
+    "EpiAware.jl: Real-time infectious disease monitoring" => "index.md",
     "Getting started" => getting_started_pages,
     "Showcase" => showcase_pages,
     "What is EpiAware?" => what_is_pages,

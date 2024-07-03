@@ -6,7 +6,7 @@ Julia is a programming language aimed at technical computing. This guide is aime
 > If you are familar with other languages with tooling for technical computing (e.g. `R`, `MATLAB`, `Python`) these [noteworthy differences](https://docs.julialang.org/en/v1/manual/noteworthy-differences/) may be useful.
 
 ```@contents
-Pages = ["man/getting-started/julia.md"]
+Pages = ["getting-started/tutorials/julia.md"]
 Depth = 3
 ```
 

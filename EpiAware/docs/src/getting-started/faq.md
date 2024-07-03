@@ -1,7 +1,9 @@
-# Tips and tricks
+# Frequently asked questions
 
-```@index
-Pages = ["lib/getting-started/tips-and-tricks.md"]
+This page contains a list of frequently asked questions about the EpiAware package. If you have a question that is not answered here, please open a discussion on the GitHub repository.
+
+```@contents
+Pages = ["lib/getting-started/faq.md"]
 ```
 
 ## Pluto scripts

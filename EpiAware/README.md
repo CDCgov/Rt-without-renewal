@@ -5,7 +5,7 @@
 [![Test EpiAware](https://github.com/CDCgov/Rt-without-renewal/actions/workflows/test-EpiAware.yaml/badge.svg)](https://github.com/CDCgov/Rt-without-renewal/actions/workflows/test-EpiAware.yaml)
 [![codecov](https://codecov.io/gh/CDCgov/Rt-without-renewal/graph/badge.svg?token=IX4GIA8F0H)](https://codecov.io/gh/CDCgov/Rt-without-renewal)
 
-*Infectious disease situational awareness modelling toolkit for Julia.*
+*An infectious disease situational awareness modelling toolkit for Julia.*
 
 **Websites**: [Organization Website](https://cdcgov.github.io/Rt-without-renewal/dev/) | [Documentation](https://cdcgov.github.io/Rt-without-renewal/dev/)
 
