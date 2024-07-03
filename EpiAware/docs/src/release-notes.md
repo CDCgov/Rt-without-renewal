@@ -1,5 +1,5 @@
 ```@meta
-EditURL = "https://github.com/cdcgov/Rt-without-renewal/EpiAware/blob/main/CHANGELOG.md"
+EditURL = "https://github.com/JuliaDocs/Documenter.jl/blob/master/CHANGELOG.md"
 ```
 
 # Release notes

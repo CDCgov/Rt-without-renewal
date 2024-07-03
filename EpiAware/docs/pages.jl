@@ -2,13 +2,20 @@ getting_started_pages = Any[
     "Installation" => "getting-started/installation.md",
     "Quickstart" => "getting-started/quickstart.md",
     "Frequently asked questions" => "getting-started/faq.md",
+    "Explainers" => [
+        "Working with Julia" => "getting-started/explainers/julia.md",
+        "Introduction to EpiAware" => "getting-started/explainers/intro.md",
+        "Modelling infections" => "getting-started/explainers/modelling-infections.md",
+        "Inference" => "getting-started/explainers/inference.md",
+        "Latent models" => "getting-started/explainers/latent-models.md",
+        "Observation models" => "getting-started/explainers/observation-models.md"
+    ],
     "Tutorials" => [
-        "Working with Julia" => "getting-started/tutorials/julia.md",
-        "Introduction to EpiAware" => "getting-started/tutorials/intro.md",
-        "Modelling infections" => "getting-started/tutorials/modelling-infections.md",
-        "Inference" => "getting-started/tutorials/inference.md",
-        "Latent models" => "getting-started/tutorials/latent-models.md",
-        "Observation models" => "getting-started/tutorials/observation-models.md"
+        "Simple renewal with delays" => "getting-started/tutorials/simple-renewal-with-delays.md",
+        "Nowcasting" => "getting-started/tutorials/nowcasting.md",
+        "Multiple observation models" => "getting-started/tutorials/multiple-observation-models.md",
+        "Multiple infection processes" => "getting-started/tutorials/multiple-infection-processes.md",
+        "Partial pooling" => "getting-started/tutorials/partial-pooling.md"
     ]
 ]
 
