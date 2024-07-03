@@ -19,7 +19,7 @@ end
     using EpiAwarePipeline
 
     map([EpiAwareExamplePipeline(), SmoothOutbreakPipeline(),
-        MeasuresOutbreakPipeline(), SmoothEndemicPipeline()]) do pipeline
+        MeasuresOutbreakPipeline(), SmoothEndemicPipeline(), RoughEndemicPipeline()]) do pipeline
         Rt = make_Rt(pipeline)
         @test Rt isa Array
     end
