@@ -2,6 +2,8 @@
 
 Documentation for `EpiAwareBase.jl`'s internal interface.
 
+# Contents
+
 ## Contents
 
 ```@contents
@@ -14,8 +16,6 @@ Depth = 2:2
 ```@index
 Pages = ["internals.md"]
 ```
-
-## Internal API
 
 ```@autodocs
 Modules = [EpiAware.EpiAwareBase]
