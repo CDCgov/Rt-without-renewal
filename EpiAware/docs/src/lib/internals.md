@@ -5,7 +5,7 @@ Documentation for `EpiAware.jl`'s internal interface.
 ## Contents
 
 ```@contents
-Pages = ["internal.md"]
+Pages = ["internals.md"]
 Depth = 2:2
 ```
 
