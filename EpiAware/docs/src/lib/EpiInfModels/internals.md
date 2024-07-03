@@ -1,11 +1,11 @@
 # Internal Documentation
 
-Documentation for `EpiAware.jl`'s internal interface.
+Documentation for `EpiInfModels.jl`'s internal interface.
 
 ## Contents
 
 ```@contents
-Pages = ["internal.md"]
+Pages = ["internals.md"]
 Depth = 2:2
 ```
 
@@ -18,6 +18,6 @@ Pages = ["internals.md"]
 ## Internal API
 
 ```@autodocs
-Modules = [EpiAware]
+Modules = [EpiAware.EpiInfModels]
 Public = false
 ```
