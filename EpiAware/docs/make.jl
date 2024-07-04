@@ -13,9 +13,9 @@ include("changelog.jl")
 include("pages.jl")
 include("build.jl")
 
-# build("getting-started")
-# build("getting-started/tutorials")
-# build("showcase/replications/mishra-2020")
+build("getting-started")
+build("getting-started/tutorials")
+build("showcase/replications/mishra-2020")
 
 DocMeta.setdocmeta!(EpiAware, :DocTestSetup, :(using EpiAware); recursive = true)
 
