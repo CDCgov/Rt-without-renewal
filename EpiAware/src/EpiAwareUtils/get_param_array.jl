@@ -15,20 +15,20 @@ Sampling from a simple model which has both scalar and vector quantity random va
 4 chains.
 
 ```jldoctest
-using StableRNGs, Turing, MCMCChains, EpiAware
+using Random, StableRNGs, Turing, MCMCChains, EpiAware
+Random.seed!(StableRNG(1234), 1234)
 
 @model function testmodel()
     y ~ Normal()
 end
 mdl = testmodel()
-rng = StableRNG(1234)
-chn = sample(rng, mdl, Prior(), MCMCSerial(), 2, 1, progress=false)
+chn = sample(mdl, Prior(), MCMCSerial(), 2, 1, progress=false)
 
 A = get_param_array(chn)
 # output
 2×1 Matrix{@NamedTuple{iteration::Int64, chain::Int64, y::Float64, lp::Float64}}:
- (iteration = 1, chain = 1, y = 0.4486089220378216, lp = -1.0195635156706409)
- (iteration = 2, chain = 1, y = 1.1384114734596742, lp = -1.566928874656986)
+ (iteration = 1, chain = 1, y = 1.2817564703577078, lp = -1.7403883578565975)
+ (iteration = 2, chain = 1, y = 0.7259423762267098, lp = -1.1824347000055138)
 ```
 """
 function get_param_array(chn::Chains)
