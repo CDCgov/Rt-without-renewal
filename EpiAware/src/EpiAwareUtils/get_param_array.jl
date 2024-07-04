@@ -14,17 +14,21 @@ MCMC sample as a `NamedTuple`.
 Sampling from a simple model which has both scalar and vector quantity random variables across
 4 chains.
 
-```julia
-using Turing, MCMCChains, EpiAware
+```jldoctest
+using StableRNGs, Turing, MCMCChains, EpiAware
 
 @model function testmodel()
-    x ~ MvNormal(2, 1.)
     y ~ Normal()
 end
 mdl = testmodel()
-chn = sample(mdl, Prior(), MCMCSerial(), 250, 4)
+rng = StableRNG(1234)
+chn = sample(rng, mdl, Prior(), MCMCSerial(), 2, 1, progress=false)
 
 A = get_param_array(chn)
+# output
+2×1 Matrix{@NamedTuple{iteration::Int64, chain::Int64, y::Float64, lp::Float64}}:
+ (iteration = 1, chain = 1, y = 0.4486089220378216, lp = -1.0195635156706409)
+ (iteration = 2, chain = 1, y = 1.1384114734596742, lp = -1.566928874656986)
 ```
 """
 function get_param_array(chn::Chains)
