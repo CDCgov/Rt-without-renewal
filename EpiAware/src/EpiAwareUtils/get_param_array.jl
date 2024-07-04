@@ -14,7 +14,7 @@ MCMC sample as a `NamedTuple`.
 Sampling from a simple model which has both scalar and vector quantity random variables across
 4 chains.
 
-```jldoctest
+```jldoctest; filter = r\"\b\d+(\.\d+)?\b\" => \"*\"
 using Random, StableRNGs, Turing, MCMCChains, EpiAware
 Random.seed!(StableRNG(1234), 1234)
 

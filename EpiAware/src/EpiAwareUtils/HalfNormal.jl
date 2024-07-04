@@ -17,10 +17,11 @@ Random.seed!(StableRNG(1234), 1234)
 
 hn = HalfNormal(1.0)
 # output
-HalfNormal{Float64}(μ=1.0)
+EpiAware.EpiAwareUtils.HalfNormal{Float64}(μ=1.0)
 ```
 
-```jldoctest HalfNormal
+# filter out all the values that are less than 0
+```jldoctest HalfNormal; filter = r\"\b\d+(\.\d+)?\b\" => \"*\"
 rand(hn)
 # output
 0.4508533245229199
