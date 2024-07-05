@@ -17,10 +17,12 @@ end
 
 @testset "make_Rt: returns an array" begin
     using EpiAwarePipeline
-    pipeline = EpiAwareExamplePipeline()
 
-    Rt = make_Rt(pipeline)
-    @test Rt isa Array
+    map([EpiAwareExamplePipeline(), SmoothOutbreakPipeline(),
+        MeasuresOutbreakPipeline(), SmoothEndemicPipeline(), RoughEndemicPipeline()]) do pipeline
+        Rt = make_Rt(pipeline)
+        @test Rt isa Array
+    end
 end
 
 @testset "default_tspan: returns an Tuple{Integer, Integer}" begin
@@ -85,7 +87,7 @@ end
 
 @testset "make_truth_data_configs" begin
     using EpiAwarePipeline
-    pipeline = RtwithoutRenewalPipeline()
+    pipeline = SmoothOutbreakPipeline()
     example_pipeline = EpiAwareExamplePipeline()
     @testset "make_truth_data_configs should return a dictionary" begin
         config_dicts = make_truth_data_configs(pipeline)
@@ -107,7 +109,7 @@ end
 @testset "default inference configurations" begin
     using EpiAwarePipeline
 
-    pipeline = RtwithoutRenewalPipeline()
+    pipeline = SmoothOutbreakPipeline()
     example_pipeline = EpiAwareExamplePipeline()
 
     @testset "make_inference_configs should return a vector of dictionaries" begin
@@ -133,7 +135,7 @@ end
 
 @testset "make_default_params" begin
     using EpiAwarePipeline
-    pipeline = RtwithoutRenewalPipeline()
+    pipeline = SmoothOutbreakPipeline()
 
     # Expected default parameters
     expected_params = Dict(
@@ -151,7 +153,8 @@ end
 end
 
 @testset "make_delay_distribution" begin
-    pipeline = RtwithoutRenewalPipeline()
+    using EpiAwarePipeline, Distributions
+    pipeline = SmoothOutbreakPipeline()
     delay_distribution = make_delay_distribution(pipeline)
     @test delay_distribution isa Distribution
     @test delay_distribution isa Gamma
@@ -162,7 +165,7 @@ end
 @testset "make_observation_model" begin
     using EpiAware
     # Mock pipeline object
-    pipeline = RtwithoutRenewalPipeline()
+    pipeline = SmoothOutbreakPipeline()
     default_params = make_default_params(pipeline)
     obs = make_observation_model(pipeline)
 
