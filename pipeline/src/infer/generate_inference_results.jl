@@ -15,16 +15,12 @@ Generate inference results based on the given configuration of inference model o
 """
 function generate_inference_results(
         truthdata, inference_config, pipeline::AbstractEpiAwarePipeline;
-        tspan, inference_method,
-        prefix_name = "observables", datadir_name = "epiaware_observables")
+        tspan, inference_method, datadir_name = "epiaware_observables")
     config = InferenceConfig(
         inference_config; case_data = truthdata["y_t"], tspan, epimethod = inference_method)
 
     # produce or load inference results
-    prfx = prefix_name * "_igp_" * string(inference_config["igp"]) * "_latentmodel_" *
-           inference_config["latent_namemodels"].first * "_truth_gi_mean_" *
-           string(truthdata["truth_gi_mean"]) * "_used_gi_mean_" *
-           string(inference_config["gi_mean"])
+    prfx = _inference_prefix(truthdata, inference_config, pipeline)
 
     inference_results, inferencefile = produce_or_load(
         infer, config, datadir(datadir_name); prefix = prfx)
@@ -51,15 +47,12 @@ which is deleted after the function call.
 """
 function generate_inference_results(
         truthdata, inference_config, pipeline::EpiAwareExamplePipeline;
-        tspan, inference_method, prefix_name = "testmode_observables")
+        tspan, inference_method)
     config = InferenceConfig(inference_config; case_data = truthdata["y_t"],
         tspan = tspan, epimethod = inference_method)
 
     # produce or load inference results
-    prfx = prefix_name * "_igp_" * string(inference_config["igp"]) * "_latentmodel_" *
-           inference_config["latent_namemodels"].first * "_truth_gi_mean_" *
-           string(truthdata["truth_gi_mean"]) * "_used_gi_mean_" *
-           string(inference_config["gi_mean"])
+    prfx = _inference_prefix(truthdata, inference_config, pipeline)
 
     datadir_name = mktempdir()
 
@@ -73,14 +66,12 @@ Method for prior predictive modelling.
 """
 function generate_inference_results(
         inference_config, pipeline::RtwithoutRenewalPriorPipeline;
-        tspan, prefix_name = "prior_observables")
+        tspan)
     config = InferenceConfig(
         inference_config; case_data = missing, tspan, epimethod = DirectSample())
 
     # produce or load inference results
-    prfx = prefix_name * "_igp_" * string(inference_config["igp"]) * "_latentmodel_" *
-           inference_config["latent_namemodels"].first * "_truth_gi_mean_" *
-           string(inference_config["gi_mean"])
+    prfx = _inference_prefix(truthdata, inference_config, pipeline)
 
     datadir_name = mktempdir()
 
