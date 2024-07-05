@@ -23,6 +23,7 @@ function make_default_params(pipeline::AbstractEpiAwarePipeline)
     θ_delay = 5.0 / 4.0
     lookahead = 21
     lookback = 35
+    stride = 7
     return Dict(
         "Rt" => Rt,
         "logit_daily_ascertainment" => logit_daily_ascertainment,
@@ -31,5 +32,6 @@ function make_default_params(pipeline::AbstractEpiAwarePipeline)
         "α_delay" => α_delay,
         "θ_delay" => θ_delay,
         "lookahead" => lookahead,
-        "lookback" => lookback)
+        "lookback" => lookback,
+        "stride" => stride)
 end
