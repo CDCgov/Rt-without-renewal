@@ -12,11 +12,12 @@ module EpiAwarePipeline
 
 using CSV, Dagger, DataFramesMeta, Dates, Distributions, DocStringExtensions, DrWatson,
       EpiAware, Plots, Statistics, ADTypes, AbstractMCMC, Plots, JLD2, MCMCChains, Turing,
-      DynamicPPL, LogExpFunctions, RCall, LinearAlgebra
+      DynamicPPL, LogExpFunctions, RCall, LinearAlgebra, Random
 
 # Exported pipeline types
-export AbstractEpiAwarePipeline, EpiAwarePipeline, RtwithoutRenewalPipeline,
-       RtwithoutRenewalPriorPipeline, EpiAwareExamplePipeline
+export AbstractEpiAwarePipeline, EpiAwarePipeline, AbstractRtwithoutRenewalPipeline,
+       RtwithoutRenewalPriorPipeline, EpiAwareExamplePipeline, SmoothOutbreakPipeline,
+       MeasuresOutbreakPipeline, SmoothEndemicPipeline, RoughEndemicPipeline
 
 # Exported utility functions
 export calculate_processes

@@ -1,4 +1,4 @@
-"""
+@doc raw"
 Extract a parameter array from a `Chains` object `chn` that matches the shape of number of sample
 and chain pairs in `chn`.
 
@@ -18,15 +18,14 @@ Sampling from a simple model which has both scalar and vector quantity random va
 using Turing, MCMCChains, EpiAware
 
 @model function testmodel()
-    x ~ MvNormal(2, 1.)
     y ~ Normal()
 end
 mdl = testmodel()
-chn = sample(mdl, Prior(), MCMCSerial(), 250, 4)
+chn = sample(mdl, Prior(), MCMCSerial(), 2, 1, progress=false)
 
 A = get_param_array(chn)
 ```
-"""
+"
 function get_param_array(chn::Chains)
     rowtable(chn) |> x -> reshape(x, size(chn, 1), size(chn, 3))
 end

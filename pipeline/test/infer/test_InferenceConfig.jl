@@ -41,7 +41,7 @@
     end
 
     @testset "construct from config dictionary" begin
-        pipeline = RtwithoutRenewalPipeline()
+        pipeline = SmoothOutbreakPipeline()
         inference_configs = make_inference_configs(pipeline)
         @test [InferenceConfig(ic; case_data, tspan, epimethod) isa InferenceConfig
                for ic in inference_configs] |> all
