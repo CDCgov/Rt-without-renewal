@@ -150,6 +150,8 @@ reproduction number is 1.0, that is the following holds:
 
 This implies that the long-term muliplicative growth of the infected community is 1.0.
 
+
+
 # Arguments
 - `pipeline::RoughEndemicPipeline`: The `RoughEndemicPipeline` object for which Rt is being constructed.
 - `N_steps::Int = 10`: The number of steps to generate random values for Rt.
