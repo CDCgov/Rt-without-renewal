@@ -15,7 +15,9 @@ Generate inference results based on the given configuration of inference model o
 """
 function generate_inference_results(
         truthdata, inference_config, pipeline::AbstractEpiAwarePipeline;
-        tspan, inference_method, datadir_name = "epiaware_observables")
+        inference_method, datadir_name = "epiaware_observables")
+    tspan = make_tspan(
+        pipeline; T = inference_config["T"], lookback = inference_config["lookback"])
     config = InferenceConfig(
         inference_config; case_data = truthdata["y_t"], tspan, epimethod = inference_method)
 
@@ -46,8 +48,9 @@ which is deleted after the function call.
 - `inference_results`: The generated inference results.
 """
 function generate_inference_results(
-        truthdata, inference_config, pipeline::EpiAwareExamplePipeline;
-        tspan, inference_method)
+        truthdata, inference_config, pipeline::EpiAwareExamplePipeline; inference_method)
+    tspan = make_tspan(
+        pipeline; T = inference_config["T"], lookback = inference_config["lookback"])
     config = InferenceConfig(inference_config; case_data = truthdata["y_t"],
         tspan = tspan, epimethod = inference_method)
 
@@ -65,8 +68,9 @@ end
 Method for prior predictive modelling.
 """
 function generate_inference_results(
-        inference_config, pipeline::RtwithoutRenewalPriorPipeline;
-        tspan)
+        inference_config, pipeline::RtwithoutRenewalPriorPipeline)
+    tspan = make_tspan(
+        pipeline; T = inference_config["T"], lookback = inference_config["lookback"])
     config = InferenceConfig(
         inference_config; case_data = missing, tspan, epimethod = DirectSample())
 
