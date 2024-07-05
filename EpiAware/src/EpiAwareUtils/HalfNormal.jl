@@ -12,8 +12,7 @@ Create a half-normal prior distribution with the specified mean.
 # Examples:
 
 ```jldoctest HalfNormal
-using Random, StableRNGs, EpiAware, Distributions
-Random.seed!(StableRNG(1234), 1234)
+using EpiAware, Distributions
 
 hn = HalfNormal(1.0)
 # output

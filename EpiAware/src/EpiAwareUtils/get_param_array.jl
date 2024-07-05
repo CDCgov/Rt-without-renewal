@@ -15,8 +15,7 @@ Sampling from a simple model which has both scalar and vector quantity random va
 4 chains.
 
 ```jldoctest; filter = r\"\b\d+(\.\d+)?\b\" => \"*\"
-using Random, StableRNGs, Turing, MCMCChains, EpiAware
-Random.seed!(StableRNG(1234), 1234)
+using Turing, MCMCChains, EpiAware
 
 @model function testmodel()
     y ~ Normal()
