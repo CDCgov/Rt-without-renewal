@@ -22,6 +22,19 @@ Apply `f` to each element of `xs` and accumulate the results.
 - `ys`: An array containing the results of applying `f` to each element of `xs`.
 - `carry`: The final value of the `carry` variable after processing all elements of `xs`.
 
+# Examples
+
+```jldoctest
+using EpiAware
+
+struct Adder <: EpiAwareBase.AbstractModel end
+function (a::Adder)(carry, x)
+    carry + x, carry + x
+end
+
+scan(Adder(), 0, 1:5)
+#output
+([1, 3, 6, 10, 15], 15)
 """
 function scan(f::F, init, xs) where {F <: EpiAwareBase.AbstractModel}
     carry = init

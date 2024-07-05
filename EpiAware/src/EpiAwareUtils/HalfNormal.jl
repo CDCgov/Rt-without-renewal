@@ -11,15 +11,49 @@ Create a half-normal prior distribution with the specified mean.
 
 # Examples:
 
-```julia
-using EpiAware
+```jldoctest HalfNormal
+using EpiAware, Distributions
+
 hn = HalfNormal(1.0)
+# output
+EpiAware.EpiAwareUtils.HalfNormal{Float64}(μ=1.0)
+```
+
+# filter out all the values that are less than 0
+```jldoctest HalfNormal; filter = r\"\b\d+(\.\d+)?\b\" => \"*\"
 rand(hn)
-cdf(hn, 4)
+# output
+0.4508533245229199
+```
+
+```jldoctest HalfNormal
+cdf(hn, 2)
+# output
+0.8894596502772643
+```
+
+```jldoctest HalfNormal
 quantile(hn, 0.5)
+# output
+0.8453475393951495
+```
+
+```jldoctest HalfNormal
 logpdf(hn, 2)
+# output
+-3.1111166111445083
+```
+
+```jldoctest HalfNormal
 mean(hn)
+# output
+1.0
+```
+
+```jldoctest HalfNormal
 var(hn)
+# output
+0.5707963267948966
 ```
 "
 struct HalfNormal{T <: Real} <: ContinuousUnivariateDistribution
