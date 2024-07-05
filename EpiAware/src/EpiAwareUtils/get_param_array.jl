@@ -1,4 +1,4 @@
-"""
+@doc raw"
 Extract a parameter array from a `Chains` object `chn` that matches the shape of number of sample
 and chain pairs in `chn`.
 
@@ -30,7 +30,7 @@ A = get_param_array(chn)
  (iteration = 1, chain = 1, y = 1.2817564703577078, lp = -1.7403883578565975)
  (iteration = 2, chain = 1, y = 0.7259423762267098, lp = -1.1824347000055138)
 ```
-"""
+"
 function get_param_array(chn::Chains)
     rowtable(chn) |> x -> reshape(x, size(chn, 1), size(chn, 3))
 end
