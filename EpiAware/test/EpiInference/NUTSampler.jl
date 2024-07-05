@@ -8,7 +8,8 @@
 end
 
 @testitem "NUTSampler __apply_method" begin
-    using Turing, Suppressor, HypothesisTests
+    using Turing, Suppressor, HypothesisTests, Random
+    Random.seed!(1234)
     @model function test_mdl()
         x ~ Normal(0, 1)
     end
