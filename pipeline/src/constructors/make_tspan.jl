@@ -19,6 +19,5 @@ function make_tspan(pipeline::AbstractEpiAwarePipeline;
         T::Union{Integer, Nothing} = nothing, lookback = 35)
     N = size(make_Rt(pipeline), 1)
     _T = isnothing(T) ? N : T
-    @assert backhorizon<N "Backhorizon must be less than the length of the default Rt."
     return (max(1, _T - lookback), min(N, _T))
 end

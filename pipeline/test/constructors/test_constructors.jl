@@ -146,7 +146,8 @@ end
         "α_delay" => 4.0,
         "θ_delay" => 5.0 / 4.0,
         "lookahead" => 21,
-        "lookback" => 35
+        "lookback" => 35,
+        "stride" => 7
     )
 
     # Test the make_default_params function
