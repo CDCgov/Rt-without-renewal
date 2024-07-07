@@ -1,6 +1,6 @@
 # Error:  ArgumentError: Converting an instance of ReverseDiff.TrackedReal{Float64, Float64, Nothing} to Float64 is not defined. Please use `ReverseDiff.value` instead.
 let
-    using Distributions, Turing
+    using Distributions
     gen_int = [0.2, 0.3, 0.5]
     transformation = exp
     data = EpiData(gen_int, transformation)

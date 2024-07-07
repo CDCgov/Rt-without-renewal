@@ -1,4 +1,5 @@
 let
+    using Distributions
     gen_int = [0.2, 0.3, 0.5]
     transformation = exp
 
@@ -11,6 +12,6 @@ let
     log_incidence = [10, 20, 30] .|> log
     expected_incidence = exp.(log_init_scale .+ log_incidence)
 
-    mdl = generate_latent_infs(direct_inf_model, log_incidence),
+    mdl = generate_latent_infs(direct_inf_model, log_incidence)
     suite["DirectInfections"] = make_turing_suite(mdl; check = true)
 end
