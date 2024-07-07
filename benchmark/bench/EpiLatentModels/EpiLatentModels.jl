@@ -11,6 +11,9 @@ include("models/HierarchicalNormal.jl")
 include("modifiers/DiffLatentModel.jl")
 include("modifiers/PrefixLatentModel.jl")
 include("modifiers/TransformLatentModel.jl")
-
+include("manipulators/CombineLatentModels.jl")
+include("manipulators/ConcatLatentModels.jl")
+include("manipulators/broadcast/LatentModel.jl")
+include("manipulators/broadcast/helpers.jl")
 end
 BenchEpiLatentModels.suite

@@ -1,18 +1,13 @@
-@testitem "broadcast_dayofweek constructor" begin
+let
     model = RandomWalk()
     broadcast_model = broadcast_dayofweek(model)
-    @test typeof(broadcast_model) <: BroadcastLatentModel
-    @test typeof(broadcast_model.model) <: TransformLatentModel
-    @test typeof(broadcast_model.model.model) <: RandomWalk
-    @test broadcast_model.period == 7
-    @test broadcast_model.broadcast_rule == RepeatEach()
+    mdl = generate_latent(broadcast_model, 10)
+    suite["broadcast_dayofweek"] = make_turing_suite(mdl; check = true)
 end
 
-@testitem "broadcast_weekly constructor" begin
+let
     model = AR()
     broadcast_model = broadcast_weekly(model)
-    @test typeof(broadcast_model) <: BroadcastLatentModel
-    @test typeof(broadcast_model.model) <: AR
-    @test broadcast_model.period == 7
-    @test broadcast_model.broadcast_rule == RepeatBlock()
+    mdl = generate_latent(broadcast_model, 10)
+    suite["broadcast_weekly"] = make_turing_suite(mdl; check = true)
 end

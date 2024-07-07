@@ -113,13 +113,13 @@ Generate latent variables by concatenating multiple latent models.
     @assert sum(dims)==n "Sum of dimensions must be equal to the dimension of the latent variables"
 
     @submodel final_latent, latent_aux = _concat_latents(
-        latent_models.models, 1, [], [], dims, latent_models.no_models)
+        latent_models.models, 1, Real[], [], dims, latent_models.no_models)
 
     return final_latent, (; latent_aux...)
 end
 
 @model function _concat_latents(
-        models, index::Int, acc_latent, acc_aux,
+        models, index::Int, acc_latent::AbstractVector{<:Real}, acc_aux,
         dims::AbstractVector{<:Int}, n_models::Int)
     if index > n_models
         return acc_latent, (; acc_aux...)
