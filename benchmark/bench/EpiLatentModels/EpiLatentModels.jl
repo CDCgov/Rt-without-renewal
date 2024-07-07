@@ -4,5 +4,13 @@ using BenchmarkTools, TuringBenchmarking, EpiAware
 suite = BenchmarkGroup()
 
 include("models/AR.jl")
+include("models/RandomWalk.jl")
+include("models/Intercept.jl")
+include("models/FixedIntercept.jl")
+include("models/HierarchicalNormal.jl")
+include("modifiers/DiffLatentModel.jl")
+include("modifiers/PrefixLatentModel.jl")
+include("modifiers/TransformLatentModel.jl")
+
 end
 BenchEpiLatentModels.suite
