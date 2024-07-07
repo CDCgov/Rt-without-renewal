@@ -1,30 +1,13 @@
-@testitem "PoissonErrorConstructor" begin
-    using Distributions
-    # Test default constructor
-    poi = PoissonError()
-    @test typeof(poi) <: PoissonError
-    @test typeof(poi) <: AbstractTuringObservationErrorModel
-end
-
-@testitem "Testing PoissonError against theoretical properties" begin
-    using Distributions, Turing, HypothesisTests, DynamicPPL
-
-    # Set up test parameters
-    n = 100  # Number of observations
-    μ = 10.0  # Mean of the poisson distribution
-
-    # Define the observation model
-    poi_obs_model = PoissonError()
-
-    # Generate observations from the model
-    Y_t = fill(μ, n)  # True values
-    model = generate_observations(poi_obs_model, missing, Y_t)
-    samples = sample(model, Prior(), 1000; progress = false)
-
-    obs_samples = samples |>
-                  chn -> mapreduce(vcat, generated_quantities(model, chn)) do gen
-        gen[1]
+let
+    using Distributions, Turing
+    μ = 10.0
+    n = 10
+    nb_obs_model = PoissonError()
+    Y_t = fill(μ, n)
+    @model function test_model(Y_t, n)
+        μ ~ filldist(truncated(Normal(10, 1); lower = 0), n)
+        @submodel generate_observations(nb_obs_model, Y_t, μ)
     end
-
-    @test isapprox(mean(obs_samples), μ, atol = 0.1)  # Test the mean
+    mdl = test_model(Y_t, n)
+    suite["PoissonError"] = make_turing_suite(mdl; check = true)
 end
