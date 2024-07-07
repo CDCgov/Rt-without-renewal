@@ -1,6 +1,6 @@
 module BenchEpiAwareUtils
 
-using BenchmarkTools, EpiAware
+using BenchmarkTools, EpiAware.EpiAwareUtils
 
 suite = BenchmarkGroup()
 
