@@ -1,6 +1,6 @@
 module BenchEpiLatentModels
 
-using BenchmarkTools, TuringBenchmarking, EpiAware
+using BenchmarkTools, TuringBenchmarking, EpiAware, DynamicPPL
 suite = BenchmarkGroup()
 
 include("models/AR.jl")
