@@ -4,9 +4,6 @@ on:
   pull_request:
     paths:
       - 'EpiAware/**'
-  merge_group:
-    paths:
-      - 'EpiAware/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
