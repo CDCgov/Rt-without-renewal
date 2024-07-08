@@ -21,6 +21,8 @@ Perform the pipeline for each `AbstractEpiAwarePipeline` in the given vector `pi
 
 """
 function do_pipeline(pipelines::Vector{<:AbstractEpiAwarePipeline})
-    map(do_pipeline, pipelines)
+    map(pipelines) do pipeline
+        Dagger.@spawn do_pipeline(pipeline)
+    end
     return nothing
 end
