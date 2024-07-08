@@ -9,7 +9,7 @@
 end
 
 @testset "do_inference tests" begin
-    using EpiAwarePipeline, Dagger
+    using EpiAwarePipeline, Dagger, EpiAware
     pipeline = EpiAwareExamplePipeline()
 
     function make_inference()
@@ -28,5 +28,12 @@ end
     using EpiAwarePipeline
     pipeline = EpiAwareExamplePipeline()
     res = do_pipeline(pipeline)
+    @test isnothing(res)
+end
+
+@testset "do_pipeline test: just run as a vector" begin
+    using EpiAwarePipeline
+    pipelines = fill(EpiAwareExamplePipeline(), 2)
+    res = do_pipeline(pipelines)
     @test isnothing(res)
 end

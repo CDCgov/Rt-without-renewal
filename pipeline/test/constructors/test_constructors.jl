@@ -70,7 +70,7 @@ end
     @test method.pre_sampler_steps[1].maxiters == 100
     @test method.sampler isa NUTSampler
     @test method.sampler.adtype == AutoForwardDiff()
-    @test method.sampler.ndraws == 2000
+    @test method.sampler.ndraws == 20
     @test method.sampler.nchains == 4
     @test method.sampler.mcmc_parallel == MCMCThreads()
 end
