@@ -42,3 +42,20 @@ function make_inference_method(
             nchains = nchains, mcmc_parallel = mcmc_ensemble)
     )
 end
+
+"""
+Constructs an inference method for the Rt-without-renewal pipeline.
+
+# Arguments
+- `pipeline`: An instance of the `AbstractRtwithoutRenewalPipeline` type.
+
+# Returns
+- An inference method for the pipeline.
+
+# Examples
+"""
+function make_inference_method(pipeline::AbstractRtwithoutRenewalPipeline)
+    return make_inference_method(pipeline; ndraws = pipeline.ndraws,
+        mcmc_ensemble = pipeline.mcmc_ensemble, nruns_pthf = pipeline.nruns_pthf,
+        maxiters_pthf = pipeline.maxiters_pthf, nchains = pipeline.nchains)
+end
