@@ -32,6 +32,19 @@
     @test concat_prefix.prefixes == ["Int", "AR"]
 end
 
+@testitem "ConcatLatentmodels constructor works with duplicate models" begin
+    using Distributions: Normal
+    concat = ConcatLatentModels([Intercept(Normal(0, 1)), Intercept(Normal(0, 2))])
+    prefix_1 = PrefixLatentModel(Intercept(Normal(0, 1)), "Concat.1")
+    prefix_2 = PrefixLatentModel(Intercept(Normal(0, 2)), "Concat.2")
+
+    @test typeof(concat) <: AbstractTuringLatentModel
+    @test concat.models == [prefix_1, prefix_2]
+    @test concat.no_models == 2
+    @test concat.dimension_adaptor == equal_dimensions
+    @test concat.prefixes == ["Concat.1", "Concat.2"]
+end
+
 @testitem "ConcatLatentModels generate_latent method works as expected: FixedIntecept + custom" begin
     using Turing
 
