@@ -44,15 +44,15 @@ struct ConcatLatentModels{
         @assert typeof(check_dim)<:AbstractVector{Int} "Output of dimension_adaptor must be a vector of integers"
         @assert length(check_dim)==no_models "The vector of dimensions must have the same length as the number of models"
         @assert length(prefixes)==no_models "The number of models and prefixes must be equal"
-        for i in eachindex(models)
-            if (prefixes[i] != "")
-                models[i] = PrefixLatentModel(models[i], prefixes[i])
+        prefix_models = map(eachindex(models)) do i
+            if prefixes[i] != ""
+                PrefixLatentModel(models[i], prefixes[i])
             end
         end
         return new{
             AbstractVector{<:AbstractTuringLatentModel}, Int, Function,
             AbstractVector{<:String}}(
-            models, no_models, dimension_adaptor, prefixes)
+            prefix_models, no_models, dimension_adaptor, prefixes)
     end
 
     function ConcatLatentModels(models::M, dimension_adaptor::Function;

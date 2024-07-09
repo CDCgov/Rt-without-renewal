@@ -16,6 +16,17 @@
     @test comb.prefixes == ["Int", "AR"]
 end
 
+@testitem "CombineLatentModels constructor handles duplicate models" begin
+    using Distributions: Normal
+    comb = CombineLatentModels([Intercept(Normal(0, 1)), Intercept(Normal(0, 2))])
+    prefix_1 = PrefixLatentModel(Intercept(Normal(0, 1)), "Combine.1")
+    prefix_2 = PrefixLatentModel(Intercept(Normal(0, 2)), "Combine.2")
+
+    @test typeof(comb) <: AbstractTuringLatentModel
+    @test comb.models == [prefix_1, prefix_2]
+    @test comb.prefixes == ["Combine.1", "Combine.2"]
+end
+
 @testitem "CombineLatentModels generate_latent method works as expected: FixedIntecept + custom" begin
     using Turing
 
