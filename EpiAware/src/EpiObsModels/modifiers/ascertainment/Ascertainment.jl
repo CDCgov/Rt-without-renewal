@@ -62,7 +62,7 @@ Generates observations based on the `LatentDelay` observation model.
 ## Arguments
 - `obs_model::Ascertainment`: The Ascertainment model.
 - `y_t`: The current state of the observations.
-- `Y_t`` : The expected observations.
+- `Y_t`: The expected observations.
 
 ## Returns
 - `y_t`: The updated observations.
