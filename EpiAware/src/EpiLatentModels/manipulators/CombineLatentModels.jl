@@ -34,6 +34,8 @@ latent_model()
         prefix_models = map(eachindex(models)) do i
             if prefixes[i] != ""
                 PrefixLatentModel(models[i], prefixes[i])
+            else
+                models[i]
             end
         end
         return new{AbstractVector{<:AbstractTuringLatentModel}, AbstractVector{<:String}}(
