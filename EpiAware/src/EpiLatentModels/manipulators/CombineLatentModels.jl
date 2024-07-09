@@ -31,13 +31,13 @@ latent_model()
             P <: AbstractVector{<:String}}
         @assert length(models)>1 "At least two models are required"
         @assert length(models)==length(prefixes) "The number of models and prefixes must be equal"
-        prefix_models = map(eachindex(models)) do i
-            if prefixes[i] != ""
-                PrefixLatentModel(models[i], prefixes[i])
+        for i in eachindex(models)
+            if (prefixes[i] != "")
+                models[i] = PrefixLatentModel(models[i], prefixes[i])
             end
         end
         return new{AbstractVector{<:AbstractTuringLatentModel}, AbstractVector{<:String}}(
-            prefix_models, prefixes)
+            models, prefixes)
     end
 
     function CombineLatentModels(models::M) where {
