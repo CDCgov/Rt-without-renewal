@@ -37,26 +37,46 @@ Rt = make_Rt(pipeline) |> Rt -> plot(Rt,
     title = "Smooth outbreak scenario")
 ```
 """
-struct SmoothOutbreakPipeline <: AbstractRtwithoutRenewalPipeline
+@kwdef struct SmoothOutbreakPipeline <: AbstractRtwithoutRenewalPipeline
+    ndraws::Integer = 2000
+    mcmc_ensemble::AbstractMCMC.AbstractMCMCEnsemble = MCMCSerial()
+    nruns_pthf::Integer = 4
+    maxiters_pthf::Integer = 100
+    nchains::Integer = 4
 end
 
 """
 The pipeline type for the Rt pipeline for an outbreak scenario where Rt has
     discontinuous changes over time due to implementation of measures.
 """
-struct MeasuresOutbreakPipeline <: AbstractRtwithoutRenewalPipeline
+@kwdef struct MeasuresOutbreakPipeline <: AbstractRtwithoutRenewalPipeline
+    ndraws::Integer = 2000
+    mcmc_ensemble::AbstractMCMC.AbstractMCMCEnsemble = MCMCSerial()
+    nruns_pthf::Integer = 4
+    maxiters_pthf::Integer = 100
+    nchains::Integer = 4
 end
 
 """
 The pipeline type for the Rt pipeline for an endemic scenario where Rt changes in
     a smooth sinusoidal manner over time.
 """
-struct SmoothEndemicPipeline <: AbstractRtwithoutRenewalPipeline
+@kwdef struct SmoothEndemicPipeline <: AbstractRtwithoutRenewalPipeline
+    ndraws::Integer = 2000
+    mcmc_ensemble::AbstractMCMC.AbstractMCMCEnsemble = MCMCSerial()
+    nruns_pthf::Integer = 4
+    maxiters_pthf::Integer = 100
+    nchains::Integer = 4
 end
 
 """
 The pipeline type for the Rt pipeline for an endemic scenario where Rt changes in
     a weekly-varying discontinuous manner over time.
 """
-struct RoughEndemicPipeline <: AbstractRtwithoutRenewalPipeline
+@kwdef struct RoughEndemicPipeline <: AbstractRtwithoutRenewalPipeline
+    ndraws::Integer = 2000
+    mcmc_ensemble::AbstractMCMC.AbstractMCMCEnsemble = MCMCSerial()
+    nruns_pthf::Integer = 4
+    maxiters_pthf::Integer = 100
+    nchains::Integer = 4
 end
