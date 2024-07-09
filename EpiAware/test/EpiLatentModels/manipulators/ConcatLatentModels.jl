@@ -54,3 +54,12 @@ end
     @test con_model_out[2].intercept == 1.0
     @test con_model_out[2].nscale == 2.0
 end
+
+@testitem "ConcatLatentModels can combine hierarchical normals" begin
+    using Distributions
+    m1 = HierarchicalNormal(-0.1, truncated(Normal(0, 0.1), 0, Inf))
+    m2 = HierarchicalNormal(0.1, truncated(Normal(0, 0.1), 0, Inf))
+    ms = [m1, m2]
+    concat = ConcatLatentModels(ms)
+    @test concat isa ConcatLatentModels
+end
