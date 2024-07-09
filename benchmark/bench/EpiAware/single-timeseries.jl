@@ -53,10 +53,7 @@ let
         latent_model = broadcast_weekly(DiffLatentModel(AR(), [Normal(0, 1)])),
         observation_model = Ascertainment(
             NegativeBinomialError(),
-            ConcatLatentModels(
-                [HierarchicalNormal(-0.1, truncated(Normal(0, 0.1), 0, Inf)),
-                HierarchicalNormal(1, truncated(Normal(0, 0.1), 0, Inf))]
-            ),
+            ConcatLatentModels([Intercept(Normal(2, 0.2)), FixedIntercept(0.2)]),
             x -> logistic.(x)
         )
     )
