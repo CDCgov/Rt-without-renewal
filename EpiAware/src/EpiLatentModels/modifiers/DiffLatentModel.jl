@@ -18,10 +18,14 @@ terms ``Z_1, \ldots, Z_d`` are inferred.
 
 ## Constructors
 
-- `DiffLatentModel(latent_model, init_prior_distribution::Distribution; d::Int)`
-    Constructs a `DiffLatentModel` for `d`-fold differencing with `latent_model` as the
+- `DiffLatentModel(latent_model, init_prior::Distribution; d::Int)`
+    Constructs a `DiffLatentModel` for `d`-fold differencing with `model` as the
     undifferenced latent process. All initial terms have common prior
     `init_prior_distribution`.
+- `DiffLatentModel(model, init_priors::Vector{D} where {D <: Distribution})`
+    Constructs a `DiffLatentModel` for `d`-fold differencing with `latent_model` as the
+    undifferenced latent process. The `d` initial terms have priors given by the vector
+    `init_priors`, therefore `length(init_priors)` sets `d`.
 - `DiffLatentModel(;model, init_priors::Vector{D} where {D <: Distribution})`
     Constructs a `DiffLatentModel` for `d`-fold differencing with `latent_model` as the
     undifferenced latent process. The `d` initial terms have priors given by the vector
@@ -53,7 +57,7 @@ diff_model = DiffLatentModel(rw, Normal(); d = 2)
 
 Or we can supply a vector of priors for the initial terms and `d` is inferred as follows:
 ```julia
-diff_model2 = DiffLatentModel(;undiffmodel = rw, init_priors = [Normal(), Normal()])
+diff_model2 = DiffLatentModel(;model = rw, init_priors = [Normal(), Normal()])
 ```
 
 Then, we can use `generate_latent` to construct a Turing model for the differenced latent
@@ -94,6 +98,11 @@ struct DiffLatentModel{M <: AbstractTuringLatentModel, P <: Distribution} <:
 
     function DiffLatentModel(; model::AbstractTuringLatentModel,
             init_priors::Vector{D} where {D <: Distribution} = [Normal()])
+        return DiffLatentModel(model, init_priors)
+    end
+
+    function DiffLatentModel(model::AbstractTuringLatentModel,
+            init_priors::Vector{D} where {D <: Distribution})
         d = length(init_priors)
         init_prior = _expand_dist(init_priors)
         return DiffLatentModel(model, init_prior, d)
