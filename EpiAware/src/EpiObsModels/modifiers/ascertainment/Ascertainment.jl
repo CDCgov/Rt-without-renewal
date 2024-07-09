@@ -30,11 +30,8 @@ struct Ascertainment{
             latent_prefix::P) where {
             M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel,
             F <: Function, P <: String}
-        prefix_model = if latent_prefix == ""
-            latent_model
-        else
-            PrefixLatentModel(latent_model, latent_prefix)
-        end
+        prefix_model = latent_prefix == "" ? latent_model :
+                       PrefixLatentModel(latent_model, latent_prefix)
         return new{M, AbstractTuringLatentModel, F, P}(
             model, prefix_model, link, latent_prefix)
     end
