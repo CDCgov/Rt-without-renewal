@@ -62,8 +62,6 @@ end
     con_model_out = con_model()
 
     @test typeof(con_model) <: DynamicPPL.Model
-    @test length(con_model_out[1]) == 5
-    @test all(con_model_out[1] .== vcat(fill(1.0, 3), fill(2.0, 2)))
-    @test con_model_out[2].intercept == 1.0
-    @test con_model_out[2].nscale == 2.0
+    @test length(con_model_out) == 5
+    @test all(con_model_out .== vcat(fill(1.0, 3), fill(2.0, 2)))
 end
