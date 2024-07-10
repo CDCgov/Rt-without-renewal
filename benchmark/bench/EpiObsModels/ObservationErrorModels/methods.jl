@@ -1,7 +1,7 @@
 suite["observation_error"] = BenchmarkGroup()
 
 let
-    using Distributions, Turing
+    using Distributions, Turing, DynamicPPL
 
     struct TestObs <: AbstractTuringObservationErrorModel end
 
