@@ -123,7 +123,7 @@ end
     struct TestObs <: AbstractTuringObservationModel end
 
     @model function EpiAwareBase.generate_observations(obs_model::TestObs, y_t, Y_t)
-        return Y_t, (;)
+        return Y_t
     end
 
     delay_int = [0.2, 0.3, 0.5]

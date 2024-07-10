@@ -52,7 +52,7 @@ end
 
     @model function EpiAware.EpiAwareBase.generate_latent(model::NextScale, n::Int)
         scale = 2
-        return scale_vect = fill(scale, n), (; nscale = scale)
+        return scale_vect = fill(scale, n)
     end
 
     s = FixedIntercept(1)
