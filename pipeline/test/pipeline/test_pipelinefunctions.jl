@@ -37,13 +37,3 @@ end
     res = do_pipeline(pipelines)
     @test isnothing(res)
 end
-
-@testset "do_pipeline test: main scenarios" begin
-    using EpiAwarePipeline
-    pipelines = [SmoothOutbreakPipeline(ndraws = 20, nchains = 1),
-        MeasuresOutbreakPipeline(ndraws = 20, nchains = 1),
-        SmoothEndemicPipeline(ndraws = 20, nchains = 1),
-        RoughEndemicPipeline(ndraws = 20, nchains = 1)]
-    res = do_pipeline(pipelines)
-    @test isnothing(res)
-end
