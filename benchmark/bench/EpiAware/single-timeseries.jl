@@ -94,7 +94,7 @@ let
             tspan = (1, 30)
         )
         growth_mdl = generate_epiaware(growth, (y_t = expected_cases,))
-        # suite["growth"] = make_turing_suite(growth_mdl; check = true)
+        suite["growth"] = make_turing_suite(growth_mdl; check = true)
     end
     # Log infections
     let
