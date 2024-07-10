@@ -78,7 +78,7 @@ Generate observations from a stack of observation models. Assumes a 1 to 1 mappi
     @assert obs_model.model_names==keys(y_t) .|> string |> collect "The model names must match the keys of the observation datasets."
     @assert keys(y_t)==keys(Y_t) "The keys of the observed and true values must match."
 
-    obs = map((obs_model.models, obs_model.model_names)) do (model, model_name)
+    obs = map(zip(obs_model.models, obs_model.model_names)) do (model, model_name)
         @submodel obs_tmp = generate_observations(
             model, y_t[Symbol(model_name)], Y_t[Symbol(model_name)])
         return obs_tmp

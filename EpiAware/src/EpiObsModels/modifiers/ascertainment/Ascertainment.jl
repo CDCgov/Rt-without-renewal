@@ -69,7 +69,7 @@ Generates observations based on the `LatentDelay` observation model.
 - `obs_aux`: Additional observation-related variables.
 "
 @model function EpiAwareBase.generate_observations(obs_model::Ascertainment, y_t, Y_t)
-    @submodel expected_obs_mod, expected_aux = generate_latent(
+    @submodel expected_obs_mod = generate_latent(
         obs_model.latent_model, length(Y_t))
 
     expected_obs = Y_t .* obs_model.link(expected_obs_mod)

@@ -56,7 +56,7 @@ end
     n_samples = 1000
     first_obs = sample(mdl, Prior(), n_samples; progress = false) |>
                 chn -> generated_quantities(fix_mdl, chn) .|>
-                       (gen -> gen[1][1]) |>
+                       (gen -> gen[1]) |>
                        vec
     direct_samples = EpiAware.EpiObsModels.NegativeBinomialMeanClust(
         I_t[1], neg_bin_cf^2) |>
@@ -93,7 +93,6 @@ end
             mdl = generate_observations(delay_obs, y_t_scenario, I_t)
             sampled_obs = sample(mdl, Prior(), 1000; progress = false) |>
                           chn -> generated_quantities(mdl, chn) .|>
-                                 (gen -> gen[1]) |>
                                  collect
 
             # Calculate mean of generated quantities
@@ -134,20 +133,20 @@ end
 
     @testset "Test with entirely missing data" begin
         mdl = generate_observations(obs_model, missing, I_t)
-        @test mdl()[1][3:end] == expected_obs[3:end]
-        @test sum(mdl()[1] .|> ismissing) == 2
+        @test mdl()[3:end] == expected_obs[3:end]
+        @test sum(mdl() .|> ismissing) == 2
     end
 
     @testset "Test with missing data defined as a vector" begin
         mdl = generate_observations(
             obs_model, [missing, missing, missing, missing, missing], I_t)
-        @test mdl()[1][3:end] == expected_obs[3:end]
-        @test sum(mdl()[1] .|> ismissing) == 2
+        @test mdl()[3:end] == expected_obs[3:end]
+        @test sum(mdl() .|> ismissing) == 2
     end
 
     @testset "Test with data" begin
         pois_obs_model = LatentDelay(PoissonError(), delay_int)
         mdl = generate_observations(pois_obs_model, [10.0, 20.0, 30.0, 40.0, 50.0], I_t)
-        @test mdl()[1] == [10.0, 20.0, 30.0, 40.0, 50]
+        @test mdl() == [10.0, 20.0, 30.0, 40.0, 50]
     end
 end
