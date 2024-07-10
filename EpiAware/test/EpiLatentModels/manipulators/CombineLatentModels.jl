@@ -34,7 +34,7 @@ end
 
     @model function EpiAware.EpiAwareBase.generate_latent(model::NextScale, n::Int)
         scale = 2
-        return scale_vect = fill(scale, n), (; nscale = scale)
+        return fill(scale, n)
     end
 
     s = FixedIntercept(1)
@@ -44,10 +44,8 @@ end
     comb_model_out = comb_model()
 
     @test typeof(comb_model) <: DynamicPPL.Model
-    @test length(comb_model_out[1]) == 5
-    @test all(comb_model_out[1] .== fill(3.0, 5))
-    @test comb_model_out[2].intercept == 1.0
-    @test comb_model_out[2].nscale == 2.0
+    @test length(comb_model_out) == 5
+    @test all(comb_model_out .== fill(3.0, 5))
 end
 
 @testitem "CombineLatentModels generate_latent method works as expected: Intercept + AR" begin
