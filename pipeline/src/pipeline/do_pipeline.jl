@@ -22,7 +22,7 @@ Perform the pipeline for each `AbstractEpiAwarePipeline` in the given vector `pi
 """
 function do_pipeline(pipelines::Vector{<:AbstractEpiAwarePipeline})
     map(pipelines) do pipeline
-        Dagger.@spawn do_pipeline(pipeline)
+        do_pipeline(pipeline)
     end
     return nothing
 end
