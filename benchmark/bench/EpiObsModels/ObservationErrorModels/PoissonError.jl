@@ -1,5 +1,5 @@
 let
-    using Distributions, Turing
+    using Distributions, Turing, DynamicPPL
     μ = 10.0
     n = 10
     nb_obs_model = PoissonError()
