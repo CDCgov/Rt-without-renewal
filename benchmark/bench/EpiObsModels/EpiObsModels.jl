@@ -1,6 +1,6 @@
 module BenchEpiObsModels
 
-using BenchmarkTools, TuringBenchmarking, EpiAware
+using BenchmarkTools, TuringBenchmarking, EpiAware, DynamicPPL
 suite = BenchmarkGroup()
 
 include("modifiers/ascertainment/Ascertainment.jl")
