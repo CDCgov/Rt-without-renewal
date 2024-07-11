@@ -133,7 +133,7 @@ plt_ar_sample = let
     n_samples = 100
     ar_mdl_samples = mapreduce(hcat, 1:n_samples) do _
         θ = rand(ar_mdl) #Sample unconditionally the underlying parameters of the model
-        gen = generated_quantities(ar_mdl, θ)[1]
+        gen = generated_quantities(ar_mdl, θ)
     end
 
     plot(ar_mdl_samples,
@@ -157,7 +157,7 @@ let
     n_samples = 100
     ar_mdl_samples = mapreduce(hcat, 1:n_samples) do _
         θ = rand(cond_ar_mdl) #Sample unconditionally the underlying parameters of the model
-        gen = generated_quantities(cond_ar_mdl, θ)[1]
+        gen = generated_quantities(cond_ar_mdl, θ)
     end
 
     plot(ar_mdl_samples,
