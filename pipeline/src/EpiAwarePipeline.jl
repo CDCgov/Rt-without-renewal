@@ -47,7 +47,8 @@ export define_forecast_epiprob, generate_forecasts
 export score_parameters
 
 # Exported functions: main plot functions and utilities
-export generate_quantiles_for_targets, timeseries_samples_into_quantiles, make_truth_data_dict
+export generate_quantiles_for_targets, timeseries_samples_into_quantiles,
+       make_truth_data_dict
 
 # Exported functions: plot functions
 export plot_truth_data, plot_Rt
