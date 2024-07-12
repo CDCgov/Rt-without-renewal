@@ -44,3 +44,36 @@ function generate_quantiles_for_targets(output, D::EpiData, qs)
         timeseries_samples_into_quantiles(X, qs)
     end
 end
+
+"""
+Internal method to get a list of truth data scenarios from a vector of pipelines.
+"""
+function _get_scenario_list(pipelines::Vector{<:AbstractEpiAwarePipeline})
+    map(pipelines) do pipeline
+        _simulate_prefix(pipeline)
+    end
+end
+
+"""
+Internal method to get a list of truth data mean generation intervals
+"""
+function _get_truth_mean_gi_string_list(pipelines::Vector{<:AbstractEpiAwarePipeline})
+    gi_params = make_gi_params(pipelines[1])
+    gi_mean_strs = gi_params["gi_means"] .|> x -> "gi_mean=$(x)"
+    gi_mean_strs
+end
+
+function make_truth_data_dict(pipelines::Vector{<:AbstractEpiAwarePipeline}; truth_data_dir::String = "truth_data")
+    truth_data_files = readdir(datadir(truth_data_dir)) |> strs -> filter(s -> occursin("jld2", s), strs)
+
+    scenario_list = _get_scenario_list(pipelines)
+    gi_mean_strs = _get_truth_mean_gi_string_list(pipelines)
+
+    map(Iterators.product(scenario_list, gi_mean_strs)) do (scenario, gi_mean_str)
+        filename = filter(name -> occursin(scenario, name) && occursin(gi_mean_str, name) , truth_data_files)
+        @assert length(filename) == 1 "More than one Truth data file found"
+
+        D = JLD2.load(joinpath(datadir(truth_data_dir), first(filename)))
+        (scenario, gi_mean_str) => D
+    end |> Dict
+end
