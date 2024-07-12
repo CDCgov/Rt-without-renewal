@@ -20,7 +20,7 @@ export AbstractTuringLatentModel, AbstractTuringIntercept
 export AbstractTuringObservationModel, AbstractTuringObservationErrorModel
 
 # Export support types
-export AbstractBroadcastRule
+export AbstractBroadcastRule, AbstractAccumulationStep
 
 #Export problems
 export AbstractEpiProblem
