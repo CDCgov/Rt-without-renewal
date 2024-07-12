@@ -27,7 +27,7 @@ Apply `f` to each element of `xs` and accumulate the results.
 ```jldoctest
 using EpiAware
 
-struct Adder <: EpiAwareBase.AbstractModel end
+struct Adder end
 function (a::Adder)(carry, x)
     carry + x, carry + x
 end
