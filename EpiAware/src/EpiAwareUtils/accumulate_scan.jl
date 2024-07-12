@@ -4,7 +4,7 @@
     `AbstractAccumulationStep` object to the input data in a single pass.
 
     # Arguments
-    - `acc_step::AbstractAccumulationStep`: The accumulation step function.
+    - `acc_step::AbstractAccumulationStep: The accumulation step function.
     - `initial_state`: The initial state of the accumulation.
     - `ϵ_t::AbstractVector{<:Real}`: The input data.
 
@@ -15,23 +15,25 @@
     # Examples
     ```julia
     using EpiAware
-    struct TestStep
+    struct TestStep <: AbstractAccumulationStep
         a::Float64
     end
 
-    function (a::TestStep)(state, ϵ_t)
-        new_state = state .+ a .* ϵ_t
-        return (state[2:end], new_state)
+    function (step::TestStep)(state, ϵ)
+        new_state = step.a * ϵ
+        return new_state
     end
 
     acc_step = TestStep(0.5)
     initial_state = zeros(3)
 
-    accumulate_scan(acc_step, initial_state)
+    accumulate_scan(acc_step, initial_state, [1.0, 2.0, 3.0])
 
     function get_state(acc_step::TestStep, initial_state, state)
         return state
     end
+
+    accumulate_scan(acc_step, initial_state, [1.0, 2.0, 3.0])
     ```
 "
 function accumulate_scan(acc_step::AbstractAccumulationStep, initial_state, ϵ_t)
