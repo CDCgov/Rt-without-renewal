@@ -14,7 +14,8 @@ A matrix where each row represents the quantiles of a time series.
 """
 function timeseries_samples_into_quantiles(X, qs)
     mapreduce(vcat, eachrow(X)) do row
-        quantile(row, qs)'
+        _row = filter(x -> !isnan(x), row)
+        quantile(_row, qs)'
     end
 end
 
@@ -123,12 +124,11 @@ end
 Internal method to get the used GI mean from a filename.
 """
 function _get_used_gi_mean_from_filename(filename;
-        used_gi_mean_strings::Vector{String} = "_gi_mean_" .*
-                                               string.([2.0, 10.0, 20.0]) .* "_gi_std")
+        used_gi_mean_strings::Vector{String} = "_gi_mean=" .*
+                                               string.([2.0, 10.0, 20.0]))
     used_gi = filter(ugi -> occursin(ugi, filename), used_gi_mean_strings)[1] |>
-              str -> split(str, "_")[end] |> s -> parse(Float64, s)
+              str -> split(str, "=")[end] |> s -> parse(Float64, s)
 end
-
 
 """
 Create a dataframe containing prediction results based on the given output and input data.
@@ -144,47 +144,53 @@ A dataframe containing the prediction results.
 
 """
 function make_prediction_dataframe_from_output(
-    filename, output, epi_datas; qs = [0.025, 0.5, 0.975])
-#Get the scenario, IGP model, latent model and true mean GI
-inference_config = output["inference_config"]
-igp_model = output["inference_config"].igp |> string
-scenario = EpiAwarePipeline._get_scenario_from_filename(filename, pipelines)
-latent_model = EpiAwarePipeline._get_latent_model_from_filename(filename)
-true_mean_gi = EpiAwarePipeline._get_true_gi_mean_from_filename(filename)
+        filename, output, epi_datas, pipelines; qs = [0.025, 0.5, 0.975])
+    #Get the scenario, IGP model, latent model and true mean GI
+    inference_config = output["inference_config"]
+    igp_model = output["inference_config"].igp |> string
+    scenario = EpiAwarePipeline._get_scenario_from_filename(filename, pipelines)
+    latent_model = EpiAwarePipeline._get_latent_model_from_filename(filename)
+    true_mean_gi = EpiAwarePipeline._get_true_gi_mean_from_filename(filename)
 
-#Get the quantiles for the targets across the gi mean scenarios
-#if Renewal model, then we use the underlying epi model
-#otherwise we use the epi datas to loop over different gi mean implications
-used_epi_datas = igp_model == "Renewal" ? [output["epiprob"].epi_model.data] : epi_datas
+    #Get the quantiles for the targets across the gi mean scenarios
+    #if Renewal model, then we use the underlying epi model
+    #otherwise we use the epi datas to loop over different gi mean implications
+    used_epi_datas = igp_model == "Renewal" ? [output["epiprob"].epi_model.data] : epi_datas
 
-preds = map(used_epi_datas) do epi_data
-    generate_quantiles_for_targets(output, epi_data, qs)
-end
-
-used_gi_means = igp_model == "Renewal" ?
-                [EpiAwarePipeline._get_used_gi_mean_from_filename(filename)] :
-                make_gi_params(EpiAwareExamplePipeline())["gi_means"]
-
-#Create the dataframe columnwise
-df = mapreduce(vcat, preds, used_gi_means) do pred, used_gi_mean
-    mapreduce(vcat, keys(pred)) do target
-        target_mat = pred[target]
-        target_times = collect(1:size(target_mat, 1)) .+ (inference_config.tspan[1] - 1)
-        _df = DataFrame(target_time = target_times)
-        _df[!, "Scenario"] .= scenario
-        _df[!, "IGP_Model"] .= igp_model
-        _df[!, "Latent_Model"] .= latent_model
-        _df[!, "True_GI_Mean"] .= true_mean_gi
-        _df[!, "Used_GI_Mean"] .= used_gi_mean
-        _df[!, "Reference_Time"] .= inference_config.tspan[2]
-        _df[!, "Target"] .= string(target)
-        # quantile predictions
-        for (j, q) in enumerate(qs)
-            q_str = split(string(q), ".")[end]
-            _df[!, "q_$(q_str)"] = target_mat[:, j]
+    preds = nothing
+    try
+        preds = map(used_epi_datas) do epi_data
+            generate_quantiles_for_targets(output, epi_data, qs)
         end
-        return _df
+        used_gi_means = igp_model == "Renewal" ?
+                        [EpiAwarePipeline._get_used_gi_mean_from_filename(filename)] :
+                        make_gi_params(EpiAwareExamplePipeline())["gi_means"]
+
+        #Create the dataframe columnwise
+        df = mapreduce(vcat, preds, used_gi_means) do pred, used_gi_mean
+            mapreduce(vcat, keys(pred)) do target
+                target_mat = pred[target]
+                target_times = collect(1:size(target_mat, 1)) .+
+                               (inference_config.tspan[1] - 1)
+                _df = DataFrame(target_time = target_times)
+                _df[!, "Scenario"] .= scenario
+                _df[!, "IGP_Model"] .= igp_model
+                _df[!, "Latent_Model"] .= latent_model
+                _df[!, "True_GI_Mean"] .= true_mean_gi
+                _df[!, "Used_GI_Mean"] .= used_gi_mean
+                _df[!, "Reference_Time"] .= inference_config.tspan[2]
+                _df[!, "Target"] .= string(target)
+                # quantile predictions
+                for (j, q) in enumerate(qs)
+                    q_str = split(string(q), ".")[end]
+                    _df[!, "q_$(q_str)"] = target_mat[:, j]
+                end
+                return _df
+            end
+        end
+        return df
+    catch
+        @warn "Error in generating quantiles for targets in file $filename"
+        return nothing
     end
-end
-return df
 end
