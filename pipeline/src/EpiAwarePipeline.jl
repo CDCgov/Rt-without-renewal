@@ -48,7 +48,7 @@ export score_parameters
 
 # Exported functions: main plot functions and utilities
 export generate_quantiles_for_targets, timeseries_samples_into_quantiles,
-       make_truth_data_dict
+       make_truth_data_dict, make_prediction_dataframe_from_output
 
 # Exported functions: plot functions
 export plot_truth_data, plot_Rt
