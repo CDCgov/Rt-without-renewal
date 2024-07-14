@@ -29,6 +29,7 @@ export broadcast_dayofweek, broadcast_weekly, equal_dimensions
 export DiffLatentModel, TransformLatentModel, PrefixLatentModel
 
 include("docstrings.jl")
+include("models/IDD.jl")
 include("models/Intercept.jl")
 include("models/RandomWalk.jl")
 include("models/AR.jl")
