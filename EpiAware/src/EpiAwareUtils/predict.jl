@@ -1,8 +1,24 @@
+
 """
-    A `PredictContext` is a context type for the `predict` function.
+    struct MiniBatchContext{Tctx, T} <: AbstractContext
+        context::Tctx
+        loglike_scalar::T
+    end
+
+The `MiniBatchContext` enables the computation of
+`log(prior) + s * log(likelihood of a batch)` when running the model, where `s` is the
+`loglike_scalar` field, typically equal to `the number of data points / batch size`.
+This is useful in batch-based stochastic gradient descent algorithms to be optimizing
+`log(prior) + log(likelihood of all the data points)` in the expectation.
 """
-struct PredictContext <: DynamicPPL.AbstractContext end
-DynamicPPL.NodeTrait(context::PredictContext) = DynamicPPL.IsLeaf()
+struct PredictContext{Tctx <: DynamicPPL.AbstractContext} <: DynamicPPL.AbstractContext
+    context::Tctx
+end
+DynamicPPL.NodeTrait(context::PredictContext) = DynamicPPL.IsParent()
+DynamicPPL.childcontext(context::PredictContext) = context.context
+function DynamicPPL.setchildcontext(parent::PredictContext, child)
+    return PredictContext(child)
+end
 
 """
 
@@ -83,7 +99,7 @@ function predict(
     chain_parameters = MCMCChains.get_sections(chain, :parameters)
 
     spl = DynamicPPL.SampleFromPrior()
-    cxt = PredictContext()
+    cxt = PredictContext(DynamicPPL.DefaultContext())
     # Sample transitions using `spl` conditioned on values in `chain`
     transitions = transitions_from_chain(
         rng, model, chain_parameters; sampler = spl, context = cxt)
@@ -182,7 +198,7 @@ function transitions_from_chain(
         model(rng, vi, sampler, context)
 
         # Convert `VarInfo` into `NamedTuple` and save.
-        DynamicPPL.Transition(model, vi)
+        Turing.Inference.Transition(model, vi)
     end
 
     return transitions
