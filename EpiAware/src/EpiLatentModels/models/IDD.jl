@@ -1,16 +1,16 @@
 @kwdef struct IDD{D <: Sampleable} <: AbstractTuringLatentModel
-    prior::D = Normal()
+    prior::D = Normal(0, 1)
 end
 
 @model function EpiAwareBase.generate_latent(model::IDD, n)
     if __context__.context isa PredictContext
         @info "Predicting"
-        ϵ_t = Vector{Float64}(undef, n)
-        for i in 1:n
+        ϵ_t = Vector(undef, n)
+        for i in eachindex(ϵ_t)
             ϵ_t[i] ~ model.prior
         end
     else
-        @info "Generating"
+        @info "Not predicting"
         ϵ_t ~ filldist(model.prior, n)
     end
     return ϵ_t

@@ -189,12 +189,17 @@ function transitions_from_chain(
         sampler = DynamicPPL.SampleFromPrior(),
         context = PredictContext()
 )
-    vi = Turing.VarInfo(model)
-
+    @info "Getting types"
+    vi = Turing.VarInfo(rng, model, sampler, context)
+    @info vi
     iters = Iterators.product(1:size(chain, 1), 1:size(chain, 3))
     transitions = map(iters) do (sample_idx, chain_idx)
         # Set variables present in `chain` and mark those NOT present in chain to be resampled.
+        @info sample_idx
+        @info chain_idx
+        @info "Reseting value"
         DynamicPPL.setval_and_resample!(vi, chain, sample_idx, chain_idx)
+        @info "sampling from model"
         model(rng, vi, sampler, context)
 
         # Convert `VarInfo` into `NamedTuple` and save.
