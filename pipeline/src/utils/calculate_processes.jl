@@ -11,7 +11,7 @@ Internal function for calculating the exponential growth rate with an informativ
     error message if the infections are not positive definite.
 """
 function _calc_rt(I_t, I0; jitter = 1e-6)
-    @assert I0 + jitter >0 "Initial infections must be positive definite."
+    @assert I0 + jitter>0 "Initial infections must be positive definite."
     log.([I0 + jitter; I_t .+ jitter]) .- log(I0 + jitter) |> diff
 end
 
@@ -22,10 +22,11 @@ assumes backward exponential growth with initial infections `I0` from initial
 estimate of `rt`.
 
 """
-function _infection_seeding(I_t, I0, data::EpiData, pipeline::AbstractEpiAwarePipeline; jitter = 1e-6)
+function _infection_seeding(
+        I_t, I0, data::EpiData, pipeline::AbstractEpiAwarePipeline; jitter = 1e-6)
     n = length(data.gen_int)
     init_rt = _calc_rt(I_t[1:2] .+ jitter, I0 + jitter) |> x -> x[1]
-    [(I0 + jitter)* exp(-init_rt * (n - i)) for i in 1:n]
+    [(I0 + jitter) * exp(-init_rt * (n - i)) for i in 1:n]
 end
 
 """
