@@ -10,7 +10,6 @@ pipelines = [
     SmoothOutbreakPipeline(), MeasuresOutbreakPipeline(),
     SmoothEndemicPipeline(), RoughEndemicPipeline()]
 
-
 ## load some data and create a dataframe for the plot
 truth_data_files = readdir(datadir("truth_data")) |>
                    strs -> filter(s -> occursin("jld2", s), strs)
