@@ -88,7 +88,7 @@ end
     #Check that are in central 99% of the posterior predictive distribution
     posterior_p_σ = ecdf(chn[:σ][:])(Z_generated.σ)
     posterior_p_σ_RW = ecdf(chn[:σ_RW][:])(Z_generated.σ_RW)
-    posterior_p_rinit = ecdf(chn[:rw_init][:])(obs_rand.rw_init)
+    posterior_p_rinit = ecdf(chn[:rw_init][:])(Z_generated.rw_init)
 
     @test 0.005 < posterior_p_σ < 0.9995
     @test 0.005 < posterior_p_σ_RW < 0.9995
