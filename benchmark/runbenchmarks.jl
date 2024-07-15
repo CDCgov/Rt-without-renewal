@@ -8,5 +8,5 @@ benchmarkpkg(
     ),
     );
     resultfile = joinpath(@__DIR__, "result.json"),
-    retune=true
+    retune = true
 )
