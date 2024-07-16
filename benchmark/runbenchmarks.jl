@@ -6,6 +6,7 @@ benchmarkpkg(
         "JULIA_NUM_THREADS" => "2",
         "OMP_NUM_THREADS" => "2"
     ),
-    ),
-    resultfile = joinpath(@__DIR__, "result.json")
+    );
+    resultfile = joinpath(@__DIR__, "result.json").
+    retune = true
 )
