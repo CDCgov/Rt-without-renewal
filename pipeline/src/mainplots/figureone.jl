@@ -289,7 +289,7 @@ fig1 = figureone(
 """
 function figureone(
         truth_df, analysis_df, latent_model, scenario_dict, target_dict,
-        latent_model_dict; fig_kws = (; size = (1000, 1000)),
+        latent_model_dict; fig_kws = (; size = (1000, 1500)),
         true_gi_choice = 10.0, used_gi_choice = 10.0,
         legend_title = "Infection generating\n process",
         targets = ["log_I_t", "rt", "Rt"],
@@ -321,8 +321,10 @@ function figureone(
     for (i, scenario) in enumerate(scenarios)
         for (j, target) in enumerate(targets)
             sf = fig[i, j]
+            V = mapping([scenario_dict[scenario].T]) * visual(VLines, color = :red, linewidth = 3)
+
             ag = draw!(
-                sf, plt_analysis_mat[i, j] + plt_truth_mat[i, j],
+                sf, plt_analysis_mat[i, j] + plt_truth_mat[i, j] + V,
                 axis = (; limits = (nothing, target_dict[target].ylims)))
             leg = AlgebraOfGraphics.compute_legend(ag)
             i == 1 &&
@@ -339,6 +341,6 @@ function figureone(
         font = :bold)
     _leg = (leg[1], leg[2], [legend_title])
     Legend(fig[2, 4], _leg...)
-
+    resize_to_layout!(fig)
     return fig
 end
