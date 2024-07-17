@@ -94,5 +94,5 @@ Z_t, _ = generated_quantities(rw_model, θ)
     for t in 2:n
         rw[t] = rw[t - 1] + σ_RW * ϵ_t[t]
     end
-    return rw, (; σ_RW, rw_init)
+    return rw
 end

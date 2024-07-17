@@ -10,6 +10,8 @@ end
     int = FixedIntercept(0.1)
     int_model = generate_latent(int, 10)
     int_model_out = int_model()
-    @test length(int_model_out[1]) == 10
-    @test all(x -> x == int_model_out[2].intercept, int_model_out[1])
+    rand_model = rand(int_model)
+    @test rand_model == NamedTuple()
+    @test length(int_model_out) == 10
+    @test all(x -> x == 0.1, int_model_out)
 end

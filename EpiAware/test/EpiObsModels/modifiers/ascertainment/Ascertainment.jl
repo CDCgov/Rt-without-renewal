@@ -21,11 +21,21 @@ end
 # make a test based on above example
 @testitem "Test Ascertainment generate_observations" begin
     using Turing, DynamicPPL
-    obs = Ascertainment(NegativeBinomialError(), FixedIntercept(0.1); link = x -> x)
+
+    struct ExpectedObs <: AbstractTuringObservationModel
+        model::AbstractTuringObservationModel
+    end
+
+    @model EpiAware.EpiAwareBase.generate_observations(model::ExpectedObs, y_t, Y_t) = begin
+        expected_obs := Y_t
+        @submodel y_t = generate_observations(model.model, y_t, Y_t)
+    end
+
+    obs = Ascertainment(
+        ExpectedObs(NegativeBinomialError()), FixedIntercept(0.1); link = x -> x)
     gen_obs = generate_observations(obs, missing, fill(100, 10))
     samples = sample(gen_obs, Prior(), 100; progress = false)
-    gen = mapreduce(vcat, generated_quantities(gen_obs, samples)) do gen
-        gen[2][:expected_obs]
-    end
+    gen = get(samples, :expected_obs).expected_obs |>
+          x -> vcat(x...)
     @test all(gen .== 10.0)
 end

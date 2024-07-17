@@ -36,7 +36,7 @@ end
 
     obs_samples = samples |>
                   chn -> mapreduce(vcat, generated_quantities(fix_model, chn)) do gen
-        gen[1]
+        gen
     end
 
     @test isapprox(mean(obs_samples), μ, atol = 0.1)  # Test the mean
