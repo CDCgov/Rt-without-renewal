@@ -321,7 +321,8 @@ function figureone(
     for (i, scenario) in enumerate(scenarios)
         for (j, target) in enumerate(targets)
             sf = fig[i, j]
-            V = mapping([scenario_dict[scenario].T]) * visual(VLines, color = :red, linewidth = 3)
+            V = mapping([scenario_dict[scenario].T]) *
+                visual(VLines, color = :red, linewidth = 3)
 
             ag = draw!(
                 sf, plt_analysis_mat[i, j] + plt_truth_mat[i, j] + V,
