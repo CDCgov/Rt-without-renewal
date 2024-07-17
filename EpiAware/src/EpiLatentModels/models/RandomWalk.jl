@@ -89,5 +89,5 @@ Z_t, _ = generated_quantities(rw_model, θ)
     rw_init ~ latent_model.init_prior
     ϵ_t ~ filldist(Normal(), n - 1)
     rw = rw_init .+ vcat(0.0, σ_RW .* cumsum(ϵ_t))
-    return rw, (; σ_RW, rw_init)
+    return rw
 end
