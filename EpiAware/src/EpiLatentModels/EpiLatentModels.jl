@@ -5,7 +5,7 @@ module EpiLatentModels
 
 using ..EpiAwareBase
 
-using ..EpiAwareUtils: HalfNormal, prefix_submodel, accumulate_scan
+using ..EpiAwareUtils: HalfNormal, prefix_submodel, accumulate_scan, PredictContext
 
 using LogExpFunctions: softmax
 
@@ -14,7 +14,7 @@ using FillArrays: Fill
 using Turing, Distributions, DocStringExtensions, LinearAlgebra
 
 #Export models
-export FixedIntercept, Intercept, RandomWalk, AR, HierarchicalNormal
+export IDD, FixedIntercept, Intercept, RandomWalk, AR, HierarchicalNormal
 
 # Export tools for manipulating latent models
 export CombineLatentModels, ConcatLatentModels, BroadcastLatentModel
@@ -29,6 +29,7 @@ export broadcast_dayofweek, broadcast_weekly, equal_dimensions
 export DiffLatentModel, TransformLatentModel, PrefixLatentModel
 
 include("docstrings.jl")
+include("models/IDD.jl")
 include("models/Intercept.jl")
 include("models/RandomWalk.jl")
 include("models/AR.jl")

@@ -6,12 +6,11 @@ module EpiAwareUtils
 using ..EpiAwareBase
 
 using DataFramesMeta: DataFrame, @rename!
-using DynamicPPL: Model, fix, condition, @submodel, @model
-using MCMCChains: Chains
-using Random: AbstractRNG
+using MCMCChains: Chains, get_sections, chainscat
 using Tables: rowtable
+using AbstractMCMC: bundle_samples
 
-using Distributions, DocStringExtensions, QuadGK, Statistics, Turing
+using Distributions, DocStringExtensions, QuadGK, Statistics, Turing, Random, DynamicPPL
 
 #Export Structures
 export HalfNormal, DirectSample
@@ -21,6 +20,9 @@ export scan, spread_draws, censored_pmf, get_param_array, prefix_submodel
 
 # Export accumulate tools
 export get_state, accumulate_scan
+
+# Export custom prediction
+export predict, PredictContext
 
 include("docstrings.jl")
 include("censored_pmf.jl")
@@ -32,5 +34,6 @@ include("turing-methods.jl")
 include("DirectSample.jl")
 include("post-inference.jl")
 include("get_param_array.jl")
+include("predict.jl")
 
 end
