@@ -90,7 +90,7 @@ end
 @doc raw"
 The autoregressive (AR) step function struct
 "
-struct ARStep{D <: AbstractVector{<:Real}, F <: Real} <: AbstractAccumulationStep
+struct ARStep{D <: AbstractVector{<:Real}} <: AbstractAccumulationStep
     damp_AR::D
 end
 
