@@ -67,7 +67,6 @@ Generate a latent AR series.
 
 # Returns
 - `ar::Vector{Float64}`: The generated AR series.
-- `params::NamedTuple`: A named tuple containing the generated parameters (`σ_AR`, `ar_init`, `damp_AR`).
 
 # Notes
 - The length of `damp_prior` and `init_prior` must be the same.
@@ -84,7 +83,7 @@ Generate a latent AR series.
 
     ar = accumulate_scan(ARStep(damp_AR), ar_init, σ_AR * ϵ_t)
 
-    return ar, (; σ_AR, ar_init, damp_AR)
+    return ar
 end
 
 @doc raw"

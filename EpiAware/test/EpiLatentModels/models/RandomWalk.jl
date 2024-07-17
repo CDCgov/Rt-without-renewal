@@ -9,7 +9,7 @@
     n_samples = 1000
     samples_day_5 = sample(fixed_model, Prior(), n_samples; progress = false) |>
                     chn -> mapreduce(vcat, generated_quantities(fixed_model, chn)) do gen
-        gen[1][5] #Extracting day 5 samples
+        gen[5] #Extracting day 5 samples
     end
     #Check that the samples are drawn from the correct distribution which is Normal(mean = 0, var = 5)
     ks_test_pval = ExactOneSampleKSTest(samples_day_5, Normal(0.0, sqrt(5))) |> pvalue

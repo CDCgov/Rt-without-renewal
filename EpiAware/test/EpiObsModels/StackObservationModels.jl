@@ -32,7 +32,7 @@ end
         for i in eachindex(y_t)
             y_t[i] ~ Normal(obs_model.mean, obs_model.std)
         end
-        return y_t, (; cluster_factor = obs_model.mean)
+        return y_t
     end
 
     obs = StackObservationModels(

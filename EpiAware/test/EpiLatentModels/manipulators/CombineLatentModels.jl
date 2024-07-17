@@ -34,7 +34,7 @@ end
 
     @model function EpiAware.EpiAwareBase.generate_latent(model::NextScale, n::Int)
         scale = 2
-        return scale_vect = fill(scale, n), (; nscale = scale)
+        return fill(scale, n)
     end
 
     s = FixedIntercept(1)
@@ -44,15 +44,13 @@ end
     comb_model_out = comb_model()
 
     @test typeof(comb_model) <: DynamicPPL.Model
-    @test length(comb_model_out[1]) == 5
-    @test all(comb_model_out[1] .== fill(3.0, 5))
-    @test comb_model_out[2].intercept == 1.0
-    @test comb_model_out[2].nscale == 2.0
+    @test length(comb_model_out) == 5
+    @test all(comb_model_out .== fill(3.0, 5))
 end
 
 @testitem "CombineLatentModels generate_latent method works as expected: Intercept + AR" begin
     using Turing
-    using Distributions: Normal
+    using Distributions
     using HypothesisTests: ExactOneSampleKSTest, pvalue
     using LinearAlgebra: Diagonal
 
@@ -65,9 +63,9 @@ end
     # Test constant if conditioning on zero residuals
     no_residual_mdl = comb_model |
                       (var"Combine.2.ϵ_t" = zeros(n - 1), var"Combine.2.ar_init" = [0.0])
-    y_const, θ_const = no_residual_mdl()
+    y_const = no_residual_mdl()
 
-    @test all(y_const .== fill(θ_const.intercept, n))
+    @test all(y_const .== y_const[1])
 
     # Check against linear regression by conditioning on normal residuals
     # Generate data
@@ -75,11 +73,11 @@ end
     normal_res_mdl = comb_model |
                      (var"Combine.2.damp_AR" = [0.0], var"Combine.2.σ_AR" = 1.0,
         var"Combine.1.intercept" = fix_intercept)
-    y, θ = normal_res_mdl()
+    y = normal_res_mdl()
 
     # Fit no-slope linear regression as a model test
     @model function no_slope_linear_regression(y)
-        @submodel y_pred, θ = generate_latent(comb, n)
+        @submodel y_pred = generate_latent(comb, n)
         y ~ MvNormal(y_pred, Diagonal(ones(n)))
     end
 
