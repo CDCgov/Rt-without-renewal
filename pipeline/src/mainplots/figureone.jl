@@ -336,12 +336,12 @@ function figureone(
     end
 
     Label(fig[:, 0], "Process values", fontsize = 28, font = :bold, rotation = pi / 2)
-    Label(fig[3, 4],
+    Label(fig[5, 3],
         "Latent model\n for infection\n generating\n process:\n$(latent_model_dict[latent_model].title)",
         fontsize = 18,
         font = :bold)
     _leg = (leg[1], leg[2], [legend_title])
-    Legend(fig[2, 4], _leg...)
+    Legend(fig[5, 2], _leg...)
     resize_to_layout!(fig)
     return fig
 end
