@@ -98,7 +98,7 @@ Internal method that generates a plot of the truth data for a specific scenario.
 - `plt_truth`: The plot of the truth data.
 
 """
-function _figure_one_scenario_truth_data(truth_df, scenario; true_gi_choice)
+function _figure_scenario_truth_data(truth_df, scenario; true_gi_choice)
     truth_plotting_data = truth_df |>
                           df -> @subset(df, :True_GI_Mean.==true_gi_choice) |>
                                 df -> @subset(df, :Scenario.==scenario) |> data
@@ -138,7 +138,7 @@ function figureone_with_latent_model(
 
     scenarios = analysis_df.Scenario |> unique
     plt_truth_vect = map(scenarios) do scenario
-        _figure_one_scenario_truth_data(truth_df, scenario; true_gi_choice)
+        _figure_scenario_truth_data(truth_df, scenario; true_gi_choice)
     end
     plt_analysis_vect = map(scenarios) do scenario
         _figure_one_scenario(
