@@ -13,5 +13,5 @@ let
     expected_incidence = exp.(log_init_scale .+ log_incidence)
 
     mdl = generate_latent_infs(direct_inf_model, log_incidence)
-    suite["DirectInfections"] = make_turing_suite(mdl; check = true)
+    suite["DirectInfections"] = make_epiaware_suite(mdl)
 end

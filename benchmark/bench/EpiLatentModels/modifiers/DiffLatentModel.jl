@@ -7,5 +7,5 @@ let
     diff_model = DiffLatentModel(model = rw_model, init_priors = init_priors)
 
     latent_model = generate_latent(diff_model, n)
-    suite["DiffLatentModel"] = make_turing_suite(latent_model; check = true)
+    suite["DiffLatentModel"] = make_epiaware_suite(latent_model)
 end

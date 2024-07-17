@@ -13,5 +13,5 @@ let
     rt = [log(recent_incidence[1]) - log_init; diff(log.(recent_incidence))]
 
     mdl = generate_latent_infs(rt_model, rt)
-    suite["ExpGrowthRate"] = make_turing_suite(mdl; check = true)
+    suite["ExpGrowthRate"] = make_epiaware_suite(mdl)
 end

@@ -3,6 +3,7 @@ module BenchEpiLatentModels
 using BenchmarkTools, TuringBenchmarking, EpiAware, DynamicPPL
 suite = BenchmarkGroup()
 
+include("../../make_epiaware_suite.jl")
 include("models/AR.jl")
 include("models/RandomWalk.jl")
 include("models/Intercept.jl")
