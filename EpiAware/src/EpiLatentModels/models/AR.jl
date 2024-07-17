@@ -82,7 +82,7 @@ Generate a latent AR series.
     damp_AR ~ latent_model.damp_prior
     @submodel ϵ_t = generate_latent(IDD(Normal()), n)
 
-    ar = accumulate_scan(ARStep(damp_AR, σ_AR), ar_init, ϵ_t)
+    ar = accumulate_scan(ARStep(damp_AR), ar_init, σ_AR * ϵ_t)
 
     return ar, (; σ_AR, ar_init, damp_AR)
 end
@@ -92,14 +92,13 @@ The autoregressive (AR) step function struct
 "
 struct ARStep{D <: AbstractVector{<:Real}, F <: Real} <: AbstractAccumulationStep
     damp_AR::D
-    σ_AR::F
 end
 
 @doc raw"
 The autoregressive (AR) step function for use with `accumulate_scan`.
 "
 function (ar::ARStep)(state, ϵ)
-    new_val = dot(ar.damp_AR, state) + ar.σ_AR * ϵ
+    new_val = dot(ar.damp_AR, state) + ϵ
     new_state = vcat(state[2:end], new_val)
     return new_state
 end
