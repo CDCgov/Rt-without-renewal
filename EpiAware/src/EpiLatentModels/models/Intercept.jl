@@ -33,11 +33,10 @@ Generate a latent intercept series.
 # Returns
 
 - `intercept::Vector{Float64}`: The generated intercept series.
-- `metadata::NamedTuple`: A named tuple containing the intercept value.
 "
 @model function EpiAwareBase.generate_latent(latent_model::Intercept, n)
     intercept ~ latent_model.intercept_prior
-    return fill(intercept, n), (; intercept = intercept)
+    return fill(intercept, n)
 end
 
 @doc raw"
@@ -71,8 +70,7 @@ Generate a latent intercept series with a fixed intercept value.
 
 # Returns
 - `latent_vars`: An array of length `n` filled with the fixed intercept value.
-- `metadata`: A named tuple containing the intercept value.
 "
 @model function EpiAwareBase.generate_latent(latent_model::FixedIntercept, n)
-    return fill(latent_model.intercept, n), (; intercept = latent_model.intercept)
+    return fill(latent_model.intercept, n)
 end

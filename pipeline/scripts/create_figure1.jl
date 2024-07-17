@@ -1,4 +1,4 @@
-## Script to make figure 1
+## Script to make figure 1 and alternate latent models for SI
 using Pkg
 Pkg.activate(joinpath(@__DIR__(), ".."))
 
@@ -19,8 +19,6 @@ truth_df = mapreduce(vcat, truth_data_files) do filename
     make_truthdata_dataframe(filename, D, pipelines)
 end
 
-## Make mainfigure plots
-
 # Define scenario titles and reference times for figure 1
 scenario_dict = Dict(
     "measures_outbreak" => (title = "Outbreak with measures", T = 28),
@@ -29,7 +27,22 @@ scenario_dict = Dict(
     "rough_endemic" => (title = "Rough endemic", T = 35)
 )
 
-fig1 = figureone(truth_df, analysis_df, scenario_dict)
+target_dict = Dict(
+    "log_I_t" => (title = "log(Incidence)", ylims = (3.5, 6)),
+    "rt" => (title = "Exp. growth rate", ylims = (-0.1, 0.1)),
+    "Rt" => (title = "Reproductive number", ylims = (-0.1, 3))
+)
 
-## Save the figure
-save(plotsdir("figure1.png"), fig1)
+latent_model_dict = Dict(
+    "wkly_rw" => (title = "Random walk",),
+    "wkly_ar" => (title = "AR(1)",),
+    "wkly_diff_ar" => (title = "Diff. AR(1)",)
+)
+
+## `wkly_ar` is the default latent model which we show as figure 1, others are for SI
+
+_ = map(latent_model_dict |> keys |> collect) do latent_model
+    fig = figureone(
+        truth_df, analysis_df, latent_model, scenario_dict, target_dict, latent_model_dict)
+    save(plotsdir("figure1_$(latent_model).png"), fig)
+end

@@ -15,19 +15,19 @@ A `DynamicPPPL.Model` object.
         y_t, time_steps, epi_model::AbstractTuringEpiModel;
         latent_model::AbstractTuringLatentModel, observation_model::AbstractTuringObservationModel)
     # Latent process
-    @submodel prefix="latent" Z_t, latent_model_aux=generate_latent(
+    @submodel prefix="latent" Z_t=generate_latent(
         latent_model, time_steps)
 
     # Transform into infections
     @submodel I_t = generate_latent_infs(epi_model, Z_t)
 
     # Predictive distribution of ascertained cases
-    @submodel prefix="obs" generated_y_t, generated_y_t_aux=generate_observations(
+    @submodel prefix="obs" generated_y_t=generate_observations(
         observation_model, y_t, I_t)
 
     # Generate quantities
     return (;
-        generated_y_t, I_t, Z_t, process_aux = merge(latent_model_aux, generated_y_t_aux))
+        generated_y_t, I_t, Z_t)
 end
 
 """
