@@ -4,5 +4,5 @@ let
     ns = RandomWalk()
     con = ConcatLatentModels([s, ns])
     mdl = generate_latent(con, 10)
-    suite["ConcatLatentModels"] = make_turing_suite(mdl; check = false)
+    suite["ConcatLatentModels"] = make_epiaware_suite(mdl; check = false)
 end

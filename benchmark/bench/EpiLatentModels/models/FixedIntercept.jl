@@ -6,5 +6,5 @@ let
         return y
     end
     mdl = model(10)
-    suite["Intercept"] = make_turing_suite(mdl; check = true)
+    suite["Intercept"] = make_epiaware_suite(mdl)
 end

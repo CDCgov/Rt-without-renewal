@@ -8,5 +8,5 @@ let
 
     gen_obs = generate_observations(obs, y_t, Y_t)
 
-    suite["StackObservationModels"] = make_turing_suite(gen_obs; check = false)
+    suite["StackObservationModels"] = make_epiaware_suite(gen_obs; check = false)
 end

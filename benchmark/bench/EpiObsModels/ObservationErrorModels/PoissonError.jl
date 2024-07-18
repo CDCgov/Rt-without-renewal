@@ -9,5 +9,5 @@ let
         @submodel generate_observations(nb_obs_model, Y_t, μ)
     end
     mdl = test_model(Y_t, n)
-    suite["PoissonError"] = make_turing_suite(mdl; check = true)
+    suite["PoissonError"] = make_epiaware_suite(mdl)
 end
