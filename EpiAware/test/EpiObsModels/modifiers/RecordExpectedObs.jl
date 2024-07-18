@@ -7,6 +7,6 @@ end
     using EpiAware, Turing
     mdl = RecordExpectedObs(NegativeBinomialError())
     gen_obs = generate_observations(mdl, missing, fill(100, 1))
-    samples = sample(gen_obs, Prior(), 10)
+    samples = sample(gen_obs, Prior(), 10; progress = false)
     @test all(get(samples, :exp_y_t).exp_y_t .== 100)
 end

@@ -9,6 +9,6 @@ end
     using EpiAware, Turing
     mdl = RecordExpectedLatent(FixedIntercept(0.1))
     gen_latent = generate_latent(mdl, 1)
-    samples = sample(gen_latent, Prior(), 10)
+    samples = sample(gen_latent, Prior(), 10; progress = false)
     @test all(get(samples, :exp_latent).exp_latent .== 0.1)
 end
