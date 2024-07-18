@@ -18,7 +18,7 @@ export PoissonError, NegativeBinomialError
 export generate_observation_error_priors, observation_error
 
 # Observation model modifiers
-export LatentDelay, Ascertainment, PrefixObservationModel
+export LatentDelay, Ascertainment, PrefixObservationModel, RecordExpectedObs
 
 # Observation model manipulators
 export StackObservationModels
@@ -31,6 +31,7 @@ include("modifiers/LatentDelay.jl")
 include("modifiers/ascertainment/Ascertainment.jl")
 include("modifiers/ascertainment/helpers.jl")
 include("modifiers/PrefixObservationModel.jl")
+include("modifiers/RecordExpectedObs.jl")
 include("StackObservationModels.jl")
 include("ObservationErrorModels/methods.jl")
 include("ObservationErrorModels/NegativeBinomialError.jl")
