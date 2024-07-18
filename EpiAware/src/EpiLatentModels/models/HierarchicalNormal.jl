@@ -34,7 +34,7 @@ Generate latent variables from the hierarchical normal distribution.
 "
 @model function EpiAwareBase.generate_latent(obs_model::HierarchicalNormal, n)
     std ~ obs_model.std_prior
-    ϵ_t ~ MvNormal(Diagonal(Fill(one(eltype(std)), n)))
+    ϵ_t ~ filldist(Normal(), n)
 
     η_t = obs_model.mean .+ std .* ϵ_t
     return η_t
