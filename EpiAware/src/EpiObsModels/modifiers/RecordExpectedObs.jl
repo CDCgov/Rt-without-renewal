@@ -3,7 +3,6 @@
 
     # Fields
     - `model::AbstractTuringObservationModel`: The observation model to dispatch to.
-    - `var_name::String`: The variable name to assign the observation to. Defaults to `exp_y_t`.
 
     # Constructors
 
