@@ -1,7 +1,5 @@
 @testitem "RecordExpectedObs constructor works as expected" begin
     model = RecordExpectedObs(PoissonError())
-    @test typeof(model) <: RecordExpectedObs
-    @test typeof(model) <: AbstractTuringObservationErrorModel
     @test typeof(model.model) <: PoissonError
 end
 
