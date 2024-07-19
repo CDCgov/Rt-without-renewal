@@ -1,7 +1,7 @@
 # Local environment script to run the analysis pipeline
 using Pkg
 Pkg.activate(joinpath(@__DIR__(), ".."))
-using Dagger
+
 
 @info("""
       Running the example pipeline.
@@ -20,7 +20,14 @@ pids_remote = addprocs([("sam@192.168.0.248", 4)];
 
 
 @everywhere using EpiAwarePipeline
+@everywhere P = EpiAwareExamplePipeline(ndraws = 2_000, pipetype = MeasuresOutbreakPipeline)
 
-pipeline = EpiAwareExamplePipeline(ndraws = 2_000, pipetype = MeasuresOutbreakPipeline)
+truth_data_configs = make_truth_data_configs(P)
+D = generate_truthdata(truth_data_configs[1], P; plot = false)
+inference_configs = make_inference_configs(pipeline)
+@everywhere inference_method = make_inference_method(pipeline)
 
-do_pipeline(pipeline)
+results = pmap(inference_configs, fill(D, length(inference_configs))) do inference_config, truthdata
+    generate_inference_results(
+            truthdata, inference_config, P; inference_method)
+end
