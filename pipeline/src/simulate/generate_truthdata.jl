@@ -60,13 +60,12 @@ which saves to a temporary directory, which is deleted after the function call.
 """
 function generate_truthdata(
         truth_data_config, pipeline::EpiAwareExamplePipeline; plot = true,
-        prefix = "truth_data")
+        prefix = "truth_data", datadir_str = "example_truth_data")
     default_params = make_default_params(pipeline)
     config = TruthSimulationConfig(
         truth_process = default_params["Rt"], gi_mean = truth_data_config["gi_mean"],
         gi_std = truth_data_config["gi_std"], logit_daily_ascertainment = default_params["logit_daily_ascertainment"],
         cluster_factor = default_params["cluster_factor"], I0 = default_params["I0"])
-    datadir_str = mktempdir()
 
     truthdata, truthfile = produce_or_load(
         simulate, config, datadir(datadir_str); prefix = prefix)

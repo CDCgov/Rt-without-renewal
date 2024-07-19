@@ -48,7 +48,8 @@ which is deleted after the function call.
 - `inference_results`: The generated inference results.
 """
 function generate_inference_results(
-        truthdata, inference_config, pipeline::EpiAwareExamplePipeline; inference_method)
+        truthdata, inference_config, pipeline::EpiAwareExamplePipeline;
+        inference_method, datadir_name = "example_epiaware_observables")
     tspan = make_tspan(
         pipeline; T = inference_config["T"], lookback = inference_config["lookback"])
     config = InferenceConfig(inference_config; case_data = truthdata["y_t"],
@@ -57,10 +58,8 @@ function generate_inference_results(
     # produce or load inference results
     prfx = _inference_prefix(truthdata, inference_config, pipeline)
 
-    datadir_name = mktempdir()
-
     inference_results, inferencefile = produce_or_load(
-        infer, config, datadir_name; prefix = prfx)
+        infer, config, datadir(datadir_name); prefix = prfx)
     return inference_results
 end
 

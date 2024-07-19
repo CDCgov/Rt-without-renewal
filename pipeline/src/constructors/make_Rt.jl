@@ -21,6 +21,20 @@ function make_Rt(pipeline::AbstractEpiAwarePipeline; A = 0.3, P = 30.0)
 end
 
 """
+Constructs an Rt object based on the given `pipeline`.
+
+# Arguments
+- `pipeline`: An instance of `EpiAwareExamplePipeline`.
+
+# Returns
+- An Rt object.
+
+"""
+function make_Rt(pipeline::EpiAwareExamplePipeline)
+    return make_Rt(pipeline.pipetype())
+end
+
+"""
 Constructs the time-varying reproduction number (Rt) for a given SmoothOutbreakPipeline.
 
 # Arguments

@@ -8,8 +8,17 @@ end
 
 """
 Internal method for selecting from a list of items based on the pipeline type.
-Example/test mode is to return a randomly selected item from the list.
+Example/test mode filters to a subset of the inference configs.
 """
 function _selector(list, pipeline::EpiAwareExamplePipeline)
-    return [rand(list)]
+    if haskey(list[1], "T")
+        _list = list |>
+                l -> filter(x -> x["T"] == pipeline.T, l) |>
+                     l -> filter(x -> x["gi_mean"] == pipeline.gi_mean, l)
+        return _list
+    else
+        _list = list |>
+                l -> filter(x -> x["gi_mean"] == pipeline.gi_mean, l)
+        return _list
+    end
 end

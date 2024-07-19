@@ -31,15 +31,13 @@ end
 """
 Pipeline test mode method for sampling from prior predictive distribution of the model.
 """
-function make_inference_method(
-        pipeline::EpiAwareExamplePipeline; ndraws::Integer = 20,
-        mcmc_ensemble::AbstractMCMC.AbstractMCMCEnsemble = MCMCThreads(),
-        nruns_pthf::Integer = 4, maxiters_pthf::Integer = 100, nchains::Integer = 4)
+function make_inference_method(pipeline::EpiAwareExamplePipeline)
     return EpiMethod(
-        pre_sampler_steps = [ManyPathfinder(nruns = nruns_pthf, maxiters = maxiters_pthf)],
+        # pre_sampler_steps = AbstractEpiOptMethod[],
+        pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 100)],
         sampler = NUTSampler(
-            target_acceptance = 0.9, adtype = AutoForwardDiff(), ndraws = ndraws,
-            nchains = nchains, mcmc_parallel = mcmc_ensemble)
+            target_acceptance = 0.7, adtype = AutoForwardDiff(), ndraws = pipeline.ndraws,
+            nchains = pipeline.nchains, mcmc_parallel = pipeline.mcmc_ensemble, metricT = DenseEuclideanMetric)
     )
 end
 

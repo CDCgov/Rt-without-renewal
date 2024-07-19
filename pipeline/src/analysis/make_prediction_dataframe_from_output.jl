@@ -12,7 +12,8 @@ A dataframe containing the prediction results.
 
 """
 function make_prediction_dataframe_from_output(
-        filename, output, epi_datas, pipelines; qs = [0.025, 0.5, 0.975])
+        filename, output, epi_datas, pipelines; qs = [0.025, 0.5, 0.975],
+        used_gi_means = [2.0, 10.0, 20.0])
     #Get the scenario, IGP model, latent model and true mean GI
     inference_config = output["inference_config"]
     igp_model = output["inference_config"].igp |> string
@@ -32,7 +33,7 @@ function make_prediction_dataframe_from_output(
         end
         used_gi_means = igp_model == "Renewal" ?
                         [EpiAwarePipeline._get_used_gi_mean_from_filename(filename)] :
-                        make_gi_params(EpiAwareExamplePipeline())["gi_means"]
+                        used_gi_means
 
         #Create the dataframe columnwise
         df = mapreduce(vcat, preds, used_gi_means) do pred, used_gi_mean

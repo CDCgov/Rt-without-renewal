@@ -18,7 +18,13 @@ end
 """
 The pipeline type for the Rt pipeline without renewal in test mode.
 """
-struct EpiAwareExamplePipeline <: AbstractEpiAwarePipeline
+@kwdef struct EpiAwareExamplePipeline{P} <: AbstractEpiAwarePipeline
+    ndraws::Integer = 2800
+    mcmc_ensemble::AbstractMCMC.AbstractMCMCEnsemble = MCMCSerial()
+    nchains::Integer = 1
+    T::Integer = 35
+    gi_mean::Float64 = 2.0
+    pipetype::P
 end
 
 """

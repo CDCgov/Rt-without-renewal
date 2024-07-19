@@ -62,16 +62,23 @@ function simulate(config::TruthSimulationConfig)
     obs = LatentDelay(dayofweek_logit_ascert, config.delay_distribution)
 
     #Sample observations with fixed values of underlying logit relative ascertainment
+
     obs_model = generate_observations(obs, missing, I_t) |>
                 mdl -> fix(mdl,
-        (std = 1.0, cluster_factor = config.cluster_factor,
-            ϵ_t = config.logit_daily_ascertainment))
+        (var"DayofWeek.std" = 1.0, cluster_factor = config.cluster_factor,
+            var"DayofWeek.ϵ_t" = config.logit_daily_ascertainment))
 
-    y_t, θ = obs_model()
+    y_t = obs_model()
+
+    # type the y_t vals
+    _y_t = Vector{Union{Int64, Missing}}(undef, length(y_t))
+    for (t, y) in enumerate(y_t)
+        _y_t[t] = ismissing(y) ? missing : Int64(y)
+    end
 
     #Return the sampled infections and observations
 
-    return Dict("I_t" => I_t, "y_t" => y_t,
+    return Dict("I_t" => I_t, "y_t" => _y_t,
         "truth_process" => config.truth_process,
         "truth_gi_mean" => config.gi_mean,
         "truth_gi_std" => config.gi_std,

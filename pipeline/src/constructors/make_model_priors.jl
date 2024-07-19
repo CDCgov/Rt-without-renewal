@@ -15,8 +15,8 @@ standard deviation 0.25.
 """
 function make_model_priors(pipeline::AbstractEpiAwarePipeline)
     transformed_process_init_prior = Normal(0.0, 0.25)
-    std_prior = HalfNormal(0.25)
-    damp_param_prior = Beta(0.5, 0.5)
+    std_prior = HalfNormal(0.55)
+    damp_param_prior = Beta(50, 10)
     log_I0_prior = Normal(log(100.0), 1e-5)
 
     return Dict(
