@@ -8,10 +8,11 @@
 end
 
 @testitem "TransformLatentModel generate_latent method" begin
-    using Turing, Distributions
+    using Turing, Distributions, DynamicPPL
 
     trans = TransformLatentModel(Intercept(Normal(2, 0.2)), x -> x .|> exp)
     trans_model = generate_latent(trans, 5)
-    returns = trans_model()
-    @test returns[1][1] == exp(returns[2].latent_aux.intercept)
+    fix_model = fix(trans_model, (intercept = 2.0))
+    returns = fix_model()
+    @test returns[1] == exp(2)
 end

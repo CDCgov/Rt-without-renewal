@@ -73,3 +73,8 @@ abstract type AbstractEpiSamplingMethod <: AbstractEpiMethod end
 Abstract type for all Turing-based Renewal infection generating models.
 """
 abstract type AbstractTuringRenewal <: AbstractTuringEpiModel end
+
+"""
+Abstract type for all accumulation steps
+"""
+abstract type AbstractAccumulationStep end

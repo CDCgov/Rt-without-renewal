@@ -22,24 +22,14 @@ end
 @testitem "generate_latent function with BroadcastLatentModel" begin
     using Turing, DynamicPPL
     model = BroadcastLatentModel(RandomWalk(), 5, RepeatBlock())
-    broadcasted_model = generate_latent(model, 10)
+    broadcasted_model = generate_latent(model, 15)
     rand_model = rand(broadcasted_model)
 
     @test length(rand_model.ϵ_t) == 2
-    fix_model = fix(broadcasted_model, (σ_RW = 1.0, rw_init = 1.0))
-    sample_model = sample(fix_model, Prior(), 100; progress = false)
-    gen_model = sample_model |>
-                chn -> mapreduce(hcat, generated_quantities(fix_model, chn)) do gen
-        gen[1]
-    end
-
-    @testset "Testing gen_model matrix" begin
-        for col in eachcol(gen_model)
-            unique_values = unique(col)
-            @test length(unique_values) == 2
-
-            @test count(x -> x == unique_values[1], col) == 5
-            @test count(x -> x == unique_values[2], col) == 5
-        end
-    end
+    fix_model = fix(
+        broadcasted_model,
+        (σ_RW = 2.0, rw_init = 1.0, ϵ_t = [1, 2])
+    )
+    out = fix_model()
+    @test out == vcat(fill(1.0, 5), fill(3.0, 5), fill(7.0, 5))
 end

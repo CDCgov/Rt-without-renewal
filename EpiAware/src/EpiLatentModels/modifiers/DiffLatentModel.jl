@@ -179,9 +179,9 @@ Z_t
     @assert n>d "n must be longer than d"
     latent_init ~ latent_model.init_prior
 
-    @submodel diff_latent, diff_latent_aux = generate_latent(latent_model.model, n - d)
+    @submodel diff_latent = generate_latent(latent_model.model, n - d)
 
-    return _combine_diff(latent_init, diff_latent, d), (; latent_init, diff_latent_aux...)
+    return _combine_diff(latent_init, diff_latent, d)
 end
 
 function _combine_diff(init, diff, d)

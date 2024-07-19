@@ -67,7 +67,6 @@ Generate a latent AR series.
 
 # Returns
 - `ar::Vector{Float64}`: The generated AR series.
-- `params::NamedTuple`: A named tuple containing the generated parameters (`σ_AR`, `ar_init`, `damp_AR`).
 
 # Notes
 - The length of `damp_prior` and `init_prior` must be the same.
@@ -80,16 +79,25 @@ Generate a latent AR series.
     σ_AR ~ latent_model.std_prior
     ar_init ~ latent_model.init_prior
     damp_AR ~ latent_model.damp_prior
-    ϵ_t ~ MvNormal(Diagonal(Fill(one(eltype(σ_AR)), n - p)))
+    ϵ_t ~ filldist(Normal(), n - p)
 
-    # Initialize the AR series with the initial values
-    ar = Vector{eltype(ϵ_t)}(undef, n)
-    ar[1:p] = ar_init
+    ar = accumulate_scan(ARStep(damp_AR), ar_init, σ_AR * ϵ_t)
 
-    # Generate the rest of the AR series
-    for t in (p + 1):n
-        ar[t] = damp_AR' * ar[(t - p):(t - 1)] + σ_AR * ϵ_t[t - p]
-    end
+    return ar
+end
 
-    return ar, (; σ_AR, ar_init, damp_AR)
+@doc raw"
+The autoregressive (AR) step function struct
+"
+struct ARStep{D <: AbstractVector{<:Real}} <: AbstractAccumulationStep
+    damp_AR::D
+end
+
+@doc raw"
+The autoregressive (AR) step function for use with `accumulate_scan`.
+"
+function (ar::ARStep)(state, ϵ)
+    new_val = dot(ar.damp_AR, state) + ϵ
+    new_state = vcat(state[2:end], new_val)
+    return new_state
 end

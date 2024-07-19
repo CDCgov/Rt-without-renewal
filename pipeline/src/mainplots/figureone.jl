@@ -274,7 +274,7 @@ function figureone(
             ag = draw!(
                 sf, plt_analysis_mat[i, j] + plt_truth_mat[i, j] + V,
                 axis = (; limits = (nothing, target_dict[target].ylims)))
-            # leg = AlgebraOfGraphics.compute_legend(ag)
+            leg = AlgebraOfGraphics.compute_legend(ag)
             i == 1 &&
                 Label(sf[0, 1], target_dict[target].title, fontsize = 22, font = :bold)
             j == 3 && Label(sf[1, 2], scenario_dict[scenario].title,
@@ -287,8 +287,10 @@ function figureone(
         "Latent model\n for infection\n generating\n process:\n$(latent_model_dict[latent_model].title)",
         fontsize = 18,
         font = :bold)
-    # _leg = (leg[1], leg[2], [legend_title])
-    # Legend(fig[5, 2], _leg...)
+
+    _leg = (leg[1], leg[2], [legend_title])
+    Legend(fig[5, 2], _leg...)
+
     resize_to_layout!(fig)
     return fig
 end

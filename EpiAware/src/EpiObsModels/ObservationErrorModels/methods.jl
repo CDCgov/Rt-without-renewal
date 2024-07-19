@@ -21,7 +21,7 @@ It dispatches to the `observation_error` function to generate the observation er
         y_t[i] ~ observation_error(obs_model, pad_Y_t[i], priors...)
     end
 
-    return y_t, priors
+    return y_t
 end
 
 @doc raw"

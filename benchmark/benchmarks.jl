@@ -1,4 +1,5 @@
 using BenchmarkTools
+
 SUITE = BenchmarkGroup()
 for folder in readdir(joinpath(@__DIR__, "bench"))
     if isdir(joinpath(@__DIR__, "bench", folder))

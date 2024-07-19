@@ -4,5 +4,5 @@ let
     ns = AR()
     con = CombineLatentModels([s, ns])
     mdl = generate_latent(con, 10)
-    suite["CombineLatentModels"] = make_turing_suite(mdl; check = true)
+    suite["CombineLatentModels"] = make_epiaware_suite(mdl)
 end
