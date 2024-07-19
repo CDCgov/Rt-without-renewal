@@ -23,8 +23,8 @@ observed data.
 ```julia
 using Distributions, Turing, EpiAware
 obs = LatentDelay(NegativeBinomialError(), truncated(Normal(5.0, 2.0), 0.0, Inf))
-obs_model = generate_observations(obs, missing, fill(10, 10))
-rand(obs_model)
+obs_model = generate_observations(obs, missing, fill(10, 30))
+obs_model()
 ```
 "
 struct LatentDelay{M <: AbstractTuringObservationModel, T <: AbstractVector{<:Real}} <:
@@ -66,13 +66,39 @@ Generates observations based on the `LatentDelay` observation model.
     pmf_length = length(obs_model.rev_pmf)
     @assert pmf_length<=length(trunc_Y_t) "The delay PMF must be shorter than or equal to the observation vector"
 
-    expected_obs = map(pmf_length:length(trunc_Y_t)) do i
-        sum(obs_model.rev_pmf .* trunc_Y_t[(i - pmf_length + 1):i])
-    end
+    expected_obs = accumulate_scan(
+        LDStep(obs_model.rev_pmf),
+        (; val = 0, current = trunc_Y_t[1:(pmf_length)]),
+        vcat(trunc_Y_t[(pmf_length + 1):end], 0.0)
+    )
+
     complete_obs = vcat(fill(missing, pmf_length + first_Y_t - 2), expected_obs)
 
     @submodel y_t = generate_observations(
         obs_model.model, y_t, complete_obs)
 
     return y_t
+end
+
+@doc raw"
+The LatentDelay step function struct
+"
+struct LDStep{D <: AbstractVector{<:Real}} <: AbstractAccumulationStep
+    rev_pmf::D
+end
+
+@doc raw"
+The LatentDelay step function method for `accumulate_scan`.
+"
+function (ld::LDStep)(state, ϵ)
+    val = dot(ld.rev_pmf, state.current)
+    current = vcat(state.current[2:end], ϵ)
+    return (; val, current)
+end
+
+@doc raw"
+The LatentDelay step function method for get_state.
+"
+function EpiAwareUtils.get_state(acc_step::LDStep, initial_state, state)
+    return state .|> x -> x.val
 end
