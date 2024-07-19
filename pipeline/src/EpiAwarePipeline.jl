@@ -52,7 +52,7 @@ export score_parameters
 export make_prediction_dataframe_from_output, make_truthdata_dataframe
 
 # Exported functions: Make main plots
-export figureone
+export figureone, figuretwo
 
 # Exported functions: plot functions
 export plot_truth_data, plot_Rt
