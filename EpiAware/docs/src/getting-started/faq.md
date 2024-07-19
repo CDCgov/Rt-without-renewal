@@ -28,7 +28,7 @@ For examples of how to use this package see the [documentation](https://juliaobj
 
 ## Working with `Turing.jl` models
 
-### `DynamicPPL.jl`](https://github.com/TuringLang/DynamicPPL.jl)
+### [`DynamicPPL.jl`](https://github.com/TuringLang/DynamicPPL.jl)
 
 Whilst `Turing.jl` is the front end of the `Turing.jl` ecosystem, it is not the only package that can be used to work with `Turing.jl` models. [`DynamicPPL.jl`](https://github.com/TuringLang/DynamicPPL.jl) is the part of the ecosytem that deals with defining, running, and manipulating models.
 
