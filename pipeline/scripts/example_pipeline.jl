@@ -9,9 +9,19 @@ using Dagger
       """)
 ##
 
-using EpiAwarePipeline
+using Distributed
 
-pipeline = EpiAwareExamplePipeline(ndraws = 1000, pipetype = SmoothOutbreakPipeline)
+pids = addprocs(; exeflags = ["--project=pipeline"])
+# Add 4 processors from another machine
+pids_remote = addprocs([("sam@192.168.0.248", 4)];
+    dir = "/Users/sam/GitHub/CFA/Rt-without-renewal",
+    exename = "/Users/sam/.juliaup/bin/julia",
+    exeflags = ["--project=pipeline"])
+
+
+@everywhere using EpiAwarePipeline
+
+pipeline = EpiAwareExamplePipeline(ndraws = 1000, pipetype = MeasuresOutbreakPipeline)
 
 list = make_inference_configs(pipeline)
 l = make_truth_data_configs(pipeline)
