@@ -6,7 +6,7 @@ observed data.
 
 ## Fields
 - `model::M`: The underlying observation model.
-- `pmf::T`: The probability mass function (PMF) representing the delay distribution.
+- `rev_pmf::T`: The probability mass function (PMF) representing the delay distribution reversed.
 
 ## Constructors
 - `LatentDelay(model::M, distribution::C; D = nothing, Δd = 1.0)
@@ -30,7 +30,7 @@ rand(obs_model)
 struct LatentDelay{M <: AbstractTuringObservationModel, T <: AbstractVector{<:Real}} <:
        AbstractTuringObservationModel
     model::M
-    pmf::T
+    rev_pmf::T
 
     function LatentDelay(model::M, distribution::C; D = nothing,
             Δd = 1.0) where {
@@ -43,7 +43,8 @@ struct LatentDelay{M <: AbstractTuringObservationModel, T <: AbstractVector{<:Re
             pmf::T) where {M <: AbstractTuringObservationModel, T <: AbstractVector{<:Real}}
         @assert all(pmf .>= 0) "Delay interval must be non-negative"
         @assert isapprox(sum(pmf), 1) "Delay interval must sum to 1"
-        new{typeof(model), typeof(pmf)}(model, pmf)
+        rev_pmf = reverse(pmf)
+        new{typeof(model), typeof(rev_pmf)}(model, rev_pmf)
     end
 end
 
@@ -62,11 +63,13 @@ Generates observations based on the `LatentDelay` observation model.
 @model function EpiAwareBase.generate_observations(obs_model::LatentDelay, y_t, Y_t)
     first_Y_t = findfirst(!ismissing, Y_t)
     trunc_Y_t = Y_t[first_Y_t:end]
-    @assert length(obs_model.pmf)<=length(trunc_Y_t) "The delay PMF must be shorter than or equal to the observation vector"
+    pmf_length = length(obs_model.rev_pmf)
+    @assert pmf_length<=length(trunc_Y_t) "The delay PMF must be shorter than or equal to the observation vector"
 
-    kernel = generate_observation_kernel(obs_model.pmf, length(trunc_Y_t), partial = false)
-    expected_obs = kernel * trunc_Y_t
-    complete_obs = vcat(fill(missing, length(obs_model.pmf) + first_Y_t - 2), expected_obs)
+    expected_obs = map(pmf_length:length(trunc_Y_t)) do i
+        sum(obs_model.rev_pmf .* trunc_Y_t[(i - pmf_length + 1):i])
+    end
+    complete_obs = vcat(fill(missing, pmf_length + first_Y_t - 2), expected_obs)
 
     @submodel y_t = generate_observations(
         obs_model.model, y_t, complete_obs)
