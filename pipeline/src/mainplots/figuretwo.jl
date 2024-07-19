@@ -61,19 +61,22 @@ function _figure_two_scenario(
     return plt_model
 end
 
-function figuretwo(truth_df, analysis_df, igp, scenario_dict, target_dict; fig_kws = (; size = (1000, 2800)),
+function figuretwo(truth_df, analysis_df, igp, scenario_dict,
+        target_dict; fig_kws = (; size = (1000, 2800)),
         true_gi_choice = 10.0, gi_choices = [2.0, 10.0, 20.0])
 
     # Perform checks on the dataframes
     _dataframe_checks(truth_df, analysis_df, scenario_dict)
 
-    f_td = _figure_two_truth_data(truth_df, scenario_dict, target_dict; true_gi_choice, gi_choices)
-    f_mdl = _figure_two_scenario(analysis_df, igp, scenario_dict, target_dict; true_gi_choice)
+    f_td = _figure_two_truth_data(
+        truth_df, scenario_dict, target_dict; true_gi_choice, gi_choices)
+    f_mdl = _figure_two_scenario(
+        analysis_df, igp, scenario_dict, target_dict; true_gi_choice)
 
     fg = draw(f_mdl + f_td; facet = (; linkyaxes = :none),
         legend = (; orientation = :horizontal, position = :bottom),
         figure = fig_kws,
-        axis = (;xlabel = "T", ylabel = "Process values"))
+        axis = (; xlabel = "T", ylabel = "Process values"))
     for g in fg.grid[1:3:end, :]
         g.axis.limits = (nothing, target_dict["rt"].ylims)
     end

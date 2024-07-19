@@ -41,7 +41,6 @@ latent_model_dict = Dict(
 
 ##
 
-
 fig = figuretwo(
     truth_df, analysis_df, "Renewal", scenario_dict, target_dict)
 _ = map(analysis_df.IGP_Model |> unique) do igp
