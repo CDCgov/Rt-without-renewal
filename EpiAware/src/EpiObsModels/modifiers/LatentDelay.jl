@@ -72,10 +72,11 @@ Generates observations based on the `LatentDelay` observation model.
         vcat(trunc_Y_t[(pmf_length + 1):end], 0.0)
     )
 
-    complete_obs = vcat(fill(missing, pmf_length + first_Y_t - 2), expected_obs)
-
+    # complete_obs = vcat(fill(missing, pmf_length + first_Y_t - 2), expected_obs)
+    m = size(expected_obs, 1)
+    _y_t = ismissing(y_t) ? missing : @view y_t[(end - m + 1):end]
     @submodel y_t = generate_observations(
-        obs_model.model, y_t, complete_obs)
+        obs_model.model, _y_t, expected_obs)
 
     return y_t
 end
