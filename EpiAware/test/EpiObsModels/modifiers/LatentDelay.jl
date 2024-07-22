@@ -144,9 +144,14 @@ end
         @test sum(mdl() .|> ismissing) == 0
     end
 
-    @testset "Test with data" begin
+    @testset "Test with a real observation error model" begin
         using Turing, DynamicPPL
         pois_obs_model = LatentDelay(RecordExpectedObs(PoissonError()), delay_int)
+        missing_mdl = generate_observations(pois_obs_model, missing, I_t)
+        missing_draws = missing_mdl()
+        @test all(ismissing.(missing_draws[1:2]))
+        @test !any(ismissing.(missing_draws[3:end]))
+
         mdl = generate_observations(pois_obs_model, [10.0, 20.0, 30.0, 40.0, 50.0], I_t)
         @test mdl() == [10.0, 20.0, 30.0, 40.0, 50]
         samples = sample(mdl, Prior(), 10; progress = false)
