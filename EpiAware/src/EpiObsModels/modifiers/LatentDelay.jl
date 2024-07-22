@@ -1,7 +1,7 @@
 @doc raw"
 The `LatentDelay` struct represents an observation model that introduces a latent delay in the observations. It is a subtype of `AbstractTuringObservationModel`.
 
-Note that the `LatentDelay` observation model shortens the observation vector by the length of the delay distribution and this is then passed to the underlying observation model. This is to prevent fitting to partially
+Note that the `LatentDelay` observation model shortens the expected observation vector by the length of the delay distribution and this is then passed to the underlying observation model. This is to prevent fitting to partially
 observed data.
 
 ## Fields
