@@ -5,11 +5,11 @@ module EpiObsModels
 
 using ..EpiAwareBase
 
-using ..EpiAwareUtils: censored_pmf, HalfNormal, prefix_submodel
+using ..EpiAwareUtils
 
 using ..EpiLatentModels: HierarchicalNormal, broadcast_dayofweek, PrefixLatentModel
 
-using Turing, Distributions, DocStringExtensions, SparseArrays
+using Turing, Distributions, DocStringExtensions, SparseArrays, LinearAlgebra
 
 # Observation error models
 export PoissonError, NegativeBinomialError
