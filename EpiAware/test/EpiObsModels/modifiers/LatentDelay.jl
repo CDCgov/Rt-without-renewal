@@ -133,20 +133,26 @@ end
 
     @testset "Test with entirely missing data" begin
         mdl = generate_observations(obs_model, missing, I_t)
-        @test mdl()[3:end] == expected_obs[3:end]
-        @test sum(mdl() .|> ismissing) == 2
+        @test mdl() == expected_obs[3:end]
+        @test sum(mdl() .|> ismissing) == 0
     end
 
     @testset "Test with missing data defined as a vector" begin
         mdl = generate_observations(
             obs_model, [missing, missing, missing, missing, missing], I_t)
-        @test mdl()[3:end] == expected_obs[3:end]
-        @test sum(mdl() .|> ismissing) == 2
+        @test mdl() == expected_obs[3:end]
+        @test sum(mdl() .|> ismissing) == 0
     end
 
     @testset "Test with data" begin
-        pois_obs_model = LatentDelay(PoissonError(), delay_int)
+        using Turing, DynamicPPL
+        pois_obs_model = LatentDelay(RecordExpectedObs(PoissonError()), delay_int)
         mdl = generate_observations(pois_obs_model, [10.0, 20.0, 30.0, 40.0, 50.0], I_t)
         @test mdl() == [10.0, 20.0, 30.0, 40.0, 50]
+        samples = sample(mdl, Prior(), 10; progress = false)
+        exp_y_t = get(samples, :exp_y_t).exp_y_t
+        @test exp_y_t[1][1] == expected_obs[3]
+        @test exp_y_t[2][1] == expected_obs[4]
+        @test exp_y_t[3][1] == expected_obs[5]
     end
 end

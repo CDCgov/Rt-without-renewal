@@ -70,8 +70,8 @@ Generates observations based on the `LatentDelay` observation model.
 
     expected_obs = accumulate_scan(
         LDStep(obs_model.rev_pmf),
-        (; val = 0, current = trunc_Y_t[1:(pmf_length)]),
-        vcat(trunc_Y_t[(pmf_length + 1):end], 0.0)
+        (; val = 0, current = Y_t[1:(pmf_length)]),
+        vcat(Y_t[(pmf_length + 1):end], 0.0)
     )
 
     @submodel y_t = generate_observations(
