@@ -42,7 +42,7 @@ end
     n_samples = 2000
     samples = sample(fixed_model, Prior(), n_samples; progress = false) |>
               chn -> mapreduce(hcat, generated_quantities(fixed_model, chn)) do gen
-        gen[1]
+        gen
     end
 
     #Because of the recursive d-times cumsum to undifference the process,
@@ -86,7 +86,7 @@ end
     n_samples = 100
     samples = sample(fixed_model, Prior(), n_samples; progress = false) |>
               chn -> mapreduce(hcat, generated_quantities(fixed_model, chn)) do gen
-        gen[1]
+        gen
     end
 
     @test size(samples) == (n, n_samples)

@@ -20,12 +20,13 @@ end
 
 # make a test based on above example
 @testitem "Test Ascertainment generate_observations" begin
-    using Turing, DynamicPPL
-    obs = Ascertainment(NegativeBinomialError(), FixedIntercept(0.1); link = x -> x)
+    using Turing
+
+    obs = Ascertainment(
+        RecordExpectedObs(NegativeBinomialError()), FixedIntercept(0.1); link = x -> x)
     gen_obs = generate_observations(obs, missing, fill(100, 10))
     samples = sample(gen_obs, Prior(), 100; progress = false)
-    gen = mapreduce(vcat, generated_quantities(gen_obs, samples)) do gen
-        gen[2][:expected_obs]
-    end
+    gen = get(samples, :exp_y_t).exp_y_t |>
+          x -> vcat(x...)
     @test all(gen .== 10.0)
 end

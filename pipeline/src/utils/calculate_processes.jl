@@ -2,19 +2,17 @@
 Internal function for calculating the log of the infections with an informative
     error message if the infections are not positive definite.
 """
-function _calc_log_infections(I_t)
-    @assert all(I_t .> 0) "Infections must be positive definite."
-    log.(I_t)
+function _calc_log_infections(I_t; jitter = 1e-6)
+    log.(I_t .+ jitter)
 end
 
 """
 Internal function for calculating the exponential growth rate with an informative
     error message if the infections are not positive definite.
 """
-function _calc_rt(I_t, I0)
-    @assert all(I_t .> 0) "Infections must be positive definite."
-    @assert I0>0 "Initial infections must be positive definite."
-    log.([I0; I_t]) .- log(I0) |> diff
+function _calc_rt(I_t, I0; jitter = 1e-6)
+    @assert I0 + jitter>0 "Initial infections must be positive definite."
+    log.([I0 + jitter; I_t .+ jitter]) .- log(I0 + jitter) |> diff
 end
 
 """
@@ -24,10 +22,11 @@ assumes backward exponential growth with initial infections `I0` from initial
 estimate of `rt`.
 
 """
-function _infection_seeding(I_t, I0, data::EpiData, pipeline::AbstractEpiAwarePipeline)
+function _infection_seeding(
+        I_t, I0, data::EpiData, pipeline::AbstractEpiAwarePipeline; jitter = 1e-6)
     n = length(data.gen_int)
-    init_rt = _calc_rt(I_t[1:2], I0) |> x -> x[1]
-    [I0 * exp(-init_rt * (n - i)) for i in 1:n]
+    init_rt = _calc_rt(I_t[1:2] .+ jitter, I0 + jitter) |> x -> x[1]
+    [(I0 + jitter) * exp(-init_rt * (n - i)) for i in 1:n]
 end
 
 """
@@ -44,11 +43,10 @@ growth from the initial infections `I0` and the exponential growth rate `init_rt
 - `data::EpiData`: An instance of the `EpiData` type containing generation interval data.
 - `pipeline::AbstractEpiAwarePipeline`: An instance of the `AbstractEpiAwarePipeline` type.
 """
-function _calc_Rt(I_t, I0, data::EpiData, pipeline::AbstractEpiAwarePipeline)
-    @assert all(I_t .> 0) "Log infections must be positive definite."
-    @assert I0>0 "Initial infections must be positive definite."
+function _calc_Rt(I_t, I0, data::EpiData, pipeline::AbstractEpiAwarePipeline; jitter = 1e-6)
+    @assert I0 + jitter>0 "Initial infections must be positive definite."
 
-    aug_I_t = vcat(_infection_seeding(I_t, I0, data, pipeline), I_t)
+    aug_I_t = vcat(_infection_seeding(I_t .+ jitter, I0 + jitter, data, pipeline), I_t)
 
     Rt = expected_Rt(data, aug_I_t)
 

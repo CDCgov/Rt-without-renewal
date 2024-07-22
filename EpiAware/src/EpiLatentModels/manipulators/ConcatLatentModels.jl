@@ -110,22 +110,23 @@ Generate latent variables by concatenating multiple latent models.
     @assert all(x -> x > 0, dims) "Non-positive dimensions are not allowed"
     @assert sum(dims)==n "Sum of dimensions must be equal to the dimension of the latent variables"
 
-    @submodel final_latent, latent_aux = _concat_latents(
-        latent_models.models, 1, Real[], [], dims, latent_models.no_models)
+    @submodel final_latent = _concat_latents(
+        latent_models.models, 1, nothing, dims, latent_models.no_models)
 
-    return final_latent, (; latent_aux...)
+    return final_latent
 end
 
 @model function _concat_latents(
-        models, index::Int, acc_latent::AbstractVector{<:Real}, acc_aux,
-        dims::AbstractVector{<:Int}, n_models::Int)
+        models, index::Int, acc_latent, dims::AbstractVector{<:Int}, n_models::Int)
     if index > n_models
-        return acc_latent, (; acc_aux...)
+        return acc_latent
     else
-        @submodel latent, new_aux = generate_latent(models[index], dims[index])
-        @submodel updated_latent, updated_aux = _concat_latents(
-            models, index + 1, vcat(acc_latent, latent),
-            (; acc_aux..., new_aux...), dims, n_models)
-        return updated_latent, (; updated_aux...)
+        @submodel latent = generate_latent(models[index], dims[index])
+
+        acc_latent = isnothing(acc_latent) ? latent : vcat(acc_latent, latent)
+        @submodel updated_latent = _concat_latents(
+            models, index + 1, acc_latent, dims, n_models
+        )
+        return updated_latent
     end
 end

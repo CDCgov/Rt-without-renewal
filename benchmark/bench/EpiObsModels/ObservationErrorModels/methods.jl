@@ -19,13 +19,13 @@ let
     I_t = [10.0, 20.0, 30.0, 40.0, 50.0]
     mdl = generate_observations(obs_model, missing, I_t)
 
-    suite["observation_error"]["missing obs"] = make_turing_suite(mdl; check = false)
+    suite["observation_error"]["missing obs"] = make_epiaware_suite(mdl; check = false)
 
     missing_I_t = vcat(missing, I_t)
     mdl2 = generate_observations(obs_model, missing_I_t, vcat(20, I_t))
-    suite["observation_error"]["partially missing obs"] = make_turing_suite(
+    suite["observation_error"]["partially missing obs"] = make_epiaware_suite(
         mdl2; check = false)
 
     mdl3 = generate_observations(obs_model, I_t, I_t)
-    suite["observation_error"]["no missing obs"] = make_turing_suite(mdl3; check = true)
+    suite["observation_error"]["no missing obs"] = make_epiaware_suite(mdl3)
 end

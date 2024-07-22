@@ -12,14 +12,14 @@
 
     @testset "Test with entirely missing data" begin
         mdl = generate_observations(obs_model, missing, I_t)
-        @test isapprox(mdl()[1], I_t, atol = 1e-3)
+        @test isapprox(mdl(), I_t, atol = 1e-3)
     end
 
     missing_I_t = vcat(missing, I_t)
 
     @testset "Test with leading missing expected observations" begin
         mdl = generate_observations(obs_model, missing_I_t, vcat(20, I_t))
-        draw = mdl()[1]
+        draw = mdl()
         @test draw[2:end] == I_t
         @test abs(draw[1] - 20) > 0
         @test isapprox(draw[1], 20, atol = 1e-3)

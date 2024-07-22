@@ -3,6 +3,7 @@ module BenchEpiObsModels
 using BenchmarkTools, TuringBenchmarking, EpiAware, DynamicPPL
 suite = BenchmarkGroup()
 
+include("../../make_epiaware_suite.jl")
 include("modifiers/ascertainment/Ascertainment.jl")
 include("modifiers/ascertainment/helpers.jl")
 include("modifiers/LatentDelay.jl")

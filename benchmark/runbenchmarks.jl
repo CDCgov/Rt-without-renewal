@@ -3,9 +3,9 @@ benchmarkpkg(
     dirname(@__DIR__),
     BenchmarkConfig(
         env = Dict(
-        "JULIA_NUM_THREADS" => "2",
-        "OMP_NUM_THREADS" => "2"
+        "JULIA_NUM_THREADS" => "4",
+        "OMP_NUM_THREADS" => "4"
     ),
-    ),
-    resultfile = joinpath(@__DIR__, "result.json")
+    );
+    retune = true
 )

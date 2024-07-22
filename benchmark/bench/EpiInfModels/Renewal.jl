@@ -12,7 +12,7 @@ let
     log_Rt = log.(Rt)
     initial_incidence = [1.0, 1.0, 1.0]#aligns with initial exp growth rate of 0.
     mdl = generate_latent_infs(renewal_model, log_Rt)
-    suite["Renewal"] = make_turing_suite(mdl; check = true)
+    suite["Renewal"] = make_epiaware_suite(mdl)
 end
 
 # Error:  ArgumentError: Converting an instance of ReverseDiff.TrackedReal{Float64, Float64, Nothing} to Float64 is not defined. Please use `ReverseDiff.value` instead.
@@ -30,5 +30,5 @@ let
     Rt = [1.0, 1.2, 1.5, 1.5, 1.5]
     log_Rt = log.(Rt)
     mdl = generate_latent_infs(renewal_model, log_Rt)
-    suite["RenewalWithPopulation"] = make_turing_suite(mdl; check = true)
+    suite["RenewalWithPopulation"] = make_epiaware_suite(mdl)
 end

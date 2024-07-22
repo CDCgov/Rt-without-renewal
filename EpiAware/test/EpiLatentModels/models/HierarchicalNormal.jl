@@ -21,16 +21,15 @@ end
     hnorm = HierarchicalNormal(0.2, truncated(Normal(0, 1), 0, Inf))
     hnorm_model = generate_latent(hnorm, 10)
     hnorm_model_out = hnorm_model()
-    @test length(hnorm_model_out) == 2
-    @test length(hnorm_model_out[1]) == 10
-    @test typeof(hnorm_model_out[1]) == Vector{Float64}
+    @test length(hnorm_model_out) == 10
+    @test typeof(hnorm_model_out) == Vector{Float64}
 
     fixed_model = fix(hnorm_model, (std = 0.1))
 
     n_samples = 100
     samples = sample(fixed_model, Prior(), n_samples; progress = false) |>
               chn -> mapreduce(vcat, generated_quantities(fixed_model, chn)) do gen
-        gen[1]
+        gen
     end
 
     theoretical_mean = 0.2

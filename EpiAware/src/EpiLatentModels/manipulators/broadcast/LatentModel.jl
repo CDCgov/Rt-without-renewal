@@ -56,8 +56,8 @@ Generates latent periods using the specified `model` and `n` number of samples.
 "
 @model function EpiAwareBase.generate_latent(model::BroadcastLatentModel, n)
     m = broadcast_n(model.broadcast_rule, n, model.period)
-    @submodel latent_period, latent_period_aux = generate_latent(model.model, m)
+    @submodel latent_period = generate_latent(model.model, m)
     broadcasted_latent = broadcast_rule(
         model.broadcast_rule, latent_period, n, model.period)
-    return broadcasted_latent, (; latent_period_aux...)
+    return broadcasted_latent
 end

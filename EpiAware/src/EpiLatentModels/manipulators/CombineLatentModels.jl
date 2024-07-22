@@ -53,27 +53,25 @@ Generate latent variables using a combination of multiple latent models.
 - `n`: The number of latent variables to generate.
 
 # Returns
-- `combined_latents`: The combined latent variables generated from all the models.
-- `latent_aux`: A tuple containing the auxiliary latent variables generated from each individual model.
+- The combined latent variables generated from all the models.
 
 # Example
 "
 @model function EpiAwareBase.generate_latent(latent_models::CombineLatentModels, n)
-    @submodel final_latent, latent_aux = _accumulate_latents(
-        latent_models.models, 1, fill(0.0, n), [], n, length(latent_models.models))
+    @submodel final_latent = _accumulate_latents(
+        latent_models.models, 1, fill(0.0, n), n, length(latent_models.models))
 
-    return final_latent, (; latent_aux...)
+    return final_latent
 end
 
 @model function _accumulate_latents(
-        models, index, acc_latent, acc_aux, n, n_models)
+        models, index, acc_latent, n, n_models)
     if index > n_models
-        return acc_latent, (; acc_aux...)
+        return acc_latent
     else
-        @submodel latent, new_aux = generate_latent(models[index], n)
-        @submodel updated_latent, updated_aux = _accumulate_latents(
-            models, index + 1, acc_latent .+ latent,
-            (; acc_aux..., new_aux...), n, n_models)
-        return updated_latent, (; updated_aux...)
+        @submodel latent = generate_latent(models[index], n)
+        @submodel updated_latent = _accumulate_latents(
+            models, index + 1, acc_latent .+ latent, n, n_models)
+        return updated_latent
     end
 end
