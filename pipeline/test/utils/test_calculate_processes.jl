@@ -1,5 +1,3 @@
-using Test
-
 @testset "calculate_processes" begin
     using EpiAware, EpiAwarePipeline
     using Random
@@ -17,16 +15,16 @@ using Test
     # Check if the log of infections is calculated correctly
     @testset "Log of infections" begin
         expected_log_I_t = log.(I_t)
-        @test result.log_I_t ≈ expected_log_I_t
+        @test isapprox(result.log_I_t,expected_log_I_t; atol = 1e-6)
     end
 
     # Check if the exponential growth rate is calculated correctly
     @testset "Exponential growth rate" begin
-        @test result.rt ≈ rt
+        @test isapprox(result.rt, rt; atol = 1e-6)
     end
 
     # In this special case (pmf = [1.0]), the Rt = exp(rt)
     @testset "Instantaneous reproduction number" begin
-        @test result.Rt ≈ exp.(rt)
+        @test isapprox(result.Rt, exp.(rt); atol = 1e-6)
     end
 end

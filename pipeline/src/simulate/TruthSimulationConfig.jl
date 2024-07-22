@@ -67,7 +67,7 @@ function simulate(config::TruthSimulationConfig)
         (std = 1.0, cluster_factor = config.cluster_factor,
             ϵ_t = config.logit_daily_ascertainment))
 
-    y_t, θ = obs_model()
+    y_t = obs_model()
 
     #Return the sampled infections and observations
 
