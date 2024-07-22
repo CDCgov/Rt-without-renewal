@@ -15,7 +15,7 @@
     # Check if the log of infections is calculated correctly
     @testset "Log of infections" begin
         expected_log_I_t = log.(I_t)
-        @test isapprox(result.log_I_t,expected_log_I_t; atol = 1e-6)
+        @test isapprox(result.log_I_t, expected_log_I_t; atol = 1e-6)
     end
 
     # Check if the exponential growth rate is calculated correctly
