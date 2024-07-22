@@ -10,15 +10,16 @@ It dispatches to the `observation_error` function to generate the observation er
     @submodel priors = generate_observation_error_priors(obs_model, y_t, Y_t)
 
     if ismissing(y_t)
-        y_t = Vector{Union{Real, Missing}}(missing, length(Y_t))
-    else
-        @assert length(y_t)==length(Y_t) "The observation vector and expected observation vector must have the same length."
+        y_t = Vector{Missing}(missing, length(Y_t))
     end
+
+    diff_t = length(y_t) - length(Y_t)
+    @assert diff_t>=0 "The observation vector must be longer than or equal to the expected observation vector"
 
     pad_Y_t = Y_t .+ 1e-6
 
-    for i in findfirst(!ismissing, Y_t):length(Y_t)
-        y_t[i] ~ observation_error(obs_model, pad_Y_t[i], priors...)
+    for i in eachindex(Y_t)
+        y_t[i + diff_t] ~ observation_error(obs_model, pad_Y_t[i], priors...)
     end
 
     return y_t

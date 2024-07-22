@@ -61,10 +61,12 @@ Generates observations based on the `LatentDelay` observation model.
 
 "
 @model function EpiAwareBase.generate_observations(obs_model::LatentDelay, y_t, Y_t)
-    first_Y_t = findfirst(!ismissing, Y_t)
-    trunc_Y_t = Y_t[first_Y_t:end]
+    if ismissing(y_t)
+        y_t = Vector{Missing}(missing, length(Y_t))
+    end
+
     pmf_length = length(obs_model.rev_pmf)
-    @assert pmf_length<=length(trunc_Y_t) "The delay PMF must be shorter than or equal to the observation vector"
+    @assert pmf_length<=length(Y_t) "The delay PMF must be shorter than or equal to the observation vector"
 
     expected_obs = accumulate_scan(
         LDStep(obs_model.rev_pmf),
@@ -72,10 +74,8 @@ Generates observations based on the `LatentDelay` observation model.
         vcat(trunc_Y_t[(pmf_length + 1):end], 0.0)
     )
 
-    complete_obs = vcat(fill(missing, pmf_length + first_Y_t - 2), expected_obs)
-
     @submodel y_t = generate_observations(
-        obs_model.model, y_t, complete_obs)
+        obs_model.model, y_t, expected_obs)
 
     return y_t
 end
