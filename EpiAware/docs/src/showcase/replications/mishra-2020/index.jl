@@ -7,12 +7,12 @@ using InteractiveUtils
 # ╔═╡ 34a06b3b-799b-48c5-bd08-1e57151f51ec
 let
     docs_dir = dirname(dirname(dirname(dirname(@__DIR__))))
-	#If running from REPL and working directory is the root of the repo
-	# docs_dir = "EpiAware/docs"
+    #If running from REPL and working directory is the root of the repo
+    # docs_dir = "EpiAware/docs"
 
     pkg_dir = dirname(docs_dir)
-	#If running from REPL and working directory is the root of the repo
-	# docs_dir = "EpiAware"
+    #If running from REPL and working directory is the root of the repo
+    # docs_dir = "EpiAware"
 
     using Pkg: Pkg
     Pkg.activate(docs_dir)
@@ -54,7 +54,7 @@ Note that `Pluto.jl` notebooks operate on single lines of code or code blocks en
 _NB:_ The difference between `let ... end` blocks and `begin ... end` blocks are that the `let ... end` type of code block only adds the final output/return value of the block to scope, like an anonymous function, whereas `begin ... end` executes each line and adds defined variables to scope.
 
 ## Environment for this notebook and running it from the REPL
-We are going to use the `docs/` Julia environment for this notebook which is set by the `Project.toml` file in the `EpiAware/docs` folder, and check-out the latest version of `EpiAware` directly from its source code using `Pkg.develop`. 
+We are going to use the `docs/` Julia environment for this notebook which is set by the `Project.toml` file in the `EpiAware/docs` folder, and check-out the latest version of `EpiAware` directly from its source code using `Pkg.develop`.
 
 From the context of this notebook we can find these _relative_ to this notebook using the `@__DIR__` macro, which returns the path of this notebook. If you are running this from the REPL from the root of the `RtWithoutRenewal` repository then replace the following:
 
@@ -109,9 +109,9 @@ data = readdlm(joinpath(notebook_dir, \"south_korea_data.csv2\"), ','; header = 
 
 # ╔═╡ a59d977c-0178-11ef-0063-83e30e0cf9f0
 begin
-	#If running from REPL and working directory is the root of the repo
-	#notebook_dir = "EpiAware/docs/src/showcase/replications/mishra-2020"
-	#data = readdlm(joinpath(notebook_dir, "south_korea_data.csv2"), ','; header = true)
+    #If running from REPL and working directory is the root of the repo
+    #notebook_dir = "EpiAware/docs/src/showcase/replications/mishra-2020"
+    #data = readdlm(joinpath(notebook_dir, "south_korea_data.csv2"), ','; header = true)
 
     data = readdlm(joinpath(@__DIR__, "south_korea_data.csv2"), ','; header = true)
     dates = data[1][:, 2] .|> Date
