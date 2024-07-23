@@ -10,7 +10,10 @@ Pages = ["lib/getting-started/faq.md"]
 
 We use [`Pluto.jl`](https://plutojl.org/) scripts as part of our documentation and testing. The scripts are located in `docs/src/examples` and can be run using the `Pluto.jl` package.
 We recommend using the version of `Pluto` that is pinned in the `Project.toml` file defining the documentation environment.
+
 An entry point to running or developing this documentation is the `docs/pluto-scripts.sh` bash shell script. Run this from the root directory of this repository.
+
+Note that `Pluto.jl` notebooks operate on single lines of code or code blocks encapsulated by `let ... end` and `begin ... end`. The reason is that `Pluto` notebooks are reactive, and re-run downstream code after changes with downstreaming determined by a tree of dependent code blocks. The difference between `let ... end` blocks and `begin ... end` blocks are that the `let ... end` type of code block only adds the final output/return value of the block to scope, like an anonymous function, whereas `begin ... end` executes each line and adds defined variables to scope.
 
 ## Manipulating `EpiAware` model specifications
 

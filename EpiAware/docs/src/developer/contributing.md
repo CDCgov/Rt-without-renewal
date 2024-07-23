@@ -39,3 +39,25 @@ As is conventional for Julia packages, unit tests are located at `test/*.jl` wit
 Tests that build example package docs from source and inspect the results (end to end tests) are
 located in `/test/examples`. The main entry points are `test/examples/make.jl` for building and
 `test/examples/test.jl` for doing some basic checks on the generated outputs.
+
+### Pluto usage in end to end tests and showcases
+Some of the end to end tests and showcases use `Pluto.jl` scripts.
+
+We recommend using the version of `Pluto` that is pinned in the `Project.toml` file defining the documentation environment located at `EpiAware/docs`, as well as using this as the environment for running the `Pluto.jl` scripts.
+
+So as to test the ability of the tests/showcases to run using a development branch of `EpiAware` we recommend checking-out the branch version of `EpiAware` directly from its source code using `Pkg.develop`. The reason for this is that when committing a change to `EpiAware` we want the website to be built with the proposed branch of `EpiAware` as part of our checking before merging.
+
+An example of doing this would be adding this code block to a `Pluto.jl` script:
+
+```julia
+    using Pkg
+    sp = splitpath(@__DIR__)
+    docs_dir = sp |> sp -> sp[1:(findfirst(sp .== "docs"))] |> joinpath
+    pkg_dir = sp |> sp -> sp[1:(findfirst(sp .== "EpiAware"))] |> joinpath
+
+    Pkg.activate(docs_dir)
+    Pkg.develop(; path = pkg_dir)
+    Pkg.instantiate()
+```
+
+This block searchs up the directory path from the location of the `Pluto.jl` script to find the `docs` directory and the `EpiAware` directory, and then activates the environment in the `docs` directory and checks out the `EpiAware` package from the `EpiAware` directory.

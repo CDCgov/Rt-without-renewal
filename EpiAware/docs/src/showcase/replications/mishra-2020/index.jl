@@ -53,16 +53,6 @@ This tutorial introduces the basic functionality of `EpiAware`. `EpiAware` is a 
 It is common to conceptualise the generative process of public health data, e.g a time series of reported cases of an infectious pathogen, in a modular way. For example, it is common to abstract the underlying latent infection process away from downstream issues of observation, or to treat quanitites such as the time-varying reproduction number as being itself generated as a random process.
 
 `EpiAware` is built using the [`DynamicPPL`](https://github.com/TuringLang/DynamicPPL.jl) probabilistic programming domain-specific language, which is part of the [`Turing`](https://turinglang.org/dev/docs/using-turing/guide/) PPL. The structural concept behind `EpiAware` is that each module of an epidemiological model is a self-contained `Turing` [`Model`](https://turinglang.org/DynamicPPL.jl/stable/api/#DynamicPPL.Model-Tuple{}); that is each module is an object that can be conditioned on observable data and sampled from. A complete `EpiAware` model is the composition of these objects using the [`@submodel`](https://turinglang.org/DynamicPPL.jl/stable/api/#DynamicPPL.@submodel) macro.
-
-## Pluto code blocks
-Note that `Pluto.jl` notebooks operate on single lines of code or code blocks encapsulated by `let ... end` and `begin ... end`. The reason is that `Pluto` notebooks are reactive, and re-run downstream code after changes with downstreaming determined by a tree of dependent code blocks. If you are running this example from the REPL, you can either use the code blocks and/or run each line individually.
-
-_NB:_ The difference between `let ... end` blocks and `begin ... end` blocks are that the `let ... end` type of code block only adds the final output/return value of the block to scope, like an anonymous function, whereas `begin ... end` executes each line and adds defined variables to scope.
-
-## Environment for this notebook and running it from the REPL
-This page is generated after running an underlying `Pluto.jl` notebook, using a Julia environment located in the `EpiAware/docs` folder of the repository and checking-out the latest version of `EpiAware` directly from its source code using `Pkg.develop`. The reason for this is that when committing a change to `EpiAware` we want the website to be built with the proposed branch of `EpiAware` as part of our checking before merging.
-
-If you are trying out this code from REPL after installing `EpiAware` then your REPL will offer you the chance to install each of the dependencies upon evaluating `using SomePackage` for a package `SomePackage` that is not available in your current active environment.
 "
 
 # ╔═╡ 27d73202-a93e-4471-ab50-d59345304a0b
