@@ -1,7 +1,7 @@
 @doc raw"
 The `LatentDelay` struct represents an observation model that introduces a latent delay in the observations. It is a subtype of `AbstractTuringObservationModel`.
 
-Note that the `LatentDelay` observation model shortens the observation vector by the length of the delay distribution and this is then passed to the underlying observation model. This is to prevent fitting to partially
+Note that the `LatentDelay` observation model shortens the expected observation vector by the length of the delay distribution and this is then passed to the underlying observation model. This is to prevent fitting to partially
 observed data.
 
 ## Fields
@@ -61,21 +61,21 @@ Generates observations based on the `LatentDelay` observation model.
 
 "
 @model function EpiAwareBase.generate_observations(obs_model::LatentDelay, y_t, Y_t)
-    first_Y_t = findfirst(!ismissing, Y_t)
-    trunc_Y_t = Y_t[first_Y_t:end]
+    if ismissing(y_t)
+        y_t = Vector{Missing}(missing, length(Y_t))
+    end
+
     pmf_length = length(obs_model.rev_pmf)
-    @assert pmf_length<=length(trunc_Y_t) "The delay PMF must be shorter than or equal to the observation vector"
+    @assert pmf_length<=length(Y_t) "The delay PMF must be shorter than or equal to the observation vector"
 
     expected_obs = accumulate_scan(
         LDStep(obs_model.rev_pmf),
-        (; val = 0, current = trunc_Y_t[1:(pmf_length)]),
-        vcat(trunc_Y_t[(pmf_length + 1):end], 0.0)
+        (; val = 0, current = Y_t[1:(pmf_length)]),
+        vcat(Y_t[(pmf_length + 1):end], 0.0)
     )
 
-    complete_obs = vcat(fill(missing, pmf_length + first_Y_t - 2), expected_obs)
-
     @submodel y_t = generate_observations(
-        obs_model.model, y_t, complete_obs)
+        obs_model.model, y_t, expected_obs)
 
     return y_t
 end
