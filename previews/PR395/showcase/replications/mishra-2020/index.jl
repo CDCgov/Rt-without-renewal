@@ -7,12 +7,7 @@ using InteractiveUtils
 # ╔═╡ 34a06b3b-799b-48c5-bd08-1e57151f51ec
 let
     docs_dir = dirname(dirname(dirname(dirname(@__DIR__))))
-    #If running from REPL and working directory is the root of the repo
-    # docs_dir = "EpiAware/docs"
-
     pkg_dir = dirname(docs_dir)
-    #If running from REPL and working directory is the root of the repo
-    # docs_dir = "EpiAware"
 
     using Pkg: Pkg
     Pkg.activate(docs_dir)
@@ -20,21 +15,31 @@ let
     Pkg.instantiate()
 end;
 
+# ╔═╡ d63b37f0-9642-4c38-ac01-9ffe48d50441
+using EpiAware
+
+# ╔═╡ 74642759-35a5-4957-9f2b-544712866410
+using Turing, DynamicPPL #Underlying Turing ecosystem packages to interact with models
+
+# ╔═╡ 0c5f413e-d043-448d-8665-f0f6f705d70f
+using Distributions, Statistics #Statistics packages
+
+# ╔═╡ b1e2a759-a52b-4ee5-8db4-cfe848878c92
+using CSV, DataFramesMeta #Data wrangling
+
+# ╔═╡ 9eb03a0b-c6ca-4e23-8109-fb68f87d7fdf
+begin #Plotting backend
+    using StatsPlots
+    using StatsPlots.PlotMeasures
+end
+
+# ╔═╡ 97b5374e-7653-4b3b-98eb-d8f73aa30580
+using ReverseDiff #Automatic differentiation backend
+
 # ╔═╡ 1642dbda-4915-4e29-beff-bca592f3ec8d
-begin
-    using EpiAware
-    using Turing
-    using Distributions
-    using StatsPlots, StatsPlots.PlotMeasures
-    using Random
-    using DynamicPPL
-    using Statistics
-    using DataFramesMeta
-    using LinearAlgebra
-    using Transducers
-    using ReverseDiff
-    using DelimitedFiles
+begin #Date utility and set Random seed
     using Dates
+    using Random
     Random.seed!(1)
 end
 
@@ -47,29 +52,12 @@ This tutorial introduces the basic functionality of `EpiAware`. `EpiAware` is a 
 It is common to conceptualise the generative process of public health data, e.g a time series of reported cases of an infectious pathogen, in a modular way. For example, it is common to abstract the underlying latent infection process away from downstream issues of observation, or to treat quanitites such as the time-varying reproduction number as being itself generated as a random process.
 
 `EpiAware` is built using the [`DynamicPPL`](https://github.com/TuringLang/DynamicPPL.jl) probabilistic programming domain-specific language, which is part of the [`Turing`](https://turinglang.org/dev/docs/using-turing/guide/) PPL. The structural concept behind `EpiAware` is that each module of an epidemiological model is a self-contained `Turing` [`Model`](https://turinglang.org/DynamicPPL.jl/stable/api/#DynamicPPL.Model-Tuple{}); that is each module is an object that can be conditioned on observable data and sampled from. A complete `EpiAware` model is the composition of these objects using the [`@submodel`](https://turinglang.org/DynamicPPL.jl/stable/api/#DynamicPPL.@submodel) macro.
-
-## Pluto code blocks
-Note that `Pluto.jl` notebooks operate on single lines of code or code blocks encapsulated by `let ... end` and `begin ... end`. The reason is that `Pluto` notebooks are reactive, and re-run downstream code after changes with downstreaming determined by a tree of dependent code blocks. If you are running this example from the REPL, you can either use the code blocks and/or run each line individually.
-
-_NB:_ The difference between `let ... end` blocks and `begin ... end` blocks are that the `let ... end` type of code block only adds the final output/return value of the block to scope, like an anonymous function, whereas `begin ... end` executes each line and adds defined variables to scope.
-
-## Environment for this notebook and running it from the REPL
-We are going to use the `docs/` Julia environment for this notebook which is set by the `Project.toml` file in the `EpiAware/docs` folder, and check-out the latest version of `EpiAware` directly from its source code using `Pkg.develop`.
-
-From the context of this notebook we can find these _relative_ to this notebook using the `@__DIR__` macro, which returns the path of this notebook. If you are running this from the REPL from the root of the `RtWithoutRenewal` repository then replace the following:
-
-```julia
-docs_dir = \"EpiAware/docs\"
-pkg_dir = \"EpiAware\"
-```
 "
 
 # ╔═╡ 27d73202-a93e-4471-ab50-d59345304a0b
 md"
 ## Dependencies for this notebook
-In the code block above we activated the environment we wanted, this determines the exact versions of the extra packages we want to use as dependencies. We also ran `Pkg.instantiate` to make sure we have locally downloaded these packages.
-
-Now we want to import these dependencies into scope.
+Now we want to import these dependencies into scope. If evaluating these code lines/blocks in REPL, then the REPL will offer to install any missing dependencies. Alternatively, you can add them to your active environment using `Pkg.add`.
 "
 
 # ╔═╡ 9161ab72-5c39-4a67-9762-e19f1c54c7fd
@@ -99,24 +87,14 @@ In the examples below we are going to largely recreate the _Mishra et al_ model,
 # ╔═╡ 1d3b9541-80ad-41b5-a5ed-a947f5c0731b
 md"
 ## Load the data into scope
-First, we make sure that we have the data we want to analysis in scope by reading from a local CSV file. As with the environment, this notebook works relative to its directory. If you are running this from the REPL from the root of the `RtWithoutRenewal` repository then replace the following:
-
-```julia
-notebook_dir = \"EpiAware/docs/src/showcase/replications/mishra-2020\"
-data = readdlm(joinpath(notebook_dir, \"south_korea_data.csv2\"), ','; header = true)
-```
+First, we make sure that we have the data we want to analysis in scope by downloading it.
 "
 
-# ╔═╡ a59d977c-0178-11ef-0063-83e30e0cf9f0
-begin
-    #If running from REPL and working directory is the root of the repo
-    #notebook_dir = "EpiAware/docs/src/showcase/replications/mishra-2020"
-    #data = readdlm(joinpath(notebook_dir, "south_korea_data.csv2"), ','; header = true)
+# ╔═╡ 4e5e0e24-8c55-4cb4-be3a-d28198f81a69
+url = "https://raw.githubusercontent.com/CDCgov/Rt-without-renewal/main/EpiAware/docs/src/showcase/replications/mishra-2020/south_korea_data.csv2"
 
-    data = readdlm(joinpath(@__DIR__, "south_korea_data.csv2"), ','; header = true)
-    dates = data[1][:, 2] .|> Date
-    daily_cases = data[1][:, 3] .|> Integer
-end;
+# ╔═╡ a59d977c-0178-11ef-0063-83e30e0cf9f0
+data = CSV.read(download(url), DataFrame)
 
 # ╔═╡ 104f4d16-7433-4a2d-89e7-288a9b223563
 md"
@@ -443,8 +421,8 @@ We supply the data as a `NamedTuple` with the `y_t` field containing the observe
 "
 
 # ╔═╡ c7140b20-e030-4dc4-97bc-0efc0ff59631
-south_korea_data = (y_t = daily_cases[epi_prob.tspan[1]:epi_prob.tspan[2]],
-    dates = dates[epi_prob.tspan[1]:epi_prob.tspan[2]])
+south_korea_data = (y_t = data.cases_new[epi_prob.tspan[1]:epi_prob.tspan[2]],
+    dates = data.date[epi_prob.tspan[1]:epi_prob.tspan[2]])
 
 # ╔═╡ 9970adfd-ee88-4598-87a3-ffde5297031c
 md"
@@ -594,11 +572,18 @@ end
 
 # ╔═╡ Cell order:
 # ╟─8a8d5682-2f89-443b-baf0-d4d3b134d311
-# ╠═34a06b3b-799b-48c5-bd08-1e57151f51ec
+# ╟─34a06b3b-799b-48c5-bd08-1e57151f51ec
 # ╟─27d73202-a93e-4471-ab50-d59345304a0b
+# ╠═d63b37f0-9642-4c38-ac01-9ffe48d50441
+# ╠═74642759-35a5-4957-9f2b-544712866410
+# ╠═0c5f413e-d043-448d-8665-f0f6f705d70f
+# ╠═b1e2a759-a52b-4ee5-8db4-cfe848878c92
+# ╠═9eb03a0b-c6ca-4e23-8109-fb68f87d7fdf
+# ╠═97b5374e-7653-4b3b-98eb-d8f73aa30580
 # ╠═1642dbda-4915-4e29-beff-bca592f3ec8d
 # ╟─9161ab72-5c39-4a67-9762-e19f1c54c7fd
 # ╟─1d3b9541-80ad-41b5-a5ed-a947f5c0731b
+# ╠═4e5e0e24-8c55-4cb4-be3a-d28198f81a69
 # ╠═a59d977c-0178-11ef-0063-83e30e0cf9f0
 # ╟─104f4d16-7433-4a2d-89e7-288a9b223563
 # ╟─d201c82b-8efd-41e2-96d7-4f5e0c67088c
