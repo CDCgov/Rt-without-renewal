@@ -226,7 +226,7 @@ let
     twod_ar_mdl = generate_latent(twod_ar, 30)
     twod_ar_mdl_samples = mapreduce(hcat, 1:n_samples) do _
         θ = rand(twod_ar_mdl) #Sample unconditionally the underlying parameters of the model
-        gen = generated_quantities(twod_ar_mdl, θ)[1]
+        gen = generated_quantities(twod_ar_mdl, θ)
     end
 
     plot(twod_ar_mdl_samples,
@@ -369,7 +369,7 @@ plt_obs = let
     n_samples = 100
     obs_mdl_samples = mapreduce(hcat, 1:n_samples) do _
         θ = rand(obs_mdl) #Sample unconditionally the underlying parameters of the model
-        gen = generated_quantities(obs_mdl, θ)[1]
+        gen = generated_quantities(obs_mdl, θ)
     end
     scatter(obs_mdl_samples,
         lab = "",
