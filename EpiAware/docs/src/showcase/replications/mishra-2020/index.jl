@@ -1,14 +1,18 @@
 ### A Pluto.jl notebook ###
-# v0.19.40
+# v0.19.43
 
 using Markdown
 using InteractiveUtils
 
 # ╔═╡ 34a06b3b-799b-48c5-bd08-1e57151f51ec
-# hideall
 let
     docs_dir = dirname(dirname(dirname(dirname(@__DIR__))))
+	#If running from REPL and working directory is the root of the repo
+	# docs_dir = "EpiAware/docs"
+
     pkg_dir = dirname(docs_dir)
+	#If running from REPL and working directory is the root of the repo
+	# docs_dir = "EpiAware"
 
     using Pkg: Pkg
     Pkg.activate(docs_dir)
@@ -34,13 +38,6 @@ begin
     Random.seed!(1)
 end
 
-# ╔═╡ a59d977c-0178-11ef-0063-83e30e0cf9f0
-begin
-    data = readdlm("south_korea_data.csv2", ','; header = true)
-    dates = data[1][:, 2] .|> Date
-    daily_cases = data[1][:, 3] .|> Integer
-end;
-
 # ╔═╡ 8a8d5682-2f89-443b-baf0-d4d3b134d311
 md"
 # Getting started with `EpiAware`
@@ -50,6 +47,29 @@ This tutorial introduces the basic functionality of `EpiAware`. `EpiAware` is a 
 It is common to conceptualise the generative process of public health data, e.g a time series of reported cases of an infectious pathogen, in a modular way. For example, it is common to abstract the underlying latent infection process away from downstream issues of observation, or to treat quanitites such as the time-varying reproduction number as being itself generated as a random process.
 
 `EpiAware` is built using the [`DynamicPPL`](https://github.com/TuringLang/DynamicPPL.jl) probabilistic programming domain-specific language, which is part of the [`Turing`](https://turinglang.org/dev/docs/using-turing/guide/) PPL. The structural concept behind `EpiAware` is that each module of an epidemiological model is a self-contained `Turing` [`Model`](https://turinglang.org/DynamicPPL.jl/stable/api/#DynamicPPL.Model-Tuple{}); that is each module is an object that can be conditioned on observable data and sampled from. A complete `EpiAware` model is the composition of these objects using the [`@submodel`](https://turinglang.org/DynamicPPL.jl/stable/api/#DynamicPPL.@submodel) macro.
+
+## Pluto code blocks
+Note that `Pluto.jl` notebooks operate on single lines of code or code blocks encapsulated by `let ... end` and `begin ... end`. The reason is that `Pluto` notebooks are reactive, and re-run downstream code after changes with downstreaming determined by a tree of dependent code blocks. If you are running this example from the REPL, you can either use the code blocks and/or run each line individually.
+
+_NB:_ The difference between `let ... end` blocks and `begin ... end` blocks are that the `let ... end` type of code block only adds the final output/return value of the block to scope, like an anonymous function, whereas `begin ... end` executes each line and adds defined variables to scope.
+
+## Environment for this notebook and running it from the REPL
+We are going to use the `docs/` Julia environment for this notebook which is set by the `Project.toml` file in the `EpiAware/docs` folder, and check-out the latest version of `EpiAware` directly from its source code using `Pkg.develop`. 
+
+From the context of this notebook we can find these _relative_ to this notebook using the `@__DIR__` macro, which returns the path of this notebook. If you are running this from the REPL from the root of the `RtWithoutRenewal` repository then replace the following:
+
+```julia
+docs_dir = \"EpiAware/docs\"
+pkg_dir = \"EpiAware\"
+```
+"
+
+# ╔═╡ 27d73202-a93e-4471-ab50-d59345304a0b
+md"
+## Dependencies for this notebook
+In the code block above we activated the environment we wanted, this determines the exact versions of the extra packages we want to use as dependencies. We also ran `Pkg.instantiate` to make sure we have locally downloaded these packages.
+
+Now we want to import these dependencies into scope.
 "
 
 # ╔═╡ 9161ab72-5c39-4a67-9762-e19f1c54c7fd
@@ -75,6 +95,28 @@ C_t \sim \text{NegBin}(\text{mean} = I_t,~ \text{overdispersion} = \phi).
 
 In the examples below we are going to largely recreate the _Mishra et al_ model, whilst emphasing that each component of the overall epidemiological model is, itself, a stand alone model that can be sampled from.
 "
+
+# ╔═╡ 1d3b9541-80ad-41b5-a5ed-a947f5c0731b
+md"
+## Load the data into scope
+First, we make sure that we have the data we want to analysis in scope by reading from a local CSV file. As with the environment, this notebook works relative to its directory. If you are running this from the REPL from the root of the `RtWithoutRenewal` repository then replace the following:
+
+```julia
+notebook_dir = \"EpiAware/docs/src/showcase/replications/mishra-2020\"
+data = readdlm(joinpath(notebook_dir, \"south_korea_data.csv2\"), ','; header = true)
+```
+"
+
+# ╔═╡ a59d977c-0178-11ef-0063-83e30e0cf9f0
+begin
+	#If running from REPL and working directory is the root of the repo
+	#notebook_dir = "EpiAware/docs/src/showcase/replications/mishra-2020"
+	#data = readdlm(joinpath(notebook_dir, "south_korea_data.csv2"), ','; header = true)
+
+    data = readdlm(joinpath(@__DIR__, "south_korea_data.csv2"), ','; header = true)
+    dates = data[1][:, 2] .|> Date
+    daily_cases = data[1][:, 3] .|> Integer
+end;
 
 # ╔═╡ 104f4d16-7433-4a2d-89e7-288a9b223563
 md"
@@ -551,11 +593,13 @@ let
 end
 
 # ╔═╡ Cell order:
-# ╟─a59d977c-0178-11ef-0063-83e30e0cf9f0
-# ╟─34a06b3b-799b-48c5-bd08-1e57151f51ec
 # ╟─8a8d5682-2f89-443b-baf0-d4d3b134d311
+# ╠═34a06b3b-799b-48c5-bd08-1e57151f51ec
+# ╟─27d73202-a93e-4471-ab50-d59345304a0b
+# ╠═1642dbda-4915-4e29-beff-bca592f3ec8d
 # ╟─9161ab72-5c39-4a67-9762-e19f1c54c7fd
-# ╟─1642dbda-4915-4e29-beff-bca592f3ec8d
+# ╟─1d3b9541-80ad-41b5-a5ed-a947f5c0731b
+# ╠═a59d977c-0178-11ef-0063-83e30e0cf9f0
 # ╟─104f4d16-7433-4a2d-89e7-288a9b223563
 # ╟─d201c82b-8efd-41e2-96d7-4f5e0c67088c
 # ╠═c88bbbd6-0101-4c04-97c9-c5887ef23999
@@ -563,17 +607,17 @@ end
 # ╟─31ee2757-0409-45df-b193-60c552797a3d
 # ╠═2bf22866-b785-4ee0-953d-ac990a197561
 # ╟─25e25125-8587-4451-8600-9b55a04dbcd9
-# ╟─fbe117b7-a0b8-4604-a5dd-e71a0a1a4fc3
+# ╠═fbe117b7-a0b8-4604-a5dd-e71a0a1a4fc3
 # ╟─9f84dec1-70f1-442e-8bef-a9494921549e
 # ╠═51a82a62-2c59-43c9-8562-69d15a7edfdd
-# ╟─d3938381-01b7-40c6-b369-a456ff6dba72
+# ╠═d3938381-01b7-40c6-b369-a456ff6dba72
 # ╟─12fd3bd5-657e-4b1a-aa88-6063419aaceb
 # ╠═61eac666-9fe4-4918-bd3f-68e89275d07a
-# ╟─5a96e7e9-0376-4365-8eb1-b2fad9be8fef
+# ╠═5a96e7e9-0376-4365-8eb1-b2fad9be8fef
 # ╟─6a9e871f-a2fa-4e41-af89-8b0b3c3b5b4b
 # ╠═c1fc1929-0624-45c0-9a89-86c8479b2675
 # ╠═99c9ba2c-20a5-4c7f-94d2-272d6c9d5904
-# ╟─71d08f7e-c409-4fbe-b154-b21d09010683
+# ╠═71d08f7e-c409-4fbe-b154-b21d09010683
 # ╟─4a2b5cf1-623c-4fe7-8365-49fb7972af5a
 # ╠═9e49d451-946b-430b-bcdb-1ef4bba55a4b
 # ╠═8487835e-d430-4300-bd7c-e33f5769ee32
@@ -581,14 +625,14 @@ end
 # ╟─51b5d5b6-3ad3-4967-ad1d-b1caee201fcb
 # ╠═9e564a6e-f521-41e8-8604-6a9d73af9ba7
 # ╠═72bdb47d-4967-4f20-9ae5-01f82e7b32c5
-# ╟─7a6d4b14-58d3-40c1-81f2-713c830f875f
+# ╠═7a6d4b14-58d3-40c1-81f2-713c830f875f
 # ╟─c8ef8a60-d087-4ae9-ae92-abeea5afc7ae
 # ╠═714908a1-dc85-476f-a99f-ec5c95a78b60
 # ╟─dacb8094-89a4-404a-8243-525c0dbfa482
 # ╠═d45f34e2-64f0-4828-ae0d-7b4cb3a3287d
 # ╠═2e0e8bf3-f34b-44bc-aa2d-046e1db6ee2d
 # ╠═55c639f6-b47b-47cf-a3d6-547e793c72bc
-# ╟─c3a62dda-e054-4c8c-b1b8-ba1b5c4447b3
+# ╠═c3a62dda-e054-4c8c-b1b8-ba1b5c4447b3
 # ╟─de5d96f0-4df6-4cc3-9f1d-156176b2b676
 # ╟─a06065e1-0e20-4cf8-8d5a-2d588da20bee
 # ╠═eaad5f46-e928-47c2-90ec-2cca3871c75d
@@ -600,6 +644,6 @@ end
 # ╟─9970adfd-ee88-4598-87a3-ffde5297031c
 # ╠═660a8511-4dd1-4788-9c14-fdd604bf83ad
 # ╟─5e6f505b-49fe-4ff4-ac2e-f6adcd445569
-# ╟─8b557bf1-f3dd-4f42-a250-ce965412eb32
+# ╠═8b557bf1-f3dd-4f42-a250-ce965412eb32
 # ╟─c05ed977-7a89-4ac8-97be-7078d69fce9f
-# ╟─ff21c9ec-1581-405f-8db1-0f522b5bc296
+# ╠═ff21c9ec-1581-405f-8db1-0f522b5bc296
