@@ -6,11 +6,10 @@ using InteractiveUtils
 
 # ╔═╡ 34a06b3b-799b-48c5-bd08-1e57151f51ec
 let
-    using Pkg
-    sp = splitpath(@__DIR__)
-    docs_dir = sp |> sp -> sp[1:(findfirst(sp .== "docs"))] |> joinpath
-    pkg_dir = sp |> sp -> sp[1:(findfirst(sp .== "EpiAware"))] |> joinpath
+    docs_dir = dirname(dirname(dirname(dirname(@__DIR__))))
+    pkg_dir = dirname(docs_dir)
 
+    using Pkg: Pkg
     Pkg.activate(docs_dir)
     Pkg.develop(; path = pkg_dir)
     Pkg.instantiate()
