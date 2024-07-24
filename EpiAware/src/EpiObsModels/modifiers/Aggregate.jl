@@ -42,18 +42,19 @@ end
 
 @model function EpiAwareBase.generate_observations(ag::Aggregate, y_t, Y_t)
     if ismissing(y_t)
-        y_t = Vector{Real}(0.0, length(Y_t))
+        y_t = fill(0.0, length(Y_t))
     end
 
     n = length(y_t)
     m = length(ag.aggregation)
 
-    aggregation = broadcast_n(RepeatEach(), ag.aggregation, n, m)
-    present = broadcast_n(RepeatEach(), ag.present, n, m)
+    aggregation = broadcast_rule(RepeatEach(), ag.aggregation, n, m)
+
+    present = broadcast_rule(RepeatEach(), ag.present, n, m)
 
     agg_Y_t = map(eachindex(aggregation)) do i
         if present[i]
-            exp_Y_t = sum(Y_t[min(1, i - aggregation[i] + 1):i])
+            exp_Y_t = sum(Y_t[max(1, i - aggregation[i] + 1):i])
         else
             exp_Y_t = 0.0
         end
@@ -61,10 +62,11 @@ end
     end
 
     @submodel exp_obs = generate_observations(ag.model, y_t[present], agg_Y_t[present])
-    return _return_aggregate(exp_obs, y_t, present)
+    return _return_aggregate(exp_obs, present, n)
 end
 
-function _return_aggregate(exp_obs, y_t, present)
+function _return_aggregate(exp_obs, present, n)
+    y_t = fill(0.0, n)
     y_t[present] = exp_obs
     return y_t
 end
