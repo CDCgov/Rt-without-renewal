@@ -1,7 +1,43 @@
-struct Aggregate{M <: AbstractTuringLatentModel,} <: AbstractTuringLatentModel
+@doc raw"
+Aggregates observations over a specified time period. For efficiency it also only passes the aggregated observations to the submodel. The aggregation vector
+is internally broadcasted to the length of the observations and the present vector is broadcasted to the length of the aggregation vector using `broadcast_n`.
+
+# Fields
+
+- `model::AbstractTuringObservationModel`: The submodel to use for the aggregated observations.
+- `aggregation::AbstractVector{<: Int}`: The number of time periods to aggregate over.
+- `present::AbstractVector{<: Bool}`: A vector of booleans indicating whether the observation is present or not.
+
+# Constructors
+
+- `Aggregate(model, aggregation)`: Constructs an `Aggregate` object and automatically sets the `present` field.
+- `Aggregate(; model, aggregation)`: Constructs an `Aggregate` object and automatically sets the `present` field using named keyword arguments
+
+# Examples
+
+```julia
+using EpiAware
+weekly_agg = Aggregate(PoissonError(), [0, 0, 0, 0, 7, 0, 0])
+gen_obs = generate_observations(weekly_agg, missing, fill(1, 28))
+gen_obs()
+```
+"
+struct Aggregate{M <: AbstractTuringObservationModel,
+    I <: AbstractVector{<:Int}, J <: AbstractVector{<:Bool}} <:
+       AbstractTuringObservationModel
     model::M
-    aggregation = [0, 7, 0, 0, 0, 0, 0]
-    present = [false, true, false, false, false, false, false]
+    aggregation::I
+    present::J
+
+    function Aggregate(model, aggregation)
+        present = aggregation .!= 0
+        new{typeof(model), typeof(aggregation), typeof(present)}(
+            model, aggregation, present)
+    end
+
+    function Aggregate(; model, aggregation)
+        return Aggregate(model, aggregation)
+    end
 end
 
 @model function EpiAwareBase.generate_observations(ag::Aggregate, y_t, Y_t)
