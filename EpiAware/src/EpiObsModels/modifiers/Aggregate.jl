@@ -42,7 +42,7 @@ end
 
 @model function EpiAwareBase.generate_observations(ag::Aggregate, y_t, Y_t)
     if ismissing(y_t)
-        y_t = fill(0.0, length(Y_t))
+        y_t = Vector{Missing}(missing, length(Y_t))
     end
 
     n = length(y_t)
