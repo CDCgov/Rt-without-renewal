@@ -25,5 +25,14 @@
         @test isapprox(draw[1], 20, atol = 1e-3)
     end
 
-    @test_throws AssertionError generate_observations(obs_model, vcat(1, I_t), I_t)()
+    @testset "Test works with truncated expected observations" begin
+        mdl = generate_observations(obs_model, fill(missing, 5), I_t[(end - 3):end])
+        draw = mdl()
+        @test all(map(zip(draw[(end - 3):end], I_t[(end - 3):end])) do (draw, I_t)
+            isapprox(draw, I_t, atol = 1e-3)
+        end)
+        @test ismissing(draw[1])
+    end
+
+    @test_throws AssertionError generate_observations(obs_model, I_t, vcat(1, I_t))()
 end
