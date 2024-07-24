@@ -8,7 +8,7 @@ Pages = ["lib/getting-started/faq.md"]
 
 ## Pluto notebooks
 
-In some of the showcase examples in `EpiAware/docs/src/showcase` we use [`Pluto.jl`](https://plutojl.org/) notebooks for the underlying computation. As well as reading the code blocks and output of the notebooks in this documentation, you can also run these notebooks by cloning `EpiAware` and running the notebooks with `Pluto.jl` (for further details see [contributing](@ref contributing)).
+In some of the showcase examples in `EpiAware/docs/src/showcase` we use [`Pluto.jl`](https://plutojl.org/) notebooks for the underlying computation. As well as reading the code blocks and output of the notebooks in this documentation, you can also run these notebooks by cloning `EpiAware` and running the notebooks with `Pluto.jl` (for further details see [developer notes](@ref developer)).
 
 It should be noted that `Pluto.jl` notebooks are reactive, meaning that they re-run downstream code after changes with downstreaming determined by a tree of dependent code blocks. This is different from the standard Julia REPL, and some other notebook formats (e.g. `.ipynb`). In `Pluto` each code block is a single lines of code or encapsulated by `let ... end` and `begin ... end`. The difference between `let ... end` blocks and `begin ... end` blocks are that the `let ... end` type of code block only adds the final output/return value of the block to scope, like an anonymous function, whereas `begin ... end` executes each line and adds defined variables to scope.
 
