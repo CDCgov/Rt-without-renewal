@@ -23,11 +23,18 @@ epi_datas = map(gi_params["gi_means"]) do μ
     Gamma(shape, scale)
 end .|> gen_dist -> EpiData(gen_distribution = gen_dist)
 
-## Calculate the prediction dataframe
-prediction_df = mapreduce(vcat, files) do filename
+## Calculate the prediction and scoring dataframes
+double_vcat = (dfs1, dfs2) -> (vcat(dfs1[1], dfs2[1]),
+                                       vcat(dfs1[2], dfs2[2]))
+
+dfs = mapreduce(double_vcat, xs) do filename
     output = load(joinpath(datadir("epiaware_observables"), filename))
-    make_prediction_dataframe_from_output(filename, output, epi_datas, pipelines)
+    (
+        make_prediction_dataframe_from_output(filename, output, epi_datas, pipelines),
+        make_scoring_dataframe_from_output(filename, output, epi_datas, pipelines)
+    )
 end
 
-## Save the prediction dataframe
-CSV.write(plotsdir("analysis_df.csv"), prediction_df)
+## Save the prediction and scoring dataframes
+CSV.write(plotsdir("analysis_df.csv"), dfs[1])
+CSV.write(plotsdir("scoring_df.csv"), dfs[2])
