@@ -56,12 +56,13 @@ end
         sum(Y_t[max(1, i - aggregation[i] + 1):i])
     end
 
-    @submodel exp_obs = generate_observations(ag.model, y_t[present], agg_Y_t)
-    return _return_aggregate(exp_obs, present, n)
+    @submodel pred_obs = generate_observations(ag.model, y_t[present], agg_Y_t)
+    return _return_aggregate(pred_obs, present, n)
 end
 
-function _return_aggregate(exp_obs, present, n)
-    y_t = Vector{eltype(exp_obs)}(zero(eltype(exp_obs)), n)
-    y_t[present] = exp_obs
+function _return_aggregate(pred_obs, present, n)
+    y_t = Vector{eltype(pred_obs)}(undef, n)
+    y_t = fill(zero(eltype(pred_obs)), n)
+    y_t[present] = pred_obs
     return y_t
 end
