@@ -18,13 +18,15 @@ Inference configuration struct for specifying the parameters and models used in 
 - `InferenceConfig(inference_config::Dict; case_data, tspan, epimethod)`: Constructs an `InferenceConfig` object from a dictionary of configuration values.
 
 """
-struct InferenceConfig{T, F, I, L, O, E, D <: Distribution, X <: Integer}
+struct InferenceConfig{T, F, IGP, L, O, E, D <: Distribution, X <: Integer}
     gi_mean::T
     gi_std::T
-    igp::I
+    igp::IGP
     latent_model::L
     observation_model::O
     case_data::Union{Vector{Union{Integer, Missing}}, Missing}
+    truth_I_t::Vector{T}
+    truth_I0::T
     tspan::Tuple{Integer, Integer}
     epimethod::E
     transformation::F
@@ -32,16 +34,17 @@ struct InferenceConfig{T, F, I, L, O, E, D <: Distribution, X <: Integer}
     lookahead::X
 
     function InferenceConfig(igp, latent_model, observation_model; gi_mean, gi_std,
-            case_data, tspan, epimethod, transformation = exp, log_I0_prior, lookahead)
+            case_data, truth_I_t, truth_I0, tspan, epimethod,
+            transformation = exp, log_I0_prior, lookahead)
         new{typeof(gi_mean), typeof(transformation),
             typeof(igp), typeof(latent_model), typeof(observation_model),
             typeof(epimethod), typeof(log_I0_prior), typeof(lookahead)}(
             gi_mean, gi_std, igp, latent_model, observation_model,
-            case_data, tspan, epimethod, transformation, log_I0_prior, lookahead)
+            case_data, truth_I_t, truth_I0, tspan, epimethod, transformation, log_I0_prior, lookahead)
     end
 
     function InferenceConfig(
-            inference_config::Dict; case_data, tspan, epimethod)
+            inference_config::Dict; case_data, truth_I_t, truth_I0, tspan, epimethod)
         InferenceConfig(
             inference_config["igp"],
             inference_config["latent_namemodels"].second,
@@ -49,6 +52,8 @@ struct InferenceConfig{T, F, I, L, O, E, D <: Distribution, X <: Integer}
             gi_mean = inference_config["gi_mean"],
             gi_std = inference_config["gi_std"],
             case_data = case_data,
+            truth_I_t = truth_I_t,
+            truth_I0 = truth_I0,
             tspan = tspan,
             epimethod = epimethod,
             log_I0_prior = inference_config["log_I0_prior"],
@@ -84,6 +89,9 @@ function infer(config::InferenceConfig)
     forecast_results = generate_forecasts(
         inference_results.samples, inference_results.data, epiprob, config.lookahead)
 
-    return Dict("inference_results" => inference_results, "epiprob" => epiprob,
-        "inference_config" => config, "forecast_results" => forecast_results)
+    score_results = summarise_crps(config, inference_results, forecast_results, epiprob)
+
+    return Dict("inference_results" => inference_results,
+        "epiprob" => epiprob, "inference_config" => config,
+        "forecast_results" => forecast_results, "score_results" => score_results)
 end

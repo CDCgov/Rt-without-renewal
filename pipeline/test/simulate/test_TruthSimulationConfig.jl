@@ -41,5 +41,5 @@ end
     @test haskey(truthdata, "truth_daily_ascertainment")
     @test haskey(truthdata, "truth_I0")
 
-    @test truthdata["y_t"] isa Vector{Union{Missing, Real}}
+    @test truthdata["y_t"] isa Vector{Union{Missing, T}} where {T <: Real}
 end

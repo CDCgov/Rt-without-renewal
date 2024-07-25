@@ -46,7 +46,7 @@ export infer, generate_inference_results, map_inference_results, define_epiprob
 export define_forecast_epiprob, generate_forecasts
 
 # Exported functions: scoring functions
-export score_parameters
+export score_parameters, simple_crps, summarise_crps
 
 # Exported functions: Analysis functions for constructing dataframes
 export make_prediction_dataframe_from_output, make_truthdata_dataframe
@@ -64,7 +64,7 @@ include("constructors/constructors.jl")
 include("simulate/simulate.jl")
 include("infer/infer.jl")
 include("forecast/forecast.jl")
-include("scoring/score_parameters.jl")
+include("scoring/scoring.jl")
 include("analysis/analysis.jl")
 include("mainplots/mainplots.jl")
 include("plot_functions.jl")
