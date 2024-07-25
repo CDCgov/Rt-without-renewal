@@ -89,6 +89,9 @@ function infer(config::InferenceConfig)
     forecast_results = generate_forecasts(
         inference_results.samples, inference_results.data, epiprob, config.lookahead)
 
-    return Dict("inference_results" => inference_results, "epiprob" => epiprob,
-        "inference_config" => config, "forecast_results" => forecast_results)
+    score_results = summarise_crps(config, inference_results, forecast_results, epiprob)
+
+    return Dict("inference_results" => inference_results,
+        "epiprob" => epiprob, "inference_config" => config,
+        "forecast_results" => forecast_results, "score_results" => score_results)
 end

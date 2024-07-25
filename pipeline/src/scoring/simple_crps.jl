@@ -29,7 +29,7 @@ crps = simple_crps(forecasts, observation)
 """
 function simple_crps(forecasts, observation)
     @assert !isempty(forecasts) "Forecasts cannot be empty"
-	mae = mean(abs, forecasts .- observation)
-	pseudo_entropy = -0.5 * mean(abs, [x - y for x in forecasts, y in forecasts])
-	return mae + pseudo_entropy
+    mae = mean(abs, forecasts .- observation)
+    pseudo_entropy = -0.5 * mean(abs, [x - y for x in forecasts, y in forecasts])
+    return mae + pseudo_entropy
 end
