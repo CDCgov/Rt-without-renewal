@@ -52,13 +52,8 @@ end
 
     present = broadcast_rule(RepeatEach(), ag.present, n, m)
 
-    agg_Y_t = map(eachindex(aggregation)) do i
-        if present[i]
-            exp_Y_t = sum(Y_t[max(1, i - aggregation[i] + 1):i])
-        else
-            exp_Y_t = 0.0
-        end
-        return exp_Y_t
+    agg_Y_t = map(findall(present)) do i
+        sum(Y_t[max(1, i - aggregation[i] + 1):i])
     end
 
     @submodel exp_obs = generate_observations(ag.model, y_t[present], agg_Y_t[present])
