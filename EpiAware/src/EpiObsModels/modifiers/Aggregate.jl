@@ -61,7 +61,7 @@ end
 end
 
 function _return_aggregate(exp_obs, present, n)
-    y_t = fill(0.0, n)
+    y_t = Vector{eltype(exp_obs)}(zero(eltype(exp_obs)), n)
     y_t[present] = exp_obs
     return y_t
 end
