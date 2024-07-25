@@ -24,7 +24,7 @@ jobs:
               import Pkg
               Pkg.activate(temp=true)
               Pkg.add(url="https://github.com/CDCgov/Rt-without-renewal", rev="${context.payload.pull_request.head.ref}", subdir="EpiAware")
-              using EpiAware}
+              using EpiAware
               \`\`\`
               `
             })
