@@ -10,7 +10,7 @@
 
     data = EpiData(pmf, exp)
 
-    result = calculate_processes(I_t, I0, data, pipeline)
+    result = calculate_processes(I_t, I0, data)
 
     # Check if the log of infections is calculated correctly
     @testset "Log of infections" begin
