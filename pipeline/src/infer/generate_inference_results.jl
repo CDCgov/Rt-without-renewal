@@ -19,7 +19,8 @@ function generate_inference_results(
     tspan = make_tspan(
         pipeline; T = inference_config["T"], lookback = inference_config["lookback"])
     config = InferenceConfig(
-        inference_config; case_data = truthdata["y_t"], tspan, epimethod = inference_method)
+        inference_config; case_data = truthdata["y_t"], truth_I_t = truthdata["I_t"],
+        truth_I0 = truthdata["I0"], tspan, epimethod = inference_method)
 
     # produce or load inference results
     prfx = _inference_prefix(truthdata, inference_config, pipeline)
@@ -51,8 +52,9 @@ function generate_inference_results(
         truthdata, inference_config, pipeline::EpiAwareExamplePipeline; inference_method)
     tspan = make_tspan(
         pipeline; T = inference_config["T"], lookback = inference_config["lookback"])
-    config = InferenceConfig(inference_config; case_data = truthdata["y_t"],
-        tspan = tspan, epimethod = inference_method)
+    config = InferenceConfig(
+        inference_config; case_data = truthdata["y_t"], truth_I_t = truthdata["I_t"],
+        truth_I0 = truthdata["truth_I0"], tspan = tspan, epimethod = inference_method)
 
     # produce or load inference results
     prfx = _inference_prefix(truthdata, inference_config, pipeline)
