@@ -51,7 +51,6 @@ Generates latent periods using the specified `model` and `n` number of samples.
 
 ## Returns
 - `broadcasted_latent`: The generated broadcasted latent periods.
-- `latent_period_aux...`: Additional auxiliary information about the latent periods.
 
 "
 @model function EpiAwareBase.generate_latent(model::BroadcastLatentModel, n)
