@@ -19,7 +19,7 @@ end
     weekly_agg = Aggregate(TestObs(), [0, 0, 0, 0, 7, 0, 0])
     gen_obs = generate_observations(weekly_agg, missing, fill(1, 28))
     draws = gen_obs()
-    @test draws isa Vector{Float64}
+    @test draws isa Vector{Int64}
     @test length(draws) == 28
     exp_draws = fill(0.0, 28)
     exp_draws[5] = 5.0
