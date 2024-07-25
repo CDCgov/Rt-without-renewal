@@ -49,7 +49,8 @@ export define_forecast_epiprob, generate_forecasts
 export score_parameters, simple_crps, summarise_crps
 
 # Exported functions: Analysis functions for constructing dataframes
-export make_prediction_dataframe_from_output, make_truthdata_dataframe
+export make_prediction_dataframe_from_output, make_truthdata_dataframe,
+       make_scoring_dataframe_from_output
 
 # Exported functions: Make main plots
 export figureone, figuretwo
