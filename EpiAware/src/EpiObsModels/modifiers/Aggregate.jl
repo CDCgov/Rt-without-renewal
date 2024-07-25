@@ -56,7 +56,7 @@ end
         sum(Y_t[max(1, i - aggregation[i] + 1):i])
     end
 
-    @submodel exp_obs = generate_observations(ag.model, y_t[present], agg_Y_t[present])
+    @submodel exp_obs = generate_observations(ag.model, y_t[present], agg_Y_t)
     return _return_aggregate(exp_obs, present, n)
 end
 
