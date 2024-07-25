@@ -15,8 +15,7 @@ effects on inference in post-inference.
 A dataframe containing the CRPS scoring results.
 
 """
-function make_scoring_dataframe_from_output(
-        filename, output, epi_datas, pipelines; qs = [0.025, 0.5, 0.975])
+function make_scoring_dataframe_from_output(filename, output, epi_datas, pipelines)
     #Get the scenario, IGP model, latent model and true mean GI
     inference_config = output["inference_config"]
     igp_model = output["inference_config"].igp |> string
