@@ -3,8 +3,9 @@ quickactivate(@__DIR__(), "EpiAwarePipeline")
 
 @testset "run inference for random scenario and do scoring" begin
     using EpiAwarePipeline, EpiAware, Plots, Statistics, RCall, DataFramesMeta
-    pipeline = EpiAwareExamplePipeline()
-    prior = RtwithoutRenewalPriorPipeline()
+    pipeline = SmoothEndemicPipeline(ndraws = 50, nchains = 1)
+
+    truth_data_config = make_truth_data_configs(pipeline)[1]
 
     ## Set up data generation on a random scenario
 

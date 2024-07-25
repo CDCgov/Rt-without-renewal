@@ -16,10 +16,7 @@ This is an internal method that generates the part of the prefix for the inferen
     results file name from the pipeline.
 """
 _prefix_from_pipeline(pipeline::AbstractEpiAwarePipeline) = "observables"
-_prefix_from_pipeline(pipeline::SmoothOutbreakPipeline) = "smooth_outbreak"
-_prefix_from_pipeline(pipeline::MeasuresOutbreakPipeline) = "measures_outbreak"
-_prefix_from_pipeline(pipeline::SmoothEndemicPipeline) = "smooth_endemic"
-_prefix_from_pipeline(pipeline::RoughEndemicPipeline) = "rough_endemic"
+_prefix_from_pipeline(pipeline::AbstractRtwithoutRenewalPipeline) = pipeline.prefix
 
 """
 This is an internal method that generates the prefix for the inference results file name.
