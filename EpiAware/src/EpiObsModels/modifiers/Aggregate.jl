@@ -61,8 +61,7 @@ end
 end
 
 function _return_aggregate(pred_obs, present, n)
-    y_t = Vector{eltype(pred_obs)}(undef, n)
-    y_t = fill(zero(eltype(pred_obs)), n)
+    y_t = zeros(eltype(pred_obs), n)
     y_t[present] = pred_obs
     return y_t
 end
