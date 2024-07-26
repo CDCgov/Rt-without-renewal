@@ -24,8 +24,9 @@ epi_datas = map(gi_params["gi_means"]) do μ
 end .|> gen_dist -> EpiData(gen_distribution = gen_dist)
 
 ## Calculate the prediction and scoring dataframes
-double_vcat = (dfs1, dfs2) -> (vcat(dfs1[1], dfs2[1]),
-                                       vcat(dfs1[2], dfs2[2]))
+double_vcat = (dfs1, dfs2) -> (
+      vcat(dfs1[1], dfs2[1]), vcat(dfs1[2], dfs2[2])
+)
 
 dfs = mapreduce(double_vcat, xs) do filename
     output = load(joinpath(datadir("epiaware_observables"), filename))
