@@ -14,7 +14,7 @@ using FillArrays: Fill
 using Turing, Distributions, DocStringExtensions, LinearAlgebra
 
 #Export models
-export FixedIntercept, Intercept, RandomWalk, AR, HierarchicalNormal
+export FixedIntercept, Intercept, RandomWalk, AR, MA, HierarchicalNormal
 
 # Export tools for manipulating latent models
 export CombineLatentModels, ConcatLatentModels, BroadcastLatentModel
@@ -32,6 +32,7 @@ include("docstrings.jl")
 include("models/Intercept.jl")
 include("models/RandomWalk.jl")
 include("models/AR.jl")
+include("models/MA.jl")
 include("models/HierarchicalNormal.jl")
 include("modifiers/DiffLatentModel.jl")
 include("modifiers/TransformLatentModel.jl")
