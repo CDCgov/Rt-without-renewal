@@ -455,7 +455,7 @@ Because we are using synthetic data we can also plot the model predictions for t
 
 We find that the `EpiAware` model recovers the main finding in _Mishra et al_; that the $R_t$ in South Korea peaked at a very high value ($R_t \sim 10$ at peak) before rapidly dropping below 1 in early March 2020.
 
-Note that, in reality, the peak $R_t$ found here and in _Mishra et al) is unrealistically high, this might be due to a combination of:
+Note that, in reality, the peak $R_t$ found here and in _Mishra et al_ is unrealistically high, this might be due to a combination of:
 - A mis-estimated generation interval/serial interval distribution.
 - An ascertainment rate that was, in reality, changing over time.
 
