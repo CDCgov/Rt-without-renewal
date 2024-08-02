@@ -23,7 +23,7 @@ Raises:
 
 # Examples
 
-```jldoctest filter
+```jldoctest
 using Distributions
 using EpiAware.EpiAwareUtils
 
