@@ -10,11 +10,14 @@ The moving average (MA) model struct.
 
 # Examples
 
-```julia
+```jldoctest; filter = r\"\b\d+(\.\d+)?\b\" => \"*\"
 using EpiAware, Distributions
 ma = MA(Normal(0.0, 0.05), HalfNormal(0.1); q = 7)
 ma_model = generate_latent(ma, 10)
 ma_model()
+
+# output
+
 ```
 "
 struct MA{C <: Sampleable, S <: Sampleable, Q <: Int} <: AbstractTuringLatentModel
@@ -66,7 +69,7 @@ Generate a latent MA series.
 
     σ_MA ~ latent_model.std_prior
     coef_MA ~ latent_model.coef_prior
-    ϵ_t ~ filldist(Normal(), n)
+    @submodel ϵ_t = generate_latent(IDD(Normal()), n)
     scaled_ϵ_t = σ_MA * ϵ_t
 
     ma = accumulate_scan(MAStep(coef_MA), scaled_ϵ_t[1:q], scaled_ϵ_t[(q + 1):end])
