@@ -79,7 +79,7 @@ Generate a latent AR series.
     σ_AR ~ latent_model.std_prior
     ar_init ~ latent_model.init_prior
     damp_AR ~ latent_model.damp_prior
-    ϵ_t ~ filldist(Normal(), n - p)
+    @submodel ϵ_t = generate_latent(IDD(Normal()), n)
 
     ar = accumulate_scan(ARStep(damp_AR), ar_init, σ_AR * ϵ_t)
 
