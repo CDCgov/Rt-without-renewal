@@ -8,13 +8,13 @@ using ..EpiAwareBase
 using DataFramesMeta: DataFrame, @rename!
 using DynamicPPL: Model, fix, condition, @submodel, @model
 using MCMCChains: Chains
-using Random: AbstractRNG
+using Random: AbstractRNG, randexp
 using Tables: rowtable
 
 using Distributions, DocStringExtensions, QuadGK, Statistics, Turing
 
 #Export Structures
-export HalfNormal, DirectSample
+export HalfNormal, DirectSample, SafePoisson
 
 #Export functions
 export scan, spread_draws, censored_pmf, get_param_array, prefix_submodel
@@ -32,5 +32,6 @@ include("turing-methods.jl")
 include("DirectSample.jl")
 include("post-inference.jl")
 include("get_param_array.jl")
+include("SafePoisson.jl")
 
 end
