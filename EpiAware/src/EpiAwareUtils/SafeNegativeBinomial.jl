@@ -23,7 +23,7 @@ parameterisation is useful for specifying the distribution in a way that is easi
 
 # Returns:
 
-- A `SafePoisson` distribution with the specified mean.
+- A `SafeNegativeBinomial` distribution with the specified mean.
 
 # Examples:
 
@@ -40,13 +40,13 @@ EpiAware.EpiAwareUtils.SafeNegativeBinomial{Float64}(μ=7.016735912097631e20, α
 ```jldoctest SafeNegativeBinomial
 cdf(d, 2)
 # output
-8.523453224359909e-90
+0.0
 ```
 
 ```jldoctest SafeNegativeBinomial
 logpdf(d, 100)
 # output
--194.3125906630495
+-16556.546939786767
 ```
 
 ```jldoctest SafeNegativeBinomial
@@ -74,11 +74,18 @@ end
 # helper function
 function _negbin(d::SafeNegativeBinomial)
     μ² = d.μ^2
-    ex_σ² = sqrt(d.α) * μ²
+    ex_σ² = d.α^2 * μ²
     p = d.μ / (d.μ + ex_σ²)
     r = μ² / ex_σ²
     return NegativeBinomial(r, p)
 end
+
+### Support
+
+Base.minimum(d::SafeNegativeBinomial) = 0
+Base.maximum(d::SafeNegativeBinomial) = Inf
+Distributions.insupport(d::SafeNegativeBinomial, x::Integer) = x >= 0
+
 
 #### Parameters
 
