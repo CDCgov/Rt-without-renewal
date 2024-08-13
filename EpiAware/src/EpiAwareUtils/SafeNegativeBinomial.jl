@@ -68,8 +68,14 @@ struct SafeNegativeBinomial{T <: Real} <: DiscreteUnivariateDistribution
     function SafeNegativeBinomial{T}(μ::T, α::T) where {T <: Real}
         return new{T}(μ, α)
     end
-    SafeNegativeBinomial(μ::Real, α::Real) = SafeNegativeBinomial{eltype(μ)}(μ, α)
 end
+
+#Outer constructors make AD work
+function SafeNegativeBinomial(μ::T, α::T) where {T <: Real}
+    return SafeNegativeBinomial{T}(μ, α)
+end
+
+SafeNegativeBinomial(μ::Real, α::Real) = SafeNegativeBinomial(promote(μ, α)...)
 
 # helper function
 function _negbin(d::SafeNegativeBinomial)
