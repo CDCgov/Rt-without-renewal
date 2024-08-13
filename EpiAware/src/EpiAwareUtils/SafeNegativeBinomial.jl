@@ -61,7 +61,7 @@ var(d)
 1.2308645715030148e39
 ```
 "
-struct SafeNegativeBinomial{T<:Real} <: DiscreteUnivariateDistribution
+struct SafeNegativeBinomial{T <: Real} <: DiscreteUnivariateDistribution
     μ::T
     α::T
 
@@ -86,7 +86,6 @@ Base.minimum(d::SafeNegativeBinomial) = 0
 Base.maximum(d::SafeNegativeBinomial) = Inf
 Distributions.insupport(d::SafeNegativeBinomial, x::Integer) = x >= 0
 
-
 #### Parameters
 
 Distributions.params(d::SafeNegativeBinomial) = _negbin(d) |> params
@@ -103,7 +102,9 @@ Distributions.std(d::SafeNegativeBinomial) = sqrt(var(d))
 Distributions.skewness(d::SafeNegativeBinomial) = _negbin(d) |> skewness
 Distributions.kurtosis(d::SafeNegativeBinomial) = _negbin(d) |> kurtosis
 Distributions.mode(d::SafeNegativeBinomial) = _negbin(d) |> mode
-Distributions.kldivergence(p::SafeNegativeBinomial, q::SafeNegativeBinomial) = kldivergence(_negbin(p), _negbin(q))
+function Distributions.kldivergence(p::SafeNegativeBinomial, q::SafeNegativeBinomial)
+    kldivergence(_negbin(p), _negbin(q))
+end
 
 #### Evaluation & Sampling
 
@@ -124,7 +125,7 @@ function Base.rand(rng::AbstractRNG, d::SafeNegativeBinomial)
     if isone(_d.p)
         return 0
     else
-        return rand(rng, SafePoisson(rand(rng, Gamma(_d.r, (1 - _d.p)/_d.p))))
+        return rand(rng, SafePoisson(rand(rng, Gamma(_d.r, (1 - _d.p) / _d.p))))
     end
 end
 

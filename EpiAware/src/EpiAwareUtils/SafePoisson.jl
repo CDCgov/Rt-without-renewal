@@ -61,7 +61,7 @@ _poisson(d::SafePoisson) = Poisson{typeof(d.λ)}(d.λ)
 # ineffiecient but safe floor function to integer, which can handle large values of x
 function _safe_int_floor(x::Real)
     Tf = typeof(x)
-    if (Tf(typemin(Int))-one(Tf)) < x < (Tf(typemax(Int))+one(Tf))
+    if (Tf(typemin(Int)) - one(Tf)) < x < (Tf(typemax(Int)) + one(Tf))
         return floor(Int, x)
     else
         return floor(BigInt, x)
@@ -70,7 +70,7 @@ end
 
 function _safe_int_round(x::Real)
     Tf = typeof(x)
-    if (Tf(typemin(Int))-one(Tf)) < x < (Tf(typemax(Int))+one(Tf))
+    if (Tf(typemin(Int)) - one(Tf)) < x < (Tf(typemax(Int)) + one(Tf))
         return round(Int, x)
     else
         return round(BigInt, x)
@@ -91,11 +91,13 @@ Distributions.var(d::SafePoisson) = d.λ
 Distributions.skewness(d::SafePoisson) = one(typeof(d.λ)) / sqrt(d.λ)
 Distributions.kurtosis(d::SafePoisson) = one(typeof(d.λ)) / d.λ
 
-function Distributions.entropy(d::SafePoisson{T}) where T<:Real
+function Distributions.entropy(d::SafePoisson{T}) where {T <: Real}
     entropy(_poisson(d))
 end
 
-Distributions.kldivergence(p::SafePoisson, q::SafePoisson) = kldivergence(_poisson(p), _poisson(q))
+function Distributions.kldivergence(p::SafePoisson, q::SafePoisson)
+    kldivergence(_poisson(p), _poisson(q))
+end
 
 ### Evaluation
 
@@ -116,7 +118,6 @@ Distributions.insupport(d::SafePoisson, x::Integer) = x >= 0
 
 ### Sampling
 ### Taken from PoissonRandom.jl https://github.com/SciML/PoissonRandom.jl/blob/master/src/PoissonRandom.jl
-
 
 count_rand(λ) = count_rand(Random.GLOBAL_RNG, λ)
 function count_rand(rng::AbstractRNG, λ)
