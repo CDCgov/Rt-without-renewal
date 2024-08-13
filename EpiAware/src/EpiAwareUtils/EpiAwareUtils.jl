@@ -14,7 +14,7 @@ using Tables: rowtable
 using Distributions, DocStringExtensions, QuadGK, Statistics, Turing
 
 #Export Structures
-export HalfNormal, DirectSample, SafePoisson
+export HalfNormal, DirectSample, SafePoisson, SafeNegativeBinomial
 
 #Export functions
 export scan, spread_draws, censored_pmf, get_param_array, prefix_submodel
@@ -33,5 +33,6 @@ include("DirectSample.jl")
 include("post-inference.jl")
 include("get_param_array.jl")
 include("SafePoisson.jl")
+include("SafeNegativeBinomial.jl")
 
 end
