@@ -55,3 +55,26 @@ end
         @test_throws InexactError rand(_dist)
     end
 end
+
+@testitem "Check gradients can be evaluated for logpdf of SafePoisson" begin
+    using Distributions, ReverseDiff, FiniteDifferences, ForwardDiff
+    log_μ = 48. #Plausible large value to hit with a log scale random walk over a number of time steps
+    α = 0.05
+
+    # Make a helper function for grad calls
+    f(x) = SafePoisson(exp(x[1])) |> poi -> logpdf(poi, 100)
+    g_fin_diff = grad(central_fdm(5, 1), f, [log_μ])[1]
+
+    # Compiled ReverseDiff version
+    input = randn(1)
+    const f_tape = ReverseDiff.GradientTape(f, input)
+    const compiled_f_tape = ReverseDiff.compile(f_tape)
+    cfg = ReverseDiff.GradientConfig(input)
+    g_rvd = ReverseDiff.gradient(f, [log_μ], cfg)
+
+    # ForwardDiff version
+    g_fd = ForwardDiff.gradient(f, [log_μ])
+
+    @test g_fin_diff ≈ g_rvd
+    @test g_fin_diff ≈ g_fd
+end
