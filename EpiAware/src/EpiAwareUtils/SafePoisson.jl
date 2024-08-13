@@ -3,7 +3,6 @@ Create a Poisson distribution with the specified mean that avoids `InExactError`
 when the mean is too large.
 
 # Arguments:
-using Base: disable_text_style
 
 - `λ`: The mean of the Poisson distribution.
 
@@ -59,19 +58,21 @@ SafePoisson() = SafePoisson{Float64}(1.0)
 # helper functions
 _poisson(d::SafePoisson) = Poisson{typeof(d.λ)}(d.λ)
 
-# ineffiecient but safe floor function to integer, which can handle large values o
+# ineffiecient but safe floor function to integer, which can handle large values of x
 function _safe_int_floor(x::Real)
-    try
+    Tf = typeof(x)
+    if (Tf(typemin(Int))-one(Tf)) < x < (Tf(typemax(Int))+one(Tf))
         return floor(Int, x)
-    catch
+    else
         return floor(BigInt, x)
     end
 end
 
 function _safe_int_round(x::Real)
-    try
+    Tf = typeof(x)
+    if (Tf(typemin(Int))-one(Tf)) < x < (Tf(typemax(Int))+one(Tf))
         return round(Int, x)
-    catch
+    else
         return round(BigInt, x)
     end
 end
@@ -114,7 +115,7 @@ Base.maximum(d::SafePoisson) = Inf
 Distributions.insupport(d::SafePoisson, x::Integer) = x >= 0
 
 ### Sampling
-### Taken from FastPoisson.jl https://github.com/SciML/PoissonRandom.jl/blob/master/src/PoissonRandom.jl
+### Taken from PoissonRandom.jl https://github.com/SciML/PoissonRandom.jl/blob/master/src/PoissonRandom.jl
 
 
 count_rand(λ) = count_rand(Random.GLOBAL_RNG, λ)
