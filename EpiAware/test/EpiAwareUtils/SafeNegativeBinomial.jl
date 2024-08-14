@@ -63,7 +63,7 @@ end
 
 @testitem "Check gradients can be evaluated for logpdf of SafeNegativeBinomial" begin
     using Distributions, ReverseDiff, FiniteDifferences, ForwardDiff
-    log_μ = 48. #Plausible large value to hit with a log scale random walk over a number of time steps
+    log_μ = 48.0 #Plausible large value to hit with a log scale random walk over a number of time steps
     α = 0.05
 
     # Make a helper function for grad calls
