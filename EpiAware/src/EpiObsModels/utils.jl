@@ -40,8 +40,8 @@ A `NegativeBinomial` distribution object.
 """
 function NegativeBinomialMeanClust(μ, α)
     μ² = μ^2
-    ex_σ² = α * μ²
-    p = μ / (μ + ex_σ²)
-    r = μ² / ex_σ²
-    return NegativeBinomial(r, p)
+    σ² = μ + α * μ²
+    p = μ / σ²
+    r = 1 / α
+    return SafeNegativeBinomial(r, p)
 end
