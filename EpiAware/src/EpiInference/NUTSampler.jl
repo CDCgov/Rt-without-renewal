@@ -25,7 +25,7 @@ The `NUTSampler` struct represents using the No-U-Turn Sampler (NUTS) to sample 
     "The metric type to use for the HMC sampler."
     metricT::M = DiagEuclideanMetric
     "number of adaptation steps"
-    nadapts::Int = 250
+    nadapts::Int = 500
 end
 
 @doc raw"
