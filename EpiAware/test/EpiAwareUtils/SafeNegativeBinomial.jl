@@ -23,16 +23,18 @@ end
     #Check Distributions.jl mean function
     @test mean(dist) ≈ μ
     @test var(dist) ≈ σ²
-    samples = [rand(dist) for _ in 1:100_000]
+    n = 100_000
+    samples = [rand(dist) for _ in 1:n]
     #Check mean from direct sampling of Distributions version and ANOVA and Variance F test comparisons
-    _dist = EpiAware.EpiAwareUtils._negbin(dist)
-    direct_samples = rand(_dist, 100_000)
+    _dist = NegativeBinomial(r, p)
+    direct_samples = rand(_dist, n)
     mean_pval = OneWayANOVATest(samples, direct_samples) |> pvalue
     @test mean_pval > 1e-6 #Very unlikely to fail if the model is correctly implemented
     var_pval = VarianceFTest(samples, direct_samples) |> pvalue
     @test var_pval > 1e-6 #Very unlikely to fail if the model is correctly implemented
-    @test isapprox(var(dist), var(direct_samples), atol = 0.1)
-
+    # Check that the variance is closer than 6 std of estimator to the direct samples
+    # very unlikely failure if the model is correctly implemented
+    @test abs(var(dist) - var(direct_samples)) < 6 * var(_dist)^2 * sqrt(2 / n)
     @testset "Check quantiles" begin
         for q in [0.1, 0.25, 0.5, 0.75, 0.9]
             @test isapprox(quantile(dist, q), quantile(direct_samples, q), atol = 0.1)
