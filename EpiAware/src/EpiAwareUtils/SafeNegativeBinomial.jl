@@ -82,7 +82,7 @@ end
 SafeNegativeBinomial(r::Real, p::Real) = SafeNegativeBinomial(promote(r, p)...)
 
 # helper function
-_negbin(d::SafeNegativeBinomial) =NegativeBinomial(d.r, d.p)
+_negbin(d::SafeNegativeBinomial) = NegativeBinomial(d.r, d.p)
 
 ### Support
 
