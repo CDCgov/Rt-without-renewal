@@ -56,7 +56,7 @@ end
 SafePoisson() = SafePoisson{Float64}(1.0)
 
 # helper functions
-_poisson(d::SafePoisson) = Poisson(d.λ; check_args=false)
+_poisson(d::SafePoisson) = Poisson(d.λ; check_args = false)
 
 # ineffiecient but safe floor function to integer, which can handle large values of x
 function _safe_int_floor(x::Real)
