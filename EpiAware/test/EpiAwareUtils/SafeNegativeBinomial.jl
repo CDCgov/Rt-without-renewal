@@ -1,7 +1,12 @@
 @testitem "Testing SafeNegativeBinomial Constructor " begin
     μ = 10.0
     α = 0.05
-    dist = SafeNegativeBinomial(μ, α)
+    # calculate the r, p parameters
+    σ² = μ + α * μ^2
+    p = μ / σ²
+    r = μ * p / (1 - p)
+
+    dist = SafeNegativeBinomial(r, p)
     @test typeof(dist) <: SafeNegativeBinomial
 end
 
@@ -9,10 +14,15 @@ end
     using Distributions, HypothesisTests, StatsBase
     μ = 10.0
     α = 0.05
-    dist = SafeNegativeBinomial(μ, α)
+    # calculate the r, p parameters
+    σ² = μ + α * μ^2
+    p = μ / σ²
+    r = μ * p / (1 - p)
+
+    dist = SafeNegativeBinomial(r, p)
     #Check Distributions.jl mean function
     @test mean(dist) ≈ μ
-    @test var(dist) ≈ μ + α^2 * μ^2
+    @test var(dist) ≈ σ²
     samples = [rand(dist) for _ in 1:100_000]
     #Check mean from direct sampling of Distributions version and ANOVA and Variance F test comparisons
     _dist = EpiAware.EpiAwareUtils._negbin(dist)
@@ -49,9 +59,14 @@ end
 
 @testitem "Testing safety of rand call for SafeNegativeBinomial at large values" begin
     using Distributions
-    bigμ = exp(48.0) #Large value of λ
+    μ = exp(48.0) #Large value of λ
     α = 0.05
-    dist = SafeNegativeBinomial(bigμ, α)
+    # calculate the r, p parameters
+    σ² = μ + α * μ^2
+    p = μ / σ²
+    r = μ * p / (1 - p)
+
+    dist = SafeNegativeBinomial(r, p)
     @testset "Large value of mean samples a BigInt with SafePoisson" begin
         @test rand(dist) isa BigInt
     end
@@ -63,22 +78,26 @@ end
 
 @testitem "Check gradients can be evaluated for logpdf of SafeNegativeBinomial" begin
     using Distributions, ReverseDiff, FiniteDifferences, ForwardDiff
-    log_μ = 48.0 #Plausible large value to hit with a log scale random walk over a number of time steps
+    μ = exp(48.0) #Large value of λ
     α = 0.05
+    # calculate the r, p parameters
+    σ² = μ + α * μ^2
+    p = μ / σ²
+    r = μ * p / (1 - p)
 
     # Make a helper function for grad calls
-    f(x) = SafeNegativeBinomial(exp(x[1]), α) |> nb -> logpdf(nb, 100)
-    g_fin_diff = grad(central_fdm(5, 1), f, [log_μ])[1]
+    f(x) = SafeNegativeBinomial(exp(x[1]), p) |> nb -> logpdf(nb, 100)
+    g_fin_diff = grad(central_fdm(5, 1), f, [log(r)])[1]
 
     # Compiled ReverseDiff version
     input = randn(1)
     const f_tape = ReverseDiff.GradientTape(f, input)
     const compiled_f_tape = ReverseDiff.compile(f_tape)
     cfg = ReverseDiff.GradientConfig(input)
-    g_rvd = ReverseDiff.gradient(f, [log_μ], cfg)
+    g_rvd = ReverseDiff.gradient(f, [log(r)], cfg)
 
     # ForwardDiff version
-    g_fd = ForwardDiff.gradient(f, [log_μ])
+    g_fd = ForwardDiff.gradient(f, [log(r)])
 
     @test g_fin_diff ≈ g_rvd
     @test g_fin_diff ≈ g_fd

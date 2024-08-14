@@ -11,15 +11,15 @@ that the variance to mean relationship is:
 \sigma^2  = \mu + \alpha^2 \mu^2
 ```
 
-The reason for this parameterisation is that at sufficiently large mean values (i.e. `μ > 1 / α`) `α` is approximately equal to the
-standard fluctuation of the distribution, e.g. if `α = 0.05` we expect typical fluctuations of samples from the negative binomial to be
+The reason for this parameterisation is that at sufficiently large mean values (i.e. `r > 1 / p`) `p` is approximately equal to the
+standard fluctuation of the distribution, e.g. if `p = 0.05` we expect typical fluctuations of samples from the negative binomial to be
 about 5% of the mean when the mean is notably larger than 20. Otherwise, we expect approximately Poisson noise. In our opinion, this
-parameterisation is useful for specifying the distribution in a way that is easier to reason on priors for `α`.
+parameterisation is useful for specifying the distribution in a way that is easier to reason on priors for `p`.
 
 # Arguments:
 
-- `μ`: The mean of the Negative binomial distribution.
-- `α`: The cluster factor of the Negative binomial distribution.
+- `r`: The number of successes, although this can be extended to a continous number.
+- `p`: Success rate.
 
 # Returns:
 
@@ -30,15 +30,19 @@ parameterisation is useful for specifying the distribution in a way that is easi
 ```jldoctest SafeNegativeBinomial
 using EpiAware, Distributions
 
-bigλ = exp(48.0) #Large value of λ
-α = 0.05
-d = SafeNegativeBinomial(bigλ, α)
+bigμ = exp(48.0) #Large value of μ
+σ² = bigμ + 0.05 * bigμ^2 #Large variance
+
+# We can calculate the success rate from the mean to variance relationship
+p = bigμ / σ²
+r = bigμ * p / (1 - p)
+d = SafeNegativeBinomial(r, p)
 # output
-EpiAware.EpiAwareUtils.SafeNegativeBinomial{Float64}(μ=7.016735912097631e20, α=0.05)
+EpiAware.EpiAwareUtils.SafeNegativeBinomial{Float64}(r=20.0, p=2.85032816548187e-20)
 ```
 
 ```jldoctest SafeNegativeBinomial
-cdf(d, 2)
+cdf(d, 100)
 # output
 0.0
 ```
@@ -46,7 +50,7 @@ cdf(d, 2)
 ```jldoctest SafeNegativeBinomial
 logpdf(d, 100)
 # output
--16556.546939786767
+-850.1397180331871
 ```
 
 ```jldoctest SafeNegativeBinomial
@@ -58,33 +62,27 @@ mean(d)
 ```jldoctest SafeNegativeBinomial
 var(d)
 # output
-1.2308645715030148e39
+2.4617291430060293e40
 ```
 "
 struct SafeNegativeBinomial{T <: Real} <: DiscreteUnivariateDistribution
-    μ::T
-    α::T
+    r::T
+    p::T
 
-    function SafeNegativeBinomial{T}(μ::T, α::T) where {T <: Real}
-        return new{T}(μ, α)
+    function SafeNegativeBinomial{T}(r::T, p::T) where {T <: Real}
+        return new{T}(r, p)
     end
 end
 
 #Outer constructors make AD work
-function SafeNegativeBinomial(μ::T, α::T) where {T <: Real}
-    return SafeNegativeBinomial{T}(μ, α)
+function SafeNegativeBinomial(r::T, p::T) where {T <: Real}
+    return SafeNegativeBinomial{T}(r, p)
 end
 
-SafeNegativeBinomial(μ::Real, α::Real) = SafeNegativeBinomial(promote(μ, α)...)
+SafeNegativeBinomial(r::Real, p::Real) = SafeNegativeBinomial(promote(r, p)...)
 
 # helper function
-function _negbin(d::SafeNegativeBinomial)
-    μ² = d.μ^2
-    ex_σ² = d.α^2 * μ²
-    p = d.μ / (d.μ + ex_σ²)
-    r = μ² / ex_σ²
-    return NegativeBinomial(r, p)
-end
+_negbin(d::SafeNegativeBinomial) =NegativeBinomial(d.r, d.p)
 
 ### Support
 
@@ -102,9 +100,9 @@ Distributions.failprob(d::SafeNegativeBinomial{T}) where {T} = one(T) - _negbin(
 
 #### Statistics
 
-Distributions.mean(d::SafeNegativeBinomial) = d.μ
-Distributions.var(d::SafeNegativeBinomial) = d.μ + d.α^2 * d.μ^2
-Distributions.std(d::SafeNegativeBinomial) = sqrt(var(d))
+Distributions.mean(d::SafeNegativeBinomial) = _negbin(d) |> mean
+Distributions.var(d::SafeNegativeBinomial) = _negbin(d) |> var
+Distributions.std(d::SafeNegativeBinomial) = _negbin(d) |> std
 Distributions.skewness(d::SafeNegativeBinomial) = _negbin(d) |> skewness
 Distributions.kurtosis(d::SafeNegativeBinomial) = _negbin(d) |> kurtosis
 Distributions.mode(d::SafeNegativeBinomial) = _negbin(d) |> mode
@@ -127,11 +125,10 @@ Distributions.invlogccdf(d::SafeNegativeBinomial, lq::Real) = invlogccdf(_negbin
 
 ## sampling
 function Base.rand(rng::AbstractRNG, d::SafeNegativeBinomial)
-    _d = _negbin(d)
-    if isone(_d.p)
+    if isone(d.p)
         return 0
     else
-        return rand(rng, SafePoisson(rand(rng, Gamma(_d.r, (1 - _d.p) / _d.p))))
+        return rand(rng, SafePoisson(rand(rng, Gamma(d.r, (1 - d.p) / d.p))))
     end
 end
 
