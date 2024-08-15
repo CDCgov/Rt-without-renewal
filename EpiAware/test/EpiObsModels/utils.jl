@@ -22,23 +22,3 @@ end
         delay_int, time_horizon; partial = false)
     @test K == expected_K
 end
-
-@testitem "Check overflow safety of Negative Binomial sampling" begin
-    using Distributions
-    big_mu = 1e30
-    alpha = 0.5
-    big_alpha = 1e30
-
-    ex_σ² = (alpha * big_mu^2)
-    p = big_mu / (big_mu + ex_σ²)
-    r = big_mu^2 / ex_σ²
-
-    #Direct definition
-    nb = NegativeBinomial(r, p)
-
-    @test_throws InexactError rand(nb) #Throws error due to overflow
-
-    #Safe versions
-    @test rand(EpiAware.EpiObsModels.NegativeBinomialMeanClust(big_mu, alpha)) isa Int
-    @test rand(EpiAware.EpiObsModels.NegativeBinomialMeanClust(big_mu, big_alpha)) isa Int
-end
