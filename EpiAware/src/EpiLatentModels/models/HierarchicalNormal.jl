@@ -8,11 +8,22 @@ The `HierarchicalNormal` struct represents a non-centered hierarchical normal di
 
 ## Examples
 
-```julia
-using Distributions, EpiAware
-hnorm = HierarchicalNormal(0.0, truncated(Normal(0, 1), 0, Inf))
-hnorm_model = generate_latent(hnorm, 10)
-hnorm_model()
+```jldoctest HierarchicalNormal
+using Distributions, Turing, EpiAware
+hn = HierarchicalNormal()
+# output
+HierarchicalNormal{Float64, Truncated{Normal{Float64}, Continuous, Float64}}(mean=0.0, std_prior=Truncated{Normal{Float64}, Continuous, Float64}(a=0.0, b=Inf, x=Normal{Float64}(μ=0.0, σ=1.0)))
+```
+
+```jldoctest HierarchicalNormal; filter=r\"\b\d+(\.\d+)?\b\" => \"*\"
+mdl = generate_latent(hn, 10)
+mdl()
+# output
+```
+
+```jldoctest HierarchicalNormal; filter=r\"\b\d+(\.\d+)?\b\" => \"*\"
+rand(mdl)
+# output
 ```
 "
 @kwdef struct HierarchicalNormal{R <: Real, D <: Sampleable} <: AbstractTuringLatentModel

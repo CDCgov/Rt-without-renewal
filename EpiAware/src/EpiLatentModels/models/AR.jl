@@ -10,12 +10,23 @@ The autoregressive (AR) model struct.
 
 # Examples
 
-```julia
-using Distributions
-using EpiAware
+```jldoctest AR
+using Distributions, Turing, EpiAware
 ar = AR()
-ar_model = generate_latent(ar, 10)
-rand(ar_model)
+ar
+# output
+
+```
+
+```jldocttest AR; filter = r\"\b\d+(\.\d+)?\b\" => \"*\"
+mdl = generate_latent(ar, 10)
+mdl()
+# output
+```
+
+```jldoctest AR; filter = r\"\b\d+(\.\d+)?\b\" => \"*\"
+rand(mdl)
+# output
 ```
 "
 struct AR{D <: Sampleable, S <: Sampleable, I <: Sampleable,
@@ -83,7 +94,7 @@ Generate a latent AR series.
     σ_AR ~ latent_model.std_prior
     ar_init ~ latent_model.init_prior
     damp_AR ~ latent_model.damp_prior
-    @submodel ϵ_t = generate_latent(latent_model.ϵ_t, n)
+    @submodel ϵ_t = generate_latent(latent_model.ϵ_t, n - p)
 
     ar = accumulate_scan(ARStep(damp_AR), ar_init, σ_AR * ϵ_t)
 
