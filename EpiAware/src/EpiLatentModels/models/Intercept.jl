@@ -9,12 +9,23 @@ broadcasts a single intercept value to a length `n` latent process.
 
 ## Examples
 
-```julia
+```jldoctest Intercept
 using Distributions, Turing, EpiAware
 int = Intercept(Normal(0, 1))
-int_model = generate_latent(int, 10)
-rand(int_model)
-int_model()
+int
+# output
+Intercept{Normal{Float64}}(intercept_prior=Normal{Float64}(μ=0.0, σ=1.0))
+```
+
+```jldoctest Intercept; filter=r\"\b\d+(\.\d+)?\b\" => \"*\"
+mdl = generate_latent(int, 10)
+mdl()
+# output
+```
+
+```jldoctest Intercept; filter=r\"\b\d+(\.\d+)?\b\" => \"*\"
+rand(mdl)
+# output
 ```
 "
 @kwdef struct Intercept{D <: Sampleable} <: AbstractTuringIntercept
