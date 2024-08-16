@@ -39,14 +39,9 @@ Compute the mean-cluster factor negative binomial distribution.
 A `NegativeBinomial` distribution object.
 """
 function NegativeBinomialMeanClust(μ, α)
-    if isnan(μ) || isnan(α)
-        return DiscreteUniform(0, 1_000_000)
-    else
-        _μ = clamp(μ, 1e-6, 1e17)
-        _α = clamp(α, 1e-6, Inf)
-        ex_σ² = (_α * _μ^2)
-        p = clamp(_μ / (_μ + ex_σ²), 1e-17, 1 - 1e-17)
-        r = clamp(_μ^2 / ex_σ², 1e-17, 1e17)
-        return NegativeBinomial(r, p)
-    end
+    μ² = μ^2
+    σ² = μ + α * μ²
+    p = μ / σ²
+    r = 1 / α
+    return SafeNegativeBinomial(r, p)
 end

@@ -30,7 +30,7 @@ end
 
     pipeline = EpiAwareExamplePipeline()
     truth_data_config = Dict("gi_mean" => 2.5, "gi_std" => 1.5)
-    truthdata = generate_truthdata(truth_data_config, pipeline)
+    truthdata = generate_truthdata(truth_data_config, pipeline; plot = false)
 
     @test haskey(truthdata, "I_t")
     @test haskey(truthdata, "y_t")
@@ -40,4 +40,6 @@ end
     @test haskey(truthdata, "truth_gi_std")
     @test haskey(truthdata, "truth_daily_ascertainment")
     @test haskey(truthdata, "truth_I0")
+
+    @test truthdata["y_t"] isa Vector{Union{Missing, T}} where {T <: Real}
 end

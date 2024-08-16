@@ -7,7 +7,7 @@ It repeats the latent process at each period. An example of this rule is to repe
 ```julia
 using EpiAware
 rule = RepeatEach()
-latent = [1, 2, 3]
+latent = [1, 2]
 n = 10
 period = 2
 broadcast_rule(rule, latent, n, period)

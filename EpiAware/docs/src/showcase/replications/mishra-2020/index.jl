@@ -1,11 +1,10 @@
 ### A Pluto.jl notebook ###
-# v0.19.40
+# v0.19.43
 
 using Markdown
 using InteractiveUtils
 
 # ╔═╡ 34a06b3b-799b-48c5-bd08-1e57151f51ec
-# hideall
 let
     docs_dir = dirname(dirname(dirname(dirname(@__DIR__))))
     pkg_dir = dirname(docs_dir)
@@ -16,30 +15,33 @@ let
     Pkg.instantiate()
 end;
 
-# ╔═╡ 1642dbda-4915-4e29-beff-bca592f3ec8d
-begin
-    using EpiAware
-    using Turing
-    using Distributions
-    using StatsPlots, StatsPlots.PlotMeasures
-    using Random
-    using DynamicPPL
-    using Statistics
-    using DataFramesMeta
-    using LinearAlgebra
-    using Transducers
-    using ReverseDiff
-    using DelimitedFiles
-    using Dates
-    Random.seed!(1)
+# ╔═╡ d63b37f0-9642-4c38-ac01-9ffe48d50441
+using EpiAware
+
+# ╔═╡ 74642759-35a5-4957-9f2b-544712866410
+using Turing, DynamicPPL #Underlying Turing ecosystem packages to interact with models
+
+# ╔═╡ 0c5f413e-d043-448d-8665-f0f6f705d70f
+using Distributions, Statistics #Statistics packages
+
+# ╔═╡ b1e2a759-a52b-4ee5-8db4-cfe848878c92
+using CSV, DataFramesMeta #Data wrangling
+
+# ╔═╡ 9eb03a0b-c6ca-4e23-8109-fb68f87d7fdf
+begin #Plotting backend
+    using StatsPlots
+    using StatsPlots.PlotMeasures
 end
 
-# ╔═╡ a59d977c-0178-11ef-0063-83e30e0cf9f0
-begin
-    data = readdlm("south_korea_data.csv2", ','; header = true)
-    dates = data[1][:, 2] .|> Date
-    daily_cases = data[1][:, 3] .|> Integer
-end;
+# ╔═╡ 97b5374e-7653-4b3b-98eb-d8f73aa30580
+using ReverseDiff #Automatic differentiation backend
+
+# ╔═╡ 1642dbda-4915-4e29-beff-bca592f3ec8d
+begin #Date utility and set Random seed
+    using Dates
+    using Random
+    Random.seed!(1)
+end
 
 # ╔═╡ 8a8d5682-2f89-443b-baf0-d4d3b134d311
 md"
@@ -50,6 +52,12 @@ This tutorial introduces the basic functionality of `EpiAware`. `EpiAware` is a 
 It is common to conceptualise the generative process of public health data, e.g a time series of reported cases of an infectious pathogen, in a modular way. For example, it is common to abstract the underlying latent infection process away from downstream issues of observation, or to treat quanitites such as the time-varying reproduction number as being itself generated as a random process.
 
 `EpiAware` is built using the [`DynamicPPL`](https://github.com/TuringLang/DynamicPPL.jl) probabilistic programming domain-specific language, which is part of the [`Turing`](https://turinglang.org/dev/docs/using-turing/guide/) PPL. The structural concept behind `EpiAware` is that each module of an epidemiological model is a self-contained `Turing` [`Model`](https://turinglang.org/DynamicPPL.jl/stable/api/#DynamicPPL.Model-Tuple{}); that is each module is an object that can be conditioned on observable data and sampled from. A complete `EpiAware` model is the composition of these objects using the [`@submodel`](https://turinglang.org/DynamicPPL.jl/stable/api/#DynamicPPL.@submodel) macro.
+"
+
+# ╔═╡ 27d73202-a93e-4471-ab50-d59345304a0b
+md"
+## Dependencies for this notebook
+Now we want to import these dependencies into scope. If evaluating these code lines/blocks in REPL, then the REPL will offer to install any missing dependencies. Alternatively, you can add them to your active environment using `Pkg.add`.
 "
 
 # ╔═╡ 9161ab72-5c39-4a67-9762-e19f1c54c7fd
@@ -75,6 +83,18 @@ C_t \sim \text{NegBin}(\text{mean} = I_t,~ \text{overdispersion} = \phi).
 
 In the examples below we are going to largely recreate the _Mishra et al_ model, whilst emphasing that each component of the overall epidemiological model is, itself, a stand alone model that can be sampled from.
 "
+
+# ╔═╡ 1d3b9541-80ad-41b5-a5ed-a947f5c0731b
+md"
+## Load the data into scope
+First, we make sure that we have the data we want to analysis in scope by downloading it.
+"
+
+# ╔═╡ 4e5e0e24-8c55-4cb4-be3a-d28198f81a69
+url = "https://raw.githubusercontent.com/CDCgov/Rt-without-renewal/main/EpiAware/docs/src/showcase/replications/mishra-2020/south_korea_data.csv2"
+
+# ╔═╡ a59d977c-0178-11ef-0063-83e30e0cf9f0
+data = CSV.read(download(url), DataFrame)
 
 # ╔═╡ 104f4d16-7433-4a2d-89e7-288a9b223563
 md"
@@ -184,7 +204,7 @@ let
     twod_ar_mdl = generate_latent(twod_ar, 30)
     twod_ar_mdl_samples = mapreduce(hcat, 1:n_samples) do _
         θ = rand(twod_ar_mdl) #Sample unconditionally the underlying parameters of the model
-        gen = generated_quantities(twod_ar_mdl, θ)[1]
+        gen = generated_quantities(twod_ar_mdl, θ)
     end
 
     plot(twod_ar_mdl_samples,
@@ -327,7 +347,7 @@ plt_obs = let
     n_samples = 100
     obs_mdl_samples = mapreduce(hcat, 1:n_samples) do _
         θ = rand(obs_mdl) #Sample unconditionally the underlying parameters of the model
-        gen = generated_quantities(obs_mdl, θ)[1]
+        gen = generated_quantities(obs_mdl, θ)
     end
     scatter(obs_mdl_samples,
         lab = "",
@@ -401,8 +421,8 @@ We supply the data as a `NamedTuple` with the `y_t` field containing the observe
 "
 
 # ╔═╡ c7140b20-e030-4dc4-97bc-0efc0ff59631
-south_korea_data = (y_t = daily_cases[epi_prob.tspan[1]:epi_prob.tspan[2]],
-    dates = dates[epi_prob.tspan[1]:epi_prob.tspan[2]])
+south_korea_data = (y_t = data.cases_new[epi_prob.tspan[1]:epi_prob.tspan[2]],
+    dates = data.date[epi_prob.tspan[1]:epi_prob.tspan[2]])
 
 # ╔═╡ 9970adfd-ee88-4598-87a3-ffde5297031c
 md"
@@ -435,7 +455,7 @@ Because we are using synthetic data we can also plot the model predictions for t
 
 We find that the `EpiAware` model recovers the main finding in _Mishra et al_; that the $R_t$ in South Korea peaked at a very high value ($R_t \sim 10$ at peak) before rapidly dropping below 1 in early March 2020.
 
-Note that, in reality, the peak $R_t$ found here and in _Mishra et al) is unrealistically high, this might be due to a combination of:
+Note that, in reality, the peak $R_t$ found here and in _Mishra et al_ is unrealistically high, this might be due to a combination of:
 - A mis-estimated generation interval/serial interval distribution.
 - An ascertainment rate that was, in reality, changing over time.
 
@@ -551,11 +571,20 @@ let
 end
 
 # ╔═╡ Cell order:
-# ╟─a59d977c-0178-11ef-0063-83e30e0cf9f0
-# ╟─34a06b3b-799b-48c5-bd08-1e57151f51ec
 # ╟─8a8d5682-2f89-443b-baf0-d4d3b134d311
+# ╟─34a06b3b-799b-48c5-bd08-1e57151f51ec
+# ╟─27d73202-a93e-4471-ab50-d59345304a0b
+# ╠═d63b37f0-9642-4c38-ac01-9ffe48d50441
+# ╠═74642759-35a5-4957-9f2b-544712866410
+# ╠═0c5f413e-d043-448d-8665-f0f6f705d70f
+# ╠═b1e2a759-a52b-4ee5-8db4-cfe848878c92
+# ╠═9eb03a0b-c6ca-4e23-8109-fb68f87d7fdf
+# ╠═97b5374e-7653-4b3b-98eb-d8f73aa30580
+# ╠═1642dbda-4915-4e29-beff-bca592f3ec8d
 # ╟─9161ab72-5c39-4a67-9762-e19f1c54c7fd
-# ╟─1642dbda-4915-4e29-beff-bca592f3ec8d
+# ╟─1d3b9541-80ad-41b5-a5ed-a947f5c0731b
+# ╠═4e5e0e24-8c55-4cb4-be3a-d28198f81a69
+# ╠═a59d977c-0178-11ef-0063-83e30e0cf9f0
 # ╟─104f4d16-7433-4a2d-89e7-288a9b223563
 # ╟─d201c82b-8efd-41e2-96d7-4f5e0c67088c
 # ╠═c88bbbd6-0101-4c04-97c9-c5887ef23999
@@ -563,17 +592,17 @@ end
 # ╟─31ee2757-0409-45df-b193-60c552797a3d
 # ╠═2bf22866-b785-4ee0-953d-ac990a197561
 # ╟─25e25125-8587-4451-8600-9b55a04dbcd9
-# ╟─fbe117b7-a0b8-4604-a5dd-e71a0a1a4fc3
+# ╠═fbe117b7-a0b8-4604-a5dd-e71a0a1a4fc3
 # ╟─9f84dec1-70f1-442e-8bef-a9494921549e
 # ╠═51a82a62-2c59-43c9-8562-69d15a7edfdd
-# ╟─d3938381-01b7-40c6-b369-a456ff6dba72
+# ╠═d3938381-01b7-40c6-b369-a456ff6dba72
 # ╟─12fd3bd5-657e-4b1a-aa88-6063419aaceb
 # ╠═61eac666-9fe4-4918-bd3f-68e89275d07a
-# ╟─5a96e7e9-0376-4365-8eb1-b2fad9be8fef
+# ╠═5a96e7e9-0376-4365-8eb1-b2fad9be8fef
 # ╟─6a9e871f-a2fa-4e41-af89-8b0b3c3b5b4b
 # ╠═c1fc1929-0624-45c0-9a89-86c8479b2675
 # ╠═99c9ba2c-20a5-4c7f-94d2-272d6c9d5904
-# ╟─71d08f7e-c409-4fbe-b154-b21d09010683
+# ╠═71d08f7e-c409-4fbe-b154-b21d09010683
 # ╟─4a2b5cf1-623c-4fe7-8365-49fb7972af5a
 # ╠═9e49d451-946b-430b-bcdb-1ef4bba55a4b
 # ╠═8487835e-d430-4300-bd7c-e33f5769ee32
@@ -581,14 +610,14 @@ end
 # ╟─51b5d5b6-3ad3-4967-ad1d-b1caee201fcb
 # ╠═9e564a6e-f521-41e8-8604-6a9d73af9ba7
 # ╠═72bdb47d-4967-4f20-9ae5-01f82e7b32c5
-# ╟─7a6d4b14-58d3-40c1-81f2-713c830f875f
+# ╠═7a6d4b14-58d3-40c1-81f2-713c830f875f
 # ╟─c8ef8a60-d087-4ae9-ae92-abeea5afc7ae
 # ╠═714908a1-dc85-476f-a99f-ec5c95a78b60
 # ╟─dacb8094-89a4-404a-8243-525c0dbfa482
 # ╠═d45f34e2-64f0-4828-ae0d-7b4cb3a3287d
 # ╠═2e0e8bf3-f34b-44bc-aa2d-046e1db6ee2d
 # ╠═55c639f6-b47b-47cf-a3d6-547e793c72bc
-# ╟─c3a62dda-e054-4c8c-b1b8-ba1b5c4447b3
+# ╠═c3a62dda-e054-4c8c-b1b8-ba1b5c4447b3
 # ╟─de5d96f0-4df6-4cc3-9f1d-156176b2b676
 # ╟─a06065e1-0e20-4cf8-8d5a-2d588da20bee
 # ╠═eaad5f46-e928-47c2-90ec-2cca3871c75d
@@ -600,6 +629,6 @@ end
 # ╟─9970adfd-ee88-4598-87a3-ffde5297031c
 # ╠═660a8511-4dd1-4788-9c14-fdd604bf83ad
 # ╟─5e6f505b-49fe-4ff4-ac2e-f6adcd445569
-# ╟─8b557bf1-f3dd-4f42-a250-ce965412eb32
+# ╠═8b557bf1-f3dd-4f42-a250-ce965412eb32
 # ╟─c05ed977-7a89-4ac8-97be-7078d69fce9f
-# ╟─ff21c9ec-1581-405f-8db1-0f522b5bc296
+# ╠═ff21c9ec-1581-405f-8db1-0f522b5bc296

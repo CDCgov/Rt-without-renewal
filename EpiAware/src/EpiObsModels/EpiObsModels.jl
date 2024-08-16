@@ -5,11 +5,12 @@ module EpiObsModels
 
 using ..EpiAwareBase
 
-using ..EpiAwareUtils: censored_pmf, HalfNormal, prefix_submodel
+using ..EpiAwareUtils
 
-using ..EpiLatentModels: HierarchicalNormal, broadcast_dayofweek, PrefixLatentModel
+using ..EpiLatentModels: HierarchicalNormal, broadcast_dayofweek
+using ..EpiLatentModels: broadcast_rule, PrefixLatentModel, RepeatEach
 
-using Turing, Distributions, DocStringExtensions, SparseArrays
+using Turing, Distributions, DocStringExtensions, SparseArrays, LinearAlgebra
 
 # Observation error models
 export PoissonError, NegativeBinomialError
@@ -19,6 +20,7 @@ export generate_observation_error_priors, observation_error
 
 # Observation model modifiers
 export LatentDelay, Ascertainment, PrefixObservationModel, RecordExpectedObs
+export Aggregate
 
 # Observation model manipulators
 export StackObservationModels
@@ -30,6 +32,7 @@ include("docstrings.jl")
 include("modifiers/LatentDelay.jl")
 include("modifiers/ascertainment/Ascertainment.jl")
 include("modifiers/ascertainment/helpers.jl")
+include("modifiers/Aggregate.jl")
 include("modifiers/PrefixObservationModel.jl")
 include("modifiers/RecordExpectedObs.jl")
 include("StackObservationModels.jl")

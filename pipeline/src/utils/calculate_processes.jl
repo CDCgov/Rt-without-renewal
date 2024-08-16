@@ -23,7 +23,7 @@ estimate of `rt`.
 
 """
 function _infection_seeding(
-        I_t, I0, data::EpiData, pipeline::AbstractEpiAwarePipeline; jitter = 1e-6)
+        I_t, I0, data::EpiData; jitter = 1e-6)
     n = length(data.gen_int)
     init_rt = _calc_rt(I_t[1:2] .+ jitter, I0 + jitter) |> x -> x[1]
     [(I0 + jitter) * exp(-init_rt * (n - i)) for i in 1:n]
@@ -41,12 +41,11 @@ growth from the initial infections `I0` and the exponential growth rate `init_rt
 - `I0`: Initial infections at time zero.
 - `init_rt`: Initial exponential growth rate.
 - `data::EpiData`: An instance of the `EpiData` type containing generation interval data.
-- `pipeline::AbstractEpiAwarePipeline`: An instance of the `AbstractEpiAwarePipeline` type.
 """
-function _calc_Rt(I_t, I0, data::EpiData, pipeline::AbstractEpiAwarePipeline; jitter = 1e-6)
+function _calc_Rt(I_t, I0, data::EpiData; jitter = 1e-6)
     @assert I0 + jitter>0 "Initial infections must be positive definite."
 
-    aug_I_t = vcat(_infection_seeding(I_t .+ jitter, I0 + jitter, data, pipeline), I_t)
+    aug_I_t = vcat(_infection_seeding(I_t .+ jitter, I0 + jitter, data), I_t)
 
     Rt = expected_Rt(data, aug_I_t)
 
@@ -69,9 +68,9 @@ from the first 7 time steps of `rt`.
 A named tuple containing the calculated values for `log_I_t`, `rt`, and `Rt`.
 
 """
-function calculate_processes(I_t, I0, data::EpiData, pipeline::AbstractEpiAwarePipeline)
+function calculate_processes(I_t, I0, data::EpiData)
     log_I_t = _calc_log_infections(I_t)
     rt = _calc_rt(I_t, I0)
-    Rt = _calc_Rt(I_t, I0, data, pipeline)
-    return (; log_I_t, rt, Rt)
+    Rt = _calc_Rt(I_t, I0, data)
+    return (; log_I_t, rt, Rt, I_t, log_Rt = log.(Rt))
 end

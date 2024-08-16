@@ -10,7 +10,7 @@
     obs_model = LatentDelay(dummy_model, delay_int)
 
     @test obs_model.model == dummy_model
-    @test obs_model.pmf == delay_int
+    @test obs_model.rev_pmf == reverse(delay_int)
 
     # Test case 2
     delay_distribution = Uniform(0.0, 20.0)
@@ -20,7 +20,7 @@
     obs_model = LatentDelay(dummy_model, delay_distribution, D = D_delay, Δd = Δd)
 
     @test obs_model.model == dummy_model
-    @test length(obs_model.pmf) == D_delay
+    @test length(obs_model.rev_pmf) == D_delay
 
     # Test case 3: check default right truncation
     delay_distribution = Gamma(3, 15 / 3)
@@ -30,7 +30,7 @@
     obs_model = LatentDelay(dummy_model, delay_distribution, D = D_delay, Δd = Δd)
 
     nn_perc_rounded = invlogcdf(delay_distribution, log(0.99)) |> x -> round(Int64, x)
-    @test length(obs_model.pmf) == nn_perc_rounded
+    @test length(obs_model.rev_pmf) == nn_perc_rounded
 end
 
 @testitem "Testing delay obs against theoretical properties" begin
@@ -129,24 +129,35 @@ end
     obs_model = LatentDelay(TestObs(), delay_int)
 
     I_t = [10.0, 20.0, 30.0, 40.0, 50.0]
-    expected_obs = [missing, missing, 23.0, 33.0, 43.0]
+    expected_obs = [missing, missing, 17.0, 27.0, 37.0]
 
     @testset "Test with entirely missing data" begin
         mdl = generate_observations(obs_model, missing, I_t)
-        @test mdl()[3:end] == expected_obs[3:end]
-        @test sum(mdl() .|> ismissing) == 2
+        @test mdl() == expected_obs[3:end]
+        @test sum(mdl() .|> ismissing) == 0
     end
 
     @testset "Test with missing data defined as a vector" begin
         mdl = generate_observations(
             obs_model, [missing, missing, missing, missing, missing], I_t)
-        @test mdl()[3:end] == expected_obs[3:end]
-        @test sum(mdl() .|> ismissing) == 2
+        @test mdl() == expected_obs[3:end]
+        @test sum(mdl() .|> ismissing) == 0
     end
 
-    @testset "Test with data" begin
-        pois_obs_model = LatentDelay(PoissonError(), delay_int)
+    @testset "Test with a real observation error model" begin
+        using Turing, DynamicPPL
+        pois_obs_model = LatentDelay(RecordExpectedObs(PoissonError()), delay_int)
+        missing_mdl = generate_observations(pois_obs_model, missing, I_t)
+        missing_draws = missing_mdl()
+        @test all(ismissing.(missing_draws[1:2]))
+        @test !any(ismissing.(missing_draws[3:end]))
+
         mdl = generate_observations(pois_obs_model, [10.0, 20.0, 30.0, 40.0, 50.0], I_t)
         @test mdl() == [10.0, 20.0, 30.0, 40.0, 50]
+        samples = sample(mdl, Prior(), 10; progress = false)
+        exp_y_t = get(samples, :exp_y_t).exp_y_t
+        @test exp_y_t[1][1] == expected_obs[3]
+        @test exp_y_t[2][1] == expected_obs[4]
+        @test exp_y_t[3][1] == expected_obs[5]
     end
 end

@@ -5,7 +5,8 @@
     truthdata = fetch.(truthdata_dg_task)
 
     @test length(truthdata) == 1
-    @test all([data["y_t"] isa Vector{Union{Missing, Real}} for data in truthdata])
+    @test all([data["y_t"] isa Vector{Union{Missing, T}} where {T <: Real}
+               for data in truthdata])
 end
 
 @testset "do_inference tests" begin

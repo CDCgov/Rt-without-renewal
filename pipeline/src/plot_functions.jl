@@ -12,16 +12,16 @@ Plot the true cases and latent infections. This is the default method for plotti
 """
 function plot_truth_data(
         data, config, pipeline::AbstractEpiAwarePipeline; plotsname = "truth_data")
-    plt_cases = scatter(
+    plt_cases = Plots.scatter(
         data["y_t"], label = "Cases", xlabel = "Time", ylabel = "Daily cases",
         title = "Cases and latent infections", legend = :bottomright)
-    plot!(plt_cases, data["I_t"], label = "True latent infections")
+    Plots.plot!(plt_cases, data["I_t"], label = "True latent infections")
 
     if !isdir(plotsdir(plotsname))
         mkdir(plotsdir(plotsname))
     end
-
-    savefig(plt_cases, plotsdir(plotsname, savename(plotsname, config, "png")))
+    _plotsname = _simulate_prefix(pipeline) * plotsname
+    savefig(plt_cases, plotsdir(plotsname, savename(_plotsname, config, "png")))
     return plt_cases
 end
 

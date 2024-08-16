@@ -1,12 +1,12 @@
 @doc raw"
 The `LatentDelay` struct represents an observation model that introduces a latent delay in the observations. It is a subtype of `AbstractTuringObservationModel`.
 
-Note that the `LatentDelay` observation model shortens the observation vector by the length of the delay distribution and this is then passed to the underlying observation model. This is to prevent fitting to partially
+Note that the `LatentDelay` observation model shortens the expected observation vector by the length of the delay distribution and this is then passed to the underlying observation model. This is to prevent fitting to partially
 observed data.
 
 ## Fields
 - `model::M`: The underlying observation model.
-- `pmf::T`: The probability mass function (PMF) representing the delay distribution.
+- `rev_pmf::T`: The probability mass function (PMF) representing the delay distribution reversed.
 
 ## Constructors
 - `LatentDelay(model::M, distribution::C; D = nothing, Δd = 1.0)
@@ -23,14 +23,14 @@ observed data.
 ```julia
 using Distributions, Turing, EpiAware
 obs = LatentDelay(NegativeBinomialError(), truncated(Normal(5.0, 2.0), 0.0, Inf))
-obs_model = generate_observations(obs, missing, fill(10, 10))
-rand(obs_model)
+obs_model = generate_observations(obs, missing, fill(10, 30))
+obs_model()
 ```
 "
 struct LatentDelay{M <: AbstractTuringObservationModel, T <: AbstractVector{<:Real}} <:
        AbstractTuringObservationModel
     model::M
-    pmf::T
+    rev_pmf::T
 
     function LatentDelay(model::M, distribution::C; D = nothing,
             Δd = 1.0) where {
@@ -43,7 +43,8 @@ struct LatentDelay{M <: AbstractTuringObservationModel, T <: AbstractVector{<:Re
             pmf::T) where {M <: AbstractTuringObservationModel, T <: AbstractVector{<:Real}}
         @assert all(pmf .>= 0) "Delay interval must be non-negative"
         @assert isapprox(sum(pmf), 1) "Delay interval must sum to 1"
-        new{typeof(model), typeof(pmf)}(model, pmf)
+        rev_pmf = reverse(pmf)
+        new{typeof(model), typeof(rev_pmf)}(model, rev_pmf)
     end
 end
 
@@ -60,16 +61,44 @@ Generates observations based on the `LatentDelay` observation model.
 
 "
 @model function EpiAwareBase.generate_observations(obs_model::LatentDelay, y_t, Y_t)
-    first_Y_t = findfirst(!ismissing, Y_t)
-    trunc_Y_t = Y_t[first_Y_t:end]
-    @assert length(obs_model.pmf)<=length(trunc_Y_t) "The delay PMF must be shorter than or equal to the observation vector"
+    if ismissing(y_t)
+        y_t = Vector{Missing}(missing, length(Y_t))
+    end
 
-    kernel = generate_observation_kernel(obs_model.pmf, length(trunc_Y_t), partial = false)
-    expected_obs = kernel * trunc_Y_t
-    complete_obs = vcat(fill(missing, length(obs_model.pmf) + first_Y_t - 2), expected_obs)
+    pmf_length = length(obs_model.rev_pmf)
+    @assert pmf_length<=length(Y_t) "The delay PMF must be shorter than or equal to the observation vector"
+
+    expected_obs = accumulate_scan(
+        LDStep(obs_model.rev_pmf),
+        (; val = 0, current = Y_t[1:(pmf_length)]),
+        vcat(Y_t[(pmf_length + 1):end], 0.0)
+    )
 
     @submodel y_t = generate_observations(
-        obs_model.model, y_t, complete_obs)
+        obs_model.model, y_t, expected_obs)
 
     return y_t
+end
+
+@doc raw"
+The LatentDelay step function struct
+"
+struct LDStep{D <: AbstractVector{<:Real}} <: AbstractAccumulationStep
+    rev_pmf::D
+end
+
+@doc raw"
+The LatentDelay step function method for `accumulate_scan`.
+"
+function (ld::LDStep)(state, ϵ)
+    val = dot(ld.rev_pmf, state.current)
+    current = vcat(state.current[2:end], ϵ)
+    return (; val, current)
+end
+
+@doc raw"
+The LatentDelay step function method for get_state.
+"
+function EpiAwareUtils.get_state(acc_step::LDStep, initial_state, state)
+    return state .|> x -> x.val
 end

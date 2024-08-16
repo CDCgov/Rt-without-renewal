@@ -23,7 +23,7 @@ export CombineLatentModels, ConcatLatentModels, BroadcastLatentModel
 export RepeatEach, RepeatBlock
 
 # Export helper functions
-export broadcast_dayofweek, broadcast_weekly, equal_dimensions
+export broadcast_rule, broadcast_dayofweek, broadcast_weekly, equal_dimensions
 
 # Export tools for modifying latent models
 export DiffLatentModel, TransformLatentModel, PrefixLatentModel, RecordExpectedLatent

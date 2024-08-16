@@ -2,103 +2,38 @@ using DrWatson, Test
 quickactivate(@__DIR__(), "EpiAwarePipeline")
 
 @testset "run inference for random scenario and do scoring" begin
-    using EpiAwarePipeline, EpiAware, Plots, Statistics, RCall, DataFramesMeta
-    pipeline = EpiAwareExamplePipeline()
-    prior = RtwithoutRenewalPriorPipeline()
+    using EpiAwarePipeline, EpiAware, Plots, Statistics
+    pipeline = SmoothEndemicPipeline(ndraws = 200, nchains = 1, prefix = "test_score")
 
-    ## Set up data generation on a random scenario
-
-    missing_padding = 14
-    lookahead = 21
-    n_observation_steps = 35
-    tspan_gen = (1, n_observation_steps + lookahead + missing_padding)
-    tspan_inf = (1, n_observation_steps + missing_padding)
-    inference_method = make_inference_method(pipeline; ndraws = 2000)
     truth_data_config = make_truth_data_configs(pipeline)[1]
-    inference_configs = make_inference_configs(pipeline)
-    inference_config = rand(inference_configs)
+    truthdata = generate_truthdata(truth_data_config, pipeline)
 
-    ## Generate truth data and plot
-    truth_sampling = generate_inference_results(inference_config, prior; tspan = tspan_gen)
-    truthdata = truth_sampling["inference_results"].generated.generated_y_t
-    ##
-    plt = scatter(truthdata, xlabel = "t", ylabel = "y_t", label = "truth data")
-    vline!(plt, [n_observation_steps + missing_padding + 0.5], label = "forecast start")
+    ## Set up data generation on a random scenario with reference time in the middle
+    inference_method = make_inference_method(pipeline)
+    inference_config = make_inference_configs(pipeline) |>
+                       cfgs -> filter(cfg -> cfg["T"] == 35, cfgs) |> rand
 
-    ##Generate true Rt values
-    truth_It = truth_sampling["inference_results"].generated.I_t
-    truth_Rt = expected_Rt(truth_sampling["epiprob"].epi_model.data,
-        truth_sampling["inference_results"].generated.I_t)
-    plt_Rt = plot(truth_Rt, xlabel = "t", ylabel = "R_t", label = "truth Rt")
-    vline!(plt_Rt, [tspan_inf[2] + 0.5], label = "forecast start")
-
-    ##
-    ## Run inference
-    obs_truthdata = truthdata[tspan_inf[1]:tspan_inf[2]]
+    ## Run inference, forecasting and scoring
 
     inference_results = generate_inference_results(
-        Dict("y_t" => obs_truthdata, "truth_gi_mean" => inference_config["gi_mean"]),
-        inference_config, pipeline; tspan = tspan_inf, inference_method)
+        truthdata, inference_config, pipeline; inference_method,
+        datadir_name = "example_epiaware_observables")
 
-    ## Make 21-day forecast
+    ## plot scores
 
-    forecast_quantities = generate_forecasts(inference_results, lookahead)
-    forecast_y_t = mapreduce(hcat, forecast_quantities.generated) do gen
-        gen.generated_y_t
+    score_results = inference_results["score_results"]
+    targets = filter(ky -> ky != "ts", keys(score_results))
+    ts = score_results["ts"]
+    plt_scores = plot(;
+        xlabel = "Time", ylabel = "CRPS", title = "CRPS Scores (relative to max)")
+    for target in targets
+        scores = score_results[target]
+        plot!(plt_scores, ts, scores ./ maximum(scores), label = target)
     end
-    forecast_qs = mapreduce(hcat, [0.025, 0.25, 0.5, 0.75, 0.975]) do q
-        map(eachrow(forecast_y_t)) do row
-            if any(ismissing, row)
-                missing
-            else
-                quantile(row, q)
-            end
-        end
-    end
-    plt = scatter(truthdata, xlabel = "t", ylabel = "y_t", label = "truth data")
-    vline!(plt, [tspan_inf[2] + 0.5], label = "forecast start")
-    plot!(plt, forecast_qs, label = "forecast quantiles",
-        color = :grey, lw = [0.5 1.5 3 1.5 0.5])
-    plot!(plt, ylims = (-0.5, maximum(truthdata) * 1.25))
-    plot!(
-        plt, title = "Forecast of y_t", ylims = (
-            -0.5, maximum(skipmissing(truthdata)) * 1.55))
-    savefig(plt,
-        joinpath(@__DIR__(), "forecast_y_t.png")
-    )
-    display(plt)
-
-    ## Make forecast plot for Z_t
-    infer_Z_t = mapreduce(hcat, inference_results["inference_results"].generated) do gen
-        gen.Z_t
-    end
-    forecast_Z_t = mapreduce(hcat, forecast_quantities.generated) do gen
-        gen.Z_t
-    end
-    plt_Zt = plot(
-        truth_sampling["inference_results"].generated.Z_t, lw = 3, color = :black, label = "truth Z_t")
-    plot!(plt_Zt, infer_Z_t, xlabel = "t", ylabel = "Z_t",
-        label = "", color = :grey, alpha = 0.05)
-    plot!((n_observation_steps + 1):size(forecast_Z_t, 1),
-        forecast_Z_t[(n_observation_steps + 1):end, :],
-        label = "", color = :red, alpha = 0.05)
-    vline!(plt_Zt, [n_observation_steps], label = "forecast start")
-
-    savefig(plt_Zt,
-        joinpath(@__DIR__(), "forecast_Z_t.png")
-    )
-    display(plt_Zt)
-
-    ## Make forecast plot for Rt
-    param_names = forecast_quantities.samples.name_map[:parameters] .|> string
-    obs_yts = filter(str -> occursin("y_t", str), param_names)
-
-    scores = score_parameters(obs_yts, forecast_quantities.samples, truthdata)
-    plt_crps = scatter(scores.crps, xlabel = "t", ylabel = "CRPS", label = "CRPS")
-    savefig(plt_crps,
+    plot!(plt_scores, legend = :topleft)
+    display(plt_scores)
+    savefig(plt_scores,
         joinpath(@__DIR__(), "crps.png")
     )
-    display(plt_crps)
-
-    @test scores isa DataFrame
+    @test true
 end

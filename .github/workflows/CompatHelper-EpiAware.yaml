@@ -5,6 +5,10 @@ on:
     - cron: '30 0 * * *'
   issues:
     types: [opened, reopened]
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -15,16 +19,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          sparse-checkout: EpiAware
-          sparse-checkout-cone-mode: false
-      - name: Move EpiAware to root
-        run: mv EpiAware/* .
       - uses: julia-actions/setup-julia@v1
       - uses: julia-actions/cache@v1
+      - name: "Add the General registry via Git"
+        run: |
+          import Pkg
+          ENV["JULIA_PKG_SERVER"] = ""
+          Pkg.Registry.add("General")
+        shell: julia --color=yes {0}
       - name: Pkg.add("CompatHelper")
         run: julia -e 'using Pkg; Pkg.add("CompatHelper")'
       - name: CompatHelper.main()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: julia -e 'using CompatHelper; CompatHelper.main(".")'
+        run: |
+            using CompatHelper;
+            CompatHelper.main(;
+              subdirs = ["EpiAware"], bump_version = true
+            )
+        shell: julia --color=yes {0}
