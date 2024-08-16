@@ -29,6 +29,7 @@ end
     using EpiAwarePipeline
     pipeline = EpiAwareExamplePipeline()
     res = do_pipeline(pipeline)
+    fetch(res)
     @test isnothing(res)
 end
 
@@ -36,5 +37,6 @@ end
     using EpiAwarePipeline
     pipelines = fill(EpiAwareExamplePipeline(), 2)
     res = do_pipeline(pipelines)
+    fetch(res)
     @test isnothing(res)
 end
