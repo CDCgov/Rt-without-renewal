@@ -78,7 +78,9 @@ Generate a latent MA series.
     @submodel ϵ_t = generate_latent(latent_model.ϵ_t, n)
     scaled_ϵ_t = σ_MA * ϵ_t
 
-    ma = accumulate_scan(MAStep(coef_MA), scaled_ϵ_t[1:q], scaled_ϵ_t[(q + 1):end])
+    ma = accumulate_scan(
+        MAStep(coef_MA),
+        (; val = 0, state = scaled_ϵ_t[1:q]), scaled_ϵ_t[(q + 1):end])
 
     return ma
 end
@@ -94,7 +96,16 @@ end
 The moving average (MA) step function for use with `accumulate_scan`.
 "
 function (ma::MAStep)(state, ϵ)
-    new_val = ϵ + dot(ma.coef_MA, state)
-    new_state = vcat(ϵ, state[1:(end - 1)])
-    return new_state
+    new_val = ϵ + dot(ma.coef_MA, state.state)
+    new_state = vcat(ϵ, state.state[1:(end - 1)])
+    return (; val = new_val, state = new_state)
+end
+
+@doc raw"
+The MA step function method for get_state.
+"
+function EpiAwareUtils.get_state(acc_step::MAStep, initial_state, state)
+    init_vals = initial_state.state
+    new_vals = state .|> x -> x.val
+    return vcat(init_vals, new_vals)
 end
