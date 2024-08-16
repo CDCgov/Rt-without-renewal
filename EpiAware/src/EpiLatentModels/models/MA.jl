@@ -10,16 +10,26 @@ The moving average (MA) model struct.
 
 # Examples
 
-```jldoctest; filter = r\"\b\d+(\.\d+)?\b\" => \"*\"
-using EpiAware, Distributions
-ma = MA(Normal(0.0, 0.05), HalfNormal(0.1); q = 7)
-ma_model = generate_latent(ma, 10)
-ma_model()
-
+```jldoctest MA
+using Distributions, Turing, EpiAware
+ma = MA()
+ma
 # output
 
 ```
+
+```jldoctest MA; filter = r\"\b\d+(\.\d+)?\b\" => \"*\"
+mdl = generate_latent(ma, 10)
+mdl()
+# output
+```
+
+```jldoctest MA; filter = r\"\b\d+(\.\d+)?\b\" => \"*\"
+rand(mdl)
+# output
+```
 "
+
 struct MA{C <: Sampleable, S <: Sampleable, Q <: Int, E <: AbstractTuringLatentModel} <:
        AbstractTuringLatentModel
     "Prior distribution for the MA coefficients."
@@ -73,7 +83,7 @@ Generate a latent MA series.
     q = latent_model.q
     @assert n>q "n must be longer than order of the moving average process"
 
-    σ_MA ~ latent_model.std_prior
+    σ ~ latent_model.std_prior
     coef_MA ~ latent_model.coef_prior
     @submodel ϵ_t = generate_latent(latent_model.ϵ_t, n)
     scaled_ϵ_t = σ_MA * ϵ_t
