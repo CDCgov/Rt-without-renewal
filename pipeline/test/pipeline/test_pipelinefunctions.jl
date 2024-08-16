@@ -5,7 +5,7 @@
     truthdata = fetch.(truthdata_dg_task)
 
     @test length(truthdata) == 1
-    @test all([data["y_t"] isa Vector{Union{Missing, T}} where {T <: Real}
+    @test all([data["y_t"] isa Vector{Union{Missing, T}} where {T <: Integer}
                for data in truthdata])
 end
 
