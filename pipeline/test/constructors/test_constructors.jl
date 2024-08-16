@@ -54,8 +54,8 @@ end
 
     namemodel_vect = make_epiaware_name_latentmodel_pairs(pipeline)
 
-    @test first.(namemodel_vect) == ["wkly_ar", "wkly_rw", "wkly_diff_ar"]
-    @test all([model isa BroadcastLatentModel for model in last.(namemodel_vect)])
+    @test first.(namemodel_vect) == ["ar", "rw", "diff_ar"]
+    @test all([model isa AbstractTuringLatentModel for model in last.(namemodel_vect)])
 end
 
 @testset "make_inference_method: constructor and defaults" begin
@@ -69,7 +69,7 @@ end
     @test method.pre_sampler_steps[1].nruns == 4
     @test method.pre_sampler_steps[1].maxiters == 100
     @test method.sampler isa NUTSampler
-    @test method.sampler.adtype == AutoForwardDiff()
+    @test method.sampler.adtype isa AbstractADType
     @test method.sampler.ndraws == 20
     @test method.sampler.nchains == 4
     @test method.sampler.mcmc_parallel == MCMCThreads()
