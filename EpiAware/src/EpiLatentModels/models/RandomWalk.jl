@@ -13,10 +13,11 @@ Z_t = Z_0 + \sigma \sum_{i = 1}^t \epsilon_t
 Constructing a random walk requires specifying:
 - An `init_prior` as a prior for ``Z_0``. Default is `Normal()`.
 - A `std_prior` for ``\sigma``. The default is HalfNormal with a mean of 0.25.
+- An `ϵ_t` prior for the white noise sequence. The default is `IDD(Normal())`.
 
 ## Constructors
 
-- `RandomWalk(; init_prior, std_prior)`
+- `RandomWalk(; init_prior, std_prior, ϵ_t)`
 
 ## Example usage with `generate_latent`
 
@@ -49,9 +50,12 @@ unobserved infections.
 Z_t, _ = generated_quantities(rw_model, θ)
 ```
 "
-@kwdef struct RandomWalk{D <: Sampleable, S <: Sampleable} <: AbstractTuringLatentModel
+@kwdef struct RandomWalk{
+    D <: Sampleable, S <: Sampleable, E <: AbstractTuringLatentModel} <:
+              AbstractTuringLatentModel
     init_prior::D = Normal()
     std_prior::S = HalfNormal(0.25)
+    ϵ_t::E = IDD(Normal())
 end
 
 @doc raw"
@@ -87,7 +91,7 @@ Z_t, _ = generated_quantities(rw_model, θ)
 @model function EpiAwareBase.generate_latent(latent_model::RandomWalk, n)
     σ_RW ~ latent_model.std_prior
     rw_init ~ latent_model.init_prior
-    @submodel ϵ_t = generate_latent(IDD(Normal()), n - 1)
+    @submodel ϵ_t = generate_latent(latent_model.ϵ_t, n - 1)
     rw = rw_init .+ vcat(0.0, σ_RW .* cumsum(ϵ_t))
     return rw
 end
