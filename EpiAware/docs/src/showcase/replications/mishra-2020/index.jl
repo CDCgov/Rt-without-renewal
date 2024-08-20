@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.43
+# v0.19.46
 
 using Markdown
 using InteractiveUtils
@@ -408,7 +408,9 @@ inference_method = EpiMethod(
     sampler = NUTSampler(adtype = AutoReverseDiff(),
         ndraws = 2000,
         nchains = num_threads,
-        mcmc_parallel = MCMCThreads())
+        mcmc_parallel = MCMCThreads(),
+        nadapts = 500
+    )
 )
 
 # ╔═╡ 92333a96-5c9b-46e1-9a8f-f1890831066b
@@ -474,6 +476,11 @@ let
         hcat, generated_quantities(mdl_unconditional, inference_results.samples)) do gen
         gen.generated_y_t
     end
+
+    if any(predicted_y_t .> 5_000)
+        throw("Sampled y_t badly")
+    end
+
     predicted_I_t = mapreduce(
         hcat, gens) do gen
         gen.I_t
@@ -481,6 +488,10 @@ let
     predicted_R_t = mapreduce(
         hcat, gens) do gen
         exp.(gen.Z_t)
+    end
+
+    if any(predicted_R_t .> 250)
+        throw("Sampled R_t badly")
     end
 
     p1 = plot(D, predicted_y_t, c = :grey, alpha = 0.05, lab = "")
