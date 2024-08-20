@@ -45,7 +45,7 @@ var(d)
 7.016735912097631e20
 ```
 "
-struct SafePoisson{T <: Real} <: ContinuousUnivariateDistribution
+struct SafePoisson{T <: Real} <: DiscreteUnivariateDistribution
     λ::T
 
     SafePoisson{T}(λ::Real) where {T <: Real} = new{T}(λ)

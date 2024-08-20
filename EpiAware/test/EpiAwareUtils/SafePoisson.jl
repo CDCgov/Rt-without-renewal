@@ -2,6 +2,9 @@
     λ = 10.0
     dist = SafePoisson(λ)
     @test typeof(dist) <: SafePoisson
+    @test rand(dist) isa Int
+    @test rand(dist, 10) isa Vector{Int}
+    @test rand(dist, 10, 10) isa Array{Int}
 end
 
 @testitem "Check distribution properties of SafePoisson" begin
