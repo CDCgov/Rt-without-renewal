@@ -224,7 +224,7 @@ end
             end
         end
     end |>
-    quantiles -> plot!(p, quantiles, label = "",
+           quantiles -> plot!(p, quantiles, label = "",
         color = :grey, lw = lws)
     scatter!(p, y_t_obs, label = "Observed data", legend = :topleft, c = 3)
 
@@ -241,7 +241,7 @@ end
             end
         end
     end |>
-    quantiles -> plot!(p, quantiles, label = "",
+           quantiles -> plot!(p, quantiles, label = "",
         color = :grey, lw = lws)
     scatter!(p, Z_t_obs, label = "Latent infections", legend = :topleft, c = 3)
 end
@@ -251,8 +251,6 @@ end
           ReverseDiff, LogDensityProblems, LogDensityProblemsAD
     Random.seed!(1234)
 
-
-
     latent_process = RandomWalk(
         init_prior = Normal(log(1.2), 0.25), std_prior = HalfNormal(0.05))
     obs_error_model = NegativeBinomialError(cluster_factor_prior = HalfNormal(0.05))
@@ -260,13 +258,13 @@ end
     obs_model = LatentDelay(obs_error_model, d_delay)
     gen_int = [0.2, 0.3, 0.5]
     data = EpiData(gen_int, exp)
-    renewal_model = Renewal(data = data, initialisation_prior = Normal(log(10.), 0.25))
+    renewal_model = Renewal(data = data, initialisation_prior = Normal(log(10.0), 0.25))
 
     epi_prob = EpiProblem(
         epi_model = renewal_model,
         latent_model = latent_process,
         observation_model = obs_model,
-        tspan = (1, 50),
+        tspan = (1, 50)
     )
 
     inference_method = EpiMethod(
@@ -293,7 +291,6 @@ end
 
     # ad = AutoForwardDiff();#AutoReverseDiff(; compile = false)
     ad = AutoReverseDiff(; compile = true)
-
 
     ℓ = DynamicPPL.LogDensityFunction(inference_results.model)
     DynamicPPL.link!!(ℓ.varinfo, mdl)
@@ -329,10 +326,9 @@ end
             end
         end
     end |>
-    quantiles -> plot!(p, quantiles, label = "",
+           quantiles -> plot!(p, quantiles, label = "",
         color = :grey, lw = lws)
     scatter!(p, gen_data.generated_y_t, label = "Observed data", legend = :topleft, c = 3)
-
 
     p = plot(; yscale = :log10)
     mapreduce(hcat, generated_quantities(generative_model, chn)) do gen
@@ -347,7 +343,7 @@ end
             end
         end
     end |>
-    quantiles -> plot!(p, quantiles, label = "",
+           quantiles -> plot!(p, quantiles, label = "",
         color = :grey, lw = lws)
     scatter!(p, gen_data.I_t, label = "Latent infections", legend = :topleft, c = 3)
 end
