@@ -162,7 +162,7 @@ end
     end
 end
 
-@testset "LatentDelay parameter recovery with RW latent process: Negative binomial errors" begin
+@testitem "LatentDelay parameter recovery with RW latent process: Negative binomial errors" begin
     using Random, Turing, FillArrays, Distributions, LinearAlgebra, DynamicPPL, StatsBase,
           ReverseDiff, LogDensityProblems, LogDensityProblemsAD
     Random.seed!(1234)
@@ -246,7 +246,7 @@ end
     scatter!(p, Z_t_obs, label = "Latent infections", legend = :topleft, c = 3)
 end
 
-@testset "LatentDelay parameter recovery with Renewal + RW latent process: Negative binomial errors" begin
+@testitem "LatentDelay parameter recovery with Renewal + RW latent process: Negative binomial errors" begin
     using Random, Turing, FillArrays, Distributions, LinearAlgebra, DynamicPPL, StatsBase,
           ReverseDiff, LogDensityProblems, LogDensityProblemsAD
     Random.seed!(1234)
@@ -288,8 +288,6 @@ end
     )
 
     chn = inference_results.samples
-
-    # ad = AutoForwardDiff();#AutoReverseDiff(; compile = false)
     ad = AutoReverseDiff(; compile = true)
 
     ℓ = DynamicPPL.LogDensityFunction(inference_results.model)
