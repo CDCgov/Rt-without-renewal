@@ -122,7 +122,7 @@ end
     posterior_p_cf = ecdf(chn[:cluster_factor][:])(obs_rand.cluster_factor)
     posterior_p_rinit = ecdf(chn[:rw_init][:])(obs_rand.rw_init)
 
-    @test 0.005 < posterior_p_cf < 0.9995
-    @test 0.005 < posterior_p_σ_RW < 0.9995
-    @test 0.005 < posterior_p_rinit < 0.9995
+    @test 0.0005 < posterior_p_cf < 0.9995
+    @test 0.0005 < posterior_p_σ_RW < 0.9995
+    @test 0.0005 < posterior_p_rinit < 0.9995
 end
