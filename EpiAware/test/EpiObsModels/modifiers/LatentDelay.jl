@@ -290,18 +290,12 @@ end
     )
 
     chn = inference_results.samples
-    gen_mdl = test_negbin_errors_with_delays(latent_process, obs_model, y_t_missing)
-    obs_rand = rand(gen_mdl)
-    Z_t_obs, y_t_obs = condition(gen_mdl, obs_rand)()
 
-    # y_t_obs = rand(80:120, 50)
-    mdl = test_negbin_errors_with_delays(latent_process, obs_model, y_t_obs)
     # ad = AutoForwardDiff();#AutoReverseDiff(; compile = false)
     ad = AutoReverseDiff(; compile = true)
 
-    chn = sample(mdl, NUTS(adtype = ad), MCMCThreads(), 500, 4, progess = true)
 
-    ℓ = DynamicPPL.LogDensityFunction(mdl)
+    ℓ = DynamicPPL.LogDensityFunction(inference_results.model)
     DynamicPPL.link!!(ℓ.varinfo, mdl)
 
     n = LogDensityProblems.dimension(ℓ)
