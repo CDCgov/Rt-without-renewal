@@ -148,12 +148,12 @@ end
         using Turing, DynamicPPL
         pois_obs_model = LatentDelay(RecordExpectedObs(PoissonError()), delay_int)
         missing_mdl = generate_observations(pois_obs_model, missing, I_t)
-        missing_draws = missing_mdl()
+        missing_draws = missing_mdl() |> Vector{Union{Int, Missing}}
         @test all(ismissing.(missing_draws[1:2]))
         @test !any(ismissing.(missing_draws[3:end]))
 
-        mdl = generate_observations(pois_obs_model, [10.0, 20.0, 30.0, 40.0, 50.0], I_t)
-        @test mdl() == [10.0, 20.0, 30.0, 40.0, 50]
+        mdl = generate_observations(pois_obs_model, [10, 20, 30, 40, 50], I_t)
+        @test mdl() == [10, 20, 30, 40, 50]
         samples = sample(mdl, Prior(), 10; progress = false)
         exp_y_t = get(samples, :exp_y_t).exp_y_t
         @test exp_y_t[1][1] == expected_obs[3]
@@ -162,8 +162,8 @@ end
     end
 end
 
-@testitem "LatentDelay parameter recovery with RW latent process: Negative binomial errors" begin
-    using Random, Turing, FillArrays, Distributions, LinearAlgebra, DynamicPPL, StatsBase,
+@testitem "LatentDelay parameter recovery with log-RW latent process: Negative binomial errors" begin
+    using Random, Turing, Distributions, LinearAlgebra, DynamicPPL, StatsBase,
           ReverseDiff, LogDensityProblems, LogDensityProblemsAD
     Random.seed!(1234)
 
@@ -179,75 +179,52 @@ end
         @submodel gen_y_t = generate_observations(obs, y_t, exp.(Z_t))
         return exp.(Z_t), gen_y_t
     end
-    y_t_missing = Vector{Union{Int, Missing}}(missing, 50)
-    gen_mdl = test_negbin_errors_with_delays(latent_process, obs_model, y_t_missing)
-    θ_true = rand(gen_mdl)
-    Z_t_obs, y_t_obs = condition(gen_mdl, θ_true)()
 
-    # y_t_obs = rand(80:120, 50)
+    #Generate data from model
+    generative_mdl = test_negbin_errors_with_delays(
+        latent_process, obs_model, Vector{Union{Missing, Int}}(undef, 50))
+    θ_true = rand(generative_mdl)
+    Z_t_obs, y_t_obs = condition(generative_mdl, θ_true)()
+
+    #Sample from model conditional on data
     mdl = test_negbin_errors_with_delays(latent_process, obs_model, y_t_obs)
-    # ad = AutoForwardDiff();#AutoReverseDiff(; compile = false)
     ad = AutoReverseDiff(; compile = true)
+    chn = sample(mdl, NUTS(adtype = ad), MCMCThreads(), 1000, 4, progess = false)
 
-    chn = sample(mdl, NUTS(adtype = ad), MCMCThreads(), 500, 4, progess = true)
+    @testset "Check model vals and grads agree across AD systems for random param choice" begin
+        ℓ = DynamicPPL.LogDensityFunction(mdl)
+        DynamicPPL.link!!(ℓ.varinfo, mdl)
 
-    ℓ = DynamicPPL.LogDensityFunction(mdl)
-    DynamicPPL.link!!(ℓ.varinfo, mdl)
+        n = LogDensityProblems.dimension(ℓ)
+        LogDensityProblems.logdensity(ℓ, zeros(n))
+        ∇ℓ_rd = LogDensityProblemsAD.ADgradient(Val(:ReverseDiff), ℓ)
+        ∇ℓ_rd2 = ADgradient(:ReverseDiff, ℓ; compile = Val(true))
+        ∇ℓ_fd = LogDensityProblemsAD.ADgradient(Val(:ForwardDiff), ℓ)
 
-    n = LogDensityProblems.dimension(ℓ)
-    LogDensityProblems.logdensity(ℓ, zeros(n))
-    ∇ℓ_rd = LogDensityProblemsAD.ADgradient(Val(:ReverseDiff), ℓ)
-    ∇ℓ_rd2 = ADgradient(:ReverseDiff, ℓ; compile = Val(true))
-    ∇ℓ_fd = LogDensityProblemsAD.ADgradient(Val(:ForwardDiff), ℓ)
+        x = randn(n)
+        val1, g1 = LogDensityProblems.logdensity_and_gradient(∇ℓ_rd, x)
+        val2, g2 = LogDensityProblems.logdensity_and_gradient(∇ℓ_fd, x)
+        val3, g3 = LogDensityProblems.logdensity_and_gradient(∇ℓ_rd2, x)
 
-    x = randn(n)
-    val1, g1 = LogDensityProblems.logdensity_and_gradient(∇ℓ_rd, x)
-    val2, g2 = LogDensityProblems.logdensity_and_gradient(∇ℓ_fd, x)
-    val3, g3 = LogDensityProblems.logdensity_and_gradient(∇ℓ_rd2, x)
+        @test val1 ≈ val2 ≈ val3
+        @test g1 ≈ g2 ≈ g3
+    end
 
-    @test val1 ≈ val2 ≈ val3
-    @test g1 ≈ g2 ≈ g3
-
-    using StatsPlots
-    qs = [0.01, 0.025, 0.25, 0.5, 0.75, 0.975, 0.99]
-    lws = [0.5 1.5 2 3 2 1.5 0.5]
-    p = plot()
-    mapreduce(hcat, generated_quantities(gen_mdl, chn)) do gen
-        gen[2]
-    end |>
-    mat -> mapreduce(hcat, qs) do q
-        map(eachrow(mat)) do row
-            if any(ismissing, row)
-                return missing
-            else
-                quantile(row, q)
+    #Check that are in central 99.9% of the posterior predictive distribution
+    #Therefore, this should be unlikely to fail if the model is correctly implemented
+    @testset "Check true parameters are within 99.9% central post. prob.: " begin
+        params_to_check = keys(θ_true)
+        @testset for param in params_to_check
+            if param ∈ keys(chn)
+                posterior_p = ecdf(chn[param][:])(θ_true[param])
+                @test 0.0005 < posterior_p < 0.9995
             end
         end
-    end |>
-           quantiles -> plot!(p, quantiles, label = "",
-        color = :grey, lw = lws)
-    scatter!(p, y_t_obs, label = "Observed data", legend = :topleft, c = 3)
-
-    p = plot(; yscale = :log10)
-    mapreduce(hcat, generated_quantities(gen_mdl, chn)) do gen
-        gen[1]
-    end |>
-    mat -> mapreduce(hcat, qs) do q
-        map(eachrow(mat)) do row
-            if any(ismissing, row)
-                return missing
-            else
-                quantile(row, q)
-            end
-        end
-    end |>
-           quantiles -> plot!(p, quantiles, label = "",
-        color = :grey, lw = lws)
-    scatter!(p, Z_t_obs, label = "Latent infections", legend = :topleft, c = 3)
+    end
 end
 
-@testitem "LatentDelay parameter recovery with Renewal + RW latent process: Negative binomial errors" begin
-    using Random, Turing, FillArrays, Distributions, LinearAlgebra, DynamicPPL, StatsBase,
+@testitem "LatentDelay parameter recovery with Renewal + RW latent process: Negative binomial errors + EpiProblem interface" begin
+    using Random, Turing, Distributions, LinearAlgebra, DynamicPPL, StatsBase,
           ReverseDiff, LogDensityProblems, LogDensityProblemsAD
     Random.seed!(1234)
 
@@ -260,6 +237,7 @@ end
     data = EpiData(gen_int, exp)
     renewal_model = Renewal(data = data, initialisation_prior = Normal(log(10.0), 0.25))
 
+    # Using the EpiProblem interface
     epi_prob = EpiProblem(
         epi_model = renewal_model,
         latent_model = latent_process,
@@ -267,81 +245,59 @@ end
         tspan = (1, 50)
     )
 
+    generative_mdl = generate_epiaware(
+        epi_prob, (y_t = Vector{Union{Int, Missing}}(missing, 50),))
+    θ_true = rand(generative_mdl)
+    gen_data = condition(generative_mdl, θ_true)()
+
+    using StatsPlots
+    scatter(gen_data.generated_y_t, label = "Observed data", legend = :topleft)
+
+    ad = AutoReverseDiff(; compile = true)
+
     inference_method = EpiMethod(
         pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 100)],
-        sampler = NUTSampler(adtype = AutoReverseDiff(),
-            ndraws = 2000,
+        sampler = NUTSampler(adtype = ad,
+            ndraws = 1000,
             nchains = 4,
             mcmc_parallel = MCMCThreads())
     )
-
-    y_t_missing = (y_t = Vector{Union{Int, Missing}}(missing, 50),)
-    generative_model = generate_epiaware(epi_prob, y_t_missing)
-
-    θ_true = rand(generative_model)
-    gen_data = condition(generative_model, θ_true)()
-    scatter(gen_data.generated_y_t, label = "Observed data", legend = :topleft)
 
     inference_results = apply_method(epi_prob,
         inference_method,
         (y_t = gen_data.generated_y_t,)
     )
 
+    # chn2 = sample(mdl, NUTS(adtype = ad), 1000, progess = false)
+    @testset "Check model vals and grads agree across AD systems for random param choice" begin
+        mdl = generate_epiaware(epi_prob, (y_t = gen_data.generated_y_t,))
+
+        ℓ = DynamicPPL.LogDensityFunction(inference_results.model)
+        DynamicPPL.link!!(ℓ.varinfo, mdl)
+
+        n = LogDensityProblems.dimension(ℓ)
+        LogDensityProblems.logdensity(ℓ, zeros(n))
+        ∇ℓ_rd = LogDensityProblemsAD.ADgradient(Val(:ReverseDiff), ℓ)
+        ∇ℓ_rd2 = ADgradient(:ReverseDiff, ℓ; compile = Val(true))
+        ∇ℓ_fd = LogDensityProblemsAD.ADgradient(Val(:ForwardDiff), ℓ)
+
+        x = randn(n)
+        val1, g1 = LogDensityProblems.logdensity_and_gradient(∇ℓ_rd, x)
+        val2, g2 = LogDensityProblems.logdensity_and_gradient(∇ℓ_fd, x)
+        val3, g3 = LogDensityProblems.logdensity_and_gradient(∇ℓ_rd2, x)
+
+        @test val1 ≈ val2 ≈ val3
+        @test g1 ≈ g2 ≈ g3
+    end
+
     chn = inference_results.samples
-    ad = AutoReverseDiff(; compile = true)
-
-    ℓ = DynamicPPL.LogDensityFunction(inference_results.model)
-    DynamicPPL.link!!(ℓ.varinfo, mdl)
-
-    n = LogDensityProblems.dimension(ℓ)
-    LogDensityProblems.logdensity(ℓ, zeros(n))
-    ∇ℓ_rd = LogDensityProblemsAD.ADgradient(Val(:ReverseDiff), ℓ)
-    ∇ℓ_rd2 = ADgradient(:ReverseDiff, ℓ; compile = Val(true))
-    ∇ℓ_fd = LogDensityProblemsAD.ADgradient(Val(:ForwardDiff), ℓ)
-
-    x = randn(n)
-    val1, g1 = LogDensityProblems.logdensity_and_gradient(∇ℓ_rd, x)
-    val2, g2 = LogDensityProblems.logdensity_and_gradient(∇ℓ_fd, x)
-    val3, g3 = LogDensityProblems.logdensity_and_gradient(∇ℓ_rd2, x)
-
-    @test val1 ≈ val2 ≈ val3
-    @test g1 ≈ g2 ≈ g3
-
-    using StatsPlots
-
-    qs = [0.01, 0.025, 0.25, 0.5, 0.75, 0.975, 0.99]
-    lws = [0.5 1.5 2 3 2 1.5 0.5]
-    p = plot()
-    mapreduce(hcat, generated_quantities(generative_model, chn)) do gen
-        gen.generated_y_t
-    end |>
-    mat -> mapreduce(hcat, qs) do q
-        map(eachrow(mat)) do row
-            if any(ismissing, row)
-                return missing
-            else
-                quantile(row, q)
+    @testset "Check true parameters are within 99.9% central post. prob.: " begin
+        params_to_check = keys(θ_true)
+        @testset for param in params_to_check
+            if param ∈ keys(chn)
+                posterior_p = ecdf(chn[param][:])(θ_true[param])
+                @test 0.0005 < posterior_p < 0.9995
             end
         end
-    end |>
-           quantiles -> plot!(p, quantiles, label = "",
-        color = :grey, lw = lws)
-    scatter!(p, gen_data.generated_y_t, label = "Observed data", legend = :topleft, c = 3)
-
-    p = plot(; yscale = :log10)
-    mapreduce(hcat, generated_quantities(generative_model, chn)) do gen
-        gen.I_t
-    end |>
-    mat -> mapreduce(hcat, qs) do q
-        map(eachrow(mat)) do row
-            if any(ismissing, row)
-                return missing
-            else
-                quantile(row, q)
-            end
-        end
-    end |>
-           quantiles -> plot!(p, quantiles, label = "",
-        color = :grey, lw = lws)
-    scatter!(p, gen_data.I_t, label = "Latent infections", legend = :topleft, c = 3)
+    end
 end
