@@ -231,11 +231,13 @@ end
             tspan = (1, n)
         )
 
+        #Generate data from generative model (i.e. data unconditioned)
         generative_mdl = generate_epiaware(
-            epi_prob, (y_t = Vector{Union{Int, Missing}}(missing, 50),))
+            epi_prob, (y_t = Vector{Union{Int, Missing}}(missing, n),))
         θ_true = rand(generative_mdl)
         gen_data = condition(generative_mdl, θ_true)()
 
+        #Apply inference method to inference model (i.e. generative model conditioned on data)
         inference_results = apply_method(epi_prob,
             inference_method,
             (y_t = gen_data.generated_y_t,)
@@ -243,6 +245,7 @@ end
 
         chn = inference_results.samples
 
+        #Check that true parameters are within 99% central posterior probability
         @testset for param in keys(θ_true)
             if param ∈ keys(chn)
                 posterior_p = ecdf(chn[param][:])(θ_true[param])
@@ -253,6 +256,7 @@ end
         return θ_true, gen_data, chn, generative_mdl
     end
 
+    #Test the parameter recovery for all combinations of latent processes and epi models
     @testset "Check true parameters are within 99% central post. prob.: " begin
         @testset for latentprocess_type in latentprocess_types, epimodel in epimodels
             latentprocess = set_latent_process(epimodel, latentprocess_type)
