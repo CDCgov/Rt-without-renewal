@@ -253,10 +253,10 @@ end
         return θ_true, gen_data, chn, generative_mdl
     end
 
-    @testset "Check true parameters are within 99.9% central post. prob.: " begin
+    @testset "Check true parameters are within 99% central post. prob.: " begin
         @testset for latentprocess_type in latentprocess_types, epimodel in epimodels
             latentprocess = set_latent_process(epimodel, latentprocess_type)
-            _ = test_full_process(epimodel, latentprocess, 50)
+            @suppress _ = test_full_process(epimodel, latentprocess, 50)
         end
     end
 end
