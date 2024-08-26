@@ -210,7 +210,7 @@ end
     end
 
     function test_full_process(epimodel, latentprocess, n;
-            ad = AutoReverseDiff(; compile = true), posterior_p_tol = 0.01)
+            ad = AutoReverseDiff(; compile = true), posterior_p_tol = 0.005)
         #Fix observation model
         obs = LatentDelay(
             NegativeBinomialError(cluster_factor_prior = HalfNormal(0.05)), Gamma(3, 7 / 3))
