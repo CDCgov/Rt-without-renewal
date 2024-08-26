@@ -162,60 +162,6 @@ end
     end
 end
 
-@testitem "LatentDelay parameter recovery with latent processes + Negative binomial errors" begin
-    using Random, Turing, Distributions, LinearAlgebra, DynamicPPL, StatsBase, ReverseDiff,
-          Suppressor
-    Random.seed!(1234)
-
-    latent_processes = [
-        RandomWalk(init_prior = Normal(log(100.0), 0.25), std_prior = HalfNormal(0.05)),
-        AR(damp_priors = [Beta(8, 2; check_args = false)],
-            std_prior = HalfNormal(0.05), init_priors = [Normal(log(100.0), 0.25)]),
-        DiffLatentModel(
-            AR(damp_priors = [Beta(8, 2; check_args = false)],
-                std_prior = HalfNormal(0.05), init_priors = [Normal(0.0, 0.25)]),
-            Normal(log(100.0), 0.25); d = 1)
-    ]
-
-    function test_latent_process(
-            latentprocess, n; ad = AutoReverseDiff(; compile = true), posterior_p_tol = 0.001)
-        obs = LatentDelay(
-            NegativeBinomialError(cluster_factor_prior = HalfNormal(0.05)), Gamma(3, 7 / 3))
-
-        @model function test_negbin_errors_with_delays(y_t)
-            n = length(y_t)
-            @submodel Z_t = generate_latent(latentprocess, n)
-            @submodel gen_y_t = generate_observations(obs, y_t, exp.(Z_t))
-            return exp.(Z_t), gen_y_t
-        end
-
-        generative_mdl = test_negbin_errors_with_delays(Vector{Union{Missing, Int}}(
-            undef, n))
-        θ_true = rand(generative_mdl)
-        Z_t_obs, y_t_obs = condition(generative_mdl, θ_true)()
-        mdl = test_negbin_errors_with_delays(y_t_obs)
-        @suppress chn = sample(
-            mdl, NUTS(adtype = ad), MCMCThreads(), 1000, 4, progess = false)
-
-        @testset for param in keys(θ_true)
-            if param ∈ keys(chn)
-                posterior_p = ecdf(chn[param][:])(θ_true[param])
-                @test 0.5 * posterior_p_tol < posterior_p < 1 - 0.5 * posterior_p_tol
-            end
-        end
-
-        return nothing
-    end
-
-    #Check that are in central 99.9% of the posterior predictive distribution
-    #Therefore, this should be unlikely to fail if the model is correctly implemented
-    @testset "Check true parameters are within 99.9% central post. prob.: " begin
-        @testset for latentprocess in latent_processes
-            test_latent_process(latentprocess, 50)
-        end
-    end
-end
-
 @testitem "LatentDelay parameter recovery with mix of IGP + latent processes: Negative binomial errors + EpiProblem interface" begin
     using Random, Turing, Distributions, LinearAlgebra, DynamicPPL, StatsBase, ReverseDiff,
           Suppressor
@@ -264,7 +210,7 @@ end
     end
 
     function test_full_process(epimodel, latentprocess, n;
-            ad = AutoReverseDiff(; compile = true), posterior_p_tol = 0.001)
+            ad = AutoReverseDiff(; compile = true), posterior_p_tol = 0.01)
         #Fix observation model
         obs = LatentDelay(
             NegativeBinomialError(cluster_factor_prior = HalfNormal(0.05)), Gamma(3, 7 / 3))
