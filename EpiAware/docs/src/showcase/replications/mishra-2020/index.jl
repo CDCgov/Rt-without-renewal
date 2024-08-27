@@ -416,7 +416,7 @@ num_threads = min(10, Threads.nthreads())
 inference_method = EpiMethod(
     pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 100)],
     sampler = NUTSampler(
-		target_acceptance=0.9,
+        target_acceptance = 0.9,
         adtype = AutoReverseDiff(),
         ndraws = 2000,
         nchains = num_threads,
