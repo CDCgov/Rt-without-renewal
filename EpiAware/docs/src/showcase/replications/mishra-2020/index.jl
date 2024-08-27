@@ -223,13 +223,18 @@ truth_GI = Gamma(6.5, 0.62)
 
 # ╔═╡ 7fdac621-4605-4ea8-88c7-7c3c4df5734f
 md"
-However, this is a continuous distribution whereas we are using a discrete-time model.
+This is a representation of the generation interval distribution as continuous whereas the infection process will be formulated in discrete daily time steps. By default, `EpiAware` performs [double interval censoring](https://www.medrxiv.org/content/10.1101/2024.01.12.24301247v1) to convert our continuous estimate of the generation interval into a discretized version $g_t$, whilst also applying left truncation such that $g_0 = 0$ and normalising $\sum_t g_t = 1.$
 
-To construct an `EpiModel` we need to supply some fixed data for the model contained in an `EpiData` object. The `EpiData` constructor performs double interval censoring to convert our _continuous_ estimate of the generation interval into a discretized version $g_t$. We also implement right truncation, the default is rounding the 99th percentile of the generation interval distribution, but this can be controlled using the keyword `D_gen`.
+The constructor for converting a continuous estimate of the generation interval distribution into a usable discrete time estimate is `EpiData`.
 "
 
 # ╔═╡ 99c9ba2c-20a5-4c7f-94d2-272d6c9d5904
 model_data = EpiData(gen_distribution = truth_GI)
+
+# ╔═╡ ca562299-82fd-4fdc-83db-b8952e10dd26
+md"
+We can compare the discretized generation interval with the continuous estimate, which in this example is the serial interval estimate.
+"
 
 # ╔═╡ 71d08f7e-c409-4fbe-b154-b21d09010683
 let
@@ -258,27 +263,25 @@ R_1 = 1 \Big{/} \sum_{t\geq 1} e^{-rt} g_t
 # ╔═╡ 9e49d451-946b-430b-bcdb-1ef4bba55a4b
 log_I0_prior = Normal(log(1.0), 1.0)
 
+# ╔═╡ 6a2d6ac2-d490-4235-9c31-d7d97362c148
+md"
+Combining the above, we can construct the `Renewal` model struct.
+"
+
 # ╔═╡ 8487835e-d430-4300-bd7c-e33f5769ee32
 epi = Renewal(model_data, log_I0_prior)
 
-# ╔═╡ 2119319f-a2ef-4c96-82c4-3c7eaf40d2e0
-md"
-_NB: We don't implement a background infection rate in this model._
-"
-
 # ╔═╡ 51b5d5b6-3ad3-4967-ad1d-b1caee201fcb
 md"
-##### `Turing` model interface
+### `Turing` model interface to `Renewal` process
 
-As mentioned above, we can use this instance of the `Renewal` latent infection model to construct a `Turing` `Model` which implements the probabilistic behaviour determined by `epi`.
+As mentioned above, we can use this instance of the `Renewal` latent infection model to construct a `Turing` `Model` which implements the probabilistic behaviour determined by `epi` using the constructor function `generate_latent_infs` which combines `epi` with a provided $\log R_t$ time series.
 
-We do this with the constructor function `generate_latent_infs` which combines `epi` with a provided $\log R_t$ time series.
-
-Here we choose an example where $R_t$ decreases from $R_t = 3$ to $R_t = 0.5$ over the course of 30 days.
+Here we choose an example where $R_t$ decreases from $R_t = 3$ to $R_t = 0.5$ over the course of 50 days.
 "
 
 # ╔═╡ 9e564a6e-f521-41e8-8604-6a9d73af9ba7
-R_t_fixed = [0.5 + 2.5 / (1 + exp(t - 15)) for t in 1:30]
+R_t_fixed = [0.5 + 2.5 / (1 + exp(t - 15)) for t in 1:50]
 
 # ╔═╡ 72bdb47d-4967-4f20-9ae5-01f82e7b32c5
 latent_inf_mdl = generate_latent_infs(epi, log.(R_t_fixed))
@@ -612,13 +615,14 @@ end
 # ╟─141543f8-681c-4804-b4c9-e094b3c04fda
 # ╟─6a9e871f-a2fa-4e41-af89-8b0b3c3b5b4b
 # ╠═c1fc1929-0624-45c0-9a89-86c8479b2675
-# ╠═7fdac621-4605-4ea8-88c7-7c3c4df5734f
+# ╟─7fdac621-4605-4ea8-88c7-7c3c4df5734f
 # ╠═99c9ba2c-20a5-4c7f-94d2-272d6c9d5904
+# ╟─ca562299-82fd-4fdc-83db-b8952e10dd26
 # ╠═71d08f7e-c409-4fbe-b154-b21d09010683
 # ╟─4a2b5cf1-623c-4fe7-8365-49fb7972af5a
 # ╠═9e49d451-946b-430b-bcdb-1ef4bba55a4b
+# ╟─6a2d6ac2-d490-4235-9c31-d7d97362c148
 # ╠═8487835e-d430-4300-bd7c-e33f5769ee32
-# ╟─2119319f-a2ef-4c96-82c4-3c7eaf40d2e0
 # ╟─51b5d5b6-3ad3-4967-ad1d-b1caee201fcb
 # ╠═9e564a6e-f521-41e8-8604-6a9d73af9ba7
 # ╠═72bdb47d-4967-4f20-9ae5-01f82e7b32c5
