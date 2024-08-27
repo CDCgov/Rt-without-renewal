@@ -1,19 +1,17 @@
 ### A Pluto.jl notebook ###
-# v0.19.43
+# v0.19.46
 
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ 34a06b3b-799b-48c5-bd08-1e57151f51ec
-let
-    docs_dir = dirname(dirname(dirname(dirname(@__DIR__))))
-    pkg_dir = dirname(docs_dir)
+# ╔═╡ e46a2fc8-f31e-4e11-9bcc-17836a41b08d
+using Pkg; Pkg.activate(temp=true)
 
-    using Pkg: Pkg
-    Pkg.activate(docs_dir)
-    Pkg.develop(; path = pkg_dir)
-    Pkg.instantiate()
-end;
+# ╔═╡ dae655f7-9f4e-47b0-847d-6f885ef5c2a1
+Pkg.add(url="https://github.com/CDCgov/Rt-without-renewal", subdir="EpiAware")
+
+# ╔═╡ 93e1c8a9-05ce-42ef-b758-cdd8cd8e9086
+Pkg.add(["Turing", "DynamicPPL", "Distributions", "Statistics", "CSV", "DataFramesMeta", "StatsPlots", "ReverseDiff"])
 
 # ╔═╡ d63b37f0-9642-4c38-ac01-9ffe48d50441
 using EpiAware
@@ -43,39 +41,21 @@ begin #Date utility and set Random seed
     Random.seed!(1)
 end
 
-# ╔═╡ 8a8d5682-2f89-443b-baf0-d4d3b134d311
-md"
-# Getting started with `EpiAware`
-
-This tutorial introduces the basic functionality of `EpiAware`. `EpiAware` is a package for making inferences on epidemiological case/determined infection data using a model-based approach.
-
-It is common to conceptualise the generative process of public health data, e.g a time series of reported cases of an infectious pathogen, in a modular way. For example, it is common to abstract the underlying latent infection process away from downstream issues of observation, or to treat quanitites such as the time-varying reproduction number as being itself generated as a random process.
-
-`EpiAware` is built using the [`DynamicPPL`](https://github.com/TuringLang/DynamicPPL.jl) probabilistic programming domain-specific language, which is part of the [`Turing`](https://turinglang.org/dev/docs/using-turing/guide/) PPL. The structural concept behind `EpiAware` is that each module of an epidemiological model is a self-contained `Turing` [`Model`](https://turinglang.org/DynamicPPL.jl/stable/api/#DynamicPPL.Model-Tuple{}); that is each module is an object that can be conditioned on observable data and sampled from. A complete `EpiAware` model is the composition of these objects using the [`@submodel`](https://turinglang.org/DynamicPPL.jl/stable/api/#DynamicPPL.@submodel) macro.
-"
-
-# ╔═╡ 27d73202-a93e-4471-ab50-d59345304a0b
-md"
-## Dependencies for this notebook
-Now we want to import these dependencies into scope. If evaluating these code lines/blocks in REPL, then the REPL will offer to install any missing dependencies. Alternatively, you can add them to your active environment using `Pkg.add`.
-"
-
 # ╔═╡ 9161ab72-5c39-4a67-9762-e19f1c54c7fd
 md"
-## Example: Early COVID-19 case data in South Korea
+# Example: Early COVID-19 case data in South Korea
 
-To demonstrate `EpiAware` we largely recreate an epidemiological model presented in [On the derivation of the renewal equation from an age-dependent branching process: an epidemic modelling perspective, _Mishra et al_ (2020)](https://arxiv.org/abs/2006.16487). _Mishra et al_ consider test-confirmed cases of COVID-19 in South Korea between January to July 2020. The components of the epidemilogical model they consider are:
+In this example we use `EpiAware` functionality to largely recreate an epidemiological model presented in [On the derivation of the renewal equation from an age-dependent branching process: an epidemic modelling perspective, _Mishra et al_ (2020)](https://arxiv.org/abs/2006.16487). _Mishra et al_ consider test-confirmed cases of COVID-19 in South Korea between January to July 2020. The components of the epidemilogical model they consider are:
 
-- The log-time varying reproductive number $\log R_t$ is modelled as an AR(2) process.
-- The latent infection ($I_t$) generating process is a renewal model:
+- The time varying reproductive number modelled as an [AR(2) process](https://en.wikipedia.org/wiki/Autoregressive_model) on the log-scale $\log R_t \sim \text{AR(2)}$.
+- The latent infection ($I_t$) generating process is a renewal model (note that we leave out external infections in this note):
 ```math
-I_t = \mu_t + R_t \sum_{s\geq 1} I_{t-s} g_s.
+I_t = R_t \sum_{s\geq 1} I_{t-s} g_s.
 ```
-Where $g_t$ is a daily discretisation of the probability mass function of an estimated serial interval distribution:
+- The discrete generation interval $g_t$ is a daily discretisation of the probability mass function of an estimated serial interval distribution for SARS-CoV-2:
 ```math
 G \sim \text{Gamma}(6.5,0.62).
 ```
-And $\mu_t$ is an external importation of infection process.
 - Observed cases $C_t$ are distributed around latent infections with negative binomial errors:
 ```math
 C_t \sim \text{NegBin}(\text{mean} = I_t,~ \text{overdispersion} = \phi).
@@ -84,10 +64,20 @@ C_t \sim \text{NegBin}(\text{mean} = I_t,~ \text{overdispersion} = \phi).
 In the examples below we are going to largely recreate the _Mishra et al_ model, whilst emphasing that each component of the overall epidemiological model is, itself, a stand alone model that can be sampled from.
 "
 
+# ╔═╡ 27d73202-a93e-4471-ab50-d59345304a0b
+md"
+## Dependencies for this notebook
+As well as the `EpiAware` package we also want to import extra dependencies for interacting with `EpiAware` models, data wrangling and visualisation. 
+
+To make this notebook as clean as possible, we create a _temporary_ environment for this notebook using `Pkg.activate(temp=true)`. We then use the `Pkg.add` function to install our desired dependencies available; because the notebook environment is temporary the installed dependencies do not persist once the notebook runtime is ended.
+"
+
 # ╔═╡ 1d3b9541-80ad-41b5-a5ed-a947f5c0731b
 md"
-## Load the data into scope
-First, we make sure that we have the data we want to analysis in scope by downloading it.
+## Load early SARS-2 case data for South Korea
+First, we make sure that we have the data we want to analysis in scope by downloading it for where we have saved a copy in the `EpiAware` repository.
+
+NB: The case data is curated by the [`covidregionaldata`](https://github.com/epiforecasts/covidregionaldata) package. We accessed the South Korean case data using a short [R script](https://github.com/CDCgov/Rt-without-renewal/blob/main/EpiAware/docs/src/showcase/replications/mishra-2020/get_data.R). It is possible to interface directly from a Julia session using the `RCall.jl` package, but we do not do this in this notebook to reduce the number of underlying dependencies required to run this notebook.
 "
 
 # ╔═╡ 4e5e0e24-8c55-4cb4-be3a-d28198f81a69
@@ -98,134 +88,140 @@ data = CSV.read(download(url), DataFrame)
 
 # ╔═╡ 104f4d16-7433-4a2d-89e7-288a9b223563
 md"
-### Time-varying reproduction number as a `LatentModel` type
+## Time-varying reproduction number as an `AbstractLatentModel` type
 
-`EpiAware` exposes a `LatentModel` type system; the purpose of which is to define stochastic processes which can be interpreted as generating time-varying parameters/quantities of interest.
+`EpiAware` exposes a `AbstractLatentModel` abstract type; the purpose of which is to group stochastic processes which can be interpreted as generating time-varying parameters/quantities of interest which we call latent process models.
 
-In the _Mishra et al_ model the log-time varying reproductive number is _a priori_ assumed to evolve as an auto-regressive process, AR(2):
+In the _Mishra et al_ model the log-time varying reproductive number $Z_t$ is assumed to evolve as an auto-regressive process, AR(2):
 
 ```math
 \begin{align}
-Z_t &= \log R_t, \\
+R_t &= \exp Z_t, \\
 Z_t &= \rho_1 Z_{t-1} + \rho_2 Z_{t-2} + \epsilon_t, \\
-\epsilon_t &\sim \text{Normal}(0, \sigma).
+\epsilon_t &\sim \text{Normal}(0, \sigma^*).
 \end{align}
 ```
+Where $\rho_1,\rho_2$, which are the parameters of AR process, and $\epsilon_t$ is a white noise process with standard deviation $\sigma^*$.
 "
 
 # ╔═╡ d201c82b-8efd-41e2-96d7-4f5e0c67088c
 md"
-`EpiAware` gives a concrete subtype `AR <: AbstractLatentModel` which defines this behaviour of the latent model. The user can supply the priors for $\rho_1,\rho_2$, wich we call `damp_priors`, as well as for $\sigma$ (`std_prior`) and the initial values $Z_1, Z_2$ (`init_priors`).
+In `EpiAware` we determine the behaviour of a latent process by choosing a concrete subtype (i.e. a struct) of `AbstractLatentModel` which has fields that set the priors of the various parameters required for the latent process.
+
+The AR process has the struct `AR <: AbstractLatentModel`. The user can supply the priors for $\rho_1,\rho_2$ in the field `damp_priors`, for $\sigma^*$ in the field `std_prior`, and the initial values $Z_1, Z_2$ in the field `init_priors`.
+"
+
+# ╔═╡ eb1ea027-684e-46a9-88fa-b4b8239ed906
+md"
+We choose priors based on _Mishra et al_ using the `Distributions.jl` interface to probability distributions. Note that we condition the AR parameters onto $[0,1]$, as in _Mishra et al_, using the `truncated` function.
+
+In _Mishra et al_ the standard deviation of the _stationary distribution_ of $Z_t$ which has a standard normal distribution conditioned to be positive $\sigma \sim \mathcal{N}^+(0,1)$. The value $σ^*$ was determined from a nonlinear function of sampled $\sigma, ~\rho_1, ~\rho_2$ values. Since, _Mishra et al_ give sharply informative priors for $\rho_1,~\rho_2$ (see below) we simplify by calculating $\sigma^*$ at the prior mode of $\rho_1,~\rho_2$. This results in a $\sigma^* \sim \mathcal{N}^+(0, 0.5)$ prior.
 "
 
 # ╔═╡ c88bbbd6-0101-4c04-97c9-c5887ef23999
 ar = AR(
     damp_priors = [truncated(Normal(0.8, 0.05), 0, 1),
-        truncated(Normal(0.05, 0.05), 0, 1)],
-    std_prior = HalfNormal(1.0),
-    init_priors = [Normal(-1.0, 0.1), Normal(-1.0, 0.1)]
+        truncated(Normal(0.1, 0.05), 0, 1)],
+    std_prior = HalfNormal(0.5),
+    init_priors = [Normal(-1.0, 0.1), Normal(-1.0, 0.5)]
 )
-
-# ╔═╡ 40352cd6-3592-438b-b5d8-f56dcb1a4d27
-md"
-The priors here are based on _Mishra et al_, note that we have decreased the _a priori_ belief in the correlation parameter $\rho_1$.
-"
 
 # ╔═╡ 31ee2757-0409-45df-b193-60c552797a3d
 md"
-##### `Turing` model interface
+### `Turing` model interface to the AR process
 
-As mentioned above, we can use this instance of the `AR` latent model to construct a `Turing` `Model` which implements the probabilistic behaviour determined by `ar`.
+As mentioned above, we can use this instance of the `AR` latent model to construct a [`Turing`](https://turinglang.org/) model object which implements the probabilistic behaviour determined by `ar`. We do this with the constructor function exposed by `EpiAware`: `generate_latent` which combines an `AbstractLatentModel` substype struct with the number of time steps for which we want to generate the latent process. 
 
-We do this with the constructor function `generate_latent` which combines `ar` with a number of time steps to generate for (in this case we choose 30).
+As a refresher, we remind that the `Turing.Model` object has the following properties:
+
+- The model object parameters are sampleable using `rand`; that is we can generate parameters from the specified priors e.g. `θ = rand(mdl)`.
+- The model object is generative as a callable; that is we can sample instances of $Z_t$ e.g. `Z_t = mdl()`.
+- The model object can construct new model objects by conditioning parameters using the [`DynamicPPL.jl`](https://turinglang.org/DynamicPPL.jl/stable/) syntax, e.g. `conditional_mdl = mdl | (σ_AR = 1.0, )`.
+
+As a concrete example we create a model object for the AR(2) process we specified above for 50 time steps:
 "
 
 # ╔═╡ 2bf22866-b785-4ee0-953d-ac990a197561
-ar_mdl = generate_latent(ar, 30)
+ar_mdl = generate_latent(ar, 50)
 
 # ╔═╡ 25e25125-8587-4451-8600-9b55a04dbcd9
 md"
-We can sample from this model, which is useful for model diagnostic and prior predictive checking.
+Ultimately, this will only be one component of the full epidemiological model. However, it is useful to visualise its probabilistic behaviour for model diagnostic and prior predictive checking.
+
+We can spaghetti plot generative samples from the AR(2) process with the priors specified above.
 "
 
 # ╔═╡ fbe117b7-a0b8-4604-a5dd-e71a0a1a4fc3
 plt_ar_sample = let
     n_samples = 100
     ar_mdl_samples = mapreduce(hcat, 1:n_samples) do _
-        θ = rand(ar_mdl) #Sample unconditionally the underlying parameters of the model
-        gen = generated_quantities(ar_mdl, θ)
+       ar_mdl() #Sample Z_t trajectories for the model
     end
 
-    plot(ar_mdl_samples,
+    plot(ar_mdl_samples .|> exp, #R_t = exp(Z_t)
         lab = "",
         c = :grey,
         alpha = 0.25,
-        title = "$(n_samples) draws from the AR(2) model",
-        ylabel = "Log Rt")
+        title = "$(n_samples) draws from the prior Rₜ model",
+        ylabel = "Time varying Rₜ",
+		yticks = [10.0^n for n = -4:4],
+	yscale = :log10)
 end
 
 # ╔═╡ 9f84dec1-70f1-442e-8bef-a9494921549e
 md"
-And we can sample from this model with some parameters conditioned, for example with $\sigma = 0$. In this case the AR process is an initial perturbation model with return to baseline.
+This suggests that _a priori_ we believe that there is a few percent chance of achieving very high $R_t$ values, i.e. $R_t \sim 10-1000$ is not excluded by our priors.
+
+To demonstrate alternatives we can sample from this model with some parameters conditioned, for example with $Z_1 = Z_2 = 0$ and $\sigma^* = 0.1$.
 "
 
 # ╔═╡ 51a82a62-2c59-43c9-8562-69d15a7edfdd
-cond_ar_mdl = ar_mdl | (σ_AR = 0.0,)
+cond_ar_mdl = ar_mdl | (ar_init = [0., 0.], σ_AR = 0.1)
 
 # ╔═╡ d3938381-01b7-40c6-b369-a456ff6dba72
 let
     n_samples = 100
     ar_mdl_samples = mapreduce(hcat, 1:n_samples) do _
-        θ = rand(cond_ar_mdl) #Sample unconditionally the underlying parameters of the model
-        gen = generated_quantities(cond_ar_mdl, θ)
+        cond_ar_mdl()
     end
 
-    plot(ar_mdl_samples,
+    plot(ar_mdl_samples .|> exp, #R_t = exp(Z_t)
         lab = "",
         c = :grey,
         alpha = 0.25,
-        title = "AR(2) model conditioned on sigma = 0",
-        ylabel = "Log Rt")
+        title = "$(n_samples) draws from the prior Rₜ model",
+        ylabel = "Time varying Rₜ",)
 end
 
-# ╔═╡ 12fd3bd5-657e-4b1a-aa88-6063419aaceb
+# ╔═╡ 141543f8-681c-4804-b4c9-e094b3c04fda
 md"
-In this note, we are going to treat $R_t$ as varying every two days. The reason for this is to 1) reduce the effective number of parameters, and 2) showcase the `BroadcastLatentModel` wrapper.
-
-In `EpiAware` we set this behaviour by wrapping a `LatentModel` in a `BroadcastLatentModel`. This allows us to set the broadcasting period and type. In this case we broadcast each latent process value over $2$ days in a `RepeatBlock`.
+With these fixed parameters, we see that the _a priori_ model for $R_t$ assigns much higher probability to values around $1$. Whether that is appropriate or not depends on the applied modelling question.
 "
-
-# ╔═╡ 61eac666-9fe4-4918-bd3f-68e89275d07a
-twod_ar = BroadcastLatentModel(ar, 2, RepeatBlock())
-
-# ╔═╡ 5a96e7e9-0376-4365-8eb1-b2fad9be8fef
-let
-    n_samples = 100
-    twod_ar_mdl = generate_latent(twod_ar, 30)
-    twod_ar_mdl_samples = mapreduce(hcat, 1:n_samples) do _
-        θ = rand(twod_ar_mdl) #Sample unconditionally the underlying parameters of the model
-        gen = generated_quantities(twod_ar_mdl, θ)
-    end
-
-    plot(twod_ar_mdl_samples,
-        lab = "",
-        c = :grey,
-        alpha = 0.25,
-        title = "$(n_samples) draws from the weekly AR(2) model",
-        ylabel = "Log Rt")
-end
 
 # ╔═╡ 6a9e871f-a2fa-4e41-af89-8b0b3c3b5b4b
 md"
-## The Renewal model as an `EpiModel` type
+## The Renewal model as an `AbstractEpiModel` type
 
-`EpiAware` has an `EpiModel` type system which we use to set the behaviour of the latent infection model. In this case we want to implement a renewal model.
+The abstract type for models that generate infections exposed by `EpiAware` is called `AbstractEpiModel`. As with latent models different concrete subtypes of `AbstractEpiModel` define different classes of infection generating process. In this case we want to implement a renewal model.
 
-To construct an `EpiModel` we need to supply some fixed data for the model contained in an `EpiData` object. The `EpiData` constructor performs double interval censoring to convert our _continuous_ estimate of the generation interval into a discretized version $g_t$. We also implement right truncation, the default is rounding the 99th percentile of the generation interval distribution, but this can be controlled using the keyword `D_gen`.
+The `Renewal <: AbstractEpiModel` type of struct needs two fields:
+
+- Data about the generation interval of the infectious disease so it can construct $g_t$.
+- A prior for the initial numbers of infected.
+
+In _Mishra et al_ they use an estimate of the serial interval of SARS-CoV-2 as an estimate of the generation interval.
+
 "
 
 # ╔═╡ c1fc1929-0624-45c0-9a89-86c8479b2675
 truth_GI = Gamma(6.5, 0.62)
+
+# ╔═╡ 7fdac621-4605-4ea8-88c7-7c3c4df5734f
+md"
+However, this is a continuous distribution whereas we are using a discrete-time model.
+
+To construct an `EpiModel` we need to supply some fixed data for the model contained in an `EpiData` object. The `EpiData` constructor performs double interval censoring to convert our _continuous_ estimate of the generation interval into a discretized version $g_t$. We also implement right truncation, the default is rounding the 99th percentile of the generation interval distribution, but this can be controlled using the keyword `D_gen`.
+"
 
 # ╔═╡ 99c9ba2c-20a5-4c7f-94d2-272d6c9d5904
 model_data = EpiData(gen_distribution = truth_GI)
@@ -258,7 +254,7 @@ R_1 = 1 \Big{/} \sum_{t\geq 1} e^{-rt} g_t
 log_I0_prior = Normal(log(1.0), 1.0)
 
 # ╔═╡ 8487835e-d430-4300-bd7c-e33f5769ee32
-epi = RenewalWithPopulation(model_data, log_I0_prior, 1e8)
+epi = Renewal(model_data, log_I0_prior)
 
 # ╔═╡ 2119319f-a2ef-4c96-82c4-3c7eaf40d2e0
 md"
@@ -320,7 +316,7 @@ In `EpiAware`, we default to a prior on $\sqrt{1/\phi}$ because this quantity ha
 "
 
 # ╔═╡ 714908a1-dc85-476f-a99f-ec5c95a78b60
-obs = NegativeBinomialError(cluster_factor_prior = HalfNormal(0.15))
+obs = NegativeBinomialError(cluster_factor_prior = HalfNormal(0.5))
 
 # ╔═╡ dacb8094-89a4-404a-8243-525c0dbfa482
 md"
@@ -382,7 +378,7 @@ The `tspan` set the range of the time index for the models.
 
 # ╔═╡ eaad5f46-e928-47c2-90ec-2cca3871c75d
 epi_prob = EpiProblem(epi_model = epi,
-    latent_model = twod_ar,
+    latent_model = ar,
     observation_model = obs,
     tspan = (45, 80))
 
@@ -405,10 +401,12 @@ num_threads = min(10, Threads.nthreads())
 # ╔═╡ 88b43e23-1e06-4716-b284-76e8afc6171b
 inference_method = EpiMethod(
     pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 100)],
-    sampler = NUTSampler(adtype = AutoReverseDiff(),
+    sampler = NUTSampler(
+		adtype = AutoReverseDiff(),
         ndraws = 2000,
         nchains = num_threads,
-        mcmc_parallel = MCMCThreads())
+        mcmc_parallel = MCMCThreads(),
+	)
 )
 
 # ╔═╡ 92333a96-5c9b-46e1-9a8f-f1890831066b
@@ -462,56 +460,59 @@ Note that, in reality, the peak $R_t$ found here and in _Mishra et al_ is unreal
 In a future note, we'll demonstrate having a time-varying ascertainment rate.
 "
 
+# ╔═╡ e0df0135-c02e-4959-b334-13208ad5c8a6
+function generated_quantiles(gens, quantity, qs; transformation = x -> x)
+	mapreduce(hcat, gens) do gen #loop over sampled generated quantities
+        getfield(gen, quantity) |> transformation
+    end |> mat -> mapreduce(hcat, qs) do q #Loop over matrix row to condense into qs
+        map(eachrow(mat)) do row
+            if any(ismissing, row)
+                return missing
+            else
+                quantile(row, q)
+            end
+        end
+    end 
+end
+
 # ╔═╡ 8b557bf1-f3dd-4f42-a250-ce965412eb32
 let
     C = south_korea_data.y_t
     D = south_korea_data.dates
-    gens = inference_results.generated
 
     #Unconditional model for posterior predictive sampling
     mdl_unconditional = generate_epiaware(epi_prob, (y_t = missing,))
-    predicted_y_t = mapreduce(
-        hcat, generated_quantities(mdl_unconditional, inference_results.samples)) do gen
-        gen.generated_y_t
-    end
-    predicted_I_t = mapreduce(
-        hcat, gens) do gen
-        gen.I_t
-    end
-    predicted_R_t = mapreduce(
-        hcat, gens) do gen
-        exp.(gen.Z_t)
-    end
+	posterior_gens = generated_quantities(mdl_unconditional, inference_results.samples)
+	
+	#plotting quantiles
+	qs = [0.025, 0.25, 0.5, 0.75, 0.975]
 
-    p1 = plot(D, predicted_y_t, c = :grey, alpha = 0.05, lab = "")
+	#Prediction quantiles
+	predicted_y_t = generated_quantiles(posterior_gens, :generated_y_t, qs)
+	predicted_R_t = generated_quantiles(posterior_gens, 
+		:Z_t, 
+		qs; 
+		transformation=x -> exp.(x))
+
+	#Plots
+    p1 = plot(D, predicted_y_t[:, 3], lw = 2, lab = "post. median", c = :purple)
+	plot!(p1, D, predicted_y_t[:, 2], fillrange = predicted_y_t[:, 4], fillalpha = 0.5, lw = 0, c = :purple, lab = "50%")
+	plot!(p1, D, predicted_y_t[:, 1], fillrange = predicted_y_t[:, 5], fillalpha = 0.2, lw = 0, c = :purple, lab = "95%")
+
     scatter!(p1, D, C,
         lab = "Actual cases",
         ylabel = "Daily Cases",
-        title = "Post. predictive: Cases",
-        ylims = (-0.5, maximum(C) * 2),
-        c = :red
+        title = "Posterior predictive: Cases",
+        ylims = (-50, maximum(C) * 2),
+        c = :black
     )
 
-    p2 = plot(D, predicted_I_t,
-        c = :grey,
-        alpha = 0.05,
-        lab = "",
-        ylabel = "Daily latent infections",
-        ylims = (-0.5, maximum(C) * 1.5),
-        title = "Prediction: Latent infections"
-    )
+	p2 = plot(D, predicted_R_t[:, 3], lw = 2, lab = "post. median", c = :green, yscale = :log10, title = "Prediction: Reproduction number")
+	plot!(p2, D, predicted_R_t[:, 2], fillrange = predicted_R_t[:, 4], fillalpha = 0.5, lw = 0, c = :green, lab = "50%")
+	plot!(p2, D, predicted_R_t[:, 1], fillrange = predicted_R_t[:, 5], fillalpha = 0.2, lw = 0, c = :green, lab = "95%")
+	hline!(p2, [1.0], lab = "Rt = 1", lw = 2, c = :blue)
 
-    p3 = plot(D, predicted_R_t,
-        c = :grey,
-        alpha = 0.025,
-        lab = "",
-        ylabel = "Rt",
-        title = "Prediction: Reproduction number",
-        yscale = :log10
-    )
-    hline!(p3, [1.0], lab = "Rt = 1", lw = 2, c = :blue)
-
-    plot(p1, p2, p3, layout = (3, 1), size = (500, 700), left_margin = 5mm)
+    plot(p1, p2, layout = (2, 1), size = (500, 700), left_margin = 5mm)
 end
 
 # ╔═╡ c05ed977-7a89-4ac8-97be-7078d69fce9f
@@ -571,9 +572,11 @@ let
 end
 
 # ╔═╡ Cell order:
-# ╟─8a8d5682-2f89-443b-baf0-d4d3b134d311
-# ╟─34a06b3b-799b-48c5-bd08-1e57151f51ec
+# ╟─9161ab72-5c39-4a67-9762-e19f1c54c7fd
 # ╟─27d73202-a93e-4471-ab50-d59345304a0b
+# ╠═e46a2fc8-f31e-4e11-9bcc-17836a41b08d
+# ╠═dae655f7-9f4e-47b0-847d-6f885ef5c2a1
+# ╠═93e1c8a9-05ce-42ef-b758-cdd8cd8e9086
 # ╠═d63b37f0-9642-4c38-ac01-9ffe48d50441
 # ╠═74642759-35a5-4957-9f2b-544712866410
 # ╠═0c5f413e-d043-448d-8665-f0f6f705d70f
@@ -581,14 +584,13 @@ end
 # ╠═9eb03a0b-c6ca-4e23-8109-fb68f87d7fdf
 # ╠═97b5374e-7653-4b3b-98eb-d8f73aa30580
 # ╠═1642dbda-4915-4e29-beff-bca592f3ec8d
-# ╟─9161ab72-5c39-4a67-9762-e19f1c54c7fd
 # ╟─1d3b9541-80ad-41b5-a5ed-a947f5c0731b
 # ╠═4e5e0e24-8c55-4cb4-be3a-d28198f81a69
 # ╠═a59d977c-0178-11ef-0063-83e30e0cf9f0
 # ╟─104f4d16-7433-4a2d-89e7-288a9b223563
 # ╟─d201c82b-8efd-41e2-96d7-4f5e0c67088c
+# ╟─eb1ea027-684e-46a9-88fa-b4b8239ed906
 # ╠═c88bbbd6-0101-4c04-97c9-c5887ef23999
-# ╟─40352cd6-3592-438b-b5d8-f56dcb1a4d27
 # ╟─31ee2757-0409-45df-b193-60c552797a3d
 # ╠═2bf22866-b785-4ee0-953d-ac990a197561
 # ╟─25e25125-8587-4451-8600-9b55a04dbcd9
@@ -596,11 +598,10 @@ end
 # ╟─9f84dec1-70f1-442e-8bef-a9494921549e
 # ╠═51a82a62-2c59-43c9-8562-69d15a7edfdd
 # ╠═d3938381-01b7-40c6-b369-a456ff6dba72
-# ╟─12fd3bd5-657e-4b1a-aa88-6063419aaceb
-# ╠═61eac666-9fe4-4918-bd3f-68e89275d07a
-# ╠═5a96e7e9-0376-4365-8eb1-b2fad9be8fef
+# ╟─141543f8-681c-4804-b4c9-e094b3c04fda
 # ╟─6a9e871f-a2fa-4e41-af89-8b0b3c3b5b4b
 # ╠═c1fc1929-0624-45c0-9a89-86c8479b2675
+# ╠═7fdac621-4605-4ea8-88c7-7c3c4df5734f
 # ╠═99c9ba2c-20a5-4c7f-94d2-272d6c9d5904
 # ╠═71d08f7e-c409-4fbe-b154-b21d09010683
 # ╟─4a2b5cf1-623c-4fe7-8365-49fb7972af5a
@@ -629,6 +630,7 @@ end
 # ╟─9970adfd-ee88-4598-87a3-ffde5297031c
 # ╠═660a8511-4dd1-4788-9c14-fdd604bf83ad
 # ╟─5e6f505b-49fe-4ff4-ac2e-f6adcd445569
+# ╠═e0df0135-c02e-4959-b334-13208ad5c8a6
 # ╠═8b557bf1-f3dd-4f42-a250-ce965412eb32
 # ╟─c05ed977-7a89-4ac8-97be-7078d69fce9f
 # ╠═ff21c9ec-1581-405f-8db1-0f522b5bc296
