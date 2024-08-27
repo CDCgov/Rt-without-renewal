@@ -6,10 +6,12 @@ using InteractiveUtils
 
 # ╔═╡ e46a2fc8-f31e-4e11-9bcc-17836a41b08d
 using Pkg;
+
+# ╔═╡ 9c876277-bb58-4d7a-ae81-184ad9f49f29
 Pkg.activate(temp = true);
 
 # ╔═╡ 555ac462-edb2-4573-8f01-27021066d0cd
-Pkg.add(name = "FFMPEG", version = "0.3")
+Pkg.add(name = "FFMPEG", version = "0.4")
 
 # ╔═╡ dae655f7-9f4e-47b0-847d-6f885ef5c2a1
 Pkg.add(url = "https://github.com/CDCgov/Rt-without-renewal", subdir = "EpiAware")
@@ -321,6 +323,8 @@ Observation models are set in `EpiAware` as concrete subtypes of an `Observation
 \text{var} = \text{mean} + {\text{mean}^2 \over \phi}.
 ```
 In `EpiAware`, we default to a prior on $\sqrt{1/\phi}$ because this quantity has the dimensions of a standard deviation and, therefore, is easier to reason on _a priori_ beliefs.
+
+The prior for $\phi$ was not specified in _Mishra et al_ so we chose the same as for $\sigma^*$.
 "
 
 # ╔═╡ 714908a1-dc85-476f-a99f-ec5c95a78b60
@@ -328,7 +332,7 @@ obs = NegativeBinomialError(cluster_factor_prior = HalfNormal(0.5))
 
 # ╔═╡ dacb8094-89a4-404a-8243-525c0dbfa482
 md"
-##### `Turing` model interface
+### `Turing` model interface to the `NegativeBinomialError` model
 
 We can construct a `NegativeBinomialError` model implementation as a `Turing` `Model` using `generate_observations`
 
@@ -373,7 +377,9 @@ md"A _reverse_ observation model, which samples the underlying latent infections
 md"
 ## Composing models into an `EpiProblem`
 
-As mentioned above, each module of the overall epidemiological model we are interested in is a `Turing` `Model` in its own right. In this section, we compose the individual models into the full epidemiological model using the `EpiProblem` struct.
+_Mishra et al_ follows a common pattern of having an infection generation process driven by a latent process with a observation model aimed at linking to a discrete valued time series of incidence data.
+
+In `EpiAware` we provide an `EpiProblem` constructor for this epidemiological model pattern.
 
 The constructor for an `EpiProblem` requires:
 - An `epi_model`.
@@ -410,6 +416,7 @@ num_threads = min(10, Threads.nthreads())
 inference_method = EpiMethod(
     pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 100)],
     sampler = NUTSampler(
+		target_acceptance=0.9,
         adtype = AutoReverseDiff(),
         ndraws = 2000,
         nchains = num_threads,
@@ -455,11 +462,9 @@ inference_results = apply_method(epi_prob,
 md"
 ### Results and Predictive plotting
 
-We can spaghetti plot generated case data from the version of the model _which hasn't conditioned on case data_ using posterior parameters inferred from the version conditioned on observed data. This is known as _posterior predictive checking_, and is a useful diagnostic tool for Bayesian inference (see [here](http://www.stat.columbia.edu/~gelman/book/BDA3.pdf)).
+To assess the quality of the inference visually we can plot predictive quantiles for generated case data from the version of the model _which hasn't conditioned on case data_ using posterior parameters inferred from the version conditioned on observed data. For this purpose, we add a `generated_quantiles` utility function. This kind of visualisation is known as _posterior predictive checking_, and is a useful diagnostic tool for Bayesian inference (see [here](http://www.stat.columbia.edu/~gelman/book/BDA3.pdf)).
 
-Because we are using synthetic data we can also plot the model predictions for the _unobserved_ infections and check that (at least in this example) we were able to capture some unobserved/latent variables in the process accurate.
-
-We find that the `EpiAware` model recovers the main finding in _Mishra et al_; that the $R_t$ in South Korea peaked at a very high value ($R_t \sim 10$ at peak) before rapidly dropping below 1 in early March 2020.
+We also plot the inferred $R_t$ estimates from the model. We find that the `EpiAware` model recovers the main finding in _Mishra et al_; that the $R_t$ in South Korea peaked at a very high value ($R_t \sim 10$ at peak) before rapidly dropping below 1 in early March 2020.
 
 Note that, in reality, the peak $R_t$ found here and in _Mishra et al_ is unrealistically high, this might be due to a combination of:
 - A mis-estimated generation interval/serial interval distribution.
@@ -588,6 +593,7 @@ end
 # ╟─9161ab72-5c39-4a67-9762-e19f1c54c7fd
 # ╟─27d73202-a93e-4471-ab50-d59345304a0b
 # ╠═e46a2fc8-f31e-4e11-9bcc-17836a41b08d
+# ╠═9c876277-bb58-4d7a-ae81-184ad9f49f29
 # ╠═555ac462-edb2-4573-8f01-27021066d0cd
 # ╠═dae655f7-9f4e-47b0-847d-6f885ef5c2a1
 # ╠═93e1c8a9-05ce-42ef-b758-cdd8cd8e9086
@@ -630,7 +636,7 @@ end
 # ╟─c8ef8a60-d087-4ae9-ae92-abeea5afc7ae
 # ╠═714908a1-dc85-476f-a99f-ec5c95a78b60
 # ╟─dacb8094-89a4-404a-8243-525c0dbfa482
-# ╠═d45f34e2-64f0-4828-ae0d-7b4cb3a3287d
+# ╟─d45f34e2-64f0-4828-ae0d-7b4cb3a3287d
 # ╠═2e0e8bf3-f34b-44bc-aa2d-046e1db6ee2d
 # ╠═55c639f6-b47b-47cf-a3d6-547e793c72bc
 # ╠═c3a62dda-e054-4c8c-b1b8-ba1b5c4447b3
