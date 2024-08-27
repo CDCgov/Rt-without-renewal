@@ -16,4 +16,4 @@ data <- get_national_data("South Korea", source = "ecdc") |>
   select(date, cases_new, deaths_new)
 plot(data$cases_new)
 
-write.csv(data, "EpiAware/docs/src/examples/south_korea_data.csv")
+write.csv(data, "south_korea_data.csv")
