@@ -22,8 +22,5 @@ function make_epiaware_name_latentmodel_pairs(pipeline::AbstractEpiAwarePipeline
     diff_ar = DiffLatentModel(;
         model = ar, init_priors = [prior_dict["transformed_process_init_prior"]])
 
-    wkly_ar, wkly_rw, wkly_diff_ar = [ar, rw, diff_ar] .|>
-                                     model -> BroadcastLatentModel(model, 7, RepeatBlock())
-
-    return ["wkly_ar" => wkly_ar, "wkly_rw" => wkly_rw, "wkly_diff_ar" => wkly_diff_ar]
+    return ["ar" => ar, "rw" => rw, "diff_ar" => diff_ar]
 end
