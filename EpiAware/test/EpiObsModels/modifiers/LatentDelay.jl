@@ -148,16 +148,119 @@ end
         using Turing, DynamicPPL
         pois_obs_model = LatentDelay(RecordExpectedObs(PoissonError()), delay_int)
         missing_mdl = generate_observations(pois_obs_model, missing, I_t)
-        missing_draws = missing_mdl()
+        missing_draws = missing_mdl() |> Vector{Union{Int, Missing}}
         @test all(ismissing.(missing_draws[1:2]))
         @test !any(ismissing.(missing_draws[3:end]))
 
-        mdl = generate_observations(pois_obs_model, [10.0, 20.0, 30.0, 40.0, 50.0], I_t)
-        @test mdl() == [10.0, 20.0, 30.0, 40.0, 50]
+        mdl = generate_observations(pois_obs_model, [10, 20, 30, 40, 50], I_t)
+        @test mdl() == [10, 20, 30, 40, 50]
         samples = sample(mdl, Prior(), 10; progress = false)
         exp_y_t = get(samples, :exp_y_t).exp_y_t
         @test exp_y_t[1][1] == expected_obs[3]
         @test exp_y_t[2][1] == expected_obs[4]
         @test exp_y_t[3][1] == expected_obs[5]
+    end
+end
+
+@testitem "LatentDelay parameter recovery with mix of IGP + latent processes: Negative binomial errors + EpiProblem interface" begin
+    using Random, Turing, Distributions, LinearAlgebra, DynamicPPL, StatsBase, ReverseDiff,
+          Suppressor
+    Random.seed!(1234)
+
+    #Set up model testing matrix
+
+    epimodels = [
+        DirectInfections,
+        ExpGrowthRate,
+        Renewal] .|>
+                em_type -> em_type(data = EpiData([0.2, 0.5, 0.3], exp),
+        initialisation_prior = Normal(log(100.0), 0.25))
+
+    latentprocess_types = [RandomWalk, AR, DiffLatentModel]
+
+    function set_init_and_std_prior(epimodel)
+        if epimodel isa Renewal
+            init_prior = Normal(log(1.2), 0.25)
+            std_prior = HalfNormal(0.05)
+            return (; init_prior, std_prior)
+        elseif epimodel isa ExpGrowthRate
+            init_prior = Normal(0.1, 0.025)
+            std_prior = HalfNormal(0.025)
+            return (; init_prior, std_prior)
+        elseif epimodel isa DirectInfections
+            init_prior = Normal(log(100.0), 0.25)
+            std_prior = HalfNormal(0.025)
+            return (; init_prior, std_prior)
+        end
+    end
+
+    function set_latent_process(epimodel, latentprocess_type)
+        init_prior, std_prior = set_init_and_std_prior(epimodel)
+        if latentprocess_type == RandomWalk
+            return RandomWalk(init_prior, std_prior)
+        elseif latentprocess_type == AR
+            return AR(damp_priors = [Beta(8, 2; check_args = false)],
+                std_prior = std_prior, init_priors = [init_prior])
+        elseif latentprocess_type == DiffLatentModel
+            return DiffLatentModel(
+                AR(damp_priors = [Beta(8, 2; check_args = false)],
+                    std_prior = std_prior, init_priors = [Normal(0.0, 0.25)]),
+                init_prior; d = 1)
+        end
+    end
+
+    function test_full_process(epimodel, latentprocess, n;
+            ad = AutoReverseDiff(; compile = true), posterior_p_tol = 0.005)
+        #Fix observation model
+        obs = LatentDelay(
+            NegativeBinomialError(cluster_factor_prior = HalfNormal(0.05)), Gamma(3, 7 / 3))
+
+        #Inference method
+        inference_method = EpiMethod(
+            pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 100)],
+            sampler = NUTSampler(adtype = ad,
+                ndraws = 1000,
+                nchains = 4,
+                mcmc_parallel = MCMCThreads())
+        )
+
+        epi_prob = EpiProblem(
+            epi_model = epimodel,
+            latent_model = latentprocess,
+            observation_model = obs,
+            tspan = (1, n)
+        )
+
+        #Generate data from generative model (i.e. data unconditioned)
+        generative_mdl = generate_epiaware(
+            epi_prob, (y_t = Vector{Union{Int, Missing}}(missing, n),))
+        θ_true = rand(generative_mdl)
+        gen_data = condition(generative_mdl, θ_true)()
+
+        #Apply inference method to inference model (i.e. generative model conditioned on data)
+        inference_results = apply_method(epi_prob,
+            inference_method,
+            (y_t = gen_data.generated_y_t,)
+        )
+
+        chn = inference_results.samples
+
+        #Check that true parameters are within 99% central posterior probability
+        @testset for param in keys(θ_true)
+            if param ∈ keys(chn)
+                posterior_p = ecdf(chn[param][:])(θ_true[param])
+                @test 0.5 * posterior_p_tol < posterior_p < 1 - 0.5 * posterior_p_tol
+            end
+        end
+
+        return θ_true, gen_data, chn, generative_mdl
+    end
+
+    #Test the parameter recovery for all combinations of latent processes and epi models
+    @testset "Check true parameters are within 99% central post. prob.: " begin
+        @testset for latentprocess_type in latentprocess_types, epimodel in epimodels
+            latentprocess = set_latent_process(epimodel, latentprocess_type)
+            @suppress _ = test_full_process(epimodel, latentprocess, 50)
+        end
     end
 end
