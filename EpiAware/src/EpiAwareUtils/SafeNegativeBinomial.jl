@@ -128,7 +128,8 @@ function Base.rand(rng::AbstractRNG, d::SafeNegativeBinomial)
     if isone(d.p)
         return 0
     else
-        return rand(rng, SafePoisson(rand(rng, Gamma(d.r, (1 - d.p) / d.p))))
+        return rand(
+            rng, SafePoisson(rand(rng, Gamma(d.r, (1 - d.p) / d.p; check_args = false))))
     end
 end
 

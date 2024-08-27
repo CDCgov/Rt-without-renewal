@@ -38,3 +38,39 @@ end
     @test rw_process.init_prior == init_prior
     @test rw_process.std_prior == std_prior
 end
+
+@testitem "Testing RandomWalk parameter recovery: Negative Binomial errors on log rw" begin
+    using Random, Turing, FillArrays, Distributions, LinearAlgebra, DynamicPPL, StatsBase,
+          ReverseDiff
+    Random.seed!(1234)
+
+    rw_process = RandomWalk()
+    obs_nb = NegativeBinomialError()
+
+    @model function test_negbin_errors(rw, obs, y_t)
+        n = length(y_t)
+        @submodel Z_t = generate_latent(rw, n)
+        @submodel y_t = generate_observations(obs, y_t, exp.(Z_t))
+        return Z_t, y_t
+    end
+
+    generative_mdl = test_negbin_errors(rw_process, obs_nb, fill(missing, 40))
+    θ_true = rand(generative_mdl)
+    Z_t_obs, y_t_obs = condition(generative_mdl, θ_true)()
+
+    mdl = test_negbin_errors(rw_process, obs_nb, Int.(y_t_obs))
+    chn = sample(
+        mdl, NUTS(adtype = AutoReverseDiff(; compile = Val(true))), 1000, progess = false)
+
+    #Check that are in central 99.9% of the posterior predictive distribution
+    #Therefore, this should be unlikely to fail if the model is correctly implemented
+    @testset "Check true parameters are within 99.9% central post. prob.: " begin
+        params_to_check = keys(θ_true)
+        @testset for param in params_to_check
+            if param ∈ keys(chn)
+                posterior_p = ecdf(chn[param][:])(θ_true[param])
+                @test 0.0005 < posterior_p < 0.9995
+            end
+        end
+    end
+end
