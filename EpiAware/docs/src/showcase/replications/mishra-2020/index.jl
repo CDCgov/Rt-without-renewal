@@ -5,13 +5,18 @@ using Markdown
 using InteractiveUtils
 
 # ╔═╡ e46a2fc8-f31e-4e11-9bcc-17836a41b08d
-using Pkg; Pkg.activate(temp=true)
+using Pkg;
+Pkg.activate(temp = true);
+
+# ╔═╡ 555ac462-edb2-4573-8f01-27021066d0cd
+Pkg.add(name = "FFMPEG", version = "0.3")
 
 # ╔═╡ dae655f7-9f4e-47b0-847d-6f885ef5c2a1
-Pkg.add(url="https://github.com/CDCgov/Rt-without-renewal", subdir="EpiAware")
+Pkg.add(url = "https://github.com/CDCgov/Rt-without-renewal", subdir = "EpiAware")
 
 # ╔═╡ 93e1c8a9-05ce-42ef-b758-cdd8cd8e9086
-Pkg.add(["Turing", "DynamicPPL", "Distributions", "Statistics", "CSV", "DataFramesMeta", "StatsPlots", "ReverseDiff"])
+Pkg.add(["Turing", "DynamicPPL", "Distributions", "Statistics",
+    "CSV", "DataFramesMeta", "StatsPlots", "ReverseDiff"])
 
 # ╔═╡ d63b37f0-9642-4c38-ac01-9ffe48d50441
 using EpiAware
@@ -67,7 +72,7 @@ In the examples below we are going to largely recreate the _Mishra et al_ model,
 # ╔═╡ 27d73202-a93e-4471-ab50-d59345304a0b
 md"
 ## Dependencies for this notebook
-As well as the `EpiAware` package we also want to import extra dependencies for interacting with `EpiAware` models, data wrangling and visualisation. 
+As well as the `EpiAware` package we also want to import extra dependencies for interacting with `EpiAware` models, data wrangling and visualisation.
 
 To make this notebook as clean as possible, we create a _temporary_ environment for this notebook using `Pkg.activate(temp=true)`. We then use the `Pkg.add` function to install our desired dependencies available; because the notebook environment is temporary the installed dependencies do not persist once the notebook runtime is ended.
 "
@@ -130,7 +135,7 @@ ar = AR(
 md"
 ### `Turing` model interface to the AR process
 
-As mentioned above, we can use this instance of the `AR` latent model to construct a [`Turing`](https://turinglang.org/) model object which implements the probabilistic behaviour determined by `ar`. We do this with the constructor function exposed by `EpiAware`: `generate_latent` which combines an `AbstractLatentModel` substype struct with the number of time steps for which we want to generate the latent process. 
+As mentioned above, we can use this instance of the `AR` latent model to construct a [`Turing`](https://turinglang.org/) model object which implements the probabilistic behaviour determined by `ar`. We do this with the constructor function exposed by `EpiAware`: `generate_latent` which combines an `AbstractLatentModel` substype struct with the number of time steps for which we want to generate the latent process.
 
 As a refresher, we remind that the `Turing.Model` object has the following properties:
 
@@ -155,7 +160,7 @@ We can spaghetti plot generative samples from the AR(2) process with the priors 
 plt_ar_sample = let
     n_samples = 100
     ar_mdl_samples = mapreduce(hcat, 1:n_samples) do _
-       ar_mdl() #Sample Z_t trajectories for the model
+        ar_mdl() #Sample Z_t trajectories for the model
     end
 
     plot(ar_mdl_samples .|> exp, #R_t = exp(Z_t)
@@ -164,8 +169,8 @@ plt_ar_sample = let
         alpha = 0.25,
         title = "$(n_samples) draws from the prior Rₜ model",
         ylabel = "Time varying Rₜ",
-		yticks = [10.0^n for n = -4:4],
-	yscale = :log10)
+        yticks = [10.0^n for n in -4:4],
+        yscale = :log10)
 end
 
 # ╔═╡ 9f84dec1-70f1-442e-8bef-a9494921549e
@@ -176,7 +181,7 @@ To demonstrate alternatives we can sample from this model with some parameters c
 "
 
 # ╔═╡ 51a82a62-2c59-43c9-8562-69d15a7edfdd
-cond_ar_mdl = ar_mdl | (ar_init = [0., 0.], σ_AR = 0.1)
+cond_ar_mdl = ar_mdl | (ar_init = [0.0, 0.0], σ_AR = 0.1)
 
 # ╔═╡ d3938381-01b7-40c6-b369-a456ff6dba72
 let
@@ -190,7 +195,7 @@ let
         c = :grey,
         alpha = 0.25,
         title = "$(n_samples) draws from the prior Rₜ model",
-        ylabel = "Time varying Rₜ",)
+        ylabel = "Time varying Rₜ")
 end
 
 # ╔═╡ 141543f8-681c-4804-b4c9-e094b3c04fda
@@ -402,11 +407,11 @@ num_threads = min(10, Threads.nthreads())
 inference_method = EpiMethod(
     pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 100)],
     sampler = NUTSampler(
-		adtype = AutoReverseDiff(),
+        adtype = AutoReverseDiff(),
         ndraws = 2000,
         nchains = num_threads,
-        mcmc_parallel = MCMCThreads(),
-	)
+        mcmc_parallel = MCMCThreads()
+    )
 )
 
 # ╔═╡ 92333a96-5c9b-46e1-9a8f-f1890831066b
@@ -462,7 +467,7 @@ In a future note, we'll demonstrate having a time-varying ascertainment rate.
 
 # ╔═╡ e0df0135-c02e-4959-b334-13208ad5c8a6
 function generated_quantiles(gens, quantity, qs; transformation = x -> x)
-	mapreduce(hcat, gens) do gen #loop over sampled generated quantities
+    mapreduce(hcat, gens) do gen #loop over sampled generated quantities
         getfield(gen, quantity) |> transformation
     end |> mat -> mapreduce(hcat, qs) do q #Loop over matrix row to condense into qs
         map(eachrow(mat)) do row
@@ -472,7 +477,7 @@ function generated_quantiles(gens, quantity, qs; transformation = x -> x)
                 quantile(row, q)
             end
         end
-    end 
+    end
 end
 
 # ╔═╡ 8b557bf1-f3dd-4f42-a250-ce965412eb32
@@ -482,22 +487,24 @@ let
 
     #Unconditional model for posterior predictive sampling
     mdl_unconditional = generate_epiaware(epi_prob, (y_t = missing,))
-	posterior_gens = generated_quantities(mdl_unconditional, inference_results.samples)
-	
-	#plotting quantiles
-	qs = [0.025, 0.25, 0.5, 0.75, 0.975]
+    posterior_gens = generated_quantities(mdl_unconditional, inference_results.samples)
 
-	#Prediction quantiles
-	predicted_y_t = generated_quantiles(posterior_gens, :generated_y_t, qs)
-	predicted_R_t = generated_quantiles(posterior_gens, 
-		:Z_t, 
-		qs; 
-		transformation=x -> exp.(x))
+    #plotting quantiles
+    qs = [0.025, 0.25, 0.5, 0.75, 0.975]
 
-	#Plots
+    #Prediction quantiles
+    predicted_y_t = generated_quantiles(posterior_gens, :generated_y_t, qs)
+    predicted_R_t = generated_quantiles(posterior_gens,
+        :Z_t,
+        qs;
+        transformation = x -> exp.(x))
+
+    #Plots
     p1 = plot(D, predicted_y_t[:, 3], lw = 2, lab = "post. median", c = :purple)
-	plot!(p1, D, predicted_y_t[:, 2], fillrange = predicted_y_t[:, 4], fillalpha = 0.5, lw = 0, c = :purple, lab = "50%")
-	plot!(p1, D, predicted_y_t[:, 1], fillrange = predicted_y_t[:, 5], fillalpha = 0.2, lw = 0, c = :purple, lab = "95%")
+    plot!(p1, D, predicted_y_t[:, 2], fillrange = predicted_y_t[:, 4],
+        fillalpha = 0.5, lw = 0, c = :purple, lab = "50%")
+    plot!(p1, D, predicted_y_t[:, 1], fillrange = predicted_y_t[:, 5],
+        fillalpha = 0.2, lw = 0, c = :purple, lab = "95%")
 
     scatter!(p1, D, C,
         lab = "Actual cases",
@@ -507,10 +514,13 @@ let
         c = :black
     )
 
-	p2 = plot(D, predicted_R_t[:, 3], lw = 2, lab = "post. median", c = :green, yscale = :log10, title = "Prediction: Reproduction number")
-	plot!(p2, D, predicted_R_t[:, 2], fillrange = predicted_R_t[:, 4], fillalpha = 0.5, lw = 0, c = :green, lab = "50%")
-	plot!(p2, D, predicted_R_t[:, 1], fillrange = predicted_R_t[:, 5], fillalpha = 0.2, lw = 0, c = :green, lab = "95%")
-	hline!(p2, [1.0], lab = "Rt = 1", lw = 2, c = :blue)
+    p2 = plot(D, predicted_R_t[:, 3], lw = 2, lab = "post. median", c = :green,
+        yscale = :log10, title = "Prediction: Reproduction number")
+    plot!(p2, D, predicted_R_t[:, 2], fillrange = predicted_R_t[:, 4],
+        fillalpha = 0.5, lw = 0, c = :green, lab = "50%")
+    plot!(p2, D, predicted_R_t[:, 1], fillrange = predicted_R_t[:, 5],
+        fillalpha = 0.2, lw = 0, c = :green, lab = "95%")
+    hline!(p2, [1.0], lab = "Rt = 1", lw = 2, c = :blue)
 
     plot(p1, p2, layout = (2, 1), size = (500, 700), left_margin = 5mm)
 end
@@ -575,6 +585,7 @@ end
 # ╟─9161ab72-5c39-4a67-9762-e19f1c54c7fd
 # ╟─27d73202-a93e-4471-ab50-d59345304a0b
 # ╠═e46a2fc8-f31e-4e11-9bcc-17836a41b08d
+# ╠═555ac462-edb2-4573-8f01-27021066d0cd
 # ╠═dae655f7-9f4e-47b0-847d-6f885ef5c2a1
 # ╠═93e1c8a9-05ce-42ef-b758-cdd8cd8e9086
 # ╠═d63b37f0-9642-4c38-ac01-9ffe48d50441
