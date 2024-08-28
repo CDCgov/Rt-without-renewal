@@ -28,6 +28,8 @@ struct AR{D <: Sampleable, S <: Sampleable, I <: Sampleable, P <: Int} <:
     init_prior::I
     "Order of the AR model."
     p::P
+    "Reversed order of the damping coefficients for computation."
+    rev_damp_prior::D
     function AR(damp_prior::Distribution, std_prior::Distribution,
             init_prior::Distribution; p::Int = 1)
         damp_priors = fill(damp_prior, p)
@@ -43,17 +45,18 @@ struct AR{D <: Sampleable, S <: Sampleable, I <: Sampleable, P <: Int} <:
         p = length(damp_priors)
         damp_prior = _expand_dist(damp_priors)
         init_prior = _expand_dist(init_priors)
-        return AR(damp_prior, std_prior, init_prior, p)
+        rev_damp_prior = _expand_dist(reverse(damp_priors))
+        return AR(damp_prior, std_prior, init_prior, p, rev_damp_prior)
     end
 
     function AR(damp_prior::Distribution, std_prior::Distribution,
-            init_prior::Distribution, p::Int)
+            init_prior::Distribution, p::Int, rev_damp_prior::Distribution)
         @assert p>0 "p must be greater than 0"
         @assert length(damp_prior)==length(init_prior) "damp_prior and init_prior must have the same length"
         @assert p==length(damp_prior) "p must be equal to the length of damp_prior"
-        new{typeof(damp_prior), typeof(std_prior), typeof(init_prior), typeof(p)}(
-            damp_prior, std_prior, init_prior, p
-        )
+        new{typeof(damp_prior), typeof(std_prior),
+            typeof(init_prior), typeof(p)}(
+            damp_prior, std_prior, init_prior, p, rev_damp_prior)
     end
 end
 
@@ -78,11 +81,10 @@ Generate a latent AR series.
 
     σ_AR ~ latent_model.std_prior
     ar_init ~ latent_model.init_prior
-    damp_AR ~ latent_model.damp_prior
+    rev_damp_AR ~ latent_model.rev_damp_prior
     ϵ_t ~ filldist(Normal(), n - p)
 
-    ar_step = ARStep(reverse(damp_AR))
-    ar = accumulate_scan(ar_step, ar_init, σ_AR * ϵ_t)
+    ar = accumulate_scan(ARStep(rev_damp_AR), ar_init, σ_AR * ϵ_t)
 
     return ar
 end

@@ -92,7 +92,8 @@ end
 @testitem "Testing AR(2) process against theoretical properties" begin
     using DynamicPPL, Turing
     using HypothesisTests: ExactOneSampleKSTest, pvalue
-    using Distributions
+    using Distributions, Random
+    Random.seed!(1234)
 
     ar_model = AR(Normal(), HalfNormal(0.1), Normal(), p = 2)
     n = 10_000
@@ -109,7 +110,7 @@ end
     ar_init = rand(MvNormal(zeros(2), init_Σ))
 
     model = generate_latent(ar_model, n)
-    fixed_model = fix(model, (σ_AR = σ_AR, damp_AR = damp, ar_init = ar_init))
+    fixed_model = fix(model, (σ_AR = σ_AR, rev_damp_AR = reverse(damp), ar_init = ar_init))
     # Draw samples from the model
     X = fixed_model()
 
