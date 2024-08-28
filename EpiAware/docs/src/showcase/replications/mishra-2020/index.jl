@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.43
+# v0.19.46
 
 using Markdown
 using InteractiveUtils
@@ -545,7 +545,7 @@ let
         c = :black,
         lab = "prior")
 
-    p3 = histogram(inference_results.samples["latent.damp_AR[1]"],
+    p3 = histogram(inference_results.samples["latent.rev_damp_AR[2]"],
         lab = "chain " .* string.([1 2 3 4]),
         fillalpha = 0.4,
         lw = 0,
@@ -556,7 +556,7 @@ let
         c = :black,
         lab = "prior")
 
-    p4 = histogram(inference_results.samples["latent.damp_AR[2]"],
+    p4 = histogram(inference_results.samples["latent.rev_damp_AR[1]"],
         lab = "chain " .* string.([1 2 3 4]),
         fillalpha = 0.4,
         lw = 0,
