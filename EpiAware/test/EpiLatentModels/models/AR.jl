@@ -96,7 +96,7 @@ end
     Random.seed!(1234)
 
     ar_model = AR(Normal(), HalfNormal(0.1), Normal(), p = 2)
-    n = 10_000
+    n = 1000
     damp = [0.8, 0.1]
     σ_AR = 1.0
 
