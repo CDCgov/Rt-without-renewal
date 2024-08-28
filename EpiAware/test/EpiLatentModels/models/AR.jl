@@ -58,7 +58,7 @@ end
     end
 end
 
-@testitem "Testing AR process against theoretical properties" begin
+@testitem "Testing AR(1) process against theoretical properties" begin
     using DynamicPPL, Turing
     using HypothesisTests: ExactOneSampleKSTest, pvalue
     using Distributions
@@ -86,5 +86,34 @@ end
 
     ks_test_pval = ExactOneSampleKSTest(
         samples, Normal(theoretical_mean, sqrt(theoretical_var))) |> pvalue
+    @test ks_test_pval > 1e-6
+end
+
+@testitem "Testing AR(2) process against theoretical properties" begin
+    using DynamicPPL, Turing
+    using HypothesisTests: ExactOneSampleKSTest, pvalue
+    using Distributions
+
+    ar_model = AR(Normal(), HalfNormal(0.1), Normal(), p = 2)
+    n = 10_000
+    damp = [0.8, 0.1]
+    σ_AR = 1.0
+
+    theoretical_mean = 0.0
+    theoretical_var = σ_AR^2 / (1 - damp[1]^2 - damp[2]^2 -
+                       2 * (damp[1]^2 * damp[2] / (1 - damp[2])))
+    theoretical_1step_cov = theoretical_var * damp[1] / (1 - damp[2])
+    init_Σ = [theoretical_var theoretical_1step_cov; theoretical_1step_cov theoretical_var]
+
+    # Draw initial values from the stationary distribution so process starts at stationarity
+    ar_init = rand(MvNormal(zeros(2), init_Σ))
+
+    model = generate_latent(ar_model, n)
+    fixed_model = fix(model, (σ_AR = σ_AR, damp_AR = damp, ar_init = ar_init))
+    # Draw samples from the model
+    X = fixed_model()
+
+    ks_test_pval = ExactOneSampleKSTest(
+        X, Normal(theoretical_mean, sqrt(theoretical_var))) |> pvalue
     @test ks_test_pval > 1e-6
 end
