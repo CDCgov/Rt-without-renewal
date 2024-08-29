@@ -543,24 +543,24 @@ let
         c = :black,
         lab = "prior")
 
-    p3 = histogram(inference_results.samples["latent.rev_damp_AR[2]"],
+    p3 = histogram(inference_results.samples["latent.damp_AR[2]"],
         lab = "chain " .* string.([1 2 3 4]),
         fillalpha = 0.4,
         lw = 0,
         norm = :pdf,
         title = "Posterior dist: rho_1")
-    plot!(p3, ar.damp_prior.v[1],
+    plot!(p3, ar.damp_prior.v[2],
         lw = 3,
         c = :black,
         lab = "prior")
 
-    p4 = histogram(inference_results.samples["latent.rev_damp_AR[1]"],
+    p4 = histogram(inference_results.samples["latent.damp_AR[1]"],
         lab = "chain " .* string.([1 2 3 4]),
         fillalpha = 0.4,
         lw = 0,
         norm = :pdf,
         title = "Posterior dist: rho_2")
-    plot!(p4, ar.damp_prior.v[2],
+    plot!(p4, ar.damp_prior.v[1],
         lw = 3,
         c = :black,
         lab = "prior")
