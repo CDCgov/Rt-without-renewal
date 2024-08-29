@@ -7,7 +7,7 @@
     transformation = exp
 
     data = EpiData(gen_int, transformation)
-    epi_model = Renewal(data, Normal())
+    epi_model = Renewal(data; initialisation_prior = Normal())
 
     function generate_infs(recent_incidence, Rt)
         new_incidence = Rt * dot(recent_incidence, epi_model.data.gen_int)
@@ -24,7 +24,7 @@
     @test generate_infs(recent_incidence, Rt) == expected_output
 end
 
-@testitem "RenewalWithPopulation function: internal generate infs" begin
+@testitem "Renewal with a population size step function: internal generate infs" begin
     using LinearAlgebra, Distributions
     gen_int = [0.2, 0.3, 0.5]
     delay_int = [0.1, 0.4, 0.5]
@@ -34,11 +34,13 @@ end
     pop_size = 1000.0
 
     data = EpiData(gen_int, transformation)
-    epi_model = RenewalWithPopulation(data, Normal(), pop_size)
+    renewal_step = EpiInfModels.ConstantRenewalWithPopulationStep(
+        reverse(gen_int), pop_size)
+    epi_model = Renewal(data, Normal(), renewal_step)
 
     function generate_infs(recent_incidence_and_available_sus, Rt)
         recent_incidence, S = recent_incidence_and_available_sus
-        new_incidence = max(S / epi_model.pop_size, 0.0) * Rt *
+        new_incidence = max(S / epi_model.renewal_step.pop_size, 1e-6) * Rt *
                         dot(recent_incidence, epi_model.data.gen_int)
         new_S = S - new_incidence
         new_recent_incidence_and_available_sus = (
@@ -67,7 +69,7 @@ end
     data = EpiData(gen_int, transformation)
     log_init_incidence_prior = Normal()
 
-    renewal_model = Renewal(data, log_init_incidence_prior)
+    renewal_model = Renewal(data; initialisation_prior = log_init_incidence_prior)
 
     #Actual Rt
     Rt = [1.0, 1.2, 1.5, 1.5, 1.5]
@@ -97,7 +99,7 @@ end
     @test mdl_incidence[1:3] ≈ [day1_incidence, day2_incidence, day3_incidence]
 end
 
-@testitem "generate_latent_infs dispatched on RenewalWithPopulation" begin
+@testitem "generate_latent_infs dispatched on Renewal with a population size step function" begin
     using Distributions, Turing, HypothesisTests, DynamicPPL, LinearAlgebra
     gen_int = [0.2, 0.3, 0.5]
     transformation = exp
@@ -105,8 +107,9 @@ end
 
     data = EpiData(gen_int, transformation)
     log_init_incidence_prior = Normal()
-
-    renewal_model = RenewalWithPopulation(data, log_init_incidence_prior, pop_size)
+    renewal_step = EpiInfModels.ConstantRenewalWithPopulationStep(
+        reverse(gen_int), pop_size)
+    epi_model = Renewal(data, Normal(), renewal_step)
 
     #Actual Rt
     Rt = [1.0, 1.2, 1.5, 1.5, 1.5]
@@ -114,7 +117,7 @@ end
     initial_incidence = [1.0, 1.0, 1.0]#aligns with initial exp growth rate of 0.
 
     #Check log_init is sampled from the correct distribution
-    @time sample_init_inc = sample(generate_latent_infs(renewal_model, log_Rt),
+    @time sample_init_inc = sample(generate_latent_infs(epi_model, log_Rt),
         Prior(), 1000; progress = false) |>
                             chn -> chn[:init_incidence] |>
                                    Array |>
@@ -126,14 +129,15 @@ end
     #Check that the generated incidence is correct given correct initialisation
     #Check first three days "by hand"
     mdl_incidence = generated_quantities(
-        generate_latent_infs(renewal_model,
+        generate_latent_infs(epi_model,
             log_Rt), (init_incidence = 0.0,))
 
     day1_incidence = dot(initial_incidence, gen_int) * Rt[1]
     day2_incidence = ((pop_size - day1_incidence) / pop_size) *
-                     dot(initial_incidence, gen_int) * Rt[2]
+                     dot([day1_incidence; initial_incidence[1:2]], gen_int) * Rt[2]
     day3_incidence = ((pop_size - day1_incidence - day2_incidence) / pop_size) *
-                     dot([day2_incidence, 1.0, 1.0], gen_int) * Rt[3]
+                     dot([day2_incidence; day1_incidence; initial_incidence[1]], gen_int) *
+                     Rt[3]
 
     @test mdl_incidence[1:3] ≈ [day1_incidence, day2_incidence, day3_incidence]
 end
