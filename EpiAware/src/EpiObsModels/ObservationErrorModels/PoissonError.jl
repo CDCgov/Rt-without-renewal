@@ -21,5 +21,5 @@ The observation error model for Poisson errors. This function generates the
 observation error model based on the Poisson error model.
 "
 function observation_error(obs_model::PoissonError, Y_t)
-    return Poisson(Y_t)
+    return SafePoisson(Y_t)
 end

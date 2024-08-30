@@ -45,7 +45,7 @@ var(d)
 7.016735912097631e20
 ```
 "
-struct SafePoisson{T <: Real} <: ContinuousUnivariateDistribution
+struct SafePoisson{T <: Real} <: DiscreteUnivariateDistribution
     λ::T
 
     SafePoisson{T}(λ::Real) where {T <: Real} = new{T}(λ)
@@ -104,7 +104,7 @@ end
 Distributions.mgf(d::SafePoisson, t::Real) = mgf(_poisson(d), t)
 Distributions.cgf(d::SafePoisson, t) = cgf(_poisson(d), t)
 Distributions.cf(d::SafePoisson, t::Real) = cf(_poisson(d), t)
-Distributions.logpdf(d::SafePoisson, x::Integer) = logpdf(_poisson(d), x)
+Distributions.logpdf(d::SafePoisson, x::Real) = logpdf(_poisson(d), x)
 Distributions.pdf(d::SafePoisson, x::Integer) = pdf(_poisson(d), x)
 Distributions.cdf(d::SafePoisson, x::Integer) = cdf(_poisson(d), x)
 Distributions.ccdf(d::SafePoisson, x::Integer) = ccdf(_poisson(d), x)
