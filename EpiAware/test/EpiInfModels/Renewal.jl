@@ -34,13 +34,13 @@ end
     pop_size = 1000.0
 
     data = EpiData(gen_int, transformation)
-    renewal_step = EpiInfModels.ConstantRenewalWithPopulationStep(
+    recurrent_step = EpiInfModels.ConstantRenewalWithPopulationStep(
         reverse(gen_int), pop_size)
-    epi_model = Renewal(data, Normal(), renewal_step)
+    epi_model = Renewal(data, Normal(), recurrent_step)
 
     function generate_infs(recent_incidence_and_available_sus, Rt)
         recent_incidence, S = recent_incidence_and_available_sus
-        new_incidence = max(S / epi_model.renewal_step.pop_size, 1e-6) * Rt *
+        new_incidence = max(S / epi_model.recurrent_step.pop_size, 1e-6) * Rt *
                         dot(recent_incidence, epi_model.data.gen_int)
         new_S = S - new_incidence
         new_recent_incidence_and_available_sus = (
@@ -107,9 +107,9 @@ end
 
     data = EpiData(gen_int, transformation)
     log_init_incidence_prior = Normal()
-    renewal_step = EpiInfModels.ConstantRenewalWithPopulationStep(
+    recurrent_step = EpiInfModels.ConstantRenewalWithPopulationStep(
         reverse(gen_int), pop_size)
-    epi_model = Renewal(data, Normal(), renewal_step)
+    epi_model = Renewal(data, Normal(), recurrent_step)
 
     #Actual Rt
     Rt = [1.0, 1.2, 1.5, 1.5, 1.5]

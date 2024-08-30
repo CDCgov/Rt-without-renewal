@@ -35,7 +35,7 @@ number.
 
 - `Renewal(; data, initialisation_prior)`. Construct a `Renewal` model with default update steps.
 - `Renewal(data; initialisation_prior)`. Construct a `Renewal` model with default update steps.
-- `Renewal(data, initialisation_prior, renewal_step)` Construct a `Renewal` model with `renewal_step` update step function.
+- `Renewal(data, initialisation_prior, recurrent_step)` Construct a `Renewal` model with `recurrent_step` update step function.
 
 ## Example usage with `generate_latent_infs`
 
@@ -84,25 +84,25 @@ struct Renewal{E, S <: Sampleable, A} <:
     E <: EpiData, A <: AbstractConstantRenewalStep}
     data::E
     initialisation_prior::S
-    renewal_step::A
+    recurrent_step::A
 
     function Renewal(data::EpiData; initialisation_prior = Normal())
         rev_gen_int = reverse(data.gen_int)
-        renewal_step = ConstantRenewalStep(rev_gen_int)
-        return Renewal(data, initialisation_prior, renewal_step)
+        recurrent_step = ConstantRenewalStep(rev_gen_int)
+        return Renewal(data, initialisation_prior, recurrent_step)
     end
 
     function Renewal(; data::EpiData, initialisation_prior = Normal())
         rev_gen_int = reverse(data.gen_int)
-        renewal_step = ConstantRenewalStep(rev_gen_int)
-        return Renewal(data, initialisation_prior, renewal_step)
+        recurrent_step = ConstantRenewalStep(rev_gen_int)
+        return Renewal(data, initialisation_prior, recurrent_step)
     end
 
     function Renewal(data::E,
             initialisation_prior::S,
-            renewal_step::A) where {
+            recurrent_step::A) where {
             E <: EpiData, S <: Sampleable, A <: AbstractConstantRenewalStep}
-        return new{E, S, A}(data, initialisation_prior, renewal_step)
+        return new{E, S, A}(data, initialisation_prior, recurrent_step)
     end
 end
 
@@ -121,7 +121,7 @@ The initial vector of infected individuals.
 function make_renewal_init(epi_model::Renewal, I₀, Rt₀)
     r_approx = R_to_r(Rt₀, epi_model)
     return renewal_init_state(
-        epi_model.renewal_step, I₀, r_approx, epi_model.data.len_gen_int)
+        epi_model.recurrent_step, I₀, r_approx, epi_model.data.len_gen_int)
 end
 
 @doc raw"
@@ -176,7 +176,7 @@ I_t = generated_quantities(latent_inf, θ)
     Rt = epi_model.data.transformation.(_Rt)
 
     init = make_renewal_init(epi_model, I₀, Rt[1])
-    I_t = accumulate_scan(epi_model.renewal_step, init, Rt)
+    I_t = accumulate_scan(epi_model.recurrent_step, init, Rt)
 
     return I_t
 end

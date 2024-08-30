@@ -14,7 +14,7 @@ struct ConstantRenewalStep{T} <: AbstractConstantRenewalStep
 end
 
 @doc """
-    function (renewal_step::ConstantRenewalStep)(recent_incidence, Rt)
+    function (recurrent_step::ConstantRenewalStep)(recent_incidence, Rt)
 
 Implement the `Renewal` model iteration/step function, with constant generation interval.
 
@@ -36,8 +36,8 @@ and `g_i` is the generation interval.
 # Returns
 - Updated incidence array.
 """
-function (renewal_step::ConstantRenewalStep)(recent_incidence, Rt)
-    new_incidence = Rt * dot(recent_incidence, renewal_step.rev_gen_int)
+function (recurrent_step::ConstantRenewalStep)(recent_incidence, Rt)
+    new_incidence = Rt * dot(recent_incidence, recurrent_step.rev_gen_int)
     return vcat(recent_incidence[2:end], new_incidence)
 end
 
@@ -45,7 +45,7 @@ end
 Constructs the initial conditions for a renewal model with `ConstantRenewalStep`
     type of step function.
 """
-function renewal_init_state(renewal_step::ConstantRenewalStep, I₀, r_approx, len_gen_int)
+function renewal_init_state(recurrent_step::ConstantRenewalStep, I₀, r_approx, len_gen_int)
     I₀ * [exp(-r_approx * t) for t in (len_gen_int - 1):-1:0]
 end
 
@@ -69,7 +69,7 @@ struct ConstantRenewalWithPopulationStep{T} <: AbstractConstantRenewalStep
 end
 
 @doc """
-    function (renewal_step::ConstantRenewalWithPopulationStep)(recent_incidence_and_available_sus, Rt)
+    function (recurrent_step::ConstantRenewalWithPopulationStep)(recent_incidence_and_available_sus, Rt)
 
 Callable on a `RenewalWithPopulation` struct for compute new incidence based on
 recent incidence, Rt and depletion of susceptibles.
@@ -94,11 +94,11 @@ values and the remaining susceptible/available individuals.
 - Vector containing the updated incidence array and the new `recent_incidence_and_available_sus`
 value.
 """
-function (renewal_step::ConstantRenewalWithPopulationStep)(
+function (recurrent_step::ConstantRenewalWithPopulationStep)(
         recent_incidence_and_available_sus, Rt)
     recent_incidence, S = recent_incidence_and_available_sus
-    new_incidence = max(S / renewal_step.pop_size, 1e-6) * Rt *
-                    dot(recent_incidence, renewal_step.rev_gen_int)
+    new_incidence = max(S / recurrent_step.pop_size, 1e-6) * Rt *
+                    dot(recent_incidence, recurrent_step.rev_gen_int)
     new_S = S - new_incidence
 
     new_recent_incidence_and_available_sus = [
@@ -112,8 +112,8 @@ Constructs the initial conditions for a renewal model with `ConstantRenewalWithP
     type of step function.
 """
 function renewal_init_state(
-        renewal_step::ConstantRenewalWithPopulationStep, I₀, r_approx, len_gen_int)
-    [I₀ * [exp(-r_approx * t) for t in (len_gen_int - 1):-1:0], renewal_step.pop_size]
+        recurrent_step::ConstantRenewalWithPopulationStep, I₀, r_approx, len_gen_int)
+    [I₀ * [exp(-r_approx * t) for t in (len_gen_int - 1):-1:0], recurrent_step.pop_size]
 end
 
 @doc raw"
