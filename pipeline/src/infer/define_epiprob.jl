@@ -16,7 +16,7 @@ function define_epiprob(config::InferenceConfig)
     model_data = EpiData(
         gen_distribution = gen_distribution, transformation = config.transformation)
     #Build the epidemiological model
-    epi = config.igp(model_data, config.log_I0_prior)
+    epi = config.igp(data = model_data, initialisation_prior = config.log_I0_prior)
 
     epi_prob = EpiProblem(epi_model = epi,
         latent_model = config.latent_model,

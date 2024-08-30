@@ -9,7 +9,7 @@ end
 """
 Internal method for setting the data directory path for the truth data.
 """
-_get_datadir_str(pipeline::AbstractEpiAwarePipeline) = "truth_data"
-function _get_datadir_str(pipeline::AbstractRtwithoutRenewalPipeline)
+_get_truthdatadir_str(pipeline::AbstractEpiAwarePipeline) = "truth_data"
+function _get_truthdatadir_str(pipeline::AbstractRtwithoutRenewalPipeline)
     pipeline.testmode ? mktempdir() : "truth_data"
 end
