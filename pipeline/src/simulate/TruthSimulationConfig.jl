@@ -46,7 +46,7 @@ function simulate(config::TruthSimulationConfig)
         transformation = config.transformation)
 
     #Sample infections NB: prior is arbitrary because I0 is fixed.
-    epi = config.igp(model_data, Normal(log(config.I0), 0.01))
+    epi = config.igp(model_data; initialisation_prior = Normal(log(config.I0), 0.01))
 
     inf_mdl = generate_latent_infs(epi, log.(config.truth_process)) |>
               mdl -> fix(mdl, (init_incidence = log(config.I0),))
