@@ -79,7 +79,7 @@ end
     data = EpiData([0.2, 0.3, 0.5], exp)
 
     #Define the epi_model
-    epi_model = Renewal(data, Normal())
+    epi_model = Renewal(data; initialisation_prior = Normal())
 
     #Define the latent process model
     r_3 = log(2) / 3.0
