@@ -234,7 +234,7 @@ R_1 = 1 \Big{/} \sum_{t\geq 1} e^{-rt} g_t
 log_I0_prior = Normal(log(1.0), 1.0)
 
 # ╔═╡ 8487835e-d430-4300-bd7c-e33f5769ee32
-epi = Renewal(model_data, log_I0_prior)
+epi = Renewal(model_data; initialisation_prior = log_I0_prior)
 
 # ╔═╡ 2119319f-a2ef-4c96-82c4-3c7eaf40d2e0
 md"
