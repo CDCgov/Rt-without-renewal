@@ -15,7 +15,7 @@ Generate inference results based on the given configuration of inference model o
 """
 function generate_inference_results(
         truthdata, inference_config, pipeline::AbstractEpiAwarePipeline;
-        inference_method, datadir_name = "epiaware_observables")
+        inference_method)
     tspan = make_tspan(
         pipeline; T = inference_config["T"], lookback = inference_config["lookback"])
     config = InferenceConfig(
@@ -24,9 +24,10 @@ function generate_inference_results(
 
     # produce or load inference results
     prfx = _inference_prefix(truthdata, inference_config, pipeline)
+    _datadir_str = _get_inferencedatadir_str(pipeline)
 
     inference_results, inferencefile = produce_or_load(
-        infer, config, datadir(datadir_name); prefix = prfx)
+        infer, config, _datadir_str; prefix = prfx)
     return inference_results
 end
 
