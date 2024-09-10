@@ -105,12 +105,13 @@ delay_counts = mapreduce(vcat, samples, pwindows, swindows, obs_times) do T, pw,
         pwindow = pw,
         swindow = sw,
         obs_time = ot,
-        observed_delay = (T ÷ sw) * sw ,
-        observed_delay_upper = (T ÷ sw) * (sw + 1)
+        observed_delay = (T ÷ sw) * sw,
+        observed_delay_upper = (T ÷ sw) * (sw + 1),
+		observed_delay_step = Int(T ÷ sw) + 1,
     )
 end |> # Aggregate to unique combinations and count occurrences
                df -> @groupby(df, :pwindow, :swindow, :obs_time, :observed_delay,
-    :observed_delay_upper) |>
+    :observed_delay_upper, :observed_delay_step) |>
                      gd -> @combine(gd, :n=length(:pwindow))
 
 # ╔═╡ a7bff47d-b61f-499e-8631-206661c2bdc0
@@ -210,7 +211,7 @@ We'll now fit an improved model using the `censored_pmf` function from the `EpiA
 "
 
 # ╔═╡ ef40112b-f23e-4d4b-8a7d-3793b786f472
-@model function primarycensoreddist_model(N, y, y_upper, n, pwindow, D)
+@model function primarycensoreddist_model(N, y, n, pwindow, D)
     try
         mu ~ Normal(1.0, 1.0)
         sigma ~ truncated(Normal(0.5, 0.5); lower = 0.1)
@@ -218,7 +219,7 @@ We'll now fit an improved model using the `censored_pmf` function from the `EpiA
         log_pmf = censored_pmf(d; Δd = pwindow, D = D) .|> log
 
         for i in eachindex(y)
-            Turing.@addlogprob! n[i] * log_pmf[ceil(Int, y[i])] #0 obs is first element of array
+            Turing.@addlogprob! n[i] * log_pmf[y[i]]
         end
         return log_pmf
     catch
@@ -234,8 +235,7 @@ Lets instantiate this model with data
 # ╔═╡ 93bca93a-5484-47fa-8424-7315eef15e37
 primarycensoreddist_mdl = primarycensoreddist_model(
     size(delay_counts, 1),
-    delay_counts.observed_delay, # Add a small constant to avoid log(0)
-    delay_counts.observed_delay_upper, # Add a small constant to avoid log(0)
+    delay_counts.observed_delay_step,
     delay_counts.n,
     delay_counts.pwindow[1],
     delay_counts.obs_time[1]
