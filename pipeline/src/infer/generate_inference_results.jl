@@ -27,7 +27,7 @@ function generate_inference_results(
     _datadir_str = _get_inferencedatadir_str(pipeline)
 
     inference_results, inferencefile = produce_or_load(
-        infer, config, _datadir_str; prefix = prfx)
+        infer_and_process, config, _datadir_str; prefix = prfx)
     return inference_results
 end
 

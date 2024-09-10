@@ -72,7 +72,7 @@ to make inference on and model configuration.
 
 # Returns
 - `inference_results`: The results of the simulation or inference.
-
+- `epiprob`: The epidemiological problem.
 """
 function infer(config::InferenceConfig)
     #Define the EpiProblem
@@ -80,19 +80,60 @@ function infer(config::InferenceConfig)
     idxs = config.tspan[1]:config.tspan[2]
 
     #Return the sampled infections and observations
-    y_t = ismissing(config.case_data) ? missing : Vector{Union{Missing,Int64}}(config.case_data[idxs])
+    y_t = ismissing(config.case_data) ?
+          Vector{Union{Missing, Int64}}(undef, config.tspan[2] - config.tspan[1] + 1) :
+          Vector{Union{Missing, Int64}}(config.case_data[idxs])
+
     inference_results = apply_method(epiprob,
         config.epimethod,
         (y_t = y_t,);
     )
 
+    return inference_results, epiprob
+end
+
+"""
+Internal function to post-processes the inference results by generating forecasts and summarizing the Continuous Ranked Probability Score (CRPS).
+
+# Arguments
+- `inference_results`: The results obtained from the inference process, containing samples and data.
+- `epiprob`: The epidemiological probability model used for generating forecasts.
+- `config`: Configuration settings for the inference process, including lookahead period and epidemiological model data.
+
+# Returns
+- A dictionary containing:
+    - `"inference_results"`: The original inference results.
+    - `"epiprob"`: The epidemiological probability model.
+    - `"inference_config"`: The configuration settings used for inference.
+    - `"forecast_results"`: The generated forecast results.
+    - `"score_results"`: The summarized CRPS score results.
+"""
+function _postprocess_inference_results(inference_results, epiprob, config)
     forecast_results = generate_forecasts(
         inference_results.samples, inference_results.data, epiprob, config.lookahead)
 
-    epidata = epiprob.epi_model.data
+    epidata = config.epiprob.epi_model.data
     score_results = summarise_crps(config, inference_results, forecast_results, epidata)
 
     return Dict("inference_results" => inference_results,
-        "epiprob" => epiprob, "inference_config" => config,
+        "epiprob" => config.epiprob, "inference_config" => config,
         "forecast_results" => forecast_results, "score_results" => score_results)
+end
+
+"""
+Perform inference and post-process the results.
+
+This function takes an `InferenceConfig` object, performs inference using the `infer` function,
+and then post-processes the inference results using the `_postprocess_inference_results` function to
+generate forecasts and summarize the Continuous Ranked Probability Score (CRPS).
+
+# Arguments
+- `config::InferenceConfig`: The configuration object containing parameters for the inference process.
+
+# Returns
+- The post-processed inference results.
+"""
+function infer_and_process(config::InferenceConfig)
+    inference_results, epiprob = infer(config)
+    return _postprocess_inference_results(inference_results, epiprob, config)
 end
