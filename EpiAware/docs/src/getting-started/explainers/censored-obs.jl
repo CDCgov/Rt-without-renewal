@@ -12,17 +12,17 @@ let
     using Pkg: Pkg
     Pkg.activate(docs_dir)
     Pkg.develop(; path = pkg_dir)
-	Pkg.add(["DataFramesMeta", "StatsBase", "TuringBenchmarking"])
+    Pkg.add(["DataFramesMeta", "StatsBase", "TuringBenchmarking"])
     Pkg.instantiate()
 end
 
 # ╔═╡ 5baa8d2e-bcf8-4e3b-b007-175ad3e2ca95
 begin
-	using EpiAware.EpiAwareUtils: censored_pmf
-	using Random, Distributions, StatsBase #utilities for random events
-	using DataFramesMeta #Data wrangling
-	using StatsPlots #plotting
-	using Turing, TuringBenchmarking #PPL
+    using EpiAware.EpiAwareUtils: censored_pmf
+    using Random, Distributions, StatsBase #utilities for random events
+    using DataFramesMeta #Data wrangling
+    using StatsPlots #plotting
+    using Turing, TuringBenchmarking #PPL
 end
 
 # ╔═╡ 8de5c5e0-6e95-11ef-1693-bfd465c8d919
@@ -45,7 +45,7 @@ In this vignette, we'll demonstrate how to use `EpiAwareUtils.censored_pmf` in c
 
 This note builds on the concepts introduced in the R/stan package [`primarycensoreddist`](https://github.com/epinowcast/primarycensoreddist), especially the [Getting Started with primarycensoreddist](https://primarycensoreddist.epinowcast.org/articles/fitting-dists-with-stan.html) vignette and assumes familiarity with using Turing tools as covered in the [Turing documentation](https://turinglang.org/).
 
-This note is generated using the `EpiAware` package locally via `Pkg.develop`, in the `EpiAware/docs` environment. It is also possible to install `EpiAware` using 
+This note is generated using the `EpiAware` package locally via `Pkg.develop`, in the `EpiAware/docs` environment. It is also possible to install `EpiAware` using
 
 ```julia
 Pkg.add(url=\"https://github.com/CDCgov/Rt-without-renewal\", subdir=\"EpiAware\")
@@ -89,34 +89,35 @@ pwindows = rand(1:1, n)
 swindows = rand(1:1, n)
 
 # ╔═╡ 7522f05b-1750-4983-8947-ef70f4298d06
-obs_times = fill(10.0,n)
+obs_times = fill(10.0, n)
 
 # ╔═╡ a4f5e9b6-ff3a-48fa-aa51-0abccb9c7bed
 #Sample secondary time relative to beginning of primary censor window respecting the right-truncation
 samples = map(pwindows, swindows, obs_times) do pw, sw, ot
-	P = rand() * pw # Primary event time 
-	T = rand(truncated(true_dist; upper= ot - P))
+    P = rand() * pw # Primary event time
+    T = rand(truncated(true_dist; upper = ot - P))
 end
 
 # ╔═╡ 0b5e96eb-9312-472e-8a88-d4509a4f25d0
 # Generate samples
 delay_counts = mapreduce(vcat, samples, pwindows, swindows, obs_times) do T, pw, sw, ot
-	DataFrame(
-		pwindow = pw, 
-		swindow = sw, 
-		obs_time = ot, 
-		observed_delay = T ÷ sw .|> Int,
-		observed_delay_upper = (T ÷ sw) + sw |> Int,
-	)
+    DataFrame(
+        pwindow = pw,
+        swindow = sw,
+        obs_time = ot,
+        observed_delay = T ÷ sw .|> Int,
+        observed_delay_upper = (T ÷ sw) + sw |> Int
+    )
 end |> # Aggregate to unique combinations and count occurrences
-	df -> @groupby(df, :pwindow, :swindow, :obs_time, :observed_delay, :observed_delay_upper) |>
-	gd -> @combine(gd, :n = length(:pwindow))
+               df -> @groupby(df, :pwindow, :swindow, :obs_time, :observed_delay,
+    :observed_delay_upper) |>
+                     gd -> @combine(gd, :n=length(:pwindow))
 
 # ╔═╡ a7bff47d-b61f-499e-8631-206661c2bdc0
 empirical_cdf = ecdf(samples)
 
 # ╔═╡ 16bcb80a-970f-4633-aca2-261fa04172f7
-empirical_cdf_obs = ecdf(delay_counts.observed_delay, weights=delay_counts.n)
+empirical_cdf_obs = ecdf(delay_counts.observed_delay, weights = delay_counts.n)
 
 # ╔═╡ 60711c3c-266e-42b5-acc6-6624db294f24
 x_seq = range(minimum(samples), maximum(samples), 100)
@@ -124,29 +125,29 @@ x_seq = range(minimum(samples), maximum(samples), 100)
 # ╔═╡ c6fe3c52-af87-4a84-b280-bc9a8532e269
 #plot
 let
-	plot(; title = "Comparison of Observed vs Theoretical CDF",
-		ylabel = "Cumulative Probability",
-		xlabel = "Delay",
-		xticks = 0:obs_times[1],
-		xlims = (-0.1, obs_times[1] + 0.5)
-	)
-	plot!(x_seq, x_seq .|> x->empirical_cdf(x), 
-		lab = "Observed secondary times",
-		c = :blue,
-		lw = 3,
-	)
-	plot!(x_seq, x_seq .|> x->empirical_cdf_obs(x), 
-		lab = "Observed censored secondary times",
-		c = :green,
-		lw = 3,
-	)
-	plot!(x_seq, x_seq .|> x -> cdf(true_dist, x),
-		lab = "Theoretical",
-		c = :black,
-		lw = 3,
-	)
-	vline!([mean(samples)], ls = :dash, c= :blue, lw = 3, lab = "")
-	vline!([mean(true_dist)], ls = :dash, c= :black, lw = 3, lab = "")
+    plot(; title = "Comparison of Observed vs Theoretical CDF",
+        ylabel = "Cumulative Probability",
+        xlabel = "Delay",
+        xticks = 0:obs_times[1],
+        xlims = (-0.1, obs_times[1] + 0.5)
+    )
+    plot!(x_seq, x_seq .|> x -> empirical_cdf(x),
+        lab = "Observed secondary times",
+        c = :blue,
+        lw = 3
+    )
+    plot!(x_seq, x_seq .|> x -> empirical_cdf_obs(x),
+        lab = "Observed censored secondary times",
+        c = :green,
+        lw = 3
+    )
+    plot!(x_seq, x_seq .|> x -> cdf(true_dist, x),
+        lab = "Theoretical",
+        c = :black,
+        lw = 3
+    )
+    vline!([mean(samples)], ls = :dash, c = :blue, lw = 3, lab = "")
+    vline!([mean(true_dist)], ls = :dash, c = :black, lw = 3, lab = "")
 end
 
 # ╔═╡ f66d4b2e-ed66-423e-9cba-62bff712862b
@@ -163,13 +164,13 @@ We'll start by fitting a naive model using Turing.
 
 # ╔═╡ d9d14c48-8700-42b5-89b4-7fc51d0f577c
 @model function naive_model(N, y, n)
-	mu ~ Normal(1., 1.)
-	sigma ~ truncated(Normal(0.5, 1.0); lower= 0.0)
-	d = LogNormal(mu, sigma)
-	
-	for i in eachindex(y)
-		Turing.@addlogprob! n[i] * logpdf(d, y[i])
-	end
+    mu ~ Normal(1.0, 1.0)
+    sigma ~ truncated(Normal(0.5, 1.0); lower = 0.0)
+    d = LogNormal(mu, sigma)
+
+    for i in eachindex(y)
+        Turing.@addlogprob! n[i] * logpdf(d, y[i])
+    end
 end
 
 # ╔═╡ 8a7cd9ec-5640-4f5f-84c3-ae3f465ca68b
@@ -179,9 +180,9 @@ Now lets instantiate this model with data
 
 # ╔═╡ 028ade5c-17bd-4dfc-8433-23aaff02c181
 naive_mdl = naive_model(
-	size(delay_counts,1), 
-	delay_counts.observed_delay .+ 1e-6, # Add a small constant to avoid log(0)
-	delay_counts.n)
+    size(delay_counts, 1),
+    delay_counts.observed_delay .+ 1e-6, # Add a small constant to avoid log(0)
+    delay_counts.n)
 
 # ╔═╡ 04b4eefb-f0f9-4887-8db0-7cbb7f3b169b
 md"
@@ -210,19 +211,19 @@ We'll now fit an improved model using the `censored_pmf` function from the `EpiA
 
 # ╔═╡ ef40112b-f23e-4d4b-8a7d-3793b786f472
 @model function primarycensoreddist_model(N, y, y_upper, n, pwindow, D)
-	try
-		mu ~ Normal(1., 1.)
-		sigma ~ truncated(Normal(0.5, 0.5); lower= 0.1,)
-		d = LogNormal(mu, sigma)
-		log_pmf = censored_pmf(d; Δd = pwindow, D = D) .|> log
-	
-		for i in eachindex(y)
-			Turing.@addlogprob! n[i] * log_pmf[y[i] + 1] #0 obs is first element of array
-		end
-		return log_pmf
-	catch
-		Turing.@addlogprob! -Inf
-	end
+    try
+        mu ~ Normal(1.0, 1.0)
+        sigma ~ truncated(Normal(0.5, 0.5); lower = 0.1)
+        d = LogNormal(mu, sigma)
+        log_pmf = censored_pmf(d; Δd = pwindow, D = D) .|> log
+
+        for i in eachindex(y)
+            Turing.@addlogprob! n[i] * log_pmf[y[i] + 1] #0 obs is first element of array
+        end
+        return log_pmf
+    catch
+        Turing.@addlogprob! -Inf
+    end
 end
 
 # ╔═╡ b823d824-419d-41e9-9ac9-2c45ef190acf
@@ -232,12 +233,12 @@ Lets instantiate this model with data
 
 # ╔═╡ 93bca93a-5484-47fa-8424-7315eef15e37
 primarycensoreddist_mdl = primarycensoreddist_model(
-	size(delay_counts,1), 
-	delay_counts.observed_delay, # Add a small constant to avoid log(0)
-	delay_counts.observed_delay_upper, # Add a small constant to avoid log(0)
-	delay_counts.n,
-	delay_counts.pwindow[1],
-	delay_counts.obs_time[1]
+    size(delay_counts, 1),
+    delay_counts.observed_delay, # Add a small constant to avoid log(0)
+    delay_counts.observed_delay_upper, # Add a small constant to avoid log(0)
+    delay_counts.n,
+    delay_counts.pwindow[1],
+    delay_counts.obs_time[1]
 )
 
 # ╔═╡ 8f1d32fd-f54b-4f69-8c93-8f0786366cef
@@ -254,8 +255,8 @@ benchmark_model(
 
 # ╔═╡ 44132e2e-5a1a-49ad-9e57-cec24f981f52
 map_estimate = [maximum_a_posteriori(primarycensoreddist_mdl) for _ in 1:10] |>
-	opts -> (opts, findmax([o.lp for o in opts])[2]) |>
-	opts_i -> opts_i[1][opts_i[2]]
+               opts -> (opts, findmax([o.lp for o in opts])[2]) |>
+                       opts_i -> opts_i[1][opts_i[2]]
 
 # ╔═╡ a34c19e8-ba9e-4276-a17e-c853bb3341cf
 # ╠═╡ disabled = true
@@ -267,7 +268,7 @@ primarycensoreddist_fit = sample(primarycensoreddist_mdl, NUTS(), MCMCThreads(),
 summarize(primarycensoreddist_fit)
 
 # ╔═╡ 46711233-f680-4962-9e3e-60c747db4d2c
-censored_pmf(true_dist; D = obs_times[1] )
+censored_pmf(true_dist; D = obs_times[1])
 
 # ╔═╡ 604458a6-7b6f-4b5c-b2e7-09be1908c0f9
 # ╠═╡ disabled = true
@@ -277,7 +278,8 @@ primarycensoreddist_fit = sample(primarycensoreddist_mdl, MH(), 100_000; initial
   ╠═╡ =#
 
 # ╔═╡ 7ae6c61d-0e33-4af8-b8d2-e31223a15a7c
-primarycensoreddist_fit = sample(primarycensoreddist_mdl, NUTS(), 1000; initial_params=map_estimate.values.array)
+primarycensoreddist_fit = sample(
+    primarycensoreddist_mdl, NUTS(), 1000; initial_params = map_estimate.values.array)
 
 # ╔═╡ Cell order:
 # ╟─8de5c5e0-6e95-11ef-1693-bfd465c8d919
