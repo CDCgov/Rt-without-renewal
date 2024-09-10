@@ -218,7 +218,7 @@ We'll now fit an improved model using the `censored_pmf` function from the `EpiA
         log_pmf = censored_pmf(d; Δd = pwindow, D = D) .|> log
 
         for i in eachindex(y)
-            Turing.@addlogprob! n[i] * log_pmf[y[i] + 1] #0 obs is first element of array
+            Turing.@addlogprob! n[i] * log_pmf[ceil(Int, y[i])] #0 obs is first element of array
         end
         return log_pmf
     catch
