@@ -105,8 +105,8 @@ delay_counts = mapreduce(vcat, samples, pwindows, swindows, obs_times) do T, pw,
         pwindow = pw,
         swindow = sw,
         obs_time = ot,
-        observed_delay = T ÷ sw .|> Int,
-        observed_delay_upper = (T ÷ sw) + sw |> Int
+        observed_delay = (T ÷ sw) * sw ,
+        observed_delay_upper = (T ÷ sw) * (sw + 1)
     )
 end |> # Aggregate to unique combinations and count occurrences
                df -> @groupby(df, :pwindow, :swindow, :obs_time, :observed_delay,
@@ -258,18 +258,6 @@ map_estimate = [maximum_a_posteriori(primarycensoreddist_mdl) for _ in 1:10] |>
                opts -> (opts, findmax([o.lp for o in opts])[2]) |>
                        opts_i -> opts_i[1][opts_i[2]]
 
-# ╔═╡ a34c19e8-ba9e-4276-a17e-c853bb3341cf
-# ╠═╡ disabled = true
-#=╠═╡
-primarycensoreddist_fit = sample(primarycensoreddist_mdl, NUTS(), MCMCThreads(), 500, 4)
-  ╠═╡ =#
-
-# ╔═╡ 1210443f-480f-4e9f-b195-d557e9e1fc31
-summarize(primarycensoreddist_fit)
-
-# ╔═╡ 46711233-f680-4962-9e3e-60c747db4d2c
-censored_pmf(true_dist; D = obs_times[1])
-
 # ╔═╡ 604458a6-7b6f-4b5c-b2e7-09be1908c0f9
 # ╠═╡ disabled = true
 #=╠═╡
@@ -277,9 +265,21 @@ primarycensoreddist_fit = sample(primarycensoreddist_mdl, MH(), 100_000; initial
 	chn -> chn[50_000:end, :, :]
   ╠═╡ =#
 
+# ╔═╡ a34c19e8-ba9e-4276-a17e-c853bb3341cf
+# ╠═╡ disabled = true
+#=╠═╡
+primarycensoreddist_fit = sample(primarycensoreddist_mdl, NUTS(), MCMCThreads(), 500, 4)
+  ╠═╡ =#
+
 # ╔═╡ 7ae6c61d-0e33-4af8-b8d2-e31223a15a7c
 primarycensoreddist_fit = sample(
     primarycensoreddist_mdl, NUTS(), 1000; initial_params = map_estimate.values.array)
+
+# ╔═╡ 1210443f-480f-4e9f-b195-d557e9e1fc31
+summarize(primarycensoreddist_fit)
+
+# ╔═╡ 46711233-f680-4962-9e3e-60c747db4d2c
+censored_pmf(true_dist; D = obs_times[1])
 
 # ╔═╡ Cell order:
 # ╟─8de5c5e0-6e95-11ef-1693-bfd465c8d919
