@@ -107,7 +107,7 @@ delay_counts = mapreduce(vcat, samples, pwindows, swindows, obs_times) do T, pw,
         obs_time = ot,
         observed_delay = (T ÷ sw) * sw,
         observed_delay_upper = (T ÷ sw) * (sw + 1),
-		observed_delay_step = Int(T ÷ sw) + 1,
+        observed_delay_step = Int(T ÷ sw) + 1
     )
 end |> # Aggregate to unique combinations and count occurrences
                df -> @groupby(df, :pwindow, :swindow, :obs_time, :observed_delay,
