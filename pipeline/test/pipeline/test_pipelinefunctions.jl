@@ -1,7 +1,7 @@
 @testset "do_truthdata tests" begin
     using EpiAwarePipeline, Dagger
     for pipetype in [SmoothOutbreakPipeline, MeasuresOutbreakPipeline,
-                     SmoothEndemicPipeline, RoughEndemicPipeline]
+        SmoothEndemicPipeline, RoughEndemicPipeline]
         pipeline = pipetype(; testmode = true)
         truthdata_dg_task = do_truthdata(pipeline)
         truthdata = fetch.(truthdata_dg_task)
@@ -22,7 +22,7 @@ end
     end
 
     pipetype = SmoothOutbreakPipeline
-    pipeline = pipetype(;ndraws = 40, testmode = true)
+    pipeline = pipetype(; ndraws = 40, testmode = true)
     truthdata_dg_task = do_truthdata(pipeline)
     truthdata = fetch.(truthdata_dg_task)
     inference_configs = make_inference_configs(pipeline)
@@ -37,12 +37,12 @@ end
 
     for pipetype in [SmoothOutbreakPipeline, MeasuresOutbreakPipeline,
         SmoothEndemicPipeline, RoughEndemicPipeline]
-        pipeline = pipetype(;ndraws = 40, testmode = true)
+        pipeline = pipetype(; ndraws = 40, testmode = true)
         inference_results_tsk = make_inference(pipeline)
         inference_results = fetch.(inference_results_tsk)
         @test length(inference_results) == 1
         @test all([result["inference_results"] isa EpiAwareObservables
-                for result in inference_results])
+                   for result in inference_results])
     end
 end
 

@@ -80,7 +80,8 @@ function infer(config::InferenceConfig)
     idxs = config.tspan[1]:config.tspan[2]
 
     #Return the sampled infections and observations
-    y_t = ismissing(config.case_data) ? missing : Vector{Union{Missing,Int64}}(config.case_data[idxs])
+    y_t = ismissing(config.case_data) ? missing :
+          Vector{Union{Missing, Int64}}(config.case_data[idxs])
     inference_results = apply_method(epiprob,
         config.epimethod,
         (y_t = y_t,);

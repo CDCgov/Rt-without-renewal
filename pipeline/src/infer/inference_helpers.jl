@@ -16,7 +16,9 @@ This is an internal method that generates the part of the prefix for the inferen
     results file name from the pipeline.
 """
 _prefix_from_pipeline(pipeline::AbstractEpiAwarePipeline) = "observables"
-_prefix_from_pipeline(pipeline::AbstractRtwithoutRenewalPipeline) = "inference_" * pipeline.prefix
+function _prefix_from_pipeline(pipeline::AbstractRtwithoutRenewalPipeline)
+    "inference_" * pipeline.prefix
+end
 
 """
 This is an internal method that generates the prefix for the inference results file name.
