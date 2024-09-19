@@ -1,5 +1,4 @@
 @testset "make_gi_params: returns a dictionary with correct keys" begin
-    using EpiAwarePipeline
     pipeline = EpiAwareExamplePipeline()
     params = make_gi_params(pipeline)
 
@@ -9,15 +8,12 @@
 end
 
 @testset "make_inf_generating_processes" begin
-    using EpiAwarePipeline, EpiAware
     pipeline = EpiAwareExamplePipeline()
     igps = make_inf_generating_processes(pipeline)
     @test igps == [DirectInfections, ExpGrowthRate, Renewal]
 end
 
 @testset "make_Rt: returns an array" begin
-    using EpiAwarePipeline
-
     map([EpiAwareExamplePipeline(), SmoothOutbreakPipeline(),
         MeasuresOutbreakPipeline(), SmoothEndemicPipeline(), RoughEndemicPipeline()]) do pipeline
         Rt = make_Rt(pipeline)
@@ -26,7 +22,6 @@ end
 end
 
 @testset "default_tspan: returns an Tuple{Integer, Integer}" begin
-    using EpiAwarePipeline
     pipeline = EpiAwareExamplePipeline()
 
     tspan = make_tspan(pipeline)
@@ -34,7 +29,7 @@ end
 end
 
 @testset "make_model_priors: generates a dict with correct keys and distributions" begin
-    using EpiAwarePipeline, Distributions
+    using Distributions
     pipeline = EpiAwareExamplePipeline()
 
     priors_dict = make_model_priors(pipeline)
@@ -49,7 +44,6 @@ end
 end
 
 @testset "make_epiaware_name_latentmodel_pairs: generates a vector of Pairs with correct keys and latent models" begin
-    using EpiAwarePipeline, EpiAware
     pipeline = EpiAwareExamplePipeline()
 
     namemodel_vect = make_epiaware_name_latentmodel_pairs(pipeline)
@@ -59,7 +53,7 @@ end
 end
 
 @testset "make_inference_method: constructor and defaults" begin
-    using EpiAwarePipeline, EpiAware, ADTypes, AbstractMCMC
+    using ADTypes, AbstractMCMC
     pipeline = EpiAwareExamplePipeline()
 
     method = make_inference_method(pipeline)
@@ -86,7 +80,6 @@ end
 end
 
 @testset "make_truth_data_configs" begin
-    using EpiAwarePipeline
     pipeline = SmoothOutbreakPipeline()
     example_pipeline = EpiAwareExamplePipeline()
     @testset "make_truth_data_configs should return a dictionary" begin
@@ -107,8 +100,6 @@ end
 end
 
 @testset "default inference configurations" begin
-    using EpiAwarePipeline
-
     pipeline = SmoothOutbreakPipeline()
     example_pipeline = EpiAwareExamplePipeline()
 
@@ -134,7 +125,6 @@ end
 end
 
 @testset "make_default_params" begin
-    using EpiAwarePipeline
     pipeline = SmoothOutbreakPipeline()
 
     # Expected default parameters
@@ -155,7 +145,7 @@ end
 end
 
 @testset "make_delay_distribution" begin
-    using EpiAwarePipeline, Distributions
+    using Distributions
     pipeline = SmoothOutbreakPipeline()
     delay_distribution = make_delay_distribution(pipeline)
     @test delay_distribution isa Distribution
@@ -165,7 +155,6 @@ end
 end
 
 @testset "make_observation_model" begin
-    using EpiAware
     # Mock pipeline object
     pipeline = SmoothOutbreakPipeline()
     default_params = make_default_params(pipeline)

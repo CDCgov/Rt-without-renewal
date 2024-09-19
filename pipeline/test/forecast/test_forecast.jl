@@ -1,5 +1,4 @@
 @testset "define_forecast_epiprob" begin
-    using EpiAwarePipeline
     pipeline = SmoothOutbreakPipeline()
 
     inference_configs = make_inference_configs(pipeline)

@@ -1,5 +1,5 @@
 @testset "InferenceConfig: constructor function" begin
-    using Distributions, EpiAwarePipeline, EpiAware
+    using Distributions
 
     struct TestLatentModel <: AbstractLatentModel
     end
