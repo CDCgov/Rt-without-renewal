@@ -60,6 +60,6 @@ end
 Internal method for setting the data directory path for the inference data.
 """
 _get_inferencedatadir_str(pipeline::AbstractEpiAwarePipeline) = "epiaware_observables"
-function _get_truthdatadir_str(pipeline::AbstractRtwithoutRenewalPipeline)
+function _get_inferencedatadir_str(pipeline::AbstractRtwithoutRenewalPipeline)
     pipeline.testmode ? mktempdir() : "epiaware_observables"
 end

@@ -11,9 +11,9 @@ with execution determined by available computational resources.
 module EpiAwarePipeline
 
 using CSV, Dagger, DataFramesMeta, Dates, Distributions, DocStringExtensions, DrWatson,
-      EpiAware, Plots, Statistics, ADTypes, AbstractMCMC, Plots, JLD2, MCMCChains, Turing,
-      DynamicPPL, LogExpFunctions, RCall, LinearAlgebra, Random, AlgebraOfGraphics,
-      CairoMakie, ReverseDiff
+      EpiAware, Statistics, ADTypes, AbstractMCMC, JLD2, MCMCChains, Turing, DynamicPPL,
+      LogExpFunctions, RCall, LinearAlgebra, Random, AlgebraOfGraphics, CairoMakie,
+      ReverseDiff
 
 # Exported pipeline types
 export AbstractEpiAwarePipeline, EpiAwarePipeline, AbstractRtwithoutRenewalPipeline,
@@ -56,7 +56,7 @@ export make_prediction_dataframe_from_output, make_truthdata_dataframe,
 export figureone, figuretwo
 
 # Exported functions: plot functions
-export plot_truth_data, plot_Rt
+export plot_truth_data#, plot_Rt
 
 include("docstrings.jl")
 include("pipeline/pipeline.jl")
