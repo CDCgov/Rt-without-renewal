@@ -67,6 +67,5 @@ include("infer/infer.jl")
 include("forecast/forecast.jl")
 include("scoring/scoring.jl")
 include("analysis/analysis.jl")
-include("mainplots/mainplots.jl")
-include("plot_functions.jl")
+include("plotting/plotting.jl")
 end
