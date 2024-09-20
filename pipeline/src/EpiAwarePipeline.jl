@@ -56,7 +56,7 @@ export make_prediction_dataframe_from_output, make_truthdata_dataframe,
 export figureone, figuretwo
 
 # Exported functions: plot functions
-export plot_truth_data#, plot_Rt
+export plot_truth_data, plot_Rt
 
 include("docstrings.jl")
 include("pipeline/pipeline.jl")
