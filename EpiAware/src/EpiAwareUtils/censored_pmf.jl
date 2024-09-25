@@ -63,7 +63,6 @@ function censored_pmf(dist::Distribution,
     ts .|> (t -> cdf(dist, t)) |> diff |> p -> p ./ sum(p)
 end
 
-
 """
 Internal function to check censored_pmf arguments and return the time steps of the rightmost limits of the censor intervals.
 """
@@ -142,5 +141,5 @@ function censored_pmf(dist::Distribution; Δd = 1.0, D = nothing, upper = 0.99)
     ∫F(dist, t, Δd) = quadgk(u -> exp(logcdf(dist, t - u) - log(Δd)), 0.0, Δd)[1]
     _q = ts .|> t -> ∫F(dist, t, Δd)
 
-    return [0.; _q] |> diff |> p -> p ./ sum(p)
+    return [0.0; _q] |> diff |> p -> p ./ sum(p)
 end

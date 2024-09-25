@@ -83,13 +83,13 @@ true_dist = LogNormal(meanlog, sdlog)
 
 # ╔═╡ aea8b28e-fffe-4aa6-b51e-8199a7c7975c
 # Generate varying pwindow, swindow, and obs_time lengths
-pwindow = 1.
+pwindow = 1.0
 
 # ╔═╡ d231bd0c-165f-4973-a46f-f66991813ea7
-swindow = 1.
+swindow = 1.0
 
 # ╔═╡ 7522f05b-1750-4983-8947-ef70f4298d06
-obs_time = 10.
+obs_time = 10.0
 
 # ╔═╡ 60212cf7-cc3d-42d3-8260-1f067ede3c6f
 nsamples_max = 2000
@@ -99,8 +99,8 @@ nsamples_max = 2000
 samples = map(1:nsamples_max) do _
     P = rand() * pwindow # Primary event time
     T = rand(true_dist)
-end |> 
-s -> filter(x -> x <= obs_time, s)
+end |>
+          s -> filter(x -> x <= obs_time, s)
 
 # ╔═╡ a627a544-4c41-4c35-83ec-be7ed7c0a737
 nsamples = length(samples)
@@ -205,10 +205,10 @@ summarize(naive_fit)
 
 # ╔═╡ 8e09d931-fca7-4ac2-81f7-2bc36b0174f3
 let
-f = pairplot(naive_fit)
-CairoMakie.vlines!(f[1,1], [meanlog])
-CairoMakie.vlines!(f[2,2], [sdlog])
-f
+    f = pairplot(naive_fit)
+    CairoMakie.vlines!(f[1, 1], [meanlog])
+    CairoMakie.vlines!(f[2, 2], [sdlog])
+    f
 end
 
 # ╔═╡ 43eac8dd-8f1d-440e-b1e8-85db9e740651
@@ -229,7 +229,7 @@ We'll now fit an improved model using the `censored_pmf` function from the `EpiA
 @model function primarycensoreddist_model(N, y, n, pwindow, D)
     try
         mu ~ Normal(1.0, 1.0)
-        sigma ~ truncated(Normal(0.5, 0.5); lower = 0.)
+        sigma ~ truncated(Normal(0.5, 0.5); lower = 0.0)
         d = LogNormal(mu, sigma)
         log_pmf = censored_pmf(d; Δd = pwindow, D = D) .|> log
 
@@ -253,7 +253,7 @@ primarycensoreddist_mdl = primarycensoreddist_model(
     delay_counts.observed_delay_step,
     delay_counts.n,
     pwindow,
-    obs_time,
+    obs_time
 )
 
 # ╔═╡ 7ae6c61d-0e33-4af8-b8d2-e31223a15a7c
@@ -265,10 +265,10 @@ summarize(primarycensoreddist_fit)
 
 # ╔═╡ b2376beb-dd7b-442d-9ff5-ac864e75366b
 let
-f = pairplot(primarycensoreddist_fit)
-CairoMakie.vlines!(f[1,1], [meanlog], linewidth = 3)
-CairoMakie.vlines!(f[2,2], [sdlog], linewidth = 3)
-f
+    f = pairplot(primarycensoreddist_fit)
+    CairoMakie.vlines!(f[1, 1], [meanlog], linewidth = 3)
+    CairoMakie.vlines!(f[2, 2], [sdlog], linewidth = 3)
+    f
 end
 
 # ╔═╡ Cell order:
