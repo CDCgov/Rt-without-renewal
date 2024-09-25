@@ -63,12 +63,33 @@ function censored_pmf(dist::Distribution,
     ts .|> (t -> cdf(dist, t)) |> diff |> p -> p ./ sum(p)
 end
 
+
+"""
+Internal function to check censored_pmf arguments and return the time steps of the rightmost limits of the censor intervals.
+"""
+function _check_and_give_ts(dist::Distribution, Δd, D, upper)
+    @assert minimum(dist)>=0.0 "Distribution must be non-negative."
+    @assert Δd>0.0 "Δd must be positive."
+
+    if isnothing(D)
+        x_99 = invlogcdf(dist, log(upper))
+        D = round(Int64, x_99 / Δd) * Δd
+    end
+
+    @assert D>=Δd "D can't be shorter than Δd."
+
+    ts = Δd:Δd:D |> collect
+
+    @assert ts[end]==D "D must be a multiple of Δd."
+
+    return ts
+end
+
 @doc raw"
 Create a discrete probability mass function (PMF) from a given distribution,
-assuming
-a uniform distribution over primary event times with censoring intervals of width `Δd` for
+assuming a uniform distribution over primary event times with censoring intervals of width `Δd` for
 both primary and secondary events. The CDF for the time from the left edge of the interval
-containing the primary event to the secondary event is created by direct numerical integration
+containing the primary event to the secondary event is created by direct numerical integration (quadrature)
 of the convolution of the CDF of `dist` with the uniform density on `[0,Δd)`, the discrete PMF
 for double censored delays is then found using simple differencing on the CDF.
 
@@ -77,8 +98,9 @@ for double censored delays is then found using simple differencing on the CDF.
 - `dist`: The distribution from which to create the PMF.
 - `Δd`: The step size for discretizing the domain. Default is 1.0.
 - `D`: The upper bound of the domain. Must be greater than `Δd`. Default `D = nothing`
-indicates that the distribution should be truncated at its 99th percentile rounded
+indicates that the distribution should be truncated at its `upper`th percentile rounded
 to nearest multiple of `Δd`.
+
 
 # Returns
 - A vector representing the PMF.
@@ -114,22 +136,11 @@ censored_pmf(dist; D = 10) |>
  0.0
 ```
 "
-function censored_pmf(dist::Distribution; Δd = 1.0, D = nothing)
-    @assert minimum(dist)>=0.0 "Distribution must be non-negative."
-    @assert Δd>0.0 "Δd must be positive."
+function censored_pmf(dist::Distribution; Δd = 1.0, D = nothing, upper = 0.99)
+    ts = _check_and_give_ts(dist, Δd, D, upper)
 
-    if isnothing(D)
-        x_99 = invlogcdf(dist, log(0.99))
-        D = round(Int64, x_99 / Δd) * Δd
-    end
+    ∫F(dist, t, Δd) = quadgk(u -> exp(logcdf(dist, t - u) - log(Δd)), 0.0, Δd)[1]
+    _q = ts .|> t -> ∫F(dist, t, Δd)
 
-    @assert D>=Δd "D can't be shorter than Δd."
-
-    ts = 0.0:Δd:D |> collect
-
-    @assert ts[end]==D "D must be a multiple of Δd."
-
-    ∫F(dist, t, Δd) = quadgk(u -> cdf(dist, t - u) / Δd, 0.0, Δd)[1]
-
-    ts .|> (t -> ∫F(dist, t, Δd)) |> diff |> p -> p ./ sum(p)
+    return [0.; _q] |> diff |> p -> p ./ sum(p)
 end
