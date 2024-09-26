@@ -253,7 +253,7 @@ md"
 ## Fitting an improved model using censoring utilities
 
 We'll now fit an improved model using the `∫F` function from `EpiAware.EpiAwareUtils` for calculating the CDF of the _total delay_ from the beginning of the primary window to the secondary event time. This includes both the delay distribution we are making inference on and the time between the start of the primary censor window and the primary event.
-The `∫F` function underlies `censored_pmf` function from the `EpiAware.EpiAwareUtils` submodule. 
+The `∫F` function underlies `censored_pmf` function from the `EpiAware.EpiAwareUtils` submodule.
 
 Using the `∫F` function we can write a log-pmf function `primary_censored_dist_lpmf` that accounts for:
 - The primary and secondary censoring windows, which can vary in length.
