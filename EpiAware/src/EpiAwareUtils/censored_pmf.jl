@@ -132,16 +132,16 @@ censored_cdf(dist; D = 10) |>
     p -> round.(p, digits=3)
 
 # output
-10-element Vector{Float64}:
+11-element Vector{Float64}:
  0.0
  0.368
- 0.768
- 0.915
+ 0.767
+ 0.914
  0.969
- 0.989
+ 0.988
  0.996
+ 0.998
  0.999
- 1.0
  1.0
  1.0
 ```
