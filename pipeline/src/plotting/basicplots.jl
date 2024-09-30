@@ -58,12 +58,13 @@ Plot and save the plot of the true Rt values over time.
 - `plotpath`: The path of the plot.
 
 """
-function plot_Rt(true_Rt, config, pipeline::AbstractEpiAwarePipeline; plotsubdir = "truth_data", saveplot = true)
+function plot_Rt(true_Rt, config, pipeline::AbstractEpiAwarePipeline;
+        plotsubdir = "truth_data", saveplot = true)
     f = Figure(; backgroundcolor = :white)
     ax = Axis(f[1, 1],
         title = "True Reproduction number",
         xlabel = "Time",
-        ylabel = "Rt",
+        ylabel = "Rt"
     )
     lines!(ax, true_Rt)
 
