@@ -71,7 +71,9 @@ end
 
 @testset "make_inference_method: for prior predictive checking" begin
     using EpiAwarePipeline, EpiAware, ADTypes, AbstractMCMC
-    pipeline = RtwithoutRenewalPriorPipeline()
+    pipetype = [SmoothOutbreakPipeline, MeasuresOutbreakPipeline,
+        SmoothEndemicPipeline, RoughEndemicPipeline] |> rand
+    pipeline = pipetype(; ndraws = 100, testmode = true, priorpredictive = true)
 
     method = make_inference_method(pipeline)
 
