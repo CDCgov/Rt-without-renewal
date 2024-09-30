@@ -4,7 +4,7 @@ using EpiAwarePipeline, EpiAware
 
 # Run tests
 include("pipeline/test_pipelinetypes.jl");
-# include("pipeline/test_pipelinefunctions.jl");
+include("pipeline/test_pipelinefunctions.jl");
 include("utils/test_utils.jl");
 include("constructors/test_constructors.jl");
 include("simulate/test_simulate.jl");
