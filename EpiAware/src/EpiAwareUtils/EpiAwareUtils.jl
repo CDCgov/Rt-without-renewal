@@ -17,7 +17,7 @@ using Distributions, DocStringExtensions, QuadGK, Statistics, Turing
 export HalfNormal, DirectSample, SafePoisson, SafeNegativeBinomial
 
 #Export functions
-export scan, spread_draws, censored_pmf, get_param_array, prefix_submodel
+export scan, spread_draws, censored_cdf, censored_pmf, get_param_array, prefix_submodel, ∫F
 
 # Export accumulate tools
 export get_state, accumulate_scan

@@ -18,6 +18,7 @@ getting_started_pages = Any[
         "Nowcasting" => "getting-started/tutorials/nowcasting.md",
         "Multiple observation models" => "getting-started/tutorials/multiple-observation-models.md",
         "Multiple infection processes" => "getting-started/tutorials/multiple-infection-processes.md",
+        "Fitting distributions with censored data" => "getting-started/tutorials/censored-obs.md",
         "Partial pooling" => "getting-started/tutorials/partial-pooling.md"
     ]
 ]
