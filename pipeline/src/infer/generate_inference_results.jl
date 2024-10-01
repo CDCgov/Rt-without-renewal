@@ -14,8 +14,7 @@ Generate inference results based on the given configuration of inference model o
 - `inference_results`: The generated inference results.
 """
 function generate_inference_results(
-        truthdata, inference_config, pipeline::AbstractEpiAwarePipeline;
-        inference_method)
+        truthdata, inference_config, pipeline::AbstractEpiAwarePipeline)
     tspan = make_tspan(
         pipeline; T = inference_config["T"], lookback = inference_config["lookback"])
     inference_method = make_inference_method(pipeline)
