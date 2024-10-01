@@ -49,3 +49,22 @@ function generate_quantiles_for_targets(output, D::EpiData, qs)
         timeseries_samples_into_quantiles(X, qs)
     end
 end
+
+"""
+Internal method that given a list of percentiles `ps`, this function calculates the corresponding quantile levels.
+This function returns both the `p/2` and `1 - p/2` quantiles for each percentile `p` in `ps`.
+# Arguments
+- `ps::Vector{Float64}`: A vector of percentiles.
+
+# Returns
+- `qs::Vector{Float64}`: A vector of quantile levels, including the median (0.5) and the calculated quantiles based on the input percentiles.
+- `n_levels::Int`: The number of input percentiles.
+
+"""
+function _setup_levels(ps)
+    n_levels = length(ps)
+    qs = mapreduce(vcat, ps) do percentile
+        [percentile / 2, 1 - percentile / 2]
+    end |> x -> [0.5; x]
+    return qs, n_levels
+end
