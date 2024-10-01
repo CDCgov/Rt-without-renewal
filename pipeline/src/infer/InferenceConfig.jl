@@ -63,6 +63,34 @@ struct InferenceConfig{T, F, IGP, L, O, E, D <: Distribution, X <: Integer}
 end
 
 """
+This function makes inference on the underlying parameters of the model specified
+in the `InferenceConfig` object `config`.
+
+# Arguments
+- `config::InferenceConfig`: The configuration object containing the case data
+to make inference on and model configuration.
+- `epiprob::EpiProblem`: The EpiProblem object containing the model to make inference on.
+
+# Returns
+- `inference_results`: The results of the simulation or inference.
+
+"""
+function create_inference_results(config, epiprob)
+    #Return the sampled infections and observations
+    y_t = ismissing(config.case_data) ? missing :
+    Vector{Union{Missing, Int64}}(config.case_data[idxs])
+            inference_results = apply_method(epiprob,
+            config.epimethod,
+            (y_t = y_t,),
+        )
+    inference_results = apply_method(epiprob,
+        config.epimethod,
+        (y_t = y_t,);
+    )
+    return inference_results
+end
+
+"""
 This method makes inference on the underlying parameters of the model specified
 in the `InferenceConfig` object `config`.
 
@@ -80,18 +108,21 @@ function infer(config::InferenceConfig)
     idxs = config.tspan[1]:config.tspan[2]
 
     #Return the sampled infections and observations
-    y_t = ismissing(config.case_data) ? missing :
-          Vector{Union{Missing, Int64}}(config.case_data[idxs])
-    inference_results = apply_method(epiprob,
-        config.epimethod,
-        (y_t = y_t,);
-    )
+    inference_results = create_inference_results(config, epiprob)
 
-    forecast_results = generate_forecasts(
+
+    forecast_results = try generate_forecasts(
         inference_results.samples, inference_results.data, epiprob, config.lookahead)
+    catch e
+        e
+    end
 
     epidata = epiprob.epi_model.data
-    score_results = summarise_crps(config, inference_results, forecast_results, epidata)
+    score_results = try
+        summarise_crps(config, inference_results, forecast_results, epidata)
+    catch e
+        e
+    end
 
     return Dict("inference_results" => inference_results,
         "epiprob" => epiprob, "inference_config" => config,
