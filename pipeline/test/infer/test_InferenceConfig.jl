@@ -33,7 +33,7 @@
             epimethod = epimethod,
             log_I0_prior = Normal(log(100.0), 1e-5),
             lookahead = lookahead,
-            latent_model_name = latent_model_name,
+            latent_model_name = latent_model_name
         )
 
         @test config.gi_mean == gi_mean
