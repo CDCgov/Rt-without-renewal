@@ -1,50 +1,46 @@
-using Test, DrWatson
-quickactivate(@__DIR__(), "EpiAwarePipeline")
+"""
+Internal method for generating a title string for a prior predictive plot based on the provided
+    configuration.
 
-using EpiAwarePipeline, EpiAware, Plots, Turing
-pipetype = [SmoothOutbreakPipeline, MeasuresOutbreakPipeline,
-    SmoothEndemicPipeline, RoughEndemicPipeline] |> rand
+# Arguments
+- `config::InferenceConfig`: `InferenceConfig` object containing the configuration for the
+    prior predictive plot.
+# Returns
+- `String`: A formatted title string for the prior predictive plot.
 
-P = pipetype(; testmode = true, nchains = 1, ndraws = 2000, priorpredictive = true)
-
-##
-
-inference_config = make_inference_configs(P) |> first
-
-missingdata = Dict("y_t" => missing, "I_t" => fill(1.0, 100), "truth_I0" => 1.0,
-    "truth_gi_mean" => inference_config.gi_mean)
-results = generate_inference_results(missingdata, inference_config, P)
-
-res = results["inference_results"]
-
-gens = generate_quantiles_for_targets(
-    res, results["epiprob"].epi_model.data, [0.025, 0.25, 0.5, 0.75, 0.975])
-
-gens.log_I_t
-
-##
-using CairoMakie
-
-function _make_prior_plot_title(config)
+"""
+function _make_prior_plot_title(config::InferenceConfig)
     igp_str = string(config.igp)
     latent_model_str = config.latent_model_name |> uppercase
     gi_mean_str = config.gi_mean |> string
     T_str = config.tspan[2] |> string
     return "Prior pred. IGP: $(igp_str), latent model: $(latent_model_str), truth gi mean: $(gi_mean_str), T: $(T_str)"
 end
-_make_prior_plot_title(config)
 
-function _setup_levels(ps)
-    n_levels = length(ps)
-    qs = mapreduce(vcat, ps) do percentile
-        [percentile / 2, 1 - percentile / 2]
-    end |> x -> [0.5; x]
-    return qs, n_levels
-end
-##
-# _get_priorpred_plot_title(results["inference_config"])
-##
+"""
+Generate a prior predictive plot for the given configuration, output, and epidemiological probabilities.
 
+# Arguments
+- `config`: Configuration object containing settings for the plot.
+- `output`: Output object containing generated data for plotting.
+- `epiprob`: Epidemiological probabilities object.
+- `ps`: Array of percentiles for quantile calculations (default: [0.05, 0.1, 0.25]).
+- `bottom_alpha`: Opacity for the lowest percentile band (default: 0.1).
+- `top_alpha`: Opacity for the highest percentile band (default: 0.5).
+- `case_color`: Color for the cases plot (default: :black).
+- `logI_color`: Color for the log(Incidence) plot (default: :purple).
+- `rt_color`: Color for the exponential growth rate plot (default: :blue).
+- `Rt_color`: Color for the reproduction number plot (default: :green).
+- `figsize`: Tuple specifying the size of the figure (default: (750, 600)).
+
+# Returns
+- `fig`: A Figure object containing the prior predictive plots.
+
+# Notes
+- The function asserts that all percentiles in `ps` are in the range [0, 0.5).
+- The function creates a 2x2 grid of subplots with linked x-axes for the top and bottom rows.
+- The function plots the median and percentile bands for cases, log(Incidence), exponential growth rate, and reproduction number.
+"""
 function prior_predictive_plot(config, output, epiprob;
         ps = [0.05, 0.1, 0.25],
         bottom_alpha = 0.1,
@@ -103,23 +99,3 @@ function prior_predictive_plot(config, output, epiprob;
 
     fig
 end
-
-##
-fig = prior_predictive_plot(config, res, results["epiprob"]; ps = [0.025, 0.1, 0.25])
-##
-gen_y_t = mapreduce(hcat, res.generated) do gen
-    gen.generated_y_t
-end |> X -> timeseries_samples_into_quantiles(X, [0.025, 0.25, 0.5, 0.75, 0.975])
-
-##
-fig = Figure()
-ax_logIt = Axis(fig[1, 1];
-    xticks = vcat(1, 5:5:50)    # xlabel
-)
-
-for i in 1:5
-    lines!(ax_logIt, gen_y_t[:, i], color = :black, alpha = 0.5)
-end
-
-# hlines!(ax, [1.0], color = :red, linestyle = :dash)
-fig

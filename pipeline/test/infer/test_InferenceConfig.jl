@@ -16,6 +16,7 @@
     latent_model = TestLatentModel()
     observation_model = TestObsModel()
     epimethod = TestMethod()
+    latent_model_name = "TestLatentModel"
     case_data = [10, 20, 30, 40, 50]
     I_t = [10, 20, 30, 40, 50] ./ 2
     I0 = 1.0
@@ -31,7 +32,8 @@
             tspan = tspan,
             epimethod = epimethod,
             log_I0_prior = Normal(log(100.0), 1e-5),
-            lookahead = lookahead
+            lookahead = lookahead,
+            latent_model_name = latent_model_name
         )
 
         @test config.gi_mean == gi_mean
@@ -42,6 +44,7 @@
         @test config.case_data == case_data
         @test config.tspan == tspan
         @test config.epimethod == epimethod
+        @test config.latent_model_name == latent_model_name
     end
 
     @testset "construct from config dictionary" begin

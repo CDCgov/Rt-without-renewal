@@ -32,15 +32,17 @@ struct InferenceConfig{T, F, IGP, L, O, E, D <: Distribution, X <: Integer}
     transformation::F
     log_I0_prior::D
     lookahead::X
+    latent_model_name::String
 
     function InferenceConfig(igp, latent_model, observation_model; gi_mean, gi_std,
             case_data, truth_I_t, truth_I0, tspan, epimethod,
-            transformation = exp, log_I0_prior, lookahead)
-        new{typeof(gi_mean), typeof(transformation),
-            typeof(igp), typeof(latent_model), typeof(observation_model),
+            transformation = exp, log_I0_prior, lookahead, latent_model_name)
+        new{typeof(gi_mean), typeof(transformation), typeof(igp),
+            typeof(latent_model), typeof(observation_model),
             typeof(epimethod), typeof(log_I0_prior), typeof(lookahead)}(
             gi_mean, gi_std, igp, latent_model, observation_model,
-            case_data, truth_I_t, truth_I0, tspan, epimethod, transformation, log_I0_prior, lookahead)
+            case_data, truth_I_t, truth_I0, tspan, epimethod,
+            transformation, log_I0_prior, lookahead, latent_model_name)
     end
 
     function InferenceConfig(
@@ -57,9 +59,38 @@ struct InferenceConfig{T, F, IGP, L, O, E, D <: Distribution, X <: Integer}
             tspan = tspan,
             epimethod = epimethod,
             log_I0_prior = inference_config["log_I0_prior"],
-            lookahead = inference_config["lookahead"]
+            lookahead = inference_config["lookahead"],
+            latent_model_name = inference_config["latent_namemodels"].first
         )
     end
+end
+
+"""
+This function makes inference on the underlying parameters of the model specified
+in the `InferenceConfig` object `config`.
+
+# Arguments
+- `config::InferenceConfig`: The configuration object containing the case data
+to make inference on and model configuration.
+- `epiprob::EpiProblem`: The EpiProblem object containing the model to make inference on.
+
+# Returns
+- `inference_results`: The results of the simulation or inference.
+
+"""
+function create_inference_results(config, epiprob)
+    #Return the sampled infections and observations
+    y_t = ismissing(config.case_data) ? missing :
+          Vector{Union{Missing, Int64}}(config.case_data[idxs])
+    inference_results = apply_method(epiprob,
+        config.epimethod,
+        (y_t = y_t,)
+    )
+    inference_results = apply_method(epiprob,
+        config.epimethod,
+        (y_t = y_t,);
+    )
+    return inference_results
 end
 
 """
@@ -80,18 +111,21 @@ function infer(config::InferenceConfig)
     idxs = config.tspan[1]:config.tspan[2]
 
     #Return the sampled infections and observations
-    y_t = ismissing(config.case_data) ? missing :
-          Vector{Union{Missing, Int64}}(config.case_data[idxs])
-    inference_results = apply_method(epiprob,
-        config.epimethod,
-        (y_t = y_t,);
-    )
+    inference_results = create_inference_results(config, epiprob)
 
-    forecast_results = generate_forecasts(
-        inference_results.samples, inference_results.data, epiprob, config.lookahead)
+    forecast_results = try
+        generate_forecasts(
+            inference_results.samples, inference_results.data, epiprob, config.lookahead)
+    catch e
+        e
+    end
 
     epidata = epiprob.epi_model.data
-    score_results = summarise_crps(config, inference_results, forecast_results, epidata)
+    score_results = try
+        summarise_crps(config, inference_results, forecast_results, epidata)
+    catch e
+        e
+    end
 
     return Dict("inference_results" => inference_results,
         "epiprob" => epiprob, "inference_config" => config,

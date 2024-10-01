@@ -1,4 +1,3 @@
-
 """
 Transforms a matrix of time series samples into quantiles.
 
@@ -14,8 +13,12 @@ A matrix where each row represents the quantiles of a time series.
 """
 function timeseries_samples_into_quantiles(X, qs)
     mapreduce(vcat, eachrow(X)) do row
-        _row = filter(x -> !isnan(x), row)
-        quantile(_row, qs)'
+        if any(ismissing, row)
+            return fill(missing, length(qs))'
+        else
+            _row = filter(x -> !isnan(x), row)
+            return quantile(_row, qs)'
+        end
     end
 end
 
@@ -39,10 +42,29 @@ An array of quantiles for each target.
 
 """
 function generate_quantiles_for_targets(output, D::EpiData, qs)
-    mapreduce(_process_reduction, output["forecast_results"].generated,
-        output["inference_results"].samples[:init_incidence]) do gen, logI0
-        calculate_processes(gen.I_t, exp(logI0), D, EpiAwareExamplePipeline())
+    mapreduce(_process_reduction, output.generated,
+        output.samples[:init_incidence]) do gen, logI0
+        calculate_processes(gen.I_t, exp(logI0), D)
     end |> res -> map(res) do X
         timeseries_samples_into_quantiles(X, qs)
     end
+end
+
+"""
+Internal method that given a list of percentiles `ps`, this function calculates the corresponding quantile levels.
+This function returns both the `p/2` and `1 - p/2` quantiles for each percentile `p` in `ps`.
+# Arguments
+- `ps::Vector{Float64}`: A vector of percentiles.
+
+# Returns
+- `qs::Vector{Float64}`: A vector of quantile levels, including the median (0.5) and the calculated quantiles based on the input percentiles.
+- `n_levels::Int`: The number of input percentiles.
+
+"""
+function _setup_levels(ps)
+    n_levels = length(ps)
+    qs = mapreduce(vcat, ps) do percentile
+        [percentile / 2, 1 - percentile / 2]
+    end |> x -> [0.5; x]
+    return qs, n_levels
 end

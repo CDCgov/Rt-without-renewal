@@ -8,7 +8,7 @@ Constructs an inference method for the given pipeline. This is a default method.
 - An inference method.
 
 """
-function make_inference_method(pipeline::AbstractEpiAwarePipeline; ndraws::Integer = 2000,
+function make_inference_method(ndraws::Integer, pipeline::AbstractEpiAwarePipeline;
         mcmc_ensemble::AbstractMCMC.AbstractMCMCEnsemble = MCMCSerial(),
         nruns_pthf::Integer = 4, maxiters_pthf::Integer = 100, nchains::Integer = 4)
     return EpiMethod(
@@ -19,17 +19,7 @@ function make_inference_method(pipeline::AbstractEpiAwarePipeline; ndraws::Integ
 end
 
 """
-Method for sampling from prior predictive distribution of the model.
-"""
-function make_inference_method(pipeline::RtwithoutRenewalPriorPipeline; n_samples = 2_000)
-    return EpiMethod(
-        pre_sampler_steps = AbstractEpiOptMethod[],
-        sampler = DirectSample(n_samples = n_samples)
-    )
-end
-
-"""
-Pipeline test mode method for sampling from prior predictive distribution of the model.
+Example pipeline.
 """
 function make_inference_method(
         pipeline::EpiAwareExamplePipeline; ndraws::Integer = 20,
@@ -38,8 +28,19 @@ function make_inference_method(
     return EpiMethod(
         pre_sampler_steps = [ManyPathfinder(nruns = nruns_pthf, maxiters = maxiters_pthf)],
         sampler = NUTSampler(
-            target_acceptance = 0.9, adtype = AutoReverseDiff(; compile = true), ndraws = ndraws,
-            nchains = nchains, mcmc_parallel = mcmc_ensemble)
+            target_acceptance = 0.9, adtype = AutoReverseDiff(; compile = true),
+            ndraws = ndraws, nchains = nchains, mcmc_parallel = mcmc_ensemble)
+    )
+end
+
+"""
+Method for sampling from prior predictive distribution of the model.
+"""
+function make_inference_method(
+        pipeline::AbstractRtwithoutRenewalPipeline, ::Val{:priorpredictive})
+    return EpiMethod(
+        pre_sampler_steps = AbstractEpiOptMethod[],
+        sampler = DirectSample(n_samples = pipeline.ndraws)
     )
 end
 
@@ -55,7 +56,12 @@ Constructs an inference method for the Rt-without-renewal pipeline.
 # Examples
 """
 function make_inference_method(pipeline::AbstractRtwithoutRenewalPipeline)
-    return make_inference_method(pipeline; ndraws = pipeline.ndraws,
-        mcmc_ensemble = pipeline.mcmc_ensemble, nruns_pthf = pipeline.nruns_pthf,
-        maxiters_pthf = pipeline.maxiters_pthf, nchains = pipeline.nchains)
+    if pipeline.priorpredictive
+        return make_inference_method(pipeline, Val(:priorpredictive))
+    else
+        return make_inference_method(
+            pipeline.ndraws, pipeline; mcmc_ensemble = pipeline.mcmc_ensemble,
+            nruns_pthf = pipeline.nruns_pthf,
+            maxiters_pthf = pipeline.maxiters_pthf, nchains = pipeline.nchains)
+    end
 end
