@@ -1,4 +1,3 @@
-
 """
 Transforms a matrix of time series samples into quantiles.
 
@@ -14,8 +13,12 @@ A matrix where each row represents the quantiles of a time series.
 """
 function timeseries_samples_into_quantiles(X, qs)
     mapreduce(vcat, eachrow(X)) do row
-        _row = filter(x -> !isnan(x), row)
-        quantile(_row, qs)'
+        if any(ismissing, row)
+            return fill(missing, length(qs))'
+        else
+            _row = filter(x -> !isnan(x), row)
+            return quantile(_row, qs)'
+        end
     end
 end
 
@@ -39,9 +42,9 @@ An array of quantiles for each target.
 
 """
 function generate_quantiles_for_targets(output, D::EpiData, qs)
-    mapreduce(_process_reduction, output["forecast_results"].generated,
-        output["inference_results"].samples[:init_incidence]) do gen, logI0
-        calculate_processes(gen.I_t, exp(logI0), D, EpiAwareExamplePipeline())
+    mapreduce(_process_reduction, output.generated,
+        output.samples[:init_incidence]) do gen, logI0
+        calculate_processes(gen.I_t, exp(logI0), D)
     end |> res -> map(res) do X
         timeseries_samples_into_quantiles(X, qs)
     end
