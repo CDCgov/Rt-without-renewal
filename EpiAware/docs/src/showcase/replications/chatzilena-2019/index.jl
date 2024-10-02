@@ -132,9 +132,8 @@ We downloaded the data of this outbreak using the R package `outbreaks` which is
 # ╔═╡ 7c9cbbc1-71ef-4d81-b93a-c2b3a8683d53
 data = "https://raw.githubusercontent.com/CDCgov/Rt-without-renewal/refs/heads/446-add-chatzilena-et-al-as-a-replication-example/EpiAware/docs/src/showcase/replications/chatzilena-2019/influenza_england_1978_school.csv2" |>
        url -> CSV.read(download(url), DataFrame) |>
-	   df -> @transform(df, 
-	   	:ts = (:date .- minimum(:date)) .|> d -> d.value + 1.0,
-	   )
+              df -> @transform(df,
+    :ts=(:date .- minimum(:date)) .|> d -> d.value + 1.0,)
 
 # ╔═╡ aba3f1db-c290-409c-9b9e-6065935ede54
 N = 763;
@@ -150,7 +149,7 @@ sir_prob = ODEProblem(
 md"
 ## Inference for the deterministic SIR model
 
-The boarding school data gives the number of children \"in bed\" and \"convalescent\" on each of 14 days from 22nd Jan to 4th Feb 1978. We follow _Chatzilena et al_ and treat the number \"in bed\" as a proxy for the number of children in the infectious (I) compartment in the ODE model. 
+The boarding school data gives the number of children \"in bed\" and \"convalescent\" on each of 14 days from 22nd Jan to 4th Feb 1978. We follow _Chatzilena et al_ and treat the number \"in bed\" as a proxy for the number of children in the infectious (I) compartment in the ODE model.
 
 The full observation model is:
 
@@ -181,32 +180,32 @@ Now we can write the observation model using the `Turing` PPL.
 "
 
 # ╔═╡ 1d287c8e-7000-4b23-ae7e-f7008c3e53bd
-@model function deterministic_ode_mdl(Yt, ts, obs, prob, N; 
-	solver = AutoTsit5(Rosenbrock23()),
-	upjitter = 1e-3
+@model function deterministic_ode_mdl(Yt, ts, obs, prob, N;
+        solver = AutoTsit5(Rosenbrock23()),
+        upjitter = 1e-3
 )
-	##Priors##
+    ##Priors##
     β ~ LogNormal(0.0, 1.0)
     γ ~ Gamma(0.004, 1 / 0.002)
     S₀ ~ Beta(0.5, 0.5)
 
-	##remake ODE model##
+    ##remake ODE model##
     _prob = remake(prob;
         u0 = [S₀, 1 - S₀, 0.0],
         p = [β, γ]
     )
 
-	##Solve remade ODE model##
-	
-    sol = solve(_prob, solver; 
-		saveat = ts,
+    ##Solve remade ODE model##
+
+    sol = solve(_prob, solver;
+        saveat = ts,
         verbose = false)
 
-	##log-like accumulation using obs##
+    ##log-like accumulation using obs##
     λt = N * sol[2, :] .+ upjitter #expected It
     @submodel obsYt = generate_observations(obs, Yt, λt)
 
-	##Generated quantities##
+    ##Generated quantities##
     return (; sol, obsYt, R0 = β / γ)
 end
 
@@ -222,7 +221,8 @@ We instantiate the model in two ways:
 deterministic_mdl = deterministic_ode_mdl(data.in_bed, data.ts, obs, sir_prob, N);
 
 # ╔═╡ e795c2bf-0861-4e96-9921-db47f41af206
-deterministic_uncond_mdl = deterministic_ode_mdl(fill(missing, length(data.in_bed)), data.ts,  obs, sir_prob, N);
+deterministic_uncond_mdl = deterministic_ode_mdl(
+    fill(missing, length(data.in_bed)), data.ts, obs, sir_prob, N);
 
 # ╔═╡ e848434c-2543-43d1-ae22-5c4241f138bb
 md"
@@ -231,29 +231,32 @@ We add a useful plotting utility.
 
 # ╔═╡ ab8c98d1-d357-4c49-9f5a-f069e05c45f5
 function plot_predYt(data, gens; title::String, ylabel::String)
-	fig = Figure()
-	ga = fig[1, 1:2] = GridLayout()
+    fig = Figure()
+    ga = fig[1, 1:2] = GridLayout()
 
-	ax = Axis(ga[1, 1];
-		title = title,
-		xticks = (data.ts[1:3:end], data.date[1:3:end] .|> string),
-		ylabel = ylabel,
-	)
-	pred_Yt = mapreduce(hcat, gens) do gen
-		gen.obsYt
-	end |> X -> mapreduce(vcat, eachrow(X)) do row
-		quantile(row, [0.5, 0.025, 0.975, 0.1, 0.9, 0.25, 0.75])'
-	end
-	
-	lines!(ax, data.ts, pred_Yt[:, 1]; linewidth = 3, color = :green, label = "Median")
-	band!(ax, data.ts, pred_Yt[:, 2], pred_Yt[:, 3], color = (:green, 0.2), label = "95% CI")
-	band!(ax, data.ts, pred_Yt[:, 4], pred_Yt[:, 5], color = (:green, 0.4), label = "80% CI")
-	band!(ax, data.ts, pred_Yt[:, 6], pred_Yt[:, 7], color = (:green, 0.6), label = "50% CI")
-	scatter!(ax, data.in_bed, label = "data")
-	leg = Legend(ga[1, 2], ax; framevisible = false)
-	hidespines!(ax)
+    ax = Axis(ga[1, 1];
+        title = title,
+        xticks = (data.ts[1:3:end], data.date[1:3:end] .|> string),
+        ylabel = ylabel
+    )
+    pred_Yt = mapreduce(hcat, gens) do gen
+        gen.obsYt
+    end |> X -> mapreduce(vcat, eachrow(X)) do row
+        quantile(row, [0.5, 0.025, 0.975, 0.1, 0.9, 0.25, 0.75])'
+    end
 
-	fig
+    lines!(ax, data.ts, pred_Yt[:, 1]; linewidth = 3, color = :green, label = "Median")
+    band!(
+        ax, data.ts, pred_Yt[:, 2], pred_Yt[:, 3], color = (:green, 0.2), label = "95% CI")
+    band!(
+        ax, data.ts, pred_Yt[:, 4], pred_Yt[:, 5], color = (:green, 0.4), label = "80% CI")
+    band!(
+        ax, data.ts, pred_Yt[:, 6], pred_Yt[:, 7], color = (:green, 0.6), label = "50% CI")
+    scatter!(ax, data.in_bed, label = "data")
+    leg = Legend(ga[1, 2], ax; framevisible = false)
+    hidespines!(ax)
+
+    fig
 end
 
 # ╔═╡ 2c6ac235-e331-4189-8c8c-74de5f98b2c4
@@ -263,12 +266,12 @@ md"
 
 # ╔═╡ a729f1cd-404c-4a33-a8f9-b2ea6f0adb62
 let
-	prior_chn = sample(deterministic_uncond_mdl, Prior(), 2000)
+    prior_chn = sample(deterministic_uncond_mdl, Prior(), 2000)
     gens = generated_quantities(deterministic_uncond_mdl, prior_chn)
-	plot_predYt(data, gens;
-		title = "Prior predictive: deterministic model", 
-		ylabel = "Number of Infected students",
-	)
+    plot_predYt(data, gens;
+        title = "Prior predictive: deterministic model",
+        ylabel = "Number of Infected students"
+    )
 end
 
 # ╔═╡ 4c0759fb-76e9-4de5-9206-89e8bfb6c3bb
@@ -287,12 +290,11 @@ nmle_tries = 100
 
 # ╔═╡ ba35cebd-0d29-43c5-8db7-f550d7f821bc
 mle_fit = map(1:nmle_tries) do _
-	fit = try
-    		maximum_likelihood(deterministic_mdl;
-    )
-	catch 
-		(lp = -Inf,)
-	end
+    fit = try
+        maximum_likelihood(deterministic_mdl)
+    catch
+        (lp = -Inf,)
+    end
 end |>
           fits -> (findmax(fit -> fit.lp, fits)[2], fits) |>
                   max_and_fits -> max_and_fits[2][max_and_fits[1]]
@@ -304,13 +306,13 @@ mle_fit.optim_result.retcode
 md"
 Note that we choose the best out of $nmle_tries tries for the MLE estimators.
 
-Now, we sample aiming at 1000 samples for each of 4 chains. 
+Now, we sample aiming at 1000 samples for each of 4 chains.
 "
 
 # ╔═╡ 2cf64ba3-ff8d-40b0-9bd8-9e80393156f5
 chn = sample(
-    deterministic_mdl, NUTS(), MCMCThreads(), 1000, 4; 
-	initial_params = fill(mle_fit.values.array, 4))
+    deterministic_mdl, NUTS(), MCMCThreads(), 1000, 4;
+    initial_params = fill(mle_fit.values.array, 4))
 
 # ╔═╡ b2429b68-dd75-499f-a4e1-1b7d72e209c7
 describe(chn)
@@ -326,10 +328,10 @@ md"
 # ╔═╡ 03d1ecf8-543d-444d-b1a3-7a19acd88499
 let
     gens = generated_quantities(deterministic_uncond_mdl, chn)
-	plot_predYt(data, gens;
-		title = "Fitted deterministic model", 
-		ylabel = "Number of Infected students",
-	)
+    plot_predYt(data, gens;
+        title = "Fitted deterministic model",
+        ylabel = "Number of Infected students"
+    )
 end
 
 # ╔═╡ e023770d-25f7-4b7a-b509-8a4372f42b76
@@ -398,46 +400,75 @@ sampled_AR_damps = ϕs .|> ϕ -> exp(-ϕ)
 
 # ╔═╡ 48032d21-53fa-4c0a-85cb-c22327b55073
 sampled_AR_stds = map(ϕs, σ²s) do ϕ, σ²
-	(1 - exp(-2 * ϕ)) * σ² / (2 * ϕ)
+    (1 - exp(-2 * ϕ)) * σ² / (2 * ϕ)
 end
+
+# ╔═╡ 89c767b8-97a0-45bb-9e9f-821879ddd38b
+md"
+We define the AR(1) process by matching means of `HalfNormal` prior distributions for the damp parameters and std deviation parameter to the calculated the prior means from the _Chatzilena et al_ definition.
+"
 
 # ╔═╡ 71a26408-1c26-46cf-bc72-c6ba528dfadd
 ar = AR(
-	damp_priors = [HalfNormal(mean(sampled_AR_damps))],
+    damp_priors = [HalfNormal(mean(sampled_AR_damps))],
     std_prior = HalfNormal(mean(sampled_AR_stds)),
     init_priors = [Normal(0, 0.001)]
 )
 
 # ╔═╡ 9309f7f8-0896-4686-8bfc-b9f82d91bc0f
-@model function stochastic_ode_mdl(Yt, logobsprob, obs, prob, N)
-    nobs = length(Yt)
+@model function stochastic_ode_mdl(Yt, ts, logobsprob, obs, prob, N;
+        solver = AutoTsit5(Rosenbrock23()),
+        upjitter = 1e-2#0.1,
+)
 
+    ##Priors##
     β ~ LogNormal(0.0, 1.0)
     γ ~ Gamma(0.004, 1 / 0.002)
     S₀ ~ Beta(0.5, 0.5)
 
+    ##Remake ODE model##
     _prob = remake(prob;
         u0 = [S₀, 1 - S₀, 0.0],
         p = [β, γ]
     )
 
-    sol = solve(_prob, AutoTsit5(Rosenbrock23());
-        sensealg = ForwardDiffSensitivity(),
-        saveat = 1.0:nobs, verbose = false)
-    # μ = log.(N * sol[2, :])
-    @submodel κ = generate_latent(logobsprob, nobs)
-    λt = @. N * sol[2, :] * exp(κ) + 0.1
+    ##Solve ODE model##
+    sol = solve(_prob, solver;
+        saveat = ts,
+        verbose = false
+    )
 
+    ##Sample the log-residual AR process##
+    nobs = length(Yt)
+    @submodel κₜ = generate_latent(logobsprob, nobs)
+    λt = @. N * sol[2, :] * exp(κₜ) + upjitter
+
+    ##log-like accumulation using obs##
     @submodel obsYt = generate_observations(obs, Yt, λt)
 
+    ##Generated quantities##
     return (; sol, obsYt, R0 = β / γ)
 end
 
 # ╔═╡ 4330c83f-de39-44c7-bdab-87e5f5830145
-stochastic_mdl = stochastic_ode_mdl(data.in_bed, ar, obs, sir_prob, N)
+stochastic_mdl = stochastic_ode_mdl(
+    data.in_bed,
+    data.ts,
+    ar,
+    obs,
+    sir_prob,
+    N
+)
 
 # ╔═╡ 8071c92f-9fe8-48cf-b1a0-79d1e34ec7e7
-stochastic_uncond_mdl = stochastic_ode_mdl(fill(missing, length(data.in_bed)), ar, obs, sir_prob, N)
+stochastic_uncond_mdl = stochastic_ode_mdl(
+    fill(missing, length(data.in_bed)),
+    data.ts,
+    ar,
+    obs,
+    sir_prob,
+    N
+)
 
 # ╔═╡ adb9d0ac-d412-4dbc-a601-59fcc33adf43
 md"
@@ -446,75 +477,83 @@ md"
 
 # ╔═╡ b44286f9-ba88-4e2b-9a34-f14c0a78824d
 let
-	prior_chn = sample(stochastic_uncond_mdl, Prior(), 2000)
+    prior_chn = sample(stochastic_uncond_mdl, Prior(), 2000)
     gens = generated_quantities(stochastic_uncond_mdl, prior_chn)
-	plot_predYt(data, gens;
-		title = "Prior predictive: stochastic model", 
-		ylabel = "Number of Infected students",
-	)
+    plot_predYt(data, gens;
+        title = "Prior predictive: stochastic model",
+        ylabel = "Number of Infected students"
+    )
 end
 
-# ╔═╡ d4502528-d058-4899-b3dd-576316116c18
-mle_fit2 = map(1:nmle_tries) do _
-	fit = try
-    		maximum_likelihood(stochastic_mdl;
-				adtype = AutoReverseDiff(true),
-    )
-	catch 
-		(lp = -Inf,)
-	end
-end |>
-          fits -> (findmax(fit -> fit.lp, fits)[2], fits) |>
-                  max_and_fits -> max_and_fits[2][max_and_fits[1]]
+# ╔═╡ f690114f-4dca-4451-8a93-57c9d8d7c20c
+md"
+The prior predictive checking again shows misaligned prior beliefs; for example _a priori_ without data we would not expect the median prediction of number of ill children as about 600 out of $N after 1 day.
 
-# ╔═╡ 78a732ab-4915-43d9-af55-b01bd84eb364
-map_fit2 = map(1:nmle_tries) do _
-	fit = 
-    		maximum_likelihood(stochastic_mdl;
-				adtype = AutoReverseDiff(true),
-				initial_params = mle_fit2.values.array,
-    )
-	# catch 
-	# 	(lp = -Inf,)
-	# end
-end |>
-          fits -> (findmax(fit -> fit.lp, fits)[2], fits) |>
-                  max_and_fits -> max_and_fits[2][max_and_fits[1]]
+The latent process for the log-residuals $\kappa_t$ doesn't make much sense without priors, so we look for a reasonable MAP point to start NUTS from. We do this by first making an initial guess which is a mixture of:
+
+1. The posterior averages from the deterministic model.
+2. The prior averages of the structure parameters of the AR(1) process.
+3. Zero for the time-varying noise underlying the AR(1) process.
+"
+
+# ╔═╡ 3491e7e5-6c82-4c50-8feb-d730d1fbe457
+rand(stochastic_mdl)
+
+# ╔═╡ e1d54935-4305-42cf-98c6-ccee9b0813ea
+initial_guess = [[mean(chn[:β]),
+                     mean(chn[:γ]),
+                     mean(chn[:S₀]),
+                     mean(ar.std_prior),
+                     mean(ar.init_prior)[1],
+                     mean(ar.damp_prior)[1]]
+                 zeros(13)]
+
+# ╔═╡ 685221ea-f268-4ddc-937f-e7620d065c28
+md"
+Starting from the initial guess, the MAP point is calculated rapidly in one pass.
+"
+
+# ╔═╡ 6796ae76-bc2d-4895-ba0a-5e2c23c50dfb
+map_fit_stoch_mdl = maximum_a_posteriori(stochastic_mdl;
+    adtype = AutoReverseDiff(),
+    initial_params = initial_guess
+)
+
+# ╔═╡ 62080cc2-3cab-4a22-9b2e-2bff640a17a4
+md"
+Now we can run NUTS, sampling 1000 posterior draws per chain for 4 chains.
+"
 
 # ╔═╡ 156272d7-56c4-4ac4-bf3e-7882f4edc144
-chn2 = sample(stochastic_mdl, NUTS(; adtype = AutoReverseDiff(true)), MCMCThreads(), 1000, 4; initial_params = fill(map_fit2.values.array,4))
+chn2 = sample(
+    stochastic_mdl,
+    NUTS(; adtype = AutoReverseDiff(true)),
+    MCMCThreads(), 1000, 4;
+    initial_params = fill(map_fit_stoch_mdl.values.array, 4)
+)
 
 # ╔═╡ 00b90e6d-732f-41c9-a603-cabe9740e329
 describe(chn2)
 
 # ╔═╡ 37a016d8-8384-41c9-abdd-23e88b1f988d
-pairplot(chn2[[:β, :γ, :S₀]])
+pairplot(chn2[[:β, :γ, :S₀, :σ_AR, Symbol("ar_init[1]"), Symbol("damp_AR[1]")]])
+
+# ╔═╡ 7df5d669-d3a2-4a66-83c3-f8618e39bec6
+let
+    vars = mapreduce(vcat, 1:13) do i
+        Symbol("ϵ_t[$i]")
+    end
+    pairplot(chn2[vars])
+end
 
 # ╔═╡ 0e7bbf13-9187-41ea-8b46-294b93be4c6d
 let
-ts = 1:size(data, 1)
-gens = generated_quantities(uncond_mdl2, chn2)
-fig = Figure()
-ax = Axis(fig[1,1];
-	title = "Fitted Stochastic model",
-	xticks = (ts[1:3:end], data.date[1:3:end] .|> string),
-	ylabel = "Number of Infected students"
-	)
-pred_Yt = mapreduce(hcat, gens) do gen
-	gen.obsYt
-end |> X -> mapreduce(vcat, eachrow(X)) do row
-	quantile(row, [0.5, 0.025, 0.975])'
+    gens = generated_quantities(stochastic_uncond_mdl, chn2)
+    plot_predYt(data, gens;
+        title = "Fitted stochastic model",
+        ylabel = "Number of Infected students"
+    )
 end
-
-lines!(ax,ts, pred_Yt[:,1]; linewidth = 3, label = "Fitted deterministic model", color = :green)
-band!(ax, ts, pred_Yt[:,2], pred_Yt[:,3], color = (:green, 0.5))
-scatter!(ax, data.in_bed)
-
-fig
-end
-
-# ╔═╡ 36efe6e0-643f-42e6-9d64-de2f5a76b764
-
 
 # ╔═╡ Cell order:
 # ╟─e34cec5a-a173-4e92-a860-340c7a9e9c72
@@ -563,16 +602,21 @@ end
 # ╠═e6bcf0c0-3cc4-41f3-ad20-fa11bf2ca37b
 # ╠═4f07e8ba-30d0-411f-8c3e-b6d5bc1bb5fa
 # ╠═48032d21-53fa-4c0a-85cb-c22327b55073
+# ╟─89c767b8-97a0-45bb-9e9f-821879ddd38b
 # ╠═71a26408-1c26-46cf-bc72-c6ba528dfadd
 # ╠═9309f7f8-0896-4686-8bfc-b9f82d91bc0f
 # ╠═4330c83f-de39-44c7-bdab-87e5f5830145
 # ╠═8071c92f-9fe8-48cf-b1a0-79d1e34ec7e7
-# ╠═adb9d0ac-d412-4dbc-a601-59fcc33adf43
+# ╟─adb9d0ac-d412-4dbc-a601-59fcc33adf43
 # ╠═b44286f9-ba88-4e2b-9a34-f14c0a78824d
-# ╠═d4502528-d058-4899-b3dd-576316116c18
-# ╠═78a732ab-4915-43d9-af55-b01bd84eb364
+# ╟─f690114f-4dca-4451-8a93-57c9d8d7c20c
+# ╠═3491e7e5-6c82-4c50-8feb-d730d1fbe457
+# ╠═e1d54935-4305-42cf-98c6-ccee9b0813ea
+# ╟─685221ea-f268-4ddc-937f-e7620d065c28
+# ╠═6796ae76-bc2d-4895-ba0a-5e2c23c50dfb
+# ╟─62080cc2-3cab-4a22-9b2e-2bff640a17a4
 # ╠═156272d7-56c4-4ac4-bf3e-7882f4edc144
 # ╠═00b90e6d-732f-41c9-a603-cabe9740e329
 # ╠═37a016d8-8384-41c9-abdd-23e88b1f988d
+# ╠═7df5d669-d3a2-4a66-83c3-f8618e39bec6
 # ╠═0e7bbf13-9187-41ea-8b46-294b93be4c6d
-# ╠═36efe6e0-643f-42e6-9d64-de2f5a76b764
