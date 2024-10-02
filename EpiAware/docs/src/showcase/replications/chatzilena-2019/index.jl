@@ -123,7 +123,9 @@ We do not define the parameters, these will be defined within an inference appro
 
 # ╔═╡ b5ff95d1-8a6f-4d48-adf2-60d91b3ebebe
 md"
-Note that this is analogous
+Note that this is analogous to the `EpiProblem` approach we expose from `EpiAware`, as used in the [Mishra et al replication](https://cdcgov.github.io/Rt-without-renewal/dev/showcase/replications/mishra-2020/).
+The difference is that here we are going to use ODE solvers from the `SciML` ecosystem to generate the dynamics of the underlying infections.
+In the linked example, we use latent process generation exposed by `EpiAware` as the underlying generative process for underlying dynamics.
 "
 
 # ╔═╡ d64388f9-6edd-414d-a191-316f75b35b2c
@@ -588,7 +590,7 @@ end
 # ╠═ab4269b1-e292-466f-8bfb-713d917c18f9
 # ╟─f16eb00b-2d77-45df-b767-757fe2f5674c
 # ╠═bb07a580-6d86-48b3-a79f-d2ed9306e87c
-# ╠═b5ff95d1-8a6f-4d48-adf2-60d91b3ebebe
+# ╟─b5ff95d1-8a6f-4d48-adf2-60d91b3ebebe
 # ╟─d64388f9-6edd-414d-a191-316f75b35b2c
 # ╠═7c9cbbc1-71ef-4d81-b93a-c2b3a8683d53
 # ╠═aba3f1db-c290-409c-9b9e-6065935ede54
