@@ -295,7 +295,7 @@ mle_fit = map(1:nmle_tries) do _
 	end
 end |>
           fits -> (findmax(fit -> fit.lp, fits)[2], fits) |>
-                  min_and_fits -> min_and_fits[2][min_and_fits[1]]
+                  max_and_fits -> max_and_fits[2][max_and_fits[1]]
 
 # ╔═╡ 0be912c1-22dc-4978-b86a-84273062f5da
 mle_fit.optim_result.retcode
@@ -416,7 +416,6 @@ ar = AR(
     γ ~ Gamma(0.004, 1 / 0.002)
     S₀ ~ Beta(0.5, 0.5)
 
-    # try
     _prob = remake(prob;
         u0 = [S₀, 1 - S₀, 0.0],
         p = [β, γ]
@@ -432,10 +431,6 @@ ar = AR(
     @submodel obsYt = generate_observations(obs, Yt, λt)
 
     return (; sol, obsYt, R0 = β / γ)
-    # catch
-    # 	Turing.@addlogprob! -Inf
-    # 	return
-    # end
 end
 
 # ╔═╡ 4330c83f-de39-44c7-bdab-87e5f5830145
@@ -444,39 +439,58 @@ stochastic_mdl = stochastic_ode_mdl(data.in_bed, ar, obs, sir_prob, N)
 # ╔═╡ 8071c92f-9fe8-48cf-b1a0-79d1e34ec7e7
 stochastic_uncond_mdl = stochastic_ode_mdl(fill(missing, length(data.in_bed)), ar, obs, sir_prob, N)
 
+# ╔═╡ adb9d0ac-d412-4dbc-a601-59fcc33adf43
+md"
+**Prior predictive checking**
+"
+
+# ╔═╡ b44286f9-ba88-4e2b-9a34-f14c0a78824d
+let
+	prior_chn = sample(stochastic_uncond_mdl, Prior(), 2000)
+    gens = generated_quantities(stochastic_uncond_mdl, prior_chn)
+	plot_predYt(data, gens;
+		title = "Prior predictive: stochastic model", 
+		ylabel = "Number of Infected students",
+	)
+end
+
 # ╔═╡ d4502528-d058-4899-b3dd-576316116c18
 mle_fit2 = map(1:nmle_tries) do _
 	fit = try
     		maximum_likelihood(stochastic_mdl;
+				adtype = AutoReverseDiff(true),
     )
 	catch 
 		(lp = -Inf,)
 	end
 end |>
           fits -> (findmax(fit -> fit.lp, fits)[2], fits) |>
-                  min_and_fits -> min_and_fits[2][min_and_fits[1]]
+                  max_and_fits -> max_and_fits[2][max_and_fits[1]]
 
-# ╔═╡ 6a246854-601b-4d5a-9fb8-52b0e1620e7d
-mdl2()
+# ╔═╡ 78a732ab-4915-43d9-af55-b01bd84eb364
+map_fit2 = map(1:nmle_tries) do _
+	fit = 
+    		maximum_likelihood(stochastic_mdl;
+				adtype = AutoReverseDiff(true),
+				initial_params = mle_fit2.values.array,
+    )
+	# catch 
+	# 	(lp = -Inf,)
+	# end
+end |>
+          fits -> (findmax(fit -> fit.lp, fits)[2], fits) |>
+                  max_and_fits -> max_and_fits[2][max_and_fits[1]]
 
 # ╔═╡ 156272d7-56c4-4ac4-bf3e-7882f4edc144
-# ╠═╡ disabled = true
-#=╠═╡
-chn2 = sample(mdl2, NUTS(; adtype = AutoReverseDiff(true)), MCMCThreads(), 1000, 4; initial_params = fill(map_fit2.values.array,4))
-  ╠═╡ =#
+chn2 = sample(stochastic_mdl, NUTS(; adtype = AutoReverseDiff(true)), MCMCThreads(), 1000, 4; initial_params = fill(map_fit2.values.array,4))
 
 # ╔═╡ 00b90e6d-732f-41c9-a603-cabe9740e329
-#=╠═╡
 describe(chn2)
-  ╠═╡ =#
 
 # ╔═╡ 37a016d8-8384-41c9-abdd-23e88b1f988d
-#=╠═╡
 pairplot(chn2[[:β, :γ, :S₀]])
-  ╠═╡ =#
 
 # ╔═╡ 0e7bbf13-9187-41ea-8b46-294b93be4c6d
-#=╠═╡
 let
 ts = 1:size(data, 1)
 gens = generated_quantities(uncond_mdl2, chn2)
@@ -498,7 +512,6 @@ scatter!(ax, data.in_bed)
 
 fig
 end
-  ╠═╡ =#
 
 # ╔═╡ 36efe6e0-643f-42e6-9d64-de2f5a76b764
 
@@ -554,8 +567,10 @@ end
 # ╠═9309f7f8-0896-4686-8bfc-b9f82d91bc0f
 # ╠═4330c83f-de39-44c7-bdab-87e5f5830145
 # ╠═8071c92f-9fe8-48cf-b1a0-79d1e34ec7e7
+# ╠═adb9d0ac-d412-4dbc-a601-59fcc33adf43
+# ╠═b44286f9-ba88-4e2b-9a34-f14c0a78824d
 # ╠═d4502528-d058-4899-b3dd-576316116c18
-# ╠═6a246854-601b-4d5a-9fb8-52b0e1620e7d
+# ╠═78a732ab-4915-43d9-af55-b01bd84eb364
 # ╠═156272d7-56c4-4ac4-bf3e-7882f4edc144
 # ╠═00b90e6d-732f-41c9-a603-cabe9740e329
 # ╠═37a016d8-8384-41c9-abdd-23e88b1f988d
