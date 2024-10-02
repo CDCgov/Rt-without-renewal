@@ -389,3 +389,4 @@ EpiAware/docs/src/examples/*.md
 # benchmark ignore
 /.benchmarkci
 /benchmark/*.json
+EpiAware/docs/src/getting-started/tutorials/censored-obs.md
