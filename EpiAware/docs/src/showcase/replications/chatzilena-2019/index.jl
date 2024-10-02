@@ -48,7 +48,8 @@ md"
 # Example: Statistical inference for ODE-based infectious disease models
 # Introduction
 ## What are we going to do in this Vignette
-In this vignette, we'll demonstrate how to use `EpiAware` in conjunction with [SciML ecosystem](https://sciml.ai/) for Bayesian inference of infectious disease dynamics. The model and data is heavily based on [Contemporary statistical inference for infectious disease models using Stan _Chatzilena et al. 2019_](https://www.sciencedirect.com/science/article/pii/S1755436519300325).
+In this vignette, we'll demonstrate how to use `EpiAware` in conjunction with [SciML ecosystem](https://sciml.ai/) for Bayesian inference of infectious disease dynamics.
+The model and data is heavily based on [Contemporary statistical inference for infectious disease models using Stan _Chatzilena et al. 2019_](https://www.sciencedirect.com/science/article/pii/S1755436519300325).
 
 We'll cover the following key points:
 
@@ -63,15 +64,17 @@ This vignette builds on concepts from `EpiAware` observation models and a famila
 
 ## Packages used in this vignette
 
-Alongside the `EpiAware` package we will use the `OrdinaryDiffEq` and `SciMLSensitivity` packages for interfacing with `SciML` ecosystem; this is a lower dependency usage of `DifferentialEquations.jl` that, respectively, exposes ODE solvers and adjoint methods for ODE solvees; that is the method of propagating parameter derivatives through functions containing ODE solutions. Bayesian inference will be done with `NUTS` from the `Turing` ecosystem. We will also use the `CairoMakie` package for plotting and `DataFramesMeta` for data manipulation.
+Alongside the `EpiAware` package we will use the `OrdinaryDiffEq` and `SciMLSensitivity` packages for interfacing with `SciML` ecosystem; this is a lower dependency usage of `DifferentialEquations.jl` that, respectively, exposes ODE solvers and adjoint methods for ODE solvees; that is the method of propagating parameter derivatives through functions containing ODE solutions.
+Bayesian inference will be done with `NUTS` from the `Turing` ecosystem. We will also use the `CairoMakie` package for plotting and `DataFramesMeta` for data manipulation.
 "
 
 # ╔═╡ 943b82ec-b4dc-4537-8183-d6c73cd74a37
 md"
 # Single population SIR model
 
-As mentioned in _Chatzilena et al_ disease spread is frequently modelled in terms
-of ODE-based models. The study population is divided into compartments representing a specific stage of the epidemic status. In this case, susceptible, infected, and recovered individuals.
+As mentioned in _Chatzilena et al_ disease spread is frequently modelled in terms of ODE-based models.
+The study population is divided into compartments representing a specific stage of the epidemic status.
+In this case, susceptible, infected, and recovered individuals.
 
 ```math
 \begin{aligned}
@@ -81,9 +84,8 @@ of ODE-based models. The study population is divided into compartments represent
 \end{aligned}
 ```
 where S(t) represents the number of susceptible, I(t) the number of
-infected and R(t) the number of recovered individuals at time t. The
-total population size is denoted by N (with N = S(t) + I(t) + R(t)), β
-denotes the transmission rate and γ denotes the recovery rate.
+infected and R(t) the number of recovered individuals at time t.
+The total population size is denoted by N (with N = S(t) + I(t) + R(t)), β denotes the transmission rate and γ denotes the recovery rate.
 
 "
 
@@ -115,7 +117,13 @@ end
 
 # ╔═╡ f16eb00b-2d77-45df-b767-757fe2f5674c
 md"
-We combine vector field function `sir!` with a initial condition `u0` and the integration period `tspan` to make an `ODEProblem`. We do not define the parameters, these will be defined within an inference approach.
+We combine vector field function `sir!` with a initial condition `u0` and the integration period `tspan` to make an `ODEProblem`.
+We do not define the parameters, these will be defined within an inference approach.
+"
+
+# ╔═╡ b5ff95d1-8a6f-4d48-adf2-60d91b3ebebe
+md"
+Note that this is analogous
 "
 
 # ╔═╡ d64388f9-6edd-414d-a191-316f75b35b2c
@@ -123,7 +131,9 @@ md"
 
 ## Data for inference
 
-There was a brief, but intense, outbreak of Influenza within the (semi-) closed community of a boarding school reported to the British medical journal in 1978. The outbreak lasted from 22nd January to 4th February and it is reported that one infected child started the epidemic and then it spread rapidly. Of the 763 children at the boarding scholl, 512 became ill.
+There was a brief, but intense, outbreak of Influenza within the (semi-) closed community of a boarding school reported to the British medical journal in 1978.
+The outbreak lasted from 22nd January to 4th February and it is reported that one infected child started the epidemic and then it spread rapidly.
+Of the 763 children at the boarding scholl, 512 became ill.
 
 We downloaded the data of this outbreak using the R package `outbreaks` which is maintained as part of the [R Epidemics Consortium(RECON)](http://www. repidemicsconsortium.org).
 
@@ -149,7 +159,8 @@ sir_prob = ODEProblem(
 md"
 ## Inference for the deterministic SIR model
 
-The boarding school data gives the number of children \"in bed\" and \"convalescent\" on each of 14 days from 22nd Jan to 4th Feb 1978. We follow _Chatzilena et al_ and treat the number \"in bed\" as a proxy for the number of children in the infectious (I) compartment in the ODE model.
+The boarding school data gives the number of children \"in bed\" and \"convalescent\" on each of 14 days from 22nd Jan to 4th Feb 1978.
+We follow _Chatzilena et al_ and treat the number \"in bed\" as a proxy for the number of children in the infectious (I) compartment in the ODE model.
 
 The full observation model is:
 
@@ -163,7 +174,8 @@ S(0) /N &\sim \text{Beta}(0.5, 0.5).
 \end{aligned}
 ```
 
-**NB: Chatzilena et al give $\lambda_t = \int_0^t  \beta \frac{I(s)}{N} S(s) - \gamma I(s)ds = I(t) - I(0).$ However, this doesn't match their underlying stan code.**
+**NB: Chatzilena et al give $\lambda_t = \int_0^t  \beta \frac{I(s)}{N} S(s) - \gamma I(s)ds = I(t) - I(0).$
+However, this doesn't match their underlying stan code.**
 "
 
 # ╔═╡ ea1be94b-d722-47ee-8465-982c83dc6838
@@ -213,8 +225,10 @@ end
 md"
 We instantiate the model in two ways:
 
-1. `deterministic_mdl`: This conditions the generative model on the data observation. We can sample from this model to find the posterior distribution of the parameters.
-2. `deterministic_uncond_mdl`: This _doesn't_ condition on the data. This is useful for prior and posterior predictive modelling.
+1. `deterministic_mdl`: This conditions the generative model on the data observation.
+We can sample from this model to find the posterior distribution of the parameters.
+2. `deterministic_uncond_mdl`: This _doesn't_ condition on the data.
+This is useful for prior and posterior predictive modelling.
 "
 
 # ╔═╡ dbc1b453-1c29-4f82-bec9-098d67f9e63f
@@ -276,7 +290,8 @@ end
 
 # ╔═╡ 4c0759fb-76e9-4de5-9206-89e8bfb6c3bb
 md"
-The prior predictive checking suggests that _a priori_ our parameter beliefs are very far from the data. Approaching the inference naively can lead to poor fits.
+The prior predictive checking suggests that _a priori_ our parameter beliefs are very far from the data.
+Approaching the inference naively can lead to poor fits.
 
 We do three things to mitigate this:
 
@@ -338,8 +353,8 @@ end
 md"
 ## Inference for the Stochastic SIR model
 
-In _Chatzilena et al_, they present an auto-regressive model for connecting the outcome of the ODE model to illness observations. The argument is that the stochastic component of the model can absorb the noise
-generated by a possible mis-specification of the model.
+In _Chatzilena et al_, they present an auto-regressive model for connecting the outcome of the ODE model to illness observations.
+The argument is that the stochastic component of the model can absorb the noise generated by a possible mis-specification of the model.
 
 In their approach they consider $\kappa_t = \log \lambda_t$ where $\kappa_t$ evolves according to an Ornstein-Uhlenbeck process:
 
@@ -386,7 +401,8 @@ S(0) /N &\sim \text{Beta}(0.5, 0.5)\\
 md"
 We will using the `AR` struct from `EpiAware` to define the auto-regressive process in this model which has a direct parameterisation of the `AR` model.
 
-To convert from the formulation above we sample from the priors, and define `HalfNormal` priors based on the sampled prior means of $e^{-\phi}$ and ${\sigma^2 \over 2 \phi} \left(1 - e^{-2\phi} \right)$. We also add a strong prior that $\kappa_1 \approx 0$.
+To convert from the formulation above we sample from the priors, and define `HalfNormal` priors based on the sampled prior means of $e^{-\phi}$ and ${\sigma^2 \over 2 \phi} \left(1 - e^{-2\phi} \right)$.
+We also add a strong prior that $\kappa_1 \approx 0$.
 "
 
 # ╔═╡ 178e0048-069a-4953-bb24-5116eb81cc41
@@ -418,7 +434,7 @@ ar = AR(
 # ╔═╡ 9309f7f8-0896-4686-8bfc-b9f82d91bc0f
 @model function stochastic_ode_mdl(Yt, ts, logobsprob, obs, prob, N;
         solver = AutoTsit5(Rosenbrock23()),
-        upjitter = 1e-2#0.1,
+        upjitter = 1e-2,
 )
 
     ##Priors##
@@ -489,7 +505,8 @@ end
 md"
 The prior predictive checking again shows misaligned prior beliefs; for example _a priori_ without data we would not expect the median prediction of number of ill children as about 600 out of $N after 1 day.
 
-The latent process for the log-residuals $\kappa_t$ doesn't make much sense without priors, so we look for a reasonable MAP point to start NUTS from. We do this by first making an initial guess which is a mixture of:
+The latent process for the log-residuals $\kappa_t$ doesn't make much sense without priors, so we look for a reasonable MAP point to start NUTS from.
+We do this by first making an initial guess which is a mixture of:
 
 1. The posterior averages from the deterministic model.
 2. The prior averages of the structure parameters of the AR(1) process.
@@ -571,13 +588,14 @@ end
 # ╠═ab4269b1-e292-466f-8bfb-713d917c18f9
 # ╟─f16eb00b-2d77-45df-b767-757fe2f5674c
 # ╠═bb07a580-6d86-48b3-a79f-d2ed9306e87c
+# ╠═b5ff95d1-8a6f-4d48-adf2-60d91b3ebebe
 # ╟─d64388f9-6edd-414d-a191-316f75b35b2c
 # ╠═7c9cbbc1-71ef-4d81-b93a-c2b3a8683d53
 # ╠═aba3f1db-c290-409c-9b9e-6065935ede54
 # ╟─3f54bb44-76c4-4744-885a-46dedfaffeca
 # ╟─ea1be94b-d722-47ee-8465-982c83dc6838
 # ╠═87509792-e28d-4618-9bf5-e06b2e5dbe8b
-# ╠═81501c84-5e1f-4829-a26d-52fe00503958
+# ╟─81501c84-5e1f-4829-a26d-52fe00503958
 # ╠═1d287c8e-7000-4b23-ae7e-f7008c3e53bd
 # ╟─e7383885-fa6a-4240-a252-44ae82cae713
 # ╠═dbc1b453-1c29-4f82-bec9-098d67f9e63f
@@ -586,7 +604,7 @@ end
 # ╠═ab8c98d1-d357-4c49-9f5a-f069e05c45f5
 # ╟─2c6ac235-e331-4189-8c8c-74de5f98b2c4
 # ╠═a729f1cd-404c-4a33-a8f9-b2ea6f0adb62
-# ╟─4c0759fb-76e9-4de5-9206-89e8bfb6c3bb
+# ╠═4c0759fb-76e9-4de5-9206-89e8bfb6c3bb
 # ╠═8d96db67-de3b-4704-9f54-f4ed50a4ecff
 # ╠═ba35cebd-0d29-43c5-8db7-f550d7f821bc
 # ╠═0be912c1-22dc-4978-b86a-84273062f5da
