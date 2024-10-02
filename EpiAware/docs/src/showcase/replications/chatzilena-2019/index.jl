@@ -94,7 +94,7 @@ We can interface to the `SciML` ecosystem by writing a function with the signatu
 > `(du, u, p, t) -> nothing`
 
 Where:
-- `du` is the _vector field_ of the ODE problem, e.g. ${dS \over dt}$, ${dI \over dt}$ etc. This is calculated _in-place_.
+- `du` is the _vector field_ of the ODE problem, e.g. ${dS \over dt}$, ${dI \over dt}$ etc. This is calculated _in-place_ (commonly denoted using ! in function names in Julia).
 - `u` is the _state_ of the ODE problem, e.g. $S$, $I$, etc.
 - `p` is an object that represents the parameters of the ODE problem, e.g. $\beta$, $\gamma$.
 - `t` is the time of the ODE problem.
