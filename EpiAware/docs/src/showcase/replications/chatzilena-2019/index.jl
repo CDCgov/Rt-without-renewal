@@ -217,7 +217,7 @@ The reason is that the solver can return small negative numbers, the soft plus t
         verbose = false)
 
     ##log-like accumulation using obs##
-    λt = log1pexp.(N * sol[2, :] ) # #expected It
+    λt = log1pexp.(N * sol[2, :]) # #expected It
     @submodel generated_y_t = generate_observations(obs, y_t, λt)
 
     ##Generated quantities##
@@ -330,7 +330,7 @@ Now, we sample aiming at 1000 samples for each of 4 chains.
 # ╔═╡ 2cf64ba3-ff8d-40b0-9bd8-9e80393156f5
 chn = sample(
     deterministic_mdl, NUTS(), MCMCThreads(), 1000, 4;
-    initial_params = fill(mle_fit.values.array, 4),
+    initial_params = fill(mle_fit.values.array, 4)
 )
 
 # ╔═╡ b2429b68-dd75-499f-a4e1-1b7d72e209c7
@@ -442,18 +442,18 @@ We can sample directly from the behaviour specified by the `ar` struct to do pri
 
 # ╔═╡ de1498fa-8502-40ba-9708-2add74368e73
 let
-nobs = size(data, 1)
-ar_mdl = generate_latent(ar, nobs)
-fig = Figure()
-ax = Axis(fig[1,1],
-	xticks = (data.ts[1:3:end], data.date[1:3:end] .|> string),
-	ylabel = "exp(kt)",
-	title = "Prior predictive sampling for relative residual in mean pred."
-)
-for i = 1:500
-lines!(ax, ar_mdl() .|> exp, color = (:grey, 0.15))
-end
-fig
+    nobs = size(data, 1)
+    ar_mdl = generate_latent(ar, nobs)
+    fig = Figure()
+    ax = Axis(fig[1, 1],
+        xticks = (data.ts[1:3:end], data.date[1:3:end] .|> string),
+        ylabel = "exp(kt)",
+        title = "Prior predictive sampling for relative residual in mean pred."
+    )
+    for i in 1:500
+        lines!(ax, ar_mdl() .|> exp, color = (:grey, 0.15))
+    end
+    fig
 end
 
 # ╔═╡ 9a82c75a-6ea4-48bb-af06-fabaca4c45ee
@@ -469,7 +469,7 @@ Note that instead of implementing `exp.(κₜ)` directly, which can be unstable 
 
 # ╔═╡ 9309f7f8-0896-4686-8bfc-b9f82d91bc0f
 @model function stochastic_ode_mdl(y_t, ts, logobsprob, obs, prob, N;
-        solver = AutoTsit5(Rosenbrock23()),
+        solver = AutoTsit5(Rosenbrock23())
 )
 
     ##Priors##
