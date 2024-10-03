@@ -190,11 +190,11 @@ obs = PoissonError()
 
 # ╔═╡ 81501c84-5e1f-4829-a26d-52fe00503958
 md"
-Now we can write the observation model using the `Turing` PPL.
+Now we can write the probabilistic model using the `Turing` PPL.
 "
 
 # ╔═╡ 1d287c8e-7000-4b23-ae7e-f7008c3e53bd
-@model function deterministic_ode_mdl(Yt, ts, obs, prob, N;
+@model function deterministic_ode_mdl(y_t, ts, obs, prob, N;
         solver = AutoTsit5(Rosenbrock23()),
         upjitter = 1e-3
 )
@@ -217,20 +217,21 @@ Now we can write the observation model using the `Turing` PPL.
 
     ##log-like accumulation using obs##
     λt = N * sol[2, :] .+ upjitter #expected It
-    @submodel obsYt = generate_observations(obs, Yt, λt)
+    @submodel generated_y_t = generate_observations(obs, y_t, λt)
 
     ##Generated quantities##
-    return (; sol, obsYt, R0 = β / γ)
+    return (; sol, generated_y_t, R0 = β / γ)
 end
 
 # ╔═╡ e7383885-fa6a-4240-a252-44ae82cae713
 md"
 We instantiate the model in two ways:
 
-1. `deterministic_mdl`: This conditions the generative model on the data observation.
-We can sample from this model to find the posterior distribution of the parameters.
-2. `deterministic_uncond_mdl`: This _doesn't_ condition on the data.
-This is useful for prior and posterior predictive modelling.
+1. `deterministic_mdl`: This conditions the generative model on the data observation. We can sample from this model to find the posterior distribution of the parameters.
+2. `deterministic_uncond_mdl`: This _doesn't_ condition on the data. This is useful for prior and posterior predictive modelling.
+
+Here we construct the `Turing` model directly, in the [Mishra et al replication](https://cdcgov.github.io/Rt-without-renewal/dev/showcase/replications/mishra-2020/) we using the `EpiProblem` functionality to build a `Turing` model under the hood.
+Because in this note we are using a mix of functionality from `SciML` and `EpiAware`, we construct the model to sample from directly.
 "
 
 # ╔═╡ dbc1b453-1c29-4f82-bec9-098d67f9e63f
@@ -256,7 +257,7 @@ function plot_predYt(data, gens; title::String, ylabel::String)
         ylabel = ylabel
     )
     pred_Yt = mapreduce(hcat, gens) do gen
-        gen.obsYt
+        gen.generated_y_t
     end |> X -> mapreduce(vcat, eachrow(X)) do row
         quantile(row, [0.5, 0.025, 0.975, 0.1, 0.9, 0.25, 0.75])'
     end
@@ -433,8 +434,39 @@ ar = AR(
     init_priors = [Normal(0, 0.001)]
 )
 
+# ╔═╡ e1ffdaf6-ca2e-405d-8355-0d8848d005b0
+md"
+We can sample directly from the behaviour specified by the `ar` struct to do prior predictive checking on the `AR(1)` process.
+"
+
+# ╔═╡ de1498fa-8502-40ba-9708-2add74368e73
+let
+nobs = size(data, 1)
+ar_mdl = generate_latent(ar, nobs)
+fig = Figure()
+ax = Axis(fig[1,1],
+	xticks = (data.ts[1:3:end], data.date[1:3:end] .|> string),
+	ylabel = "exp(kt)",
+	title = "Prior predictive sampling for relative residual in mean pred."
+)
+for i = 1:500
+lines!(ax, ar_mdl() .|> exp, color = (:grey, 0.15))
+end
+fig
+end
+
+# ╔═╡ 9a82c75a-6ea4-48bb-af06-fabaca4c45ee
+md"
+We see that the choice of priors implies an _a priori_ belief that the extra observation noise on the mean prediction of the ODE model is fairly small, approximately 10% relative to the mean prediction.
+"
+
+# ╔═╡ b693a942-c6c7-40f8-997c-0dc8e5548132
+md"
+We can now define the probabilistic model.
+"
+
 # ╔═╡ 9309f7f8-0896-4686-8bfc-b9f82d91bc0f
-@model function stochastic_ode_mdl(Yt, ts, logobsprob, obs, prob, N;
+@model function stochastic_ode_mdl(y_t, ts, logobsprob, obs, prob, N;
         solver = AutoTsit5(Rosenbrock23()),
         upjitter = 1e-2,
 )
@@ -457,15 +489,15 @@ ar = AR(
     )
 
     ##Sample the log-residual AR process##
-    nobs = length(Yt)
+    nobs = length(y_t)
     @submodel κₜ = generate_latent(logobsprob, nobs)
     λt = @. N * sol[2, :] * exp(κₜ) + upjitter
 
     ##log-like accumulation using obs##
-    @submodel obsYt = generate_observations(obs, Yt, λt)
+    @submodel generated_y_t = generate_observations(obs, y_t, λt)
 
     ##Generated quantities##
-    return (; sol, obsYt, R0 = β / γ)
+    return (; sol, generated_y_t, R0 = β / γ)
 end
 
 # ╔═╡ 4330c83f-de39-44c7-bdab-87e5f5830145
@@ -624,6 +656,10 @@ end
 # ╠═48032d21-53fa-4c0a-85cb-c22327b55073
 # ╟─89c767b8-97a0-45bb-9e9f-821879ddd38b
 # ╠═71a26408-1c26-46cf-bc72-c6ba528dfadd
+# ╟─e1ffdaf6-ca2e-405d-8355-0d8848d005b0
+# ╠═de1498fa-8502-40ba-9708-2add74368e73
+# ╟─9a82c75a-6ea4-48bb-af06-fabaca4c45ee
+# ╟─b693a942-c6c7-40f8-997c-0dc8e5548132
 # ╠═9309f7f8-0896-4686-8bfc-b9f82d91bc0f
 # ╠═4330c83f-de39-44c7-bdab-87e5f5830145
 # ╠═8071c92f-9fe8-48cf-b1a0-79d1e34ec7e7
