@@ -26,7 +26,8 @@ getting_started_pages = Any[
 showcase_pages = Any[
     "Overview" => "showcase/index.md",
     "Replication" => [
-        "On the derivation of the renewal equation from an age-dependent branching process: an epidemic modelling perspective" => "showcase/replications/mishra-2020/index.md"
+        "On the derivation of the renewal equation from an age-dependent branching process: an epidemic modelling perspective" => "showcase/replications/mishra-2020/index.md",
+        "Statistical inference for ODE-based infectious disease models" => "showcase/replications/chatzilena-2019/index.md"
     ]
 ]
 
