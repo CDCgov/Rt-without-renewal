@@ -142,7 +142,7 @@ We downloaded the data of this outbreak using the R package `outbreaks` which is
 "
 
 # ╔═╡ 7c9cbbc1-71ef-4d81-b93a-c2b3a8683d53
-data = "https://raw.githubusercontent.com/CDCgov/Rt-without-renewal/refs/heads/446-add-chatzilena-et-al-as-a-replication-example/EpiAware/docs/src/showcase/replications/chatzilena-2019/influenza_england_1978_school.csv2" |>
+data = "https://raw.githubusercontent.com/CDCgov/Rt-without-renewal/refs/heads/main/EpiAware/docs/src/showcase/replications/chatzilena-2019/influenza_england_1978_school.csv2" |>
        url -> CSV.read(download(url), DataFrame) |>
               df -> @transform(df,
     :ts=(:date .- minimum(:date)) .|> d -> d.value + 1.0,)
