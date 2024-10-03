@@ -441,18 +441,18 @@ We can sample directly from the behaviour specified by the `ar` struct to do pri
 
 # ╔═╡ de1498fa-8502-40ba-9708-2add74368e73
 let
-nobs = size(data, 1)
-ar_mdl = generate_latent(ar, nobs)
-fig = Figure()
-ax = Axis(fig[1,1],
-	xticks = (data.ts[1:3:end], data.date[1:3:end] .|> string),
-	ylabel = "exp(kt)",
-	title = "Prior predictive sampling for relative residual in mean pred."
-)
-for i = 1:500
-lines!(ax, ar_mdl() .|> exp, color = (:grey, 0.15))
-end
-fig
+    nobs = size(data, 1)
+    ar_mdl = generate_latent(ar, nobs)
+    fig = Figure()
+    ax = Axis(fig[1, 1],
+        xticks = (data.ts[1:3:end], data.date[1:3:end] .|> string),
+        ylabel = "exp(kt)",
+        title = "Prior predictive sampling for relative residual in mean pred."
+    )
+    for i in 1:500
+        lines!(ax, ar_mdl() .|> exp, color = (:grey, 0.15))
+    end
+    fig
 end
 
 # ╔═╡ 9a82c75a-6ea4-48bb-af06-fabaca4c45ee
@@ -468,7 +468,7 @@ We can now define the probabilistic model.
 # ╔═╡ 9309f7f8-0896-4686-8bfc-b9f82d91bc0f
 @model function stochastic_ode_mdl(y_t, ts, logobsprob, obs, prob, N;
         solver = AutoTsit5(Rosenbrock23()),
-        upjitter = 1e-2,
+        upjitter = 1e-2
 )
 
     ##Priors##
