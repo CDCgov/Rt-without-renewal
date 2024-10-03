@@ -25,7 +25,7 @@ using Turing
 using OrdinaryDiffEq, SciMLSensitivity #ODE solvers and adjoint methods
 
 # ╔═╡ 261420cd-4650-402b-b126-7a431f93f37e
-using Distributions, Statistics #Statistics packages
+using Distributions, Statistics, LogExpFunctions #Statistics and special func packages
 
 # ╔═╡ 9c19a98b-a08b-4560-966d-61ff0ece2ad5
 using CSV, DataFramesMeta #Data wrangling
@@ -191,12 +191,13 @@ obs = PoissonError()
 # ╔═╡ 81501c84-5e1f-4829-a26d-52fe00503958
 md"
 Now we can write the probabilistic model using the `Turing` PPL.
+Note that instead of using $I(t)$ directly we do the [softplus](https://en.wikipedia.org/wiki/Softplus) transform on $I(t)$ implemented by `LogExpFunctions.log1pexp`.
+The reason is that the solver can return small negative numbers, the soft plus transform smoothly maintains positivity which being very close to $I(t)$ when $I(t) > 2$.
 "
 
 # ╔═╡ 1d287c8e-7000-4b23-ae7e-f7008c3e53bd
 @model function deterministic_ode_mdl(y_t, ts, obs, prob, N;
-        solver = AutoTsit5(Rosenbrock23()),
-        upjitter = 1e-3
+        solver = AutoTsit5(Rosenbrock23())
 )
     ##Priors##
     β ~ LogNormal(0.0, 1.0)
@@ -216,7 +217,7 @@ Now we can write the probabilistic model using the `Turing` PPL.
         verbose = false)
 
     ##log-like accumulation using obs##
-    λt = N * sol[2, :] .+ upjitter #expected It
+    λt = log1pexp.(N * sol[2, :] ) # #expected It
     @submodel generated_y_t = generate_observations(obs, y_t, λt)
 
     ##Generated quantities##
@@ -299,8 +300,7 @@ Approaching the inference naively can lead to poor fits.
 We do three things to mitigate this:
 
 1. We choose a switching ODE solver which switches between explicit (`Tsit5`) and implicit (`Rosenbrock23`) solvers. This helps avoid the ODE solver failing when the sampler tries extreme parameter values. This is the default `solver = AutoTsit5(Rosenbrock23())` above.
-2. To avoid the effect of numerically negative small values of `λt` we add a small `upjitter`.
-3. We locate the maximum likelihood point, that is we ignore the influence of the priors, as a useful starting point for `NUTS`.
+2. We locate the maximum likelihood point, that is we ignore the influence of the priors, as a useful starting point for `NUTS`.
 "
 
 # ╔═╡ 8d96db67-de3b-4704-9f54-f4ed50a4ecff
@@ -330,7 +330,8 @@ Now, we sample aiming at 1000 samples for each of 4 chains.
 # ╔═╡ 2cf64ba3-ff8d-40b0-9bd8-9e80393156f5
 chn = sample(
     deterministic_mdl, NUTS(), MCMCThreads(), 1000, 4;
-    initial_params = fill(mle_fit.values.array, 4))
+    initial_params = fill(mle_fit.values.array, 4),
+)
 
 # ╔═╡ b2429b68-dd75-499f-a4e1-1b7d72e209c7
 describe(chn)
@@ -441,18 +442,18 @@ We can sample directly from the behaviour specified by the `ar` struct to do pri
 
 # ╔═╡ de1498fa-8502-40ba-9708-2add74368e73
 let
-    nobs = size(data, 1)
-    ar_mdl = generate_latent(ar, nobs)
-    fig = Figure()
-    ax = Axis(fig[1, 1],
-        xticks = (data.ts[1:3:end], data.date[1:3:end] .|> string),
-        ylabel = "exp(kt)",
-        title = "Prior predictive sampling for relative residual in mean pred."
-    )
-    for i in 1:500
-        lines!(ax, ar_mdl() .|> exp, color = (:grey, 0.15))
-    end
-    fig
+nobs = size(data, 1)
+ar_mdl = generate_latent(ar, nobs)
+fig = Figure()
+ax = Axis(fig[1,1],
+	xticks = (data.ts[1:3:end], data.date[1:3:end] .|> string),
+	ylabel = "exp(kt)",
+	title = "Prior predictive sampling for relative residual in mean pred."
+)
+for i = 1:500
+lines!(ax, ar_mdl() .|> exp, color = (:grey, 0.15))
+end
+fig
 end
 
 # ╔═╡ 9a82c75a-6ea4-48bb-af06-fabaca4c45ee
@@ -463,12 +464,12 @@ We see that the choice of priors implies an _a priori_ belief that the extra obs
 # ╔═╡ b693a942-c6c7-40f8-997c-0dc8e5548132
 md"
 We can now define the probabilistic model.
+Note that instead of implementing `exp.(κₜ)` directly, which can be unstable for large primal values, we use the `LogExpFunctions.xexpy` function which implements $x\exp(y)$ stabily for a wide range of values.
 "
 
 # ╔═╡ 9309f7f8-0896-4686-8bfc-b9f82d91bc0f
 @model function stochastic_ode_mdl(y_t, ts, logobsprob, obs, prob, N;
         solver = AutoTsit5(Rosenbrock23()),
-        upjitter = 1e-2
 )
 
     ##Priors##
@@ -491,7 +492,7 @@ We can now define the probabilistic model.
     ##Sample the log-residual AR process##
     nobs = length(y_t)
     @submodel κₜ = generate_latent(logobsprob, nobs)
-    λt = @. N * sol[2, :] * exp(κₜ) + upjitter
+    λt = xexpy.(log1pexp.(N * sol[2, :]), κₜ)
 
     ##log-like accumulation using obs##
     @submodel generated_y_t = generate_observations(obs, y_t, λt)
@@ -638,7 +639,7 @@ end
 # ╠═ab8c98d1-d357-4c49-9f5a-f069e05c45f5
 # ╟─2c6ac235-e331-4189-8c8c-74de5f98b2c4
 # ╠═a729f1cd-404c-4a33-a8f9-b2ea6f0adb62
-# ╠═4c0759fb-76e9-4de5-9206-89e8bfb6c3bb
+# ╟─4c0759fb-76e9-4de5-9206-89e8bfb6c3bb
 # ╠═8d96db67-de3b-4704-9f54-f4ed50a4ecff
 # ╠═ba35cebd-0d29-43c5-8db7-f550d7f821bc
 # ╠═0be912c1-22dc-4978-b86a-84273062f5da
