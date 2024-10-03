@@ -55,4 +55,13 @@
                                 for s in 1:length(pmf)]]
         @test sum(expected_pmf_uncond) > 0.99
     end
+
+    @testset "Check CDF function" begin
+        dist = Exponential(1.0)
+        expected_pmf_uncond = [exp(-1)
+                               [(1 - exp(-1)) * (exp(1) - 1) * exp(-s) for s in 1:9]]
+        expected_cdf = [0.0; cumsum(expected_pmf_uncond)]
+        calc_cdf = censored_cdf(dist; Δd = 1.0, D = 10.0)
+        @test expected_cdf≈calc_cdf atol=1e-15
+    end
 end
