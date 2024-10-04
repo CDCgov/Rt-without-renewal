@@ -80,6 +80,7 @@ to make inference on and model configuration.
 """
 function create_inference_results(config, epiprob)
     #Return the sampled infections and observations
+    idxs = config.tspan[1]:config.tspan[2]
     y_t = ismissing(config.case_data) ? missing :
           Vector{Union{Missing, Int64}}(config.case_data[idxs])
     inference_results = apply_method(epiprob,
@@ -108,7 +109,6 @@ to make inference on and model configuration.
 function infer(config::InferenceConfig)
     #Define the EpiProblem
     epiprob = define_epiprob(config)
-    idxs = config.tspan[1]:config.tspan[2]
 
     #Return the sampled infections and observations
     inference_results = create_inference_results(config, epiprob)
