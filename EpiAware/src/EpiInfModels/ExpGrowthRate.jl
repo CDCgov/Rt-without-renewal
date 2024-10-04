@@ -116,5 +116,5 @@ I_t = generated_quantities(latent_inf, θ)
 "
 @model function EpiAwareBase.generate_latent_infs(epi_model::ExpGrowthRate, rt)
     init_incidence ~ epi_model.initialisation_prior
-    return exp.(init_incidence .+ cumsum(rt))
+    return exp.(accumulate(+, rt; init=init_incidence))
 end
