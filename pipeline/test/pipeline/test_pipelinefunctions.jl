@@ -43,3 +43,15 @@ end
     fetch(res)
     @test isnothing(res)
 end
+
+@testset "do_pipeline test: prior predictive" begin
+    using Dagger
+    pipelines = map([SmoothOutbreakPipeline, MeasuresOutbreakPipeline,
+        SmoothEndemicPipeline, RoughEndemicPipeline]) do pipetype
+        pipetype(; ndraws = 10, nchains = 1, testmode = true, priorpredictive = true)
+    end
+
+    res = do_pipeline(pipelines)
+    fetch(res)
+    @test isnothing(res)
+end
