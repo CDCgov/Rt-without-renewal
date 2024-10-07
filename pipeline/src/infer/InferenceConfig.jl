@@ -12,13 +12,18 @@ Inference configuration struct for specifying the parameters and models used in 
 - `epimethod::E`: Inference method.
 - `transformation::F`: Transformation function.
 - `log_I0_prior::Distribution`: Prior for log initial infections. Default is `Normal(log(100.0), 1e-5)`.
+- `lookahead::X`: Number of days to forecast ahead.
+- `latent_model_name::String`: Name of the latent model.
+- `pipeline`: Pipeline type defining the inference scenario.
 
 # Constructors
 - `InferenceConfig(igp, latent_model, observation_model; gi_mean, gi_std, case_data, tspan, epimethod, transformation = exp)`: Constructs an `InferenceConfig` object with the specified parameters.
 - `InferenceConfig(inference_config::Dict; case_data, tspan, epimethod)`: Constructs an `InferenceConfig` object from a dictionary of configuration values.
 
 """
-struct InferenceConfig{T, F, IGP, L, O, E, D <: Distribution, X <: Integer}
+struct InferenceConfig{
+    T, F, IGP, L, O, E, D <: Distribution, X <: Integer,
+    P <: AbstractRtwithoutRenewalPipeline}
     gi_mean::T
     gi_std::T
     igp::IGP
@@ -33,22 +38,22 @@ struct InferenceConfig{T, F, IGP, L, O, E, D <: Distribution, X <: Integer}
     log_I0_prior::D
     lookahead::X
     latent_model_name::String
-    priorpredictive::Bool
+    pipeline::P
 
     function InferenceConfig(
             igp, latent_model, observation_model; gi_mean, gi_std, case_data,
             truth_I_t, truth_I0, tspan, epimethod, transformation = oneexpy,
-            log_I0_prior, lookahead, latent_model_name, priorpredictive)
+            log_I0_prior, lookahead, latent_model_name, pipeline)
         new{typeof(gi_mean), typeof(transformation), typeof(igp),
-            typeof(latent_model), typeof(observation_model),
-            typeof(epimethod), typeof(log_I0_prior), typeof(lookahead)}(
+            typeof(latent_model), typeof(observation_model), typeof(epimethod),
+            typeof(log_I0_prior), typeof(lookahead), typeof(pipeline)}(
             gi_mean, gi_std, igp, latent_model, observation_model,
             case_data, truth_I_t, truth_I0, tspan, epimethod,
-            transformation, log_I0_prior, lookahead, latent_model_name, priorpredictive)
+            transformation, log_I0_prior, lookahead, latent_model_name, pipeline)
     end
 
     function InferenceConfig(
-            inference_config::Dict; case_data, truth_I_t, truth_I0, tspan, epimethod, priorpredictive)
+            inference_config::Dict; case_data, truth_I_t, truth_I0, tspan, epimethod, pipeline)
         InferenceConfig(
             inference_config["igp"],
             inference_config["latent_namemodels"].second,
@@ -63,9 +68,38 @@ struct InferenceConfig{T, F, IGP, L, O, E, D <: Distribution, X <: Integer}
             log_I0_prior = inference_config["log_I0_prior"],
             lookahead = inference_config["lookahead"],
             latent_model_name = inference_config["latent_namemodels"].first,
-            priorpredictive
+            pipeline
         )
     end
+end
+
+"""
+Internal function that returns a dictionary containing key configuration fields from the given `InferenceConfig` object.
+The dictionary includes the following keys:
+
+- `"igp"`: The string representation of the `igp` field.
+- `"latent_model"`: The name of the latent model.
+- `"gi_mean"`: The mean of the generation interval.
+- `"gi_std"`: The standard deviation of the generation interval.
+- `"tspan"`: The time span for the inference.
+- `"priorpredictive"`: The prior predictive setting.
+
+# Arguments
+- `config::InferenceConfig`: An instance of `InferenceConfig` containing the configuration details.
+
+# Returns
+- `Dict{String, Any}`: A dictionary with the key configuration fields.
+"""
+function _saved_config_fields(config::InferenceConfig)
+    return Dict(
+        "igp" => string(config.igp),
+        "latent_model" => config.latent_model_name,
+        "gi_mean" => config.gi_mean,
+        "gi_std" => config.gi_std,
+        "tspan" => string(config.tspan[1]) * "_" * string(config.tspan[2]),
+        "priorpredictive" => config.pipeline.priorpredictive,
+        "scenario" => config.pipeline |> typeof |> string
+    )
 end
 
 """
@@ -113,6 +147,9 @@ function infer(config::InferenceConfig)
     #Define the EpiProblem
     epiprob = define_epiprob(config)
 
+    #Define savable configuration
+    save_config = _saved_config_fields(config)
+
     #Return the sampled infections and observations
     inference_results = try
         create_inference_results(config, epiprob)
@@ -120,15 +157,17 @@ function infer(config::InferenceConfig)
         e
     end
 
-    if config.priorpredictive
+    if config.pipeline.priorpredictive
         if inference_results isa Exception
-            return Dict("priorpredictive" => inference_results,
-                "epiprob" => epiprob, "inference_config" => config)
+            return Dict("priorpredictive" => string(inference_results),
+                "inference_config" => save_config)
         else
             fig = prior_predictive_plot(
                 config, inference_results, epiprob; ps = [0.025, 0.1, 0.25])
-            return Dict("priorpredictive" => fig, "epiprob" => epiprob,
-                "inference_config" => config)
+            figdir = config.pipeline.testmode ? mktempdir() : plotsdir("priorpredictive")
+            figpath = joinpath(figdir, "priorpred_" * savename(save_config) * ".png")
+            CairoMakie.save(figpath, fig)
+            return Dict("priorpredictive" => "Pass", "inference_config" => save_config)
         end
     else
         forecast_results = try
@@ -145,8 +184,8 @@ function infer(config::InferenceConfig)
             e
         end
 
-        return Dict("inference_results" => inference_results,
-            "epiprob" => epiprob, "inference_config" => config,
+        return Dict(
+            "inference_results" => inference_results, "inference_config" => save_config,
             "forecast_results" => forecast_results, "score_results" => score_results)
     end
 end
