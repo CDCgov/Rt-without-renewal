@@ -42,7 +42,7 @@ struct InferenceConfig{
 
     function InferenceConfig(
             igp, latent_model, observation_model; gi_mean, gi_std, case_data,
-            truth_I_t, truth_I0, tspan, epimethod, transformation = exp,
+            truth_I_t, truth_I0, tspan, epimethod, transformation = oneexpy,
             log_I0_prior, lookahead, latent_model_name, pipeline)
         new{typeof(gi_mean), typeof(transformation), typeof(igp),
             typeof(latent_model), typeof(observation_model), typeof(epimethod),
