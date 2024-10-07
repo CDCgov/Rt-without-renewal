@@ -64,5 +64,5 @@ Internal method for setting the data directory path for the inference data.
 _get_inferencedatadir_str(pipeline::AbstractEpiAwarePipeline) = datadir("epiaware_observables")
 function _get_inferencedatadir_str(pipeline::AbstractRtwithoutRenewalPipeline)
     pipeline.testmode ? mktempdir() :
-    pipeline.priorpredictive ? plotsdir("priorpredictive") : datadir("epiaware_observables")
+    pipeline.priorpredictive ? datadir("priorpredictive") : datadir("epiaware_observables")
 end
