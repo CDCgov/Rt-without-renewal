@@ -20,8 +20,7 @@ the `simulate` function to generate the truth data. This is the default method.
 - `truthfile`: The file path where the truth data is saved.
 """
 function generate_truthdata(
-        truth_data_config, pipeline::AbstractEpiAwarePipeline; plot = true,
-        datadir_str = "truth_data")
+        truth_data_config, pipeline::AbstractEpiAwarePipeline; plot = true)
     default_params = make_default_params(pipeline)
     config = TruthSimulationConfig(
         truth_process = default_params["Rt"], gi_mean = truth_data_config["gi_mean"],
@@ -29,9 +28,10 @@ function generate_truthdata(
         cluster_factor = default_params["cluster_factor"], I0 = default_params["I0"])
 
     prefix = _simulate_prefix(pipeline)
+    _datadir_str = _get_truthdatadir_str(pipeline)
 
     truthdata, truthfile = produce_or_load(
-        simulate, config, datadir(datadir_str); prefix = prefix)
+        simulate, config, _datadir_str; prefix = prefix)
     if plot
         plot_truth_data(truthdata, config, pipeline)
     end

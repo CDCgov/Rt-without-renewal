@@ -11,9 +11,11 @@ with execution determined by available computational resources.
 module EpiAwarePipeline
 
 using CSV, Dagger, DataFramesMeta, Dates, Distributions, DocStringExtensions, DrWatson,
-      EpiAware, Plots, Statistics, ADTypes, AbstractMCMC, Plots, JLD2, MCMCChains, Turing,
-      DynamicPPL, LogExpFunctions, RCall, LinearAlgebra, Random, AlgebraOfGraphics,
-      CairoMakie, ReverseDiff
+      EpiAware, Statistics, ADTypes, AbstractMCMC, JLD2, MCMCChains, Turing, DynamicPPL,
+      LogExpFunctions, RCall, LinearAlgebra, Random, AlgebraOfGraphics, CairoMakie,
+      ReverseDiff
+
+using EpiAware.EpiInfModels: oneexpy
 
 # Exported pipeline types
 export AbstractEpiAwarePipeline, EpiAwarePipeline, AbstractRtwithoutRenewalPipeline,
@@ -56,7 +58,7 @@ export make_prediction_dataframe_from_output, make_truthdata_dataframe,
 export figureone, figuretwo
 
 # Exported functions: plot functions
-export plot_truth_data, plot_Rt
+export plot_truth_data, plot_Rt, prior_predictive_plot
 
 include("docstrings.jl")
 include("pipeline/pipeline.jl")
@@ -67,6 +69,5 @@ include("infer/infer.jl")
 include("forecast/forecast.jl")
 include("scoring/scoring.jl")
 include("analysis/analysis.jl")
-include("mainplots/mainplots.jl")
-include("plot_functions.jl")
+include("plotting/plotting.jl")
 end

@@ -44,6 +44,8 @@ Rt = make_Rt(pipeline) |> Rt -> plot(Rt,
     maxiters_pthf::Integer = 100
     nchains::Integer = 4
     prefix::String = "smooth_outbreak"
+    testmode::Bool = false
+    priorpredictive::Bool = false
 end
 
 """
@@ -57,6 +59,8 @@ The pipeline type for the Rt pipeline for an outbreak scenario where Rt has
     maxiters_pthf::Integer = 100
     nchains::Integer = 4
     prefix::String = "measures_outbreak"
+    testmode::Bool = false
+    priorpredictive::Bool = false
 end
 
 """
@@ -70,6 +74,8 @@ The pipeline type for the Rt pipeline for an endemic scenario where Rt changes i
     maxiters_pthf::Integer = 100
     nchains::Integer = 4
     prefix::String = "smooth_endemic"
+    testmode::Bool = false
+    priorpredictive::Bool = false
 end
 
 """
@@ -83,4 +89,6 @@ The pipeline type for the Rt pipeline for an endemic scenario where Rt changes i
     maxiters_pthf::Integer = 100
     nchains::Integer = 4
     prefix::String = "rough_endemic"
+    testmode::Bool = false
+    priorpredictive::Bool = false
 end

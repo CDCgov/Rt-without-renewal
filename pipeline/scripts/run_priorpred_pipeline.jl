@@ -3,8 +3,11 @@ using Pkg
 Pkg.activate(joinpath(@__DIR__(), ".."))
 using Dagger
 
+@assert !isempty(ARGS) "Test mode script requires the number of draws as an argument."
+ndraws = parse(Int64, ARGS[1])
+
 @info("""
-      Running the analysis pipeline.
+      Running the prior predictive pipeline in test mode with $(ndraws) draws per model.
       --------------------------------------------
       """)
 
@@ -15,11 +18,17 @@ pids = addprocs(; exeflags = ["--project=$(Base.active_project())"])
 
 @everywhere using EpiAwarePipeline
 
-# Create an instance of the pipeline behaviour
-pipeline = RtwithoutRenewalPriorPipeline()
+# Create instances of the pipeline behaviour
+
+pipelines = [
+    SmoothOutbreakPipeline(ndraws = ndraws, nchains = 1, priorpredictive = true),
+    MeasuresOutbreakPipeline(ndraws = ndraws, nchains = 1, priorpredictive = true),
+    SmoothEndemicPipeline(ndraws = ndraws, nchains = 1, priorpredictive = true),
+    RoughEndemicPipeline(ndraws = ndraws, nchains = 1, priorpredictive = true)
+]
 
 # Run the pipeline
-do_pipeline(pipeline)
+do_pipeline(pipelines)
 
 # Remove the workers
 rmprocs(pids)

@@ -1,5 +1,5 @@
 @testset "InferenceConfig: constructor function" begin
-    using Distributions, EpiAwarePipeline, EpiAware
+    using Distributions
 
     struct TestLatentModel <: AbstractLatentModel
     end
@@ -16,6 +16,7 @@
     latent_model = TestLatentModel()
     observation_model = TestObsModel()
     epimethod = TestMethod()
+    latent_model_name = "TestLatentModel"
     case_data = [10, 20, 30, 40, 50]
     I_t = [10, 20, 30, 40, 50] ./ 2
     I0 = 1.0
@@ -31,7 +32,9 @@
             tspan = tspan,
             epimethod = epimethod,
             log_I0_prior = Normal(log(100.0), 1e-5),
-            lookahead = lookahead
+            lookahead = lookahead,
+            latent_model_name = latent_model_name,
+            pipeline = SmoothOutbreakPipeline()
         )
 
         @test config.gi_mean == gi_mean
@@ -42,13 +45,15 @@
         @test config.case_data == case_data
         @test config.tspan == tspan
         @test config.epimethod == epimethod
+        @test config.latent_model_name == latent_model_name
     end
 
     @testset "construct from config dictionary" begin
         pipeline = SmoothOutbreakPipeline()
         inference_configs = make_inference_configs(pipeline)
         @test [InferenceConfig(ic; case_data, truth_I_t = I_t,
-                   truth_I0 = I0, tspan, epimethod) isa InferenceConfig
+                   truth_I0 = I0, tspan, epimethod, pipeline = pipeline) isa
+               InferenceConfig
                for ic in inference_configs] |> all
     end
 end

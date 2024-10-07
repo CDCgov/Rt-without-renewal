@@ -1,5 +1,5 @@
 @testset "simulate runs" begin
-    using Distributions, EpiAwarePipeline, EpiAware, LogExpFunctions
+    using Distributions, LogExpFunctions
     # Define a mock TruthSimulationConfig object for testing
     logit_daily_ascertainment = [zeros(5); -0.5 * ones(2)]
 
@@ -26,8 +26,6 @@
 end
 
 @testset "generate_truthdata" begin
-    using EpiAwarePipeline
-
     pipeline = EpiAwareExamplePipeline()
     truth_data_config = Dict("gi_mean" => 2.5, "gi_std" => 1.5)
     truthdata = generate_truthdata(truth_data_config, pipeline; plot = false)

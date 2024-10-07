@@ -14,19 +14,20 @@ Generate inference results based on the given configuration of inference model o
 - `inference_results`: The generated inference results.
 """
 function generate_inference_results(
-        truthdata, inference_config, pipeline::AbstractEpiAwarePipeline;
-        inference_method, datadir_name = "epiaware_observables")
+        truthdata, inference_config, pipeline::AbstractEpiAwarePipeline)
     tspan = make_tspan(
         pipeline; T = inference_config["T"], lookback = inference_config["lookback"])
+    inference_method = make_inference_method(pipeline)
     config = InferenceConfig(
         inference_config; case_data = truthdata["y_t"], truth_I_t = truthdata["I_t"],
-        truth_I0 = truthdata["truth_I0"], tspan, epimethod = inference_method)
+        truth_I0 = truthdata["truth_I0"], tspan, epimethod = inference_method, pipeline = pipeline)
 
     # produce or load inference results
     prfx = _inference_prefix(truthdata, inference_config, pipeline)
+    _datadir_str = _get_inferencedatadir_str(pipeline)
 
     inference_results, inferencefile = produce_or_load(
-        infer, config, datadir(datadir_name); prefix = prfx)
+        infer, config, _datadir_str; prefix = prfx)
     return inference_results
 end
 
@@ -49,12 +50,13 @@ which is deleted after the function call.
 - `inference_results`: The generated inference results.
 """
 function generate_inference_results(
-        truthdata, inference_config, pipeline::EpiAwareExamplePipeline; inference_method)
+        truthdata, inference_config, pipeline::EpiAwareExamplePipeline)
     tspan = make_tspan(
         pipeline; T = inference_config["T"], lookback = inference_config["lookback"])
+    inference_method = make_inference_method(pipeline)
     config = InferenceConfig(
         inference_config; case_data = truthdata["y_t"], truth_I_t = truthdata["I_t"],
-        truth_I0 = truthdata["truth_I0"], tspan = tspan, epimethod = inference_method)
+        truth_I0 = truthdata["truth_I0"], tspan = tspan, epimethod = inference_method, pipeline = pipeline)
 
     # produce or load inference results
     prfx = _inference_prefix(truthdata, inference_config, pipeline)
@@ -63,25 +65,5 @@ function generate_inference_results(
 
     inference_results, inferencefile = produce_or_load(
         infer, config, datadir_name; prefix = prfx)
-    return inference_results
-end
-
-"""
-Method for prior predictive modelling.
-"""
-function generate_inference_results(
-        inference_config, pipeline::RtwithoutRenewalPriorPipeline)
-    tspan = make_tspan(
-        pipeline; T = inference_config["T"], lookback = inference_config["lookback"])
-    config = InferenceConfig(
-        inference_config; case_data = missing, tspan, epimethod = DirectSample())
-
-    # produce or load inference results
-    prfx = _inference_prefix(truthdata, inference_config, pipeline)
-
-    datadir_name = mktempdir()
-
-    inference_results, inferencefile = produce_or_load(
-        infer, config, datadir(datadir_name); prefix = prfx)
     return inference_results
 end

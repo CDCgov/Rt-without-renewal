@@ -1,5 +1,5 @@
 @testset "score_parameter tests" begin
-    using MCMCChains, EpiAwarePipeline
+    using MCMCChains
 
     samples = MCMCChains.Chains(0.5 .+ randn(1000, 2, 1), [:a, :b])
     truths = fill(0.5, 2)
