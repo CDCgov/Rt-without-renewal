@@ -6,7 +6,7 @@ module EpiInfModels
 using ..EpiAwareBase
 using ..EpiAwareUtils
 
-using Turing, Distributions, DocStringExtensions, LinearAlgebra
+using Turing, Distributions, DocStringExtensions, LinearAlgebra, LogExpFunctions
 
 #Export models
 export EpiData, DirectInfections, ExpGrowthRate, Renewal
