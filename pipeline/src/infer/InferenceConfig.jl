@@ -164,7 +164,7 @@ function infer(config::InferenceConfig)
         else
             fig = prior_predictive_plot(
                 config, inference_results, epiprob; ps = [0.025, 0.1, 0.25])
-            figdir = pipeline.testmode ? mktempdir() : plotsdir("priorpredictive")
+            figdir = config.pipeline.testmode ? mktempdir() : plotsdir("priorpredictive")
             figpath = joinpath(figdir, "priorpred_" * savename(save_config) * ".png")
             CairoMakie.save(figpath, fig)
             return Dict("priorpredictive" => "Pass", "inference_config" => save_config)
