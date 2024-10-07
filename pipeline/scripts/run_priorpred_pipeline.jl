@@ -24,8 +24,8 @@ pipelines = [
     SmoothOutbreakPipeline(ndraws = ndraws, nchains = 1, priorpredictive = true),
     MeasuresOutbreakPipeline(ndraws = ndraws, nchains = 1, priorpredictive = true),
     SmoothEndemicPipeline(ndraws = ndraws, nchains = 1, priorpredictive = true),
-    RoughEndemicPipeline(ndraws = ndraws, nchains = 1, priorpredictive = true),
-    ]
+    RoughEndemicPipeline(ndraws = ndraws, nchains = 1, priorpredictive = true)
+]
 
 # Run the pipeline
 do_pipeline(pipelines)
