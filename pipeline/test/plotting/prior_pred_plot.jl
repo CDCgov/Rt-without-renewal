@@ -13,5 +13,5 @@
 
     fig = results["priorpredictive"]
 
-    @test fig isa Figure
+    @test fig isa String #Figure object no longer returned
 end
