@@ -72,3 +72,10 @@ Compute the reproductive ratio given exponential growth rate `r`
 function r_to_R(r, w::AbstractVector)
     return 1 / neg_MGF(r, w::AbstractVector)
 end
+
+"""
+Version of `LogExpFunctions.xexpy` that takes a single argument `y` and returns `exp(y)`.
+"""
+function oneexpy(y::T) where {T}
+    return xexpy(one(T), y)
+end

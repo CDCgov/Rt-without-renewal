@@ -20,7 +20,7 @@ function generate_inference_results(
     inference_method = make_inference_method(pipeline)
     config = InferenceConfig(
         inference_config; case_data = truthdata["y_t"], truth_I_t = truthdata["I_t"],
-        truth_I0 = truthdata["truth_I0"], tspan, epimethod = inference_method)
+        truth_I0 = truthdata["truth_I0"], tspan, epimethod = inference_method, priorpredictive = pipeline.priorpredictive)
 
     # produce or load inference results
     prfx = _inference_prefix(truthdata, inference_config, pipeline)

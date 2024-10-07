@@ -33,7 +33,8 @@
             epimethod = epimethod,
             log_I0_prior = Normal(log(100.0), 1e-5),
             lookahead = lookahead,
-            latent_model_name = latent_model_name
+            latent_model_name = latent_model_name,
+            priorpredictive = false
         )
 
         @test config.gi_mean == gi_mean
@@ -51,7 +52,8 @@
         pipeline = SmoothOutbreakPipeline()
         inference_configs = make_inference_configs(pipeline)
         @test [InferenceConfig(ic; case_data, truth_I_t = I_t,
-                   truth_I0 = I0, tspan, epimethod) isa InferenceConfig
+                   truth_I0 = I0, tspan, epimethod, priorpredictive = pipeline.priorpredictive) isa
+               InferenceConfig
                for ic in inference_configs] |> all
     end
 end

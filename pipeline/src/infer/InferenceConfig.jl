@@ -33,20 +33,21 @@ struct InferenceConfig{T, F, IGP, L, O, E, D <: Distribution, X <: Integer}
     log_I0_prior::D
     lookahead::X
     latent_model_name::String
+    priorpredictive::Bool
 
     function InferenceConfig(igp, latent_model, observation_model; gi_mean, gi_std,
             case_data, truth_I_t, truth_I0, tspan, epimethod,
-            transformation = exp, log_I0_prior, lookahead, latent_model_name)
+            transformation = exp, log_I0_prior, lookahead, latent_model_name, priorpredictive)
         new{typeof(gi_mean), typeof(transformation), typeof(igp),
             typeof(latent_model), typeof(observation_model),
             typeof(epimethod), typeof(log_I0_prior), typeof(lookahead)}(
             gi_mean, gi_std, igp, latent_model, observation_model,
             case_data, truth_I_t, truth_I0, tspan, epimethod,
-            transformation, log_I0_prior, lookahead, latent_model_name)
+            transformation, log_I0_prior, lookahead, latent_model_name, priorpredictive)
     end
 
     function InferenceConfig(
-            inference_config::Dict; case_data, truth_I_t, truth_I0, tspan, epimethod)
+            inference_config::Dict; case_data, truth_I_t, truth_I0, tspan, epimethod, priorpredictive)
         InferenceConfig(
             inference_config["igp"],
             inference_config["latent_namemodels"].second,
@@ -60,7 +61,8 @@ struct InferenceConfig{T, F, IGP, L, O, E, D <: Distribution, X <: Integer}
             epimethod = epimethod,
             log_I0_prior = inference_config["log_I0_prior"],
             lookahead = inference_config["lookahead"],
-            latent_model_name = inference_config["latent_namemodels"].first
+            latent_model_name = inference_config["latent_namemodels"].first,
+            priorpredictive
         )
     end
 end
@@ -111,23 +113,39 @@ function infer(config::InferenceConfig)
     epiprob = define_epiprob(config)
 
     #Return the sampled infections and observations
-    inference_results = create_inference_results(config, epiprob)
-
-    forecast_results = try
-        generate_forecasts(
-            inference_results.samples, inference_results.data, epiprob, config.lookahead)
+    inference_results = try
+        create_inference_results(config, epiprob)
     catch e
         e
     end
 
-    epidata = epiprob.epi_model.data
-    score_results = try
-        summarise_crps(config, inference_results, forecast_results, epidata)
-    catch e
-        e
-    end
+    if config.priorpredictive
+        if inference_results isa Exception
+            return Dict("priorpredictive" => inference_results,
+                "epiprob" => epiprob, "inference_config" => config)
+        else
+            fig = prior_predictive_plot(
+                config, inference_results, epiprob; ps = [0.025, 0.1, 0.25])
+            return Dict("priorpredictive" => fig, "epiprob" => epiprob,
+                "inference_config" => config)
+        end
+    else
+        forecast_results = try
+            generate_forecasts(
+                inference_results.samples, inference_results.data, epiprob, config.lookahead)
+        catch e
+            e
+        end
 
-    return Dict("inference_results" => inference_results,
-        "epiprob" => epiprob, "inference_config" => config,
-        "forecast_results" => forecast_results, "score_results" => score_results)
+        epidata = epiprob.epi_model.data
+        score_results = try
+            summarise_crps(config, inference_results, forecast_results, epidata)
+        catch e
+            e
+        end
+
+        return Dict("inference_results" => inference_results,
+            "epiprob" => epiprob, "inference_config" => config,
+            "forecast_results" => forecast_results, "score_results" => score_results)
+    end
 end

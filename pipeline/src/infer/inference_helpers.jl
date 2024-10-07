@@ -17,6 +17,8 @@ This is an internal method that generates the part of the prefix for the inferen
 """
 _prefix_from_pipeline(pipeline::AbstractEpiAwarePipeline) = "observables"
 function _prefix_from_pipeline(pipeline::AbstractRtwithoutRenewalPipeline)
+    pipeline.priorpredictive ?
+    "priorpredictive_" * "" * pipeline.prefix :
     "inference_" * pipeline.prefix
 end
 
@@ -59,7 +61,8 @@ end
 """
 Internal method for setting the data directory path for the inference data.
 """
-_get_inferencedatadir_str(pipeline::AbstractEpiAwarePipeline) = "epiaware_observables"
+_get_inferencedatadir_str(pipeline::AbstractEpiAwarePipeline) = datadir("epiaware_observables")
 function _get_inferencedatadir_str(pipeline::AbstractRtwithoutRenewalPipeline)
-    pipeline.testmode ? mktempdir() : "epiaware_observables"
+    pipeline.testmode ? mktempdir() :
+    pipeline.priorpredictive ? plotsdir("priorpredictive") : datadir("epiaware_observables")
 end
