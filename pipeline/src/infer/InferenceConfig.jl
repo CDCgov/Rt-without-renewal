@@ -35,9 +35,10 @@ struct InferenceConfig{T, F, IGP, L, O, E, D <: Distribution, X <: Integer}
     latent_model_name::String
     priorpredictive::Bool
 
-    function InferenceConfig(igp, latent_model, observation_model; gi_mean, gi_std,
-            case_data, truth_I_t, truth_I0, tspan, epimethod,
-            transformation = exp, log_I0_prior, lookahead, latent_model_name, priorpredictive)
+    function InferenceConfig(
+            igp, latent_model, observation_model; gi_mean, gi_std, case_data,
+            truth_I_t, truth_I0, tspan, epimethod, transformation = oneexpy,
+            log_I0_prior, lookahead, latent_model_name, priorpredictive)
         new{typeof(gi_mean), typeof(transformation), typeof(igp),
             typeof(latent_model), typeof(observation_model),
             typeof(epimethod), typeof(log_I0_prior), typeof(lookahead)}(

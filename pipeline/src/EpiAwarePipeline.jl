@@ -15,6 +15,8 @@ using CSV, Dagger, DataFramesMeta, Dates, Distributions, DocStringExtensions, Dr
       LogExpFunctions, RCall, LinearAlgebra, Random, AlgebraOfGraphics, CairoMakie,
       ReverseDiff
 
+using EpiAware.EpiInfModels: oneexpy
+
 # Exported pipeline types
 export AbstractEpiAwarePipeline, EpiAwarePipeline, AbstractRtwithoutRenewalPipeline,
        RtwithoutRenewalPriorPipeline, EpiAwareExamplePipeline, SmoothOutbreakPipeline,
