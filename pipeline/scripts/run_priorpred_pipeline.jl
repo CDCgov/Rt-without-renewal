@@ -7,7 +7,7 @@ using Dagger
 ndraws = parse(Int64, ARGS[1])
 
 @info("""
-      Running the analysis pipeline in test mode with $(ndraws) draws per model.
+      Running the prior predictive pipeline in test mode with $(ndraws) draws per model.
       --------------------------------------------
       """)
 
