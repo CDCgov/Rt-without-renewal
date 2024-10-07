@@ -154,12 +154,12 @@ function infer(config::InferenceConfig)
     inference_results = try
         create_inference_results(config, epiprob)
     catch e
-        e
+        string(e)
     end
 
     if config.pipeline.priorpredictive
-        if inference_results isa Exception
-            return Dict("priorpredictive" => string(inference_results),
+        if inference_results isa String
+            return Dict("priorpredictive" => inference_results,
                 "inference_config" => save_config)
         else
             fig = prior_predictive_plot(
@@ -174,14 +174,14 @@ function infer(config::InferenceConfig)
             generate_forecasts(
                 inference_results.samples, inference_results.data, epiprob, config.lookahead)
         catch e
-            e
+            string(e)
         end
 
         epidata = epiprob.epi_model.data
         score_results = try
             summarise_crps(config, inference_results, forecast_results, epidata)
         catch e
-            e
+            string(e)
         end
 
         return Dict(
