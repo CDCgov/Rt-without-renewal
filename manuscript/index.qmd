@@ -5,6 +5,7 @@ citation:
   container-title: Earth and Space Science
 number-sections: true
 jupyter: julia-1.11
+echo: false
 ---
 
 ```{julia}
@@ -13,7 +14,9 @@ jupyter: julia-1.11
 using Pkg
 index_location = @__DIR__()
 Pkg.activate(index_location)
-Pkg.add("CairoMakie")
+Pkg.resolve()
+Pkg.instantiate()
+Pkg.add(["CairoMakie", "JLD2", "DataFramesMeta", "DrWatson"])
 ```
 
 ## Introduction
@@ -206,3 +209,32 @@ Say if it looked okay and reference SI
 
 ::: {#refs}
 :::
+
+## Supporting information
+
+### Prior predictive modelling with default priors
+
+```{julia}
+using DataFramesMeta
+priorpred_dir = "pipeline/data/priorpredictive/"
+priorpred_datafiles = readdir(priorpred_dir) |> 
+  fns -> filter(fn -> contains(fn, ".jld2"), fns) #filter for .jld2 files
+ 
+priorpred_outcomes_df = mapreduce(vcat, priorpred_datafiles) do fn
+  D = load(joinpath(priorpred_dir, fn))
+  igp = D["inference_config"]["igp"]
+  latent_model = D["inference_config"]["latent_model"]
+  gi_mean = D["inference_config"]["gi_mean"]
+  T1, T2 = split(D["inference_config"]["tspan"], "_")
+  runsuccess = D["priorpredictive"] .== "Pass"
+  df = DataFrame(
+    igp = igp,
+    latent_model = latent_model,
+    gi_mean = gi_mean,
+    T1 = T1,
+    T2 = T2,
+    runsuccess = runsuccess,
+    )
+end
+
+```
