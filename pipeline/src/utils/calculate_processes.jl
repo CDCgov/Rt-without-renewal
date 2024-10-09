@@ -2,7 +2,7 @@
 Internal function for calculating the log of the infections with an informative
     error message if the infections are not positive definite.
 """
-function _calc_log_infections(I_t; jitter = 1e-6)
+function _calc_log_infections(I_t; jitter = 0.)
     log.(I_t .+ jitter)
 end
 
@@ -10,7 +10,7 @@ end
 Internal function for calculating the exponential growth rate with an informative
     error message if the infections are not positive definite.
 """
-function _calc_rt(I_t, I0; jitter = 1e-6)
+function _calc_rt(I_t, I0; jitter = 0.)
     @assert I0 + jitter>0 "Initial infections must be positive definite."
     log.([I0 + jitter; I_t .+ jitter]) .- log(I0 + jitter) |> diff
 end
@@ -23,7 +23,7 @@ estimate of `rt`.
 
 """
 function _infection_seeding(
-        I_t, I0, data::EpiData; jitter = 1e-6)
+        I_t, I0, data::EpiData; jitter = 0.)
     n = length(data.gen_int)
     init_rt = _calc_rt(I_t[1:2] .+ jitter, I0 + jitter) |> x -> x[1]
     [(I0 + jitter) * exp(-init_rt * (n - i)) for i in 1:n]
@@ -42,7 +42,7 @@ growth from the initial infections `I0` and the exponential growth rate `init_rt
 - `init_rt`: Initial exponential growth rate.
 - `data::EpiData`: An instance of the `EpiData` type containing generation interval data.
 """
-function _calc_Rt(I_t, I0, data::EpiData; jitter = 1e-6)
+function _calc_Rt(I_t, I0, data::EpiData; jitter = 0.)
     @assert I0 + jitter>0 "Initial infections must be positive definite."
 
     aug_I_t = vcat(_infection_seeding(I_t .+ jitter, I0 + jitter, data), I_t)
