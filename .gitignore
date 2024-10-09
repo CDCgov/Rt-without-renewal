@@ -379,7 +379,6 @@ docs/site/
 # such, it should not be committed for packages, but should be committed for
 # applications that require a static environment.
 #Manifest.toml
-/Manifest.toml
 .DS_Store
 .vscode/settings.json
 
@@ -390,3 +389,4 @@ EpiAware/docs/src/examples/*.md
 /.benchmarkci
 /benchmark/*.json
 EpiAware/docs/src/getting-started/tutorials/censored-obs.md
+*/Manifest*.toml
