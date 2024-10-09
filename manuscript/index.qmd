@@ -1,17 +1,20 @@
 ---
 title: "Evaluating the role of the infection generating process for situational awareness of infections diseases: Should we be using the renewal process?"
-author:
-keywords:
-abstract: |
-plain-language-summary: |
-key-points:
-date: last-modified
 bibliography: references.bib
 citation:
   container-title: Earth and Space Science
 number-sections: true
-jupyter: python3
+jupyter: julia-1.11
 ---
+
+```{julia}
+#| echo: false
+#| output: false
+using Pkg
+index_location = @__DIR__()
+Pkg.activate(index_location)
+Pkg.add("CairoMakie")
+```
 
 ## Introduction
 
