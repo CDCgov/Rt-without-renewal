@@ -240,14 +240,14 @@ Using these priors we made prior predictive checks across our range of models. T
 % julia pipeline/scripts/run_priorpred_pipeline.jl 1000
 ```
 
-We noted that for a substantial number of the model configurations there were model predictive samples with such large numbers of infecteds that calls to `BigInt` caused `InexactError` exceptions. Rather than directly stop these exceptions we recorded the pattern of prior prediction failure so as to inform model improvement @tbl-prior-fail. 
+We noted that for a substantial number of the model configurations there were model predictive samples with such large numbers of infecteds that calls to `BigInt` caused `InexactError` exceptions. Rather than directly stop these exceptions we recorded the pattern of prior prediction failure so as to inform model improvement @tbl-prior-fail.
 
 ```{julia}
 #| output: false
 priorpred_dir = joinpath(@__DIR__(),"..", "pipeline/data/priorpredictive/")
-priorpred_datafiles = readdir(priorpred_dir) |> 
+priorpred_datafiles = readdir(priorpred_dir) |>
   fns -> filter(fn -> contains(fn, ".jld2"), fns) #filter for .jld2 files
- 
+
 priorpred_outcomes_df = mapreduce(vcat, priorpred_datafiles) do fn
   D = load(joinpath(priorpred_dir, fn))
   igp = D["inference_config"]["igp"]
@@ -264,14 +264,14 @@ priorpred_outcomes_df = mapreduce(vcat, priorpred_datafiles) do fn
     T_diff = parse(Int, T2) - parse(Int, T1),
     runsuccess = runsuccess,
     )
-end 
+end
 ```
 
 
 ```{julia}
 #| label: tbl-prior-fail
 #| tbl-cap: Number of prior predictive successes and fails from initial prior group grouped by infection generating process and latent model.
-priorpred_outcomes_df |> 
+priorpred_outcomes_df |>
   df -> @groupby(df, :infection_gen_proc, :latent_model) |>
   gd -> @combine(gd, :n_success = sum(:runsuccess), :n_fail = sum(1 .- :runsuccess))
 ```

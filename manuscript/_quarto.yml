@@ -1,6 +1,6 @@
 project:
   type: manuscript
-  
+
 format:
   html:
     toc: true
