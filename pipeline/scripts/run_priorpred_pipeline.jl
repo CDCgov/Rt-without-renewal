@@ -18,13 +18,10 @@ pids = addprocs(; exeflags = ["--project=$(Base.active_project())"])
 
 @everywhere using EpiAwarePipeline
 
-# Create instances of the pipeline behaviour
-
+# For prior predictive we only need one scenario pipeline because the underlying
+# generative model is the same for all scenarios
 pipelines = [
     SmoothOutbreakPipeline(ndraws = ndraws, nchains = 1, priorpredictive = true),
-    MeasuresOutbreakPipeline(ndraws = ndraws, nchains = 1, priorpredictive = true),
-    SmoothEndemicPipeline(ndraws = ndraws, nchains = 1, priorpredictive = true),
-    RoughEndemicPipeline(ndraws = ndraws, nchains = 1, priorpredictive = true)
 ]
 
 # Run the pipeline
