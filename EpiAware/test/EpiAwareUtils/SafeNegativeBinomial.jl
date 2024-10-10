@@ -70,7 +70,7 @@ end
 
     dist = SafeNegativeBinomial(r, p)
     @testset "Large value of mean samples a BigInt with SafePoisson" begin
-        @test rand(dist) isa Real
+        @test rand(dist) isa Union{Int, BigInt}
     end
     @testset "Large value of mean sample failure with Poisson" begin
         _dist = EpiAware.EpiAwareUtils._negbin(dist)
