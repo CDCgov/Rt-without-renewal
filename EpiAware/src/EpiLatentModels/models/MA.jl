@@ -2,11 +2,16 @@
 The moving average (MA) model struct.
 
 # Constructors
-- `MA(coef_prior::Distribution, std_prior::Distribution; q::Int = 1, ϵ_t::AbstractTuringLatentModel = IDD(Normal()))`: Constructs an MA model with the specified prior distributions for MA coefficients and standard deviation. The order of the MA model and the error term distribution can also be specified.
+- `MA(θ::Distribution, σ::Distribution; q::Int = 1, ϵ::AbstractTuringLatentModel = IDD(Normal()))`: Constructs an MA model with the specified prior distributions.
 
-- `MA(; coef_priors::Vector{C} = [truncated(Normal(0.0, 0.05), -1, 1)], std_prior::Distribution = HalfNormal(0.1), ϵ_t::AbstractTuringLatentModel = IDD(Normal())) where {C <: Distribution}`: Constructs an MA model with the specified prior distributions for MA coefficients, standard deviation, and error term. The order of the MA model is determined by the length of the `coef_priors` vector.
+- `MA(; θ::Vector{C} = [truncated(Normal(0.0, 0.05), -1, 1)], σ::Distribution = HalfNormal(0.1), ϵ::AbstractTuringLatentModel = HierarchicalNormal) where {C <: Distribution}`: Constructs an MA model with the specified prior distributions.
 
-- `MA(coef_prior::Distribution, std_prior::Distribution, q::Int, ϵ_t::AbstractTuringLatentModel)`: Constructs an MA model with the specified prior distributions for MA coefficients, standard deviation, and error term. The order of the MA model is explicitly specified.
+- `MA(θ::Distribution, q::Int, ϵ_t::AbstractTuringLatentModel)`: Constructs an MA model with the specified prior distributions and order.
+
+# Parameters
+- `θ`: Prior distribution for the MA coefficients. For MA(q), this should be a vector of q distributions or a multivariate distribution of dimension q.
+- `q`: Order of the MA model, i.e., the number of lagged error terms.
+- `ϵ_t`: Distribution of the error term, typically standard normal.
 
 # Examples
 
@@ -32,35 +37,32 @@ rand(mdl)
 
 struct MA{C <: Sampleable, S <: Sampleable, Q <: Int, E <: AbstractTuringLatentModel} <:
        AbstractTuringLatentModel
-    "Prior distribution for the MA coefficients."
-    coef_prior::C
-    "Prior distribution for the standard deviation."
-    std_prior::S
-    "Order of the MA model."
+    "Prior distribution for the MA coefficients. For MA(q), this should be a vector of q distributions or a multivariate distribution of dimension q"
+    θ::C
+    "Order of the MA model, i.e., the number of lagged error terms."
     q::Q
     "Prior distribution for the error term."
     ϵ_t::E
 
-    function MA(coef_prior::Distribution, std_prior::Distribution;
-            q::Int = 1, ϵ_t::AbstractTuringLatentModel = IDD(Normal()))
-        coef_priors = fill(coef_prior, q)
-        return MA(; coef_priors = coef_priors, std_prior = std_prior, ϵ_t = ϵ_t)
+    function MA(θ::Distribution, σ::Distribution;
+            q::Int = 1, ϵ::AbstractTuringLatentModel = IDD(Normal()))
+        θ_priors = fill(θ, q)
+        return MA(; θ_priors = θ_priors, σ = σ, ϵ = ϵ)
     end
 
-    function MA(; coef_priors::Vector{C} = [truncated(Normal(0.0, 0.05), -1, 1)],
-            std_prior::Distribution = HalfNormal(0.1),
-            ϵ_t::AbstractTuringLatentModel = IDD(Normal())) where {C <: Distribution}
-        q = length(coef_priors)
-        coef_prior = _expand_dist(coef_priors)
-        return MA(coef_prior, std_prior, q, ϵ_t)
+    function MA(; θ_priors::Vector{C} = [truncated(Normal(0.0, 0.05), -1, 1)],
+            σ::Distribution = HalfNormal(0.1),
+            ϵ::AbstractTuringLatentModel = IDD(Normal())) where {C <: Distribution}
+        q = length(θ_priors)
+        θ = _expand_dist(θ_priors)
+        return MA(θ, q, ϵ)
     end
 
-    function MA(coef_prior::Distribution, std_prior::Distribution,
-            q::Int, ϵ_t::AbstractTuringLatentModel)
+    function MA(θ::Distribution, q::Int, ϵ::AbstractTuringLatentModel)
         @assert q>0 "q must be greater than 0"
-        @assert q==length(coef_prior) "q must be equal to the length of coef_prior"
-        new{typeof(coef_prior), typeof(std_prior), typeof(q), typeof(ϵ_t)}(
-            coef_prior, std_prior, q, ϵ_t
+        @assert q==length(θ) "q must be equal to the length of θ"
+        new{typeof(θ), typeof(σ), typeof(q), typeof(ϵ)}(
+            θ, q, ϵ
         )
     end
 end
@@ -82,15 +84,12 @@ Generate a latent MA series.
 @model function EpiAwareBase.generate_latent(latent_model::MA, n)
     q = latent_model.q
     @assert n>q "n must be longer than order of the moving average process"
-
-    σ ~ latent_model.std_prior
-    coef_MA ~ latent_model.coef_prior
-    @submodel ϵ_t = generate_latent(latent_model.ϵ_t, n)
-    scaled_ϵ_t = σ_MA * ϵ_t
+    θ ~ latent_model.θ
+    @submodel ϵ_t = generate_latent(latent_model.ϵ, n)
 
     ma = accumulate_scan(
-        MAStep(coef_MA),
-        (; val = 0, state = scaled_ϵ_t[1:q]), scaled_ϵ_t[(q + 1):end])
+        MAStep(θ),
+        (; val = 0, state = ϵ_t[1:q]), ϵ_t[(q + 1):end])
 
     return ma
 end
@@ -99,14 +98,14 @@ end
 The moving average (MA) step function struct
 "
 struct MAStep{C <: AbstractVector{<:Real}} <: AbstractAccumulationStep
-    coef_MA::C
+    θ::C
 end
 
 @doc raw"
 The moving average (MA) step function for use with `accumulate_scan`.
 "
 function (ma::MAStep)(state, ϵ)
-    new_val = ϵ + dot(ma.coef_MA, state.state)
+    new_val = ϵ + dot(ma.θ, state.state)
     new_state = vcat(ϵ, state.state[1:(end - 1)])
     return (; val = new_val, state = new_state)
 end
