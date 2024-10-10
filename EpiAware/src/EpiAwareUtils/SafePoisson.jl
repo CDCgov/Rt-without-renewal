@@ -229,7 +229,7 @@ function log1pmx(x::Float64)
 end
 
 # Procedure F
-function procf(λ, K::Int, s::Float64)
+function procf(λ, K, s::Float64)
     # can be pre-computed, but does not seem to affect performance
     ω = 0.3989422804014327 / s
     b1 = 0.041666666666666664 / λ
