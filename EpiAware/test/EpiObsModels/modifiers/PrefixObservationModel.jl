@@ -10,5 +10,5 @@ end
 
     mdl = generate_observations(model, missing, 10)
     draw = rand(mdl)
-    @test typeof(draw[:var"Test.y_t[1]"]) <: Int
+    @test typeof(draw[:var"Test.y_t[1]"]) <: Real
 end

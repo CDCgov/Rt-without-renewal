@@ -65,7 +65,7 @@ var(d)
 2.4617291430060293e40
 ```
 "
-struct SafeNegativeBinomial{T <: Real} <: DiscreteUnivariateDistribution
+struct SafeNegativeBinomial{T <: Real} <: RealUnivariateDistribution
     r::T
     p::T
 
