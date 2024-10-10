@@ -9,6 +9,7 @@
     x = [0.1, 0.2]
     expected_result = LogExpFunctions.xexpy.(Y_t, x)
     @test all(isapprox.(asc.transform(Y_t, x), expected_result, atol = 1e-6))
+    @test_throws DimensionMismatch asc.transform([1.0, 2.0], [0.1, 0.2, 0.3])
     @test asc.latent_prefix == "Ascertainment"
 
     custom_transform(Y_t, x) = Y_t .* exp.(x)
@@ -18,6 +19,54 @@
     @test asc_custom.latent_model == PrefixLatentModel(FixedIntercept(0.1), "A")
     @test asc_custom.transform == custom_transform
     @test asc_custom.latent_prefix == "A"
+end
+
+@testitem "Test all Ascertainment constructor variants" begin
+    using Turing, LogExpFunctions
+
+    # Test full constructor
+    custom_transform(Y_t, x) = Y_t .* exp.(x)
+    asc1 = Ascertainment(
+        NegativeBinomialError(), FixedIntercept(0.1), custom_transform, "Custom")
+    @test asc1.model == NegativeBinomialError()
+    @test asc1.latent_model isa PrefixLatentModel
+    @test asc1.transform == custom_transform
+    @test asc1.latent_prefix == "Custom"
+
+    # Test constructor with default transform and prefix
+    asc2 = Ascertainment(NegativeBinomialError(), FixedIntercept(0.1))
+    @test asc2.model == NegativeBinomialError()
+    @test asc2.latent_model isa PrefixLatentModel
+    @test asc2.transform([1.0, 2.0], [0.1, 0.2]) ≈
+          LogExpFunctions.xexpy.([1.0, 2.0], [0.1, 0.2])
+    @test asc2.latent_prefix == "Ascertainment"
+
+    # Test constructor with custom transform
+    asc3 = Ascertainment(
+        NegativeBinomialError(), FixedIntercept(0.1), transform = custom_transform)
+    @test asc3.transform == custom_transform
+    @test asc3.latent_prefix == "Ascertainment"
+
+    # Test constructor with custom prefix
+    asc4 = Ascertainment(
+        NegativeBinomialError(), FixedIntercept(0.1), latent_prefix = "Test")
+    @test asc4.latent_prefix == "Test"
+
+    # Test keyword argument constructor
+    asc5 = Ascertainment(
+        model = NegativeBinomialError(),
+        latent_model = FixedIntercept(0.1),
+        transform = custom_transform,
+        latent_prefix = "Keyword"
+    )
+    @test asc5.model == NegativeBinomialError()
+    @test asc5.latent_model isa PrefixLatentModel
+    @test asc5.transform == custom_transform
+    @test asc5.latent_prefix == "Keyword"
+
+    # Test empty latent_prefix (should not use PrefixLatentModel)
+    asc6 = Ascertainment(NegativeBinomialError(), FixedIntercept(0.1), latent_prefix = "")
+    @test asc6.latent_model isa FixedIntercept
 end
 
 @testitem "Test Ascertainment generate_observations" begin
