@@ -45,7 +45,7 @@ var(d)
 7.016735912097631e20
 ```
 "
-struct SafePoisson{T <: Real} <: DiscreteUnivariateDistribution
+struct SafePoisson{T <: Real} <: RealUnivariateDistribution
     λ::T
 
     SafePoisson{T}(λ::Real) where {T <: Real} = new{T}(λ)
@@ -86,7 +86,7 @@ Distributions.rate(d::SafePoisson) = d.λ
 ### Statistics
 
 Distributions.mean(d::SafePoisson) = d.λ
-Distributions.mode(d::SafePoisson) = _safe_int_floor(d.λ)
+Distributions.mode(d::SafePoisson) = floor(d.λ)
 Distributions.var(d::SafePoisson) = d.λ
 Distributions.skewness(d::SafePoisson) = one(typeof(d.λ)) / sqrt(d.λ)
 Distributions.kurtosis(d::SafePoisson) = one(typeof(d.λ)) / d.λ
@@ -142,12 +142,12 @@ ad_rand(λ) = ad_rand(Random.GLOBAL_RNG, λ)
 function ad_rand(rng::AbstractRNG, λ)
     s = sqrt(λ)
     d = 6.0 * λ^2
-    L = _safe_int_floor(λ - 1.1484)
+    L = floor(λ - 1.1484)
     # Step N
     G = λ + s * randn(rng)
 
     if G >= 0.0
-        K = _safe_int_floor(G)
+        K = floor(G)
         # Step I
         if K >= L
             return K
@@ -177,7 +177,7 @@ function ad_rand(rng::AbstractRNG, λ)
             continue
         end
 
-        K = _safe_int_floor(λ + s * T)
+        K = floor(λ + s * T)
         px, py, fx, fy = procf(λ, K, s)
         c = 0.1069 / λ
 
