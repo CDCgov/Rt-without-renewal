@@ -11,6 +11,7 @@ using ..EpiLatentModels: HierarchicalNormal, broadcast_dayofweek
 using ..EpiLatentModels: broadcast_rule, PrefixLatentModel, RepeatEach
 
 using Turing, Distributions, DocStringExtensions, SparseArrays, LinearAlgebra
+using LogExpFunctions: log1pexp
 
 # Observation error models
 export PoissonError, NegativeBinomialError
@@ -20,7 +21,7 @@ export generate_observation_error_priors, observation_error
 
 # Observation model modifiers
 export LatentDelay, Ascertainment, PrefixObservationModel, RecordExpectedObs
-export Aggregate
+export Aggregate, TransformObservationModel
 
 # Observation model manipulators
 export StackObservationModels
@@ -35,6 +36,7 @@ include("modifiers/ascertainment/helpers.jl")
 include("modifiers/Aggregate.jl")
 include("modifiers/PrefixObservationModel.jl")
 include("modifiers/RecordExpectedObs.jl")
+include("modifiers/TransformObservationModel.jl")
 include("StackObservationModels.jl")
 include("ObservationErrorModels/methods.jl")
 include("ObservationErrorModels/NegativeBinomialError.jl")
