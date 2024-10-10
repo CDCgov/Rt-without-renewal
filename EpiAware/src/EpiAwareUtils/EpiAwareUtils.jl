@@ -15,8 +15,8 @@ import Base: eltype
 using Distributions, DocStringExtensions, QuadGK, Statistics, Turing
 
 #Export Structures
-export HalfNormal, DirectSample, SafePoisson, SafeNegativeBinomial, RealValued,
-       RealUnivariateDistribution
+export HalfNormal, DirectSample, SafePoisson, SafeNegativeBinomial, SafeIntValued, SafeInt,
+       SafeDiscreteUnivariateDistribution
 
 #Export functions
 export scan, spread_draws, censored_cdf, censored_pmf, get_param_array, prefix_submodel, ∫F
@@ -34,7 +34,7 @@ include("turing-methods.jl")
 include("DirectSample.jl")
 include("post-inference.jl")
 include("get_param_array.jl")
-include("RealValued.jl")
+include("SafeInt.jl")
 include("SafePoisson.jl")
 include("SafeNegativeBinomial.jl")
 

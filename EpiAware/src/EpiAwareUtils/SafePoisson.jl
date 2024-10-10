@@ -45,7 +45,7 @@ var(d)
 7.016735912097631e20
 ```
 "
-struct SafePoisson{T <: Real} <: RealUnivariateDistribution
+struct SafePoisson{T <: Real} <: SafeDiscreteUnivariateDistribution
     λ::T
 
     SafePoisson{T}(λ::Real) where {T <: Real} = new{T}(λ)
@@ -142,12 +142,12 @@ ad_rand(λ) = ad_rand(Random.GLOBAL_RNG, λ)
 function ad_rand(rng::AbstractRNG, λ)
     s = sqrt(λ)
     d = 6.0 * λ^2
-    L = floor(λ - 1.1484)
+    L = _safe_int_floor(λ - 1.1484)
     # Step N
     G = λ + s * randn(rng)
 
     if G >= 0.0
-        K = floor(G)
+        K = _safe_int_floor(G)
         # Step I
         if K >= L
             return K
@@ -177,7 +177,7 @@ function ad_rand(rng::AbstractRNG, λ)
             continue
         end
 
-        K = floor(λ + s * T)
+        K = _safe_int_floor(λ + s * T)
         px, py, fx, fy = procf(λ, K, s)
         c = 0.1069 / λ
 
@@ -229,7 +229,7 @@ function log1pmx(x::Float64)
 end
 
 # Procedure F
-function procf(λ, K, s::Float64)
+function procf(λ, K::SafeInt, s::Float64)
     # can be pre-computed, but does not seem to affect performance
     ω = 0.3989422804014327 / s
     b1 = 0.041666666666666664 / λ
@@ -241,7 +241,7 @@ function procf(λ, K, s::Float64)
 
     if K < 10
         px = -float(λ)
-        py = λ^K / factorial(floor(Int, K))
+        py = λ^K / factorial(K)
     else
         δ = 0.08333333333333333 / K
         δ -= 4.8 * δ^3
