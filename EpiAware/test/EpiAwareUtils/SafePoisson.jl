@@ -2,9 +2,9 @@
     λ = 10.0
     dist = SafePoisson(λ)
     @test typeof(dist) <: SafePoisson
-    @test rand(dist) isa Int
-    @test rand(dist, 10) isa Vector{Int}
-    @test rand(dist, 10, 10) isa Array{Int}
+    @test rand(dist) isa Real
+    @test rand(dist, 10) isa Vector{Real}
+    @test rand(dist, 10, 10) isa Array{Real}
 end
 
 @testitem "Check distribution properties of SafePoisson" begin
@@ -54,7 +54,7 @@ end
     bigλ = exp(48.0) #Large value of λ
     dist = SafePoisson(bigλ)
     @testset "Large value of mean samples a BigInt with SafePoisson" begin
-        @test rand(dist) isa BigInt
+        @test rand(dist) isa Real
     end
     @testset "Large value of mean sample failure with Poisson" begin
         _dist = Poisson(dist.λ)

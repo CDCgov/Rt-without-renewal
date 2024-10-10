@@ -241,7 +241,7 @@ function procf(λ, K, s::Float64)
 
     if K < 10
         px = -float(λ)
-        py = λ^K / factorial(K)
+        py = λ^K / factorial(floor(Int, K))
     else
         δ = 0.08333333333333333 / K
         δ -= 4.8 * δ^3

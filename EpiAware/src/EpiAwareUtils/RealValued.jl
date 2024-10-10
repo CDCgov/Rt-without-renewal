@@ -8,4 +8,5 @@ Base.eltype(::Type{<:Distributions.Sampleable{F, RealValued}}) where {F} = Real
 """
 A constant alias for `Distribution{Univariate, RealValued}`. This type represents a univariate distribution with real-valued outcomes.
 """
-const RealUnivariateDistribution = Distributions.Distribution{Distributions.Univariate, RealValued}
+const RealUnivariateDistribution = Distributions.Distribution{
+    Distributions.Univariate, RealValued}
