@@ -15,7 +15,8 @@ import Base: eltype
 using Distributions, DocStringExtensions, QuadGK, Statistics, Turing
 
 #Export Structures
-export HalfNormal, DirectSample, SafePoisson, SafeNegativeBinomial
+export HalfNormal, DirectSample, SafePoisson, SafeNegativeBinomial, RealValued,
+       RealUnivariateDistribution
 
 #Export functions
 export scan, spread_draws, censored_cdf, censored_pmf, get_param_array, prefix_submodel, ∫F
