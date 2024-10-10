@@ -25,33 +25,24 @@ end
     # Test with default log1pexp transform
     trans_obs = TransformObservationModel(NegativeBinomialError())
     gen_obs = generate_observations(trans_obs, missing, fill(10.0, 1))
-    samples = sample(gen_obs, Prior(), 1000; progress = false)
+    samples = sample(gen_obs, Prior(), 1000; progress = false)["y_t[1]"]
 
-    # Check that the mean of the samples is close to the transformed value
-    sample_mean = mean(samples["y_t[1]"])
-    expected_mean = generate_observations(
-        NegativeBinomialError(), missing, fill(10.0, 1)
-    ) |>
-                    x -> sample(x, Prior(), 1000; progress = false)["y_t[1]"] |>
-                         x -> log1pexp.(x) |>
-                              mean
+    # Reverse the transform
+    reversed_samples = samples .|> exp |> x -> x .- 1 .|> log
+    # Apply the transform again
+    recovered_samples = log1pexp.(reversed_samples)
 
-    @test isapprox(sample_mean, expected_mean, rtol = 0.2)
+    @test all(isapprox.(samples, recovered_samples, rtol = 1e-6))
 
     # Test with custom transform and Poisson distribution
     custom_transform = x -> x .^ 2  # Square transform
     trans_obs_custom = TransformObservationModel(PoissonError(), custom_transform)
     gen_obs_custom = generate_observations(trans_obs_custom, missing, fill(5.0, 1))
     samples_custom = sample(gen_obs_custom, Prior(), 1000; progress = false)
+    # Reverse the transform
+    reversed_samples_custom = sqrt.(samples_custom["y_t[1]"])
+    # Apply the transform again
+    recovered_samples_custom = custom_transform.(reversed_samples_custom)
 
-    # Check that the mean of the samples is close to the transformed value
-    sample_mean_custom = mean(samples_custom["y_t[1]"])
-    expected_mean_custom = generate_observations(
-        PoissonError(), missing, fill(5.0, 1)
-    ) |>
-                           x -> sample(x, Prior(), 1000; progress = false)["y_t[1]"] |>
-                                x -> custom_transform(x) |>
-                                     mean
-
-    @test isapprox(sample_mean_custom, expected_mean_custom, rtol = 0.2)
+    @test all(isapprox.(samples_custom["y_t[1]"], recovered_samples_custom, rtol = 1e-6))
 end
