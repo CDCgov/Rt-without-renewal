@@ -1,17 +1,26 @@
 ---
 title: "Evaluating the role of the infection generating process for situational awareness of infections diseases: Should we be using the renewal process?"
-author:
-keywords:
-abstract: |
-plain-language-summary: |
-key-points:
-date: last-modified
 bibliography: references.bib
 citation:
   container-title: Earth and Space Science
 number-sections: true
-jupyter: python3
+jupyter: julia-1.11
+echo: false
 ---
+
+```{julia}
+#| echo: false
+#| output: false
+using Pkg
+index_location = @__DIR__()
+Pkg.activate(index_location)
+Pkg.resolve()
+Pkg.instantiate()
+Pkg.add(["CairoMakie", "JLD2", "DataFramesMeta", "DrWatson"])
+
+using DataFramesMeta, JLD2
+
+```
 
 ## Introduction
 
@@ -203,3 +212,66 @@ Say if it looked okay and reference SI
 
 ::: {#refs}
 :::
+
+## Supporting information
+
+### Prior predictive modelling with default priors and transformations
+
+As a first attempt, we used common priors for each latent process considered in this study: random walk, first order auto-regressive and differenced first-order auto-regressive. These priors were:
+
+- The initial value parameter for all latent processes was:
+$$
+Z_0 \sim \text{Normal}(\text{mean} = 0, \text{std} = 0.25).
+$$
+- The standard deviation prior for all latent processes was:
+$$
+\sigma \sim \text{HalfNormal}(\text{mean} = 0.25).
+$$
+- The damping/auto-regression parameter for the auto-regressive latent processes was:
+$$
+\rho \sim \text{Beta}(a = 0.5, b = 0.5).
+$$
+
+For direct infection and renewal models the latent process represents a log-transformed epidemiological quantity, respectively: $Z_t = \log R_t$ and $Z_t = \log I_t$. The exponential growth rate modelling we identify the exponential growth rate with the latent process $Z_t = r_t$.
+
+Using these priors we made prior predictive checks across our range of models. This was run with the pipeline script.
+
+```bash
+% julia pipeline/scripts/run_priorpred_pipeline.jl 1000
+```
+
+We noted that for a substantial number of the model configurations there were model predictive samples with such large numbers of infecteds that calls to `BigInt` caused `InexactError` exceptions. Rather than directly stop these exceptions we recorded the pattern of prior prediction failure so as to inform model improvement @tbl-prior-fail.
+
+```{julia}
+#| output: false
+priorpred_dir = joinpath(@__DIR__(),"..", "pipeline/data/priorpredictive/")
+priorpred_datafiles = readdir(priorpred_dir) |>
+  fns -> filter(fn -> contains(fn, ".jld2"), fns) #filter for .jld2 files
+
+priorpred_outcomes_df = mapreduce(vcat, priorpred_datafiles) do fn
+  D = load(joinpath(priorpred_dir, fn))
+  igp = D["inference_config"]["igp"]
+  latent_model = D["inference_config"]["latent_model"]
+  gi_mean = D["inference_config"]["gi_mean"]
+  T1, T2 = split(D["inference_config"]["tspan"], "_")
+  runsuccess = D["priorpredictive"] .== "Pass"
+  df = DataFrame(
+    infection_gen_proc = igp,
+    latent_model = latent_model,
+    gi_mean = gi_mean,
+    T1 = T1,
+    T2 = T2,
+    T_diff = parse(Int, T2) - parse(Int, T1),
+    runsuccess = runsuccess,
+    )
+end
+```
+
+
+```{julia}
+#| label: tbl-prior-fail
+#| tbl-cap: Number of prior predictive successes and fails from initial prior group grouped by infection generating process and latent model.
+priorpred_outcomes_df |>
+  df -> @groupby(df, :infection_gen_proc, :latent_model) |>
+  gd -> @combine(gd, :n_success = sum(:runsuccess), :n_fail = sum(1 .- :runsuccess))
+```
