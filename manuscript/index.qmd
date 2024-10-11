@@ -1,8 +1,16 @@
 ---
-title: "Evaluating the role of the infection generating process for situational awareness of infections diseases: Should we be using the renewal process?"
+title: "Supporting information: _Evaluating the role of the infection generating process for situational awareness of infections diseases_"
+author: 
+  - name: Samuel P. C. Brand
+    orcid: 0000-0003-0645-5367
+    email: usi1@cdc.gov
+  - name: Zachary Susswein
+    orcid: 0000-0002-4329-4833
+    email: utb2@cdc.gov
+  - name: Sam Abbott
+    orcid: 0000-0001-8057-8037
+    email: azw1@cdc.gov  
 bibliography: references.bib
-citation:
-  container-title: Earth and Space Science
 number-sections: true
 jupyter: julia-1.11
 echo: false
@@ -22,200 +30,11 @@ using DataFramesMeta, JLD2
 
 ```
 
-## Introduction
+## Read-only link to main text
 
-There are a range of measures that are often used for situational awareness both during outbreaks of infectious diseases and for more routine measures. The most popular are short-term forecasts of available metrics, estimates of the instantaneous reproduction number, estimates of the growth rate of infections, and estimates of the number of infections themselves.
+[Read the main text here](https://www.overleaf.com/read/nmxhyrkffryv#3df385). For edit access please contact one of the authors.
 
-Often modellers implicitly assume that the generating process for infections should be specific to their target measure but in reality, these are decoupled, as highlighted by the use of renewal process models for forecasting. This means that there is a question as to whether different infection-generating processes have different characteristics concerning the target measures of interest.
-
-For example, it has been argued that it is more efficient to estimate the growth rate directly and then estimate the effective reproduction number as a postprocessing step. However, little evaluation of this has been done and what work has been done has not explored the wider context.
-
-We aim to explore the performance characteristics for situational awareness of different commonly used infection-generating processes within a commonly used discrete convolution framework. We do this by first defining a generic model framework, set of output measures, and candidate infection-generating processes and then evaluate these both in simulated scenarios and in a range of case studies.
-
-## Methods
-
-### Modelling
-
-#### Generic model structure
-
-We use the commonly implemented discrete convolution framework of `EpiNow2`, `epidemia`, `epinowcast`
-
-We assume:
-
-- Discrete doubly censored generation intervals and a single delay distribution as input
-- A negative binomial observation model
-- Partial ascertainment
-- A fixed growth rate initialisation process
-
-#### Latent infection-generating process
-
-- Infection-generating process
-	- Renewal process
-	- Epidemic growth rate
-	- Log of incidence
-- Prior models
-   - Random walk
-   - AR(1) process
-   - Differenced AR(1) process
-
-### Simulations
-
-#### Observation-generating process
-
-We use the generic model structure described above with a renewal process as it represents (in its equivalence to an SEIR compartmental model) domain understanding of a model that can capture known infectious dynamics.
-
-We simulate from the renewal process through the following procedure:
-1. Take a fixed timeseries of Rt for 160 days. See the next subsection for more description of these scenarios.
-2. Add noise to the fixed Rt estimates draws from a N(0, 0.1) with a fixed seed of `12345`.
-3. Simulate daily incidence starting from $I_0 = 10$ cases and a fixed generation interval. See the next subsection for more detail.
-4. The delay between infection and case ascertainment is represented as a convolution on the true incidence timeseries, as is standard in the literature **CITATIONS**. For any given infected person the delay between infection and ascertainment is distributed **SOME GAMMA/LOGNORMAL**; this is mapped to our discrete time forward simulations using double interval censoring of both the time of infection and the time of ascertainment **CITE SWP + OTHERS**.
-5. Simulate additional negative binomial observation noise on the delayed cases drawn with mean of the true cases and overdispersion of 10.
-
-We do not add a day-of-week effect.
-
-#### Generation intervals
-
-We use two generation intervals, corresponding to pathogens with long and short GIs. We use descretized, double-censored versions of the GI PMFs.
-1. *Short:* We use a Gamma(shape = 2, scale = 1), corresponding to a pathogen with a relatively short generation interval. Vaguely corresponds to flu A in Wallinga & Lipsitch, 2006
-3. *Medium:* We use a Gamma(shape = 2, scale = 5, corresponding to lots of
-2. *Long:* We use a Gamma(shape = 2, scale = 10), corresponding to a pathogen with a moderately long generation interval (Smallpox? I don't know if we need to ground this in anything real and if we do we could drop this down to 15 days and use varicella?)
-
-
-We produce the simulations described in the next section for both of these GIs.
-
-#### Scenarios
-
-##### Reproduction number scenarios
-
-We test the following scenarios grouped by the **Outbreak**, **Endemic**, and **Miscellaneous** categories:
-
-**Outbreak scenarios**
-
-This is the list of scenarios where the initial number of infections is small but $R_t$ is initially significantly greater the 1 (e.g. $R_t > 1.5$).
-
-- _Susecptible depletion_. A smooth transition over time from $R_t > 1$ to $R_t < 0$. This represents a scenario where decrease in $R_t$ is due to greater population immunity, although it should be noted that we aren't modelling that effect mechanistically.
-- _Susecptible depletion with measures_. A sharp/discontinuous transition over time from $R_t > 1$ to $R_t < 1$, followed by a sharp transition back to $R_t > 1$ and then smooth transition to $R_t < 1$ again. This represents a scenario where initial decrease in $R_t$ is due to implementation of public health measures to reduce transmission. The sharp transition back to $R_t > 1$ is due to later relaxation of measures.
-- _Early outbreak_. Constant $R_t = R_0$ but for a short period.
-- _Early outbreak with random effects_. As _Early outbreak_ scenario but with white noise jitter on $R_t$.
-
-**Endemic scenarios**
-
-- _Regular variation_. A scenario with an endemic disease with sinusoidal variation in $R_t$ around 1 with some period length $P$: e.g. $R_t = 1 + \xi \sin(2 \pi (t - \phi) / P)$.
-- _Regular variation with random effects_. As _Regular variation_ scenario but with white noise jitter on $R_t$.
-
-**Mixed scenario(s)**
-
-- _Piecewise constant with large switches_: This scenario provides both sharp changes at the start of the timeseries and more gradual transitions towards the end. $R_t$ varies according to the following schedule,
-  - 1.1 for two weeks
-  - 2 for two weeks
-  - 0.5 for two weeks
-  - 1.5 for two weeks
-  - 0.75 for two weeks
-  - 1.1 for six weeks
-  - sine curve centered at 1 with amplitude of 0.3 afterwards
-
-We simulate out of this scenario for the GIs described in the previous section.
-
-The rolling windows allow for exploration of both of these situations in a single case study. The longer fit to the entire timeseries tests the ability to flexibily handle both of these paradigms in a single fit.
-
-##### Inference scenarios
-We explore the following misspecification scenarios for the generation interval:
-
-- Correct
-- Too short
-- Too long
-
-For each simulated scenario we fit to 12 weeks of data or as much as possible if the scenario is shorter than 12 weeks.
-
-### Case studies
-
-- [ ] 2014-2016 Sierra Leone Ebola virus disease outbreak
-- [ ] 2022 US Mpox outbreak
-- [ ] US COVID-19 from September 2021 to Feburary 2022
-
-### Validation
-
-- Prior predictive checks for all models (SI)
-
-### Evaluation
-
-#### Posterior prediction
-
-- We fit each model to each day for each time-series being evaluated
-- We visualise posterior predictions of all measures.
-- We assess coverage, the CRPS, and CRPS of log-transformed data for all observables.
-- We scale all metrics where possible by the performance of the renewal process infection-generating model and stratify by the target measure.
-- As well as reporting overall metrics we also report performance by horizon aggregated by week for the following horizons (-4, -2, -1, 0, 1, 2) and over time.
-- We report performance both overall and by scenario and case study
-
-#### Inference efficiency
-
-- We report the algorithm settings required to maintain reasonable performance in our simulated scenarios
-- We also report any diagnostics issues models may have had appropriately stratified to highlight problem areas
-- As an overall measure of efficiency we also report the effective sample size per second relative to the renewal process model.
-
-### Implementation
-
-All code was implemented using a pull request-driven development process.
-
-This work is implemented as:
-- [ ] A standalone Julia package for the modelling components
-- [ ] A standalone Julia module for the pipeline components
-- [ ] A standalone Julia module for the analysis of specific components
-- [ ] A R package for postprocessing and figure creation for the analysis
-
-For Julia we use:
-- [ ] `Documenter.jl` for producing rendered documentation
-- [ ] `doctests` for basic unit testing
-- [ ] Models are implemented as structs that inherit from a generic model class.
-- [ ] `Pipelines.jl` to manage our analysis pipeline
-
-For inference we:
-- Use NUTS via `Turing.jl` initialised using `pathfinder`
-- Use a standard warmup of 1000 samples and 1000 samples post warmup over 4 parallel chains
-- For each model we adjust the probability of acceptance and maximum tree depth so that the models run with as few diagnostics issues as possible over our simulated case studies.
-
-## Results
-
-### Validation
-
-Say if it looked okay and reference SI
-
-### Overall
-
-- Overall summary figure of posterior prediction performance and comment
-- Sub panel looking at performance by horizon
-- Overall summary figure looking at inference efficiency
-
-### Simulated scenarios
-
-- By scenario summary of posterior prediction performance repeated for all scenarios
-- By scenario summary of inference efficiency performance
-### Case studies
-
-## Discussion
-
-### Limitations & further work
-
-- We do not explore the impact of different delay distributions
-- We do not explore stochastic or approximately stochastic inference models
-- We do not explore attempting to make the latent infection-generating processes mathematically equivalent in order to highlight the impact of different posterior geometries
-- Aside from misspecification we do not explore the impact of uncertainty in the generation interval within inference models
-- We do not explore the impact of right truncation which is often present in real-time analysis
-- Our set of scenarios and case studies does not give complete coverage over all potential scenarios
-- We do not explore more complex prior models such as splines and gaussian processes
-- We focus our efforts on situational awareness and hence real-time performance. This means we do not focus on retrospective performance which may have different characteristics.
-- We did not perform full simulation-based calibration.
-- Our simulations are produced by a model that is similar to the renewal process inference method and so represents a "best" case for this method. Potential future work could explore other versions of the infection generation process backing the simulations but we feel this choice makes sense given that the renewal process best reflects our mechanistic understanding of how transmission works of the models we explore here.
-
-## References {.unnumbered}
-
-::: {#refs}
-:::
-
-## Supporting information
-
-### Prior predictive modelling with default priors and transformations
+## Prior predictive modelling with default priors and transformations
 
 As a first attempt, we used common priors for each latent process considered in this study: random walk, first order auto-regressive and differenced first-order auto-regressive. These priors were:
 
@@ -271,7 +90,14 @@ end
 ```{julia}
 #| label: tbl-prior-fail
 #| tbl-cap: Number of prior predictive successes and fails from initial prior group grouped by infection generating process and latent model.
+#| tbl-cap-location: bottom
 priorpred_outcomes_df |>
   df -> @groupby(df, :infection_gen_proc, :latent_model) |>
   gd -> @combine(gd, :n_success = sum(:runsuccess), :n_fail = sum(1 .- :runsuccess))
 ```
+
+
+## References {.unnumbered}
+
+::: {#refs}
+:::
