@@ -30,7 +30,7 @@ rand(mdl)
     mean::R = 0.0
     std_prior::D = truncated(Normal(0, 1), 0, Inf)
 
-    function HierarchicalNormal(std_prior::D)
+    function HierarchicalNormal(std_prior::Sampleable)
         return HierarchicalNormal(; mean = 0.0, std_prior = std_prior)
     end
 end

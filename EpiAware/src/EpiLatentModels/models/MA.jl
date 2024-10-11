@@ -4,14 +4,14 @@ The moving average (MA) model struct.
 # Constructors
 - `MA(θ::Distribution, σ::Distribution; q::Int = 1, ϵ::AbstractTuringLatentModel = IDD(Normal()))`: Constructs an MA model with the specified prior distributions.
 
-- `MA(; θ::Vector{C} = [truncated(Normal(0.0, 0.05), -1, 1)], σ::Distribution = HalfNormal(0.1), ϵ::AbstractTuringLatentModel = HierarchicalNormal) where {C <: Distribution}`: Constructs an MA model with the specified prior distributions.
+- `MA(; θ::Vector{C} = [truncated(Normal(0.0, 0.05), -1, 1)], ϵ::AbstractTuringLatentModel = HierarchicalNormal) where {C <: Distribution}`: Constructs an MA model with the specified prior distributions.
 
 - `MA(θ::Distribution, q::Int, ϵ_t::AbstractTuringLatentModel)`: Constructs an MA model with the specified prior distributions and order.
 
 # Parameters
 - `θ`: Prior distribution for the MA coefficients. For MA(q), this should be a vector of q distributions or a multivariate distribution of dimension q.
 - `q`: Order of the MA model, i.e., the number of lagged error terms.
-- `ϵ_t`: Distribution of the error term, typically standard normal.
+- `ϵ_t`: Distribution of the error term, typically standard normal. Defaults to `IDD(Normal())`.
 
 # Examples
 
@@ -44,26 +44,24 @@ struct MA{C <: Sampleable, S <: Sampleable, Q <: Int, E <: AbstractTuringLatentM
     "Prior distribution for the error term."
     ϵ_t::E
 
-    function MA(θ::Distribution, σ::Distribution;
-            q::Int = 1, ϵ::AbstractTuringLatentModel = IDD(Normal()))
+    function MA(θ::Distribution;
+            q::Int = 1, ϵ_t::AbstractTuringLatentModel = HierarchicalNormal(HalfNormal(0.1)))
         θ_priors = fill(θ, q)
-        return MA(; θ_priors = θ_priors, σ = σ, ϵ = ϵ)
+        return MA(; θ_priors = θ_priors, ϵ_t = ϵ_t)
     end
 
     function MA(; θ_priors::Vector{C} = [truncated(Normal(0.0, 0.05), -1, 1)],
-            σ::Distribution = HalfNormal(0.1),
-            ϵ::AbstractTuringLatentModel = IDD(Normal())) where {C <: Distribution}
+            ϵ_t::AbstractTuringLatentModel = HierarchicalNormal(HalfNormal(0.1))) where {C <:
+                                                                                         Distribution}
         q = length(θ_priors)
         θ = _expand_dist(θ_priors)
-        return MA(θ, q, ϵ)
+        return MA(θ, q, ϵ_t)
     end
 
-    function MA(θ::Distribution, q::Int, ϵ::AbstractTuringLatentModel)
+    function MA(θ::Distribution, q::Int, ϵ_t::AbstractTuringLatentModel)
         @assert q>0 "q must be greater than 0"
         @assert q==length(θ) "q must be equal to the length of θ"
-        new{typeof(θ), typeof(σ), typeof(q), typeof(ϵ)}(
-            θ, q, ϵ
-        )
+        new{typeof(θ), typeof(q), typeof(ϵ_t)}(θ, q, ϵ_t)
     end
 end
 
@@ -85,7 +83,7 @@ Generate a latent MA series.
     q = latent_model.q
     @assert n>q "n must be longer than order of the moving average process"
     θ ~ latent_model.θ
-    @submodel ϵ_t = generate_latent(latent_model.ϵ, n)
+    @submodel ϵ_t = generate_latent(latent_model.ϵ_t, n)
 
     ma = accumulate_scan(
         MAStep(θ),
