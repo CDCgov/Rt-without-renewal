@@ -24,7 +24,7 @@ gen_obs()
     M <: AbstractTuringObservationModel, F <: Function} <: AbstractTuringObservationModel
     "The underlying observation model."
     model::M
-    "The transformation function."
+    "The transformation function. The default is `log1pexp` which is the softplus transformation"
     transform::F = x -> log1pexp.(x)
 end
 
