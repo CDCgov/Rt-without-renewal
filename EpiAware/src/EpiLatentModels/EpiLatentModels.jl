@@ -28,6 +28,9 @@ export broadcast_rule, broadcast_dayofweek, broadcast_weekly, equal_dimensions
 # Export tools for modifying latent models
 export DiffLatentModel, TransformLatentModel, PrefixLatentModel, RecordExpectedLatent
 
+# Export combinations of models and modifiers
+export define_arma, define_arima
+
 include("docstrings.jl")
 include("models/Intercept.jl")
 include("models/IDD.jl")
@@ -44,6 +47,8 @@ include("manipulators/ConcatLatentModels.jl")
 include("manipulators/broadcast/LatentModel.jl")
 include("manipulators/broadcast/rules.jl")
 include("manipulators/broadcast/helpers.jl")
+include("combinations/define_arma.jl")
+include("combinations/define_arima.jl")
 include("utils.jl")
 
 end
