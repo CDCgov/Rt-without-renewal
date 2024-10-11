@@ -35,7 +35,7 @@ rand(mdl)
 ```
 "
 
-struct MA{C <: Sampleable, S <: Sampleable, Q <: Int, E <: AbstractTuringLatentModel} <:
+struct MA{C <: Sampleable, Q <: Int, E <: AbstractTuringLatentModel} <:
        AbstractTuringLatentModel
     "Prior distribution for the MA coefficients. For MA(q), this should be a vector of q distributions or a multivariate distribution of dimension q"
     θ::C
@@ -45,14 +45,14 @@ struct MA{C <: Sampleable, S <: Sampleable, Q <: Int, E <: AbstractTuringLatentM
     ϵ_t::E
 
     function MA(θ::Distribution;
-            q::Int = 1, ϵ_t::AbstractTuringLatentModel = HierarchicalNormal(HalfNormal(0.1)))
+            q::Int = 1, ϵ_t::AbstractTuringLatentModel = HierarchicalNormal())
         θ_priors = fill(θ, q)
         return MA(; θ_priors = θ_priors, ϵ_t = ϵ_t)
     end
 
     function MA(; θ_priors::Vector{C} = [truncated(Normal(0.0, 0.05), -1, 1)],
-            ϵ_t::AbstractTuringLatentModel = HierarchicalNormal(HalfNormal(0.1))) where {C <:
-                                                                                         Distribution}
+            ϵ_t::AbstractTuringLatentModel = HierarchicalNormal()) where {C <:
+                                                                          Distribution}
         q = length(θ_priors)
         θ = _expand_dist(θ_priors)
         return MA(θ, q, ϵ_t)

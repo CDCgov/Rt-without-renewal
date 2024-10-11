@@ -4,7 +4,7 @@ The `HierarchicalNormal` struct represents a non-centered hierarchical normal di
 ## Constructors
 
 - `HierarchicalNormal(mean, std_prior)`: Constructs a `HierarchicalNormal` instance with the specified mean and standard deviation prior.
-- `HierarchicalNormal(; mean = 0.0, std_prior = truncated(Normal(0,1), 0, Inf))`: Constructs a `HierarchicalNormal` instance with the specified mean and standard deviation prior using named arguments and with default values.
+- `HierarchicalNormal(; mean = 0.0, std_prior = truncated(Normal(0,0.1), 0, Inf))`: Constructs a `HierarchicalNormal` instance with the specified mean and standard deviation prior using named arguments and with default values.
 - `HierarchicalNormal(std_prior)`: Constructs a `HierarchicalNormal` instance with the specified standard deviation prior.
 ## Examples
 
@@ -12,7 +12,7 @@ The `HierarchicalNormal` struct represents a non-centered hierarchical normal di
 using Distributions, Turing, EpiAware
 hn = HierarchicalNormal()
 # output
-HierarchicalNormal{Float64, Truncated{Normal{Float64}, Continuous, Float64}}(mean=0.0, std_prior=Truncated{Normal{Float64}, Continuous, Float64}(a=0.0, b=Inf, x=Normal{Float64}(μ=0.0, σ=1.0)))
+HierarchicalNormal{Float64, Truncated{Normal{Float64}, Continuous, Float64}}(mean=0.0, std_prior=Truncated{Normal{Float64}, Continuous, Float64}(a=0.0, b=Inf, x=Normal{Float64}(μ=0.0, σ=0.1)))
 ```
 
 ```jldoctest HierarchicalNormal; filter=r\"\b\d+(\.\d+)?\b\" => \"*\"
@@ -27,12 +27,10 @@ rand(mdl)
 ```
 "
 @kwdef struct HierarchicalNormal{R <: Real, D <: Sampleable} <: AbstractTuringLatentModel
+    "Mean of the normal distribution."
     mean::R = 0.0
-    std_prior::D = truncated(Normal(0, 1), 0, Inf)
-
-    function HierarchicalNormal(std_prior::Sampleable)
-        return HierarchicalNormal(; mean = 0.0, std_prior = std_prior)
-    end
+    "Prior distribution for the standard deviation."
+    std_prior::D = truncated(Normal(0, 0.1), 0, Inf)
 end
 
 @doc raw"
