@@ -164,7 +164,8 @@ end
 
 @testitem "LatentDelay parameter recovery with mix of IGP + latent processes: Negative binomial errors + EpiProblem interface" begin
     using Random, Turing, Distributions, LinearAlgebra, DynamicPPL, StatsBase, ReverseDiff,
-          Suppressor
+          Suppressor, LogExpFunctions
+    # using PairPlots, CairoMakie
     Random.seed!(1234)
 
     #Set up model testing matrix
@@ -173,8 +174,12 @@ end
         DirectInfections,
         ExpGrowthRate,
         Renewal] .|>
-                em_type -> em_type(data = EpiData([0.2, 0.5, 0.3], exp),
-        initialisation_prior = Normal(log(100.0), 0.25))
+                em_type -> em_type(
+        data = EpiData([0.2, 0.5, 0.3],
+            em_type == Renewal ? softplus : exp
+        ),
+        initialisation_prior = Normal(log(100.0), 0.25)
+    )
 
     latentprocess_types = [RandomWalk, AR, DiffLatentModel]
 
