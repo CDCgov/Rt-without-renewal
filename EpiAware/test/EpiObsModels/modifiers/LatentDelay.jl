@@ -222,10 +222,10 @@ end
 
         #Inference method
         inference_method = EpiMethod(
-            pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 100)],
+            pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 50)],
             sampler = NUTSampler(adtype = ad,
                 ndraws = 1000,
-                nchains = 4,
+                nchains = 2,
                 mcmc_parallel = MCMCThreads())
         )
 
@@ -238,14 +238,15 @@ end
 
         #Generate data from generative model (i.e. data unconditioned)
         generative_mdl = generate_epiaware(
-            epi_prob, (y_t = Vector{Union{Int, Missing}}(missing, n),))
+            epi_prob, (y_t = missing,))
         θ_true = rand(generative_mdl)
         gen_data = condition(generative_mdl, θ_true)()
 
         #Apply inference method to inference model (i.e. generative model conditioned on data)
         inference_results = apply_method(epi_prob,
             inference_method,
-            (y_t = gen_data.generated_y_t,)
+            (y_t = gen_data.generated_y_t,);
+            progress = false
         )
 
         chn = inference_results.samples
