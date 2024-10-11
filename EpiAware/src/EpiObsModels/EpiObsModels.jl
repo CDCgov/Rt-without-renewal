@@ -11,6 +11,7 @@ using ..EpiLatentModels: HierarchicalNormal, broadcast_dayofweek
 using ..EpiLatentModels: broadcast_rule, PrefixLatentModel, RepeatEach
 
 using Turing, Distributions, DocStringExtensions, SparseArrays, LinearAlgebra
+using LogExpFunctions: xexpy
 
 # Observation error models
 export PoissonError, NegativeBinomialError
