@@ -1,6 +1,6 @@
 ---
 title: "Supporting information: _Evaluating the role of the infection generating process for situational awareness of infections diseases_"
-author: 
+author:
   - name: Samuel P. C. Brand
     orcid: 0000-0003-0645-5367
     email: usi1@cdc.gov
@@ -9,7 +9,7 @@ author:
     email: utb2@cdc.gov
   - name: Sam Abbott
     orcid: 0000-0001-8057-8037
-    email: azw1@cdc.gov  
+    email: azw1@cdc.gov
 bibliography: references.bib
 number-sections: true
 jupyter: julia-1.11
