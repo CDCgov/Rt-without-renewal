@@ -60,7 +60,7 @@ end
 
     mdl = test_negbin_errors(rw_process, obs_nb, Int.(y_t_obs))
     chn = sample(
-        mdl, NUTS(adtype = AutoReverseDiff(; compile = Val(true))), 1000, progess = false)
+        mdl, NUTS(adtype = AutoReverseDiff(; compile = Val(true))), 1000; progess = false)
 
     #Check that are in central 99.9% of the posterior predictive distribution
     #Therefore, this should be unlikely to fail if the model is correctly implemented
