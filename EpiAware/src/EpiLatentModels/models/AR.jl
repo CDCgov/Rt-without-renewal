@@ -27,7 +27,7 @@ rand(mdl)
 # output
 ```
 "
-struct AR{D <: Sampleable, S <: Sampleable, I <: Sampleable,
+struct AR{D <: Sampleable, I <: Sampleable,
     P <: Int, E <: AbstractTuringLatentModel} <: AbstractTuringLatentModel
     "Prior distribution for the damping coefficients."
     damp_prior::D
@@ -60,8 +60,7 @@ struct AR{D <: Sampleable, S <: Sampleable, I <: Sampleable,
         @assert p>0 "p must be greater than 0"
         @assert p==length(damp_prior)==length(init_prior) "p must be equal to the length of damp_prior and init_prior"
         new{typeof(damp_prior), typeof(init_prior), typeof(p), typeof(ϵ_t)}(
-            damp_prior, init_prior, p, ϵ_t
-        )
+            damp_prior, init_prior, p, ϵ_t)
     end
 end
 
@@ -84,12 +83,11 @@ Generate a latent AR series.
     p = latent_model.p
     @assert n>p "n must be longer than order of the autoregressive process"
 
-    σ_AR ~ latent_model.std_prior
     ar_init ~ latent_model.init_prior
     damp_AR ~ latent_model.damp_prior
     @submodel ϵ_t = generate_latent(latent_model.ϵ_t, n - p)
 
-    ar = accumulate_scan(ARStep(damp_AR), ar_init, σ_AR * ϵ_t)
+    ar = accumulate_scan(ARStep(damp_AR), ar_init, ϵ_t)
 
     return ar
 end
