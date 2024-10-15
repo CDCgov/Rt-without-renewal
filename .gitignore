@@ -390,3 +390,4 @@ EpiAware/docs/src/examples/*.md
 /benchmark/*.json
 EpiAware/docs/src/getting-started/tutorials/censored-obs.md
 */Manifest*.toml
+EpiAware/docs/Manifest*.toml
