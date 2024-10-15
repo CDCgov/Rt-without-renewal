@@ -65,7 +65,7 @@ var(d)
 2.4617291430060293e40
 ```
 "
-struct SafeNegativeBinomial{T <: Real} <: DiscreteUnivariateDistribution
+struct SafeNegativeBinomial{T <: Real} <: ContinuousUnivariateDistribution
     r::T
     p::T
 
@@ -86,17 +86,17 @@ _negbin(d::SafeNegativeBinomial) = NegativeBinomial(d.r, d.p; check_args = false
 
 ### Support
 
-Base.minimum(d::SafeNegativeBinomial) = 0
+Base.minimum(d::SafeNegativeBinomial) = 0.0
 Base.maximum(d::SafeNegativeBinomial) = Inf
-Distributions.insupport(d::SafeNegativeBinomial, x::Integer) = x >= 0
+Distributions.insupport(d::SafeNegativeBinomial, x) = x >= 0
 
 #### Parameters
 
 Distributions.params(d::SafeNegativeBinomial) = _negbin(d) |> params
 Distributions.partype(::SafeNegativeBinomial{T}) where {T} = T
 
-Distributions.succprob(d::SafeNegativeBinomial) = _negbin(d).p
-Distributions.failprob(d::SafeNegativeBinomial{T}) where {T} = one(T) - _negbin(d).p
+Distributions.succprob(d::SafeNegativeBinomial) = d.p
+Distributions.failprob(d::SafeNegativeBinomial{T}) where {T} = one(T) - d.p
 
 #### Statistics
 
@@ -112,16 +112,16 @@ end
 
 #### Evaluation & Sampling
 
-Distributions.logpdf(d::SafeNegativeBinomial, k::Real) = logpdf(_negbin(d), k)
-
-Distributions.cdf(d::SafeNegativeBinomial, x::Real) = cdf(_negbin(d), x)
-Distributions.ccdf(d::SafeNegativeBinomial, x::Real) = ccdf(_negbin(d), x)
-Distributions.logcdf(d::SafeNegativeBinomial, x::Real) = logcdf(_negbin(d), x)
-Distributions.logccdf(d::SafeNegativeBinomial, x::Real) = logccdf(_negbin(d), x)
+Distributions.pdf(d::SafeNegativeBinomial, k::Real) = nbinompdf(d.r, d.p, k)
+Distributions.logpdf(d::SafeNegativeBinomial, k::Real) = logpdf(_negbin(d), k) #for ChainRules ext
+Distributions.cdf(d::SafeNegativeBinomial, x::Real) = nbinomcdf(d.r, d.p, x)
+Distributions.ccdf(d::SafeNegativeBinomial, x::Real) = nbinomccdf(d.r, d.p, x)
+Distributions.logcdf(d::SafeNegativeBinomial, x::Real) = nbinomlogcdf(d.r, d.p, x)
+Distributions.logccdf(d::SafeNegativeBinomial, x::Real) = nbinomlogccdf(d.r, d.p, x)
 Distributions.quantile(d::SafeNegativeBinomial, q::Real) = quantile(_negbin(d), q)
 Distributions.cquantile(d::SafeNegativeBinomial, q::Real) = cquantile(_negbin(d), q)
-Distributions.invlogcdf(d::SafeNegativeBinomial, lq::Real) = invlogcdf(_negbin(d), lq)
-Distributions.invlogccdf(d::SafeNegativeBinomial, lq::Real) = invlogccdf(_negbin(d), lq)
+Distributions.invlogcdf(d::SafeNegativeBinomial, lq::Real) = nbinominvlogcdf(d.r, d.p, lq)
+Distributions.invlogccdf(d::SafeNegativeBinomial, lq::Real) = nbinominvlogccdf(d.r, d.p, lq)
 
 ## sampling
 function Base.rand(rng::AbstractRNG, d::SafeNegativeBinomial)

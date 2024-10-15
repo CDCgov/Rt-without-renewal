@@ -45,7 +45,7 @@ var(d)
 7.016735912097631e20
 ```
 "
-struct SafePoisson{T <: Real} <: DiscreteUnivariateDistribution
+struct SafePoisson{T <: Real} <: ContinuousUnivariateDistribution
     λ::T
 
     SafePoisson{T}(λ::Real) where {T <: Real} = new{T}(λ)
@@ -86,7 +86,7 @@ Distributions.rate(d::SafePoisson) = d.λ
 ### Statistics
 
 Distributions.mean(d::SafePoisson) = d.λ
-Distributions.mode(d::SafePoisson) = _safe_int_floor(d.λ)
+Distributions.mode(d::SafePoisson) = floor(d.λ)
 Distributions.var(d::SafePoisson) = d.λ
 Distributions.skewness(d::SafePoisson) = one(typeof(d.λ)) / sqrt(d.λ)
 Distributions.kurtosis(d::SafePoisson) = one(typeof(d.λ)) / d.λ
@@ -104,17 +104,17 @@ end
 Distributions.mgf(d::SafePoisson, t::Real) = mgf(_poisson(d), t)
 Distributions.cgf(d::SafePoisson, t) = cgf(_poisson(d), t)
 Distributions.cf(d::SafePoisson, t::Real) = cf(_poisson(d), t)
-Distributions.logpdf(d::SafePoisson, x::Real) = logpdf(_poisson(d), x)
-Distributions.pdf(d::SafePoisson, x::Integer) = pdf(_poisson(d), x)
-Distributions.cdf(d::SafePoisson, x::Integer) = cdf(_poisson(d), x)
-Distributions.ccdf(d::SafePoisson, x::Integer) = ccdf(_poisson(d), x)
+Distributions.logpdf(d::SafePoisson, x::Real) = poislogpdf(d.λ, x)
+Distributions.pdf(d::SafePoisson, x::Real) = poispdf(d.λ, x)
+Distributions.cdf(d::SafePoisson, x::Real) = poiscdf(d.λ, x)
+Distributions.ccdf(d::SafePoisson, x::Real) = poisccdf(d.λ, x)
 Distributions.quantile(d::SafePoisson, q::Real) = quantile(_poisson(d), q)
 
 ### Support
 
-Base.minimum(d::SafePoisson) = 0
+Base.minimum(d::SafePoisson) = 0.0
 Base.maximum(d::SafePoisson) = Inf
-Distributions.insupport(d::SafePoisson, x::Integer) = x >= 0
+Distributions.insupport(d::SafePoisson, x) = x >= 0
 
 ### Sampling
 ### Taken from PoissonRandom.jl https://github.com/SciML/PoissonRandom.jl/blob/master/src/PoissonRandom.jl
@@ -142,12 +142,12 @@ ad_rand(λ) = ad_rand(Random.GLOBAL_RNG, λ)
 function ad_rand(rng::AbstractRNG, λ)
     s = sqrt(λ)
     d = 6.0 * λ^2
-    L = _safe_int_floor(λ - 1.1484)
+    L = floor(λ - 1.1484)
     # Step N
     G = λ + s * randn(rng)
 
     if G >= 0.0
-        K = _safe_int_floor(G)
+        K = floor(G)
         # Step I
         if K >= L
             return K
@@ -177,7 +177,7 @@ function ad_rand(rng::AbstractRNG, λ)
             continue
         end
 
-        K = _safe_int_floor(λ + s * T)
+        K = floor(λ + s * T)
         px, py, fx, fy = procf(λ, K, s)
         c = 0.1069 / λ
 
@@ -229,7 +229,7 @@ function log1pmx(x::Float64)
 end
 
 # Procedure F
-function procf(λ, K::Int, s::Float64)
+function procf(λ, K, s::Float64)
     # can be pre-computed, but does not seem to affect performance
     ω = 0.3989422804014327 / s
     b1 = 0.041666666666666664 / λ
@@ -241,7 +241,7 @@ function procf(λ, K::Int, s::Float64)
 
     if K < 10
         px = -float(λ)
-        py = λ^K / factorial(K)
+        py = exp(K * log(λ) - loggamma(K + 1))
     else
         δ = 0.08333333333333333 / K
         δ -= 4.8 * δ^3

@@ -10,6 +10,10 @@ using DynamicPPL: Model, fix, condition, @submodel, @model
 using MCMCChains: Chains
 using Random: AbstractRNG, randexp
 using Tables: rowtable
+using SpecialFunctions: loggamma
+using StatsFuns: poispdf, poislogpdf, poiscdf, poisccdf
+using StatsFuns: nbinompdf, nbinomlogpdf, nbinomcdf, nbinomccdf, nbinomlogcdf,
+                 nbinomlogccdf, nbinominvlogcdf, nbinominvlogccdf
 
 using Distributions, DocStringExtensions, QuadGK, Statistics, Turing
 
