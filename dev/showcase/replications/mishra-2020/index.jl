@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.46
+# v0.20.0
 
 using Markdown
 using InteractiveUtils
@@ -7,11 +7,8 @@ using InteractiveUtils
 # ╔═╡ 34a06b3b-799b-48c5-bd08-1e57151f51ec
 let
     docs_dir = dirname(dirname(dirname(dirname(@__DIR__))))
-    pkg_dir = dirname(docs_dir)
-
     using Pkg: Pkg
     Pkg.activate(docs_dir)
-    Pkg.develop(; path = pkg_dir)
     Pkg.instantiate()
 end;
 
@@ -394,7 +391,7 @@ num_threads = min(10, Threads.nthreads())
 inference_method = EpiMethod(
     pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 100)],
     sampler = NUTSampler(
-        adtype = AutoReverseDiff(),
+        adtype = AutoReverseDiff(compile = true),
         ndraws = 2000,
         nchains = num_threads,
         mcmc_parallel = MCMCThreads())
