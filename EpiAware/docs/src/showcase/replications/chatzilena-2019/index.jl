@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.46
+# v0.20.0
 
 using Markdown
 using InteractiveUtils
@@ -7,11 +7,8 @@ using InteractiveUtils
 # ╔═╡ e34cec5a-a173-4e92-a860-340c7a9e9c72
 let
     docs_dir = dirname(dirname(dirname(dirname(@__DIR__))))
-    pkg_dir = dirname(docs_dir)
-
     using Pkg: Pkg
     Pkg.activate(docs_dir)
-    Pkg.develop(; path = pkg_dir)
     Pkg.instantiate()
 end;
 
