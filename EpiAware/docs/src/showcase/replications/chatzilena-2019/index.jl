@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.46
+# v0.20.0
 
 using Markdown
 using InteractiveUtils
@@ -464,11 +464,43 @@ We see that the choice of priors implies an _a priori_ belief that the extra obs
 # ╔═╡ b693a942-c6c7-40f8-997c-0dc8e5548132
 md"
 We can now define the probabilistic model.
-Note that instead of implementing `exp.(κₜ)` directly, which can be unstable for large primal values, we use the `LogExpFunctions.xexpy` function which implements $x\exp(y)$ stabily for a wide range of values.
+The stochastic model assumes a (random) time-varying ascertainment, which we implement using the `Ascertainment` struct from `EpiAware`.
+Note that instead of implementing an ascertainment factor `exp.(κₜ)` directly, which can be unstable for large primal values, by default `Ascertainment` uses the `LogExpFunctions.xexpy` function which implements $x\exp(y)$ stabily for a wide range of values.
+"
+
+# ╔═╡ 8588c45d-c225-4779-b7d0-8a9fd059f30e
+md"
+To distinguish random variables sampled by various sub-processes `EpiAware` process types create prefixes.
+The default for `Ascertainment` is just the string `\"Ascertainment\"`, but in this case we use the less verbose `\"va\"` for \"varying ascertainment\".
+"
+
+# ╔═╡ f116bb64-0426-4cd5-a01d-d8916d61af6d
+mdl_prefix = "va"
+
+# ╔═╡ 8956b070-3b9a-4a0f-a5a0-ff0b2770d9de
+md"
+Now we can construct our time varying ascertianment model.
+The main keyword arguments here are `model` and `latent_model`.
+`model` sets the connection between the expected observation and the actual observation.
+In this case, we reuse our `PoissonError` model from above.
+`latent_model` sets the modification model on the expected values.
+In this case, we use the `AR` process we defined above.
+"
+
+# ╔═╡ c7b5d1dd-3e21-4841-b096-917328432c3c
+varying_ascertainment = Ascertainment(
+    model = obs,
+    latent_model = ar,
+    latent_prefix = mdl_prefix
+)
+
+# ╔═╡ 0e2e281c-ef19-4027-a1fa-16ce17b7bdd7
+md"
+Now we can declare the full model in the `Turing` PPL.
 "
 
 # ╔═╡ 9309f7f8-0896-4686-8bfc-b9f82d91bc0f
-@model function stochastic_ode_mdl(y_t, ts, logobsprob, obs, prob, N;
+@model function stochastic_ode_mdl(y_t, ts, obs, prob, N;
         solver = AutoTsit5(Rosenbrock23())
 )
 
@@ -488,13 +520,9 @@ Note that instead of implementing `exp.(κₜ)` directly, which can be unstable 
         saveat = ts,
         verbose = false
     )
+    λt = log1pexp.(N * sol[2, :])
 
-    ##Sample the log-residual AR process##
-    nobs = length(y_t)
-    @submodel κₜ = generate_latent(logobsprob, nobs)
-    λt = xexpy.(log1pexp.(N * sol[2, :]), κₜ)
-
-    ##log-like accumulation using obs##
+    ##Observation##
     @submodel generated_y_t = generate_observations(obs, y_t, λt)
 
     ##Generated quantities##
@@ -505,8 +533,7 @@ end
 stochastic_mdl = stochastic_ode_mdl(
     data.in_bed,
     data.ts,
-    ar,
-    obs,
+    varying_ascertainment,
     sir_prob,
     N
 )
@@ -515,8 +542,7 @@ stochastic_mdl = stochastic_ode_mdl(
 stochastic_uncond_mdl = stochastic_ode_mdl(
     fill(missing, length(data.in_bed)),
     data.ts,
-    ar,
-    obs,
+    varying_ascertainment,
     sir_prob,
     N
 )
@@ -588,12 +614,13 @@ chn2 = sample(
 describe(chn2)
 
 # ╔═╡ 37a016d8-8384-41c9-abdd-23e88b1f988d
-pairplot(chn2[[:β, :γ, :S₀, :σ_AR, Symbol("ar_init[1]"), Symbol("damp_AR[1]")]])
+pairplot(chn2[[:β, :γ, :S₀, Symbol(mdl_prefix * ".σ_AR"),
+    Symbol(mdl_prefix * ".ar_init[1]"), Symbol(mdl_prefix * ".damp_AR[1]")]])
 
 # ╔═╡ 7df5d669-d3a2-4a66-83c3-f8618e39bec6
 let
     vars = mapreduce(vcat, 1:13) do i
-        Symbol("ϵ_t[$i]")
+        Symbol(mdl_prefix * ".ϵ_t[$i]")
     end
     pairplot(chn2[vars])
 end
@@ -661,6 +688,11 @@ end
 # ╠═de1498fa-8502-40ba-9708-2add74368e73
 # ╟─9a82c75a-6ea4-48bb-af06-fabaca4c45ee
 # ╟─b693a942-c6c7-40f8-997c-0dc8e5548132
+# ╟─8588c45d-c225-4779-b7d0-8a9fd059f30e
+# ╠═f116bb64-0426-4cd5-a01d-d8916d61af6d
+# ╟─8956b070-3b9a-4a0f-a5a0-ff0b2770d9de
+# ╠═c7b5d1dd-3e21-4841-b096-917328432c3c
+# ╟─0e2e281c-ef19-4027-a1fa-16ce17b7bdd7
 # ╠═9309f7f8-0896-4686-8bfc-b9f82d91bc0f
 # ╠═4330c83f-de39-44c7-bdab-87e5f5830145
 # ╠═8071c92f-9fe8-48cf-b1a0-79d1e34ec7e7
