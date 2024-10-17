@@ -13,6 +13,7 @@ function generate_observation_kernel(delay_int, time_horizon; partial::Bool = tr
     if (partial)
         K = zeros(eltype(delay_int), time_horizon, time_horizon) |> SparseMatrixCSC
         for i in 1:time_horizon, j in 1:time_horizon
+
             m = i - j
             if m >= 0 && m <= (length(delay_int) - 1)
                 K[i, j] = delay_int[m + 1]
