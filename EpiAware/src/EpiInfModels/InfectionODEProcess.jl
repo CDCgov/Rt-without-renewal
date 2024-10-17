@@ -103,7 +103,7 @@ I_t = generate_latent_infs(expgrowth_model, params)()
  2.6918002758361723
 ```
 """
-struct InfectionODEProcess{P, T, S, F} <: EpiAwareBase.AbstractTuringRenewal where {
+struct InfectionODEProcess{P, T, S, F} <: EpiAwareBase.AbstractTuringEpiModel where {
     P <: ODEProblem,
     T,
     S,
