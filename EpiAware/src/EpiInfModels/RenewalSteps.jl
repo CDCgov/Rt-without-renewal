@@ -46,7 +46,7 @@ Constructs the initial conditions for a renewal model with `ConstantRenewalStep`
     type of step function.
 """
 function renewal_init_state(recurrent_step::ConstantRenewalStep, I₀, r_approx, len_gen_int)
-    I₀ * [exp(-r_approx * t) for t in (len_gen_int - 1):-1:0]
+    I₀ * [exp(-r_approx * t) for t in (len_gen_int-1):-1:0]
 end
 
 @doc raw"
@@ -113,7 +113,7 @@ Constructs the initial conditions for a renewal model with `ConstantRenewalWithP
 """
 function renewal_init_state(
         recurrent_step::ConstantRenewalWithPopulationStep, I₀, r_approx, len_gen_int)
-    [I₀ * [exp(-r_approx * t) for t in (len_gen_int - 1):-1:0], recurrent_step.pop_size]
+    [I₀ * [exp(-r_approx * t) for t in (len_gen_int-1):-1:0], recurrent_step.pop_size]
 end
 
 @doc raw"

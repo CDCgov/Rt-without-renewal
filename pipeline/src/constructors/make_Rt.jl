@@ -16,7 +16,7 @@ function make_Rt(pipeline::AbstractEpiAwarePipeline; A = 0.3, P = 30.0)
     true_Rt = vcat(fill(1.1, 2 * 7), fill(2.0, 2 * 7), fill(0.5, 2 * 7),
         fill(1.5, 2 * 7), fill(0.75, 2 * 7), fill(1.1, 6 * 7)) |>
               Rt -> [Rt;
-                     [1.0 + A * sin.(2 * π * (t - ϕ) / P) for t in 1:(N - length(Rt))]]
+                     [1.0 + A * sin.(2 * π * (t - ϕ) / P) for t in 1:(N-length(Rt))]]
     return true_Rt
 end
 
@@ -88,8 +88,8 @@ function make_Rt(
         pipeline::MeasuresOutbreakPipeline; N = 70.0, initial_Rt = 1.5, measures_Rt = 0.8,
         post_measures_Rt = 1.2, reduction = 0.6, r = 1 / 3.5, shift = 21.0, t₁ = 21.0, t₂ = 42.0)
     Rt = vcat(map(t -> initial_Rt, 1.0:t₁),
-        map(t -> measures_Rt, (t₁ + 1.0):t₂),
-        map((t₂ + 1):N) do t
+        map(t -> measures_Rt, (t₁+1.0):t₂),
+        map((t₂+1):N) do t
             post_measures_Rt * (1 - reduction * logistic(r * (t - t₂ - shift)))
         end)
 

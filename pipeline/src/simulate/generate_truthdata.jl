@@ -68,7 +68,8 @@ function generate_truthdata(
         cluster_factor = default_params["cluster_factor"], I0 = default_params["I0"])
     datadir_str = mktempdir()
 
-    truthdata, truthfile = produce_or_load(
+    truthdata,
+    truthfile = produce_or_load(
         simulate, config, datadir(datadir_str); prefix = prefix)
     if plot
         plot_truth_data(truthdata, config, pipeline)

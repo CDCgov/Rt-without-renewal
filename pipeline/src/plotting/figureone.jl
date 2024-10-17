@@ -18,10 +18,11 @@ Internal method for creating a figure of model inference for a specific scenario
 function _figure_one_scenario(analysis_df, scenario; reference_time, true_gi_choice,
         used_gi_choice, lower_sym = :q_025, upper_sym = :q_975)
     model_plotting_data = analysis_df |>
-                          df -> @subset(df, :True_GI_Mean.==true_gi_choice) |>
-                                df -> @subset(df, :Used_GI_Mean.==used_gi_choice) |>
-                                      df -> @subset(df, :Reference_Time.==reference_time) |>
-                                            df -> @subset(df, :Scenario.==scenario) |>
+                          df -> @subset(df, :True_GI_Mean .== true_gi_choice) |>
+                                df -> @subset(df, :Used_GI_Mean .== used_gi_choice) |>
+                                      df -> @subset(df,
+        :Reference_Time .== reference_time) |>
+                                            df -> @subset(df, :Scenario .== scenario) |>
                                                   data
 
     plt_model = model_plotting_data *
@@ -47,8 +48,8 @@ Internal method that generates a plot of the truth data for a specific scenario.
 """
 function _figure_scenario_truth_data(truth_df, scenario; true_gi_choice)
     truth_plotting_data = truth_df |>
-                          df -> @subset(df, :True_GI_Mean.==true_gi_choice) |>
-                                df -> @subset(df, :Scenario.==scenario) |> data
+                          df -> @subset(df, :True_GI_Mean .== true_gi_choice) |>
+                                df -> @subset(df, :Scenario .== scenario) |> data
     plt_truth = truth_plotting_data *
                 mapping(:target_times => "T", :target_values => "values",
                     col = :Target, color = :Latent_Model => "Latent Model") *
@@ -139,13 +140,14 @@ function _figure_one_model_panel(
         analysis_df, scenario, target, latentmodel; reference_time, true_gi_choice,
         used_gi_choice, lower_sym = :q_025, upper_sym = :q_975)
     model_plotting_data = analysis_df |>
-                          df -> @subset(df, :True_GI_Mean.==true_gi_choice) |>
-                                df -> @subset(df, :Used_GI_Mean.==used_gi_choice) |>
-                                      df -> @subset(df, :Reference_Time.==reference_time) |>
-                                            df -> @subset(df, :Scenario.==scenario) |>
-                                                  df -> @subset(df, :Target.==target) |>
+                          df -> @subset(df, :True_GI_Mean .== true_gi_choice) |>
+                                df -> @subset(df, :Used_GI_Mean .== used_gi_choice) |>
+                                      df -> @subset(df,
+        :Reference_Time .== reference_time) |>
+                                            df -> @subset(df, :Scenario .== scenario) |>
+                                                  df -> @subset(df, :Target .== target) |>
                                                         df -> @subset(df,
-        :Latent_Model.==latentmodel) |>
+        :Latent_Model .== latentmodel) |>
                                                               data
 
     plt_model = model_plotting_data *
@@ -172,9 +174,9 @@ Internal method for creating a truth data panel plot for a given scenario and
 """
 function _figure_one_truth_data_panel(truth_df, scenario, target; true_gi_choice)
     truth_plotting_data = truth_df |>
-                          df -> @subset(df, :True_GI_Mean.==true_gi_choice) |>
-                                df -> @subset(df, :Scenario.==scenario) |>
-                                      df -> @subset(df, :Target.==target) |> data
+                          df -> @subset(df, :True_GI_Mean .== true_gi_choice) |>
+                                df -> @subset(df, :Scenario .== scenario) |>
+                                      df -> @subset(df, :Target .== target) |> data
     plt_truth = truth_plotting_data *
                 mapping(
                     :target_times => "T", :target_values => "values", color = :IGP_Model) *
