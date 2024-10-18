@@ -8,7 +8,3 @@ OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
 PkgBenchmark = "32113eaa-f34f-5b0d-bd6c-c81e245fc73d"
 Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
 TuringBenchmarking = "0db1332d-5c25-4deb-809f-459bc696f94f"
-
-[sources]
-BenchmarkCI = {path = "./BenchmarkCI"}
-EpiAware = {path = "./../EpiAware"}
