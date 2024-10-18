@@ -61,6 +61,6 @@ end
     @testset "infection generation accuracy" begin
         actual_infs = map(t -> exp(params.p[1] * t), infectionmodel.ts)
         generated_infs = generate_latent_infs(infectionmodel, params)()
-        @test generated_infs ≈ actual_infs atol = 1e-6
+        @test generated_infs≈actual_infs atol=1e-6
     end
 end

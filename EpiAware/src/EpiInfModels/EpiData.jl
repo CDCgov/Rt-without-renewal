@@ -92,7 +92,7 @@ function expected_Rt(data::EpiData, infections::Vector{<:Real})
 
     denom_Rt = [dot(reverse(data.gen_int),
                     infections[(t - n):(t - 1)]
-                ) for t in (n+1):length(infections)]
+                ) for t in (n + 1):length(infections)]
     exp_Rt = infections[(n + 1):end] ./ denom_Rt
     return exp_Rt
 end

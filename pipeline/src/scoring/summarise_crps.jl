@@ -10,7 +10,7 @@ A dictionary containing the summarized CRPS scores for different processes.
 
 """
 function summarise_crps(config, inference_results, forecast_results, epidata)
-    ts = config.tspan[1]:min(config.tspan[2]+config.lookahead, length(config.truth_I_t))
+    ts = config.tspan[1]:min(config.tspan[2] + config.lookahead, length(config.truth_I_t))
 
     procs_names = (:log_I_t, :rt, :Rt, :I_t, :log_Rt)
     scores_log_I_t, scores_rt,

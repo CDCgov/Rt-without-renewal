@@ -16,7 +16,7 @@ function _figure_two_truth_data(
     _make_captions!(_truth_df, scenario_dict, target_dict)
 
     truth_plotting_data = _truth_df |>
-                          df -> @subset(df, :True_GI_Mean .== true_gi_choice) |>
+                          df -> @subset(df, :True_GI_Mean.==true_gi_choice) |>
                                 df -> @transform(df, :Data="Truth data") |> data
     plt_truth = truth_plotting_data *
                 mapping(:target_times => "T", :target_values => "Process values",
@@ -33,16 +33,16 @@ function _figure_two_scenario(
         lower_sym = :q_025, upper_sym = :q_975)
     min_ref_time = minimum(analysis_df.Reference_Time)
     early_df = analysis_df |>
-               df -> @subset(df, :Reference_Time .== min_ref_time) |>
-                     df -> @subset(df, :IGP_Model .== igp) |>
-                           df -> @subset(df, :True_GI_Mean .== true_gi_choice) |>
-                                 df -> @subset(df, :target_times .<= min_ref_time - 7)
+               df -> @subset(df, :Reference_Time.==min_ref_time) |>
+                     df -> @subset(df, :IGP_Model.==igp) |>
+                           df -> @subset(df, :True_GI_Mean.==true_gi_choice) |>
+                                 df -> @subset(df, :target_times.<=min_ref_time - 7)
 
     seqn_df = analysis_df |>
-              df -> @subset(df, :True_GI_Mean .== true_gi_choice) |>
-                    df -> @subset(df, :IGP_Model .== igp) |>
+              df -> @subset(df, :True_GI_Mean.==true_gi_choice) |>
+                    df -> @subset(df, :IGP_Model.==igp) |>
                           df -> @subset(df,
-        :Reference_Time .- :target_times .∈ fill(0:6, size(df, 1)))
+        :Reference_Time .- :target_times.∈fill(0:6, size(df, 1)))
 
     full_df = vcat(early_df, seqn_df)
     _make_captions!(full_df, scenario_dict, target_dict)
