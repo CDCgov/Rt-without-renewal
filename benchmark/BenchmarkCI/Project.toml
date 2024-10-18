@@ -21,22 +21,7 @@ UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 Zstd_jll = "3161d3a3-bdf6-5164-811a-617609db77b4"
 
 [compat]
-Base64 = "1.11.0"
-BenchmarkTools = "1.5.0"
-CpuId = "0.3.1"
-Dates = "1.11.0"
-GitHub = "5.9.0"
-JSON = "0.21.4"
-LinearAlgebra = "1.11.0"
-Logging = "1.11.0"
-Markdown = "1.11.0"
-Pkg = "1.11.0"
-PkgBenchmark = "0.2.12"
-Setfield = "1.1.1"
-Tar = "1.10.0"
-Test = "1.11.0"
-UnPack = "1.0.2"
-Zstd_jll = "1.5.6"
+julia = "1"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
