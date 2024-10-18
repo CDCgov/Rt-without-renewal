@@ -8,7 +8,8 @@
     subdirname = "test"
     testpipeline = RtwithoutRenewalPriorPipeline()
 
-    f, path = plot_truth_data(
+    f,
+    path = plot_truth_data(
         data, config, testpipeline; plotsubdir = subdirname, saveplot = false)
     @test f isa Figure
     @test path isa String

@@ -25,8 +25,10 @@ end
 """
 Internal function for reducing a sequence of results from calls to `calculate_processes`.
 """
-_process_reduction(procs_1, procs_2) = (; log_I_t = hcat(procs_1.log_I_t, procs_2.log_I_t),
-    Rt = hcat(procs_1.Rt, procs_2.Rt), rt = hcat(procs_1.rt, procs_2.rt))
+function _process_reduction(procs_1, procs_2)
+    (; log_I_t = hcat(procs_1.log_I_t, procs_2.log_I_t),
+        Rt = hcat(procs_1.Rt, procs_2.Rt), rt = hcat(procs_1.rt, procs_2.rt))
+end
 
 """
 Generate quantiles for targets based on the output and EpiData.
