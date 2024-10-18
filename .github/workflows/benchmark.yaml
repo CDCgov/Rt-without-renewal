@@ -11,23 +11,16 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  actions: write
-  contents: read
-
 jobs:
   Benchmark:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v1
-        with:
-          version: '1.11'
+      - uses: julia-actions/cache@v1
       - name: Install dependencies
         run: |
-          julia --project=benchmark -e 'using Pkg;
-          Pkg.resolve();
-          Pkg.instantiate();'
+          julia --project=benchmark -e 'using Pkg; Pkg.instantiate();'
       - name: Run benchmarks
         run: julia --project=benchmark -e 'using BenchmarkCI; BenchmarkCI.judge(; baseline = "origin/main", retune = true)'
       - name: Post results
