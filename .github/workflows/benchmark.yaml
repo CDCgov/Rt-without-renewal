@@ -23,7 +23,6 @@ jobs:
       - uses: julia-actions/setup-julia@v1
         with:
           version: '1.11'
-      - uses: julia-actions/cache@v1
       - name: Install dependencies
         run: |
           julia --project=benchmark -e 'using Pkg;
