@@ -1,4 +1,5 @@
 let
+    using OrdinaryDiffEq
     r = log(2) / 7 # Growth rate corresponding to 7 day doubling time
     u0 = [1.0]
     p = [r]
