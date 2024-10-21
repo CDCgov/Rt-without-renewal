@@ -21,7 +21,6 @@ jobs:
       - name: Install dependencies
         run: |
           julia --project=benchmark -e 'using Pkg: Pkg;
-          Pkg.rm("EpiAware");
           Pkg.resolve();
           Pkg.instantiate();
           Pkg.develop(path = "./EpiAware")'
