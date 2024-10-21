@@ -1,5 +1,5 @@
 [deps]
-BenchmarkCI = "0078029e-5cb1-420a-9e18-e3aa68eaae70"
+BenchmarkCI = "20533458-34a3-403d-a444-e18f38190b5b"
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 DynamicPPL = "366bfd00-2699-11ea-058f-f148b4cae6d8"
@@ -10,4 +10,4 @@ Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
 TuringBenchmarking = "0db1332d-5c25-4deb-809f-459bc696f94f"
 
 [sources]
-BenchmarkCI = {url="https://github.com/SamuelBrand1/BenchmarkCI.jl", rev="master"}
+BenchmarkCI = {url = "https://github.com/SamuelBrand1/BenchmarkCI.jl"}
