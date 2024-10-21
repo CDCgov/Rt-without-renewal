@@ -11,3 +11,4 @@ TuringBenchmarking = "0db1332d-5c25-4deb-809f-459bc696f94f"
 
 [sources]
 BenchmarkCI = {url = "https://github.com/SamuelBrand1/BenchmarkCI.jl"}
+EpiAware = {path = "../EpiAware"}
