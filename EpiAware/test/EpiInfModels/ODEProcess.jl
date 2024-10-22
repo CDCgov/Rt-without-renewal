@@ -30,7 +30,7 @@
     @test eltype(params_mixed.p) == Float64
 end
 
-@testitem "InfectionODEProcess + generate_latent_infs Tests" begin
+@testitem "ODEProcess + generate_latent_infs Tests" begin
     using OrdinaryDiffEq
 
     function simple_ode!(du, u, p, t)
@@ -47,11 +47,11 @@ end
     solver = Tsit5()
     sol2infs = sol -> sol[1, :]
 
-    # Create an instance of InfectionODEProcess for testing
-    infectionmodel = InfectionODEProcess(prob; ts = [0.0, 1.0, 2.0], solver, sol2infs)
+    # Create an instance of ODEProcess for testing
+    infectionmodel = ODEProcess(prob; ts = [0.0, 1.0, 2.0], solver, sol2infs)
 
-    @testset "InfectionODEProcess constructor" begin
-        @test infectionmodel isa InfectionODEProcess
+    @testset "ODEProcess constructor" begin
+        @test infectionmodel isa ODEProcess
         @test infectionmodel.prob == prob
         @test infectionmodel.ts == [0.0, 1.0, 2.0]
         @test infectionmodel.solver == solver

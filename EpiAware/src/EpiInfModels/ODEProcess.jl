@@ -1,6 +1,6 @@
 """
 A structure to hold the initial condition and parameters for an ODE (Ordinary Differential Equation) process.
-`params::ODEParams` is used in the method `generate_latent_infs(epi_model::InfectionODEProcess, params::ODEParams)`
+`params::ODEParams` is used in the method `generate_latent_infs(epi_model::ODEProcess, params::ODEParams)`
 
 # Constructors
 - `ODEParams(; u0::VecOrMat, p::VecOrMat)`: Create an `ODEParams` object with the initial condition(s) `u0` and parameters `p`.
@@ -39,7 +39,7 @@ A structure representing an infection process modeled by an Ordinary Differentia
 
 The purpose of this structure is to define the behaviour of modelling an infection process
 using an ODE. We use the [`SciML` ecosystem](https://sciml.ai/) to define and solve the ODE.
-For `InfectionODEProcess` structs we focus on defining from a restricted set of ODE problems:
+For `ODEProcess` structs we focus on defining from a restricted set of ODE problems:
 - The initial condition `u0` must be a vector or matrix.
 - The parameters `p` must be a vector or matrix.
 - The output of the ODE should be interpreted as the infection incidence at each time point in
@@ -52,7 +52,7 @@ For `InfectionODEProcess` structs we focus on defining from a restricted set of 
 - `sol2infs::F`: A function that maps the solution object of the ODE to infection counts.
 
 # Constructors
-- `InfectionODEProcess(prob::ODEProblem; ts, solver, sol2infs)`: Create an `InfectionODEProcess`
+- `ODEProcess(prob::ODEProblem; ts, solver, sol2infs)`: Create an `ODEProcess`
 object with the ODE problem `prob`, time points `ts`, solver `solver`, and function `sol2infs`.
 
 # Type Parameters
@@ -78,9 +78,9 @@ function expgrowth(du, u, p, t)
 end
 prob = ODEProblem(expgrowth, u0, (0.0, 10.0), p)
 
-# Define the InfectionODEProcess
+# Define the ODEProcess
 
-expgrowth_model = InfectionODEProcess(prob::ODEProblem; ts = 0:1:10,
+expgrowth_model = ODEProcess(prob::ODEProblem; ts = 0:1:10,
         solver = Tsit5(),
         sol2infs = sol -> sol[1, :])
 
@@ -103,7 +103,7 @@ I_t = generate_latent_infs(expgrowth_model, params)()
  2.6918002758361723
 ```
 """
-struct InfectionODEProcess{P, T, S, F} <: EpiAwareBase.AbstractTuringEpiModel where {
+struct ODEProcess{P, T, S, F} <: EpiAwareBase.AbstractTuringEpiModel where {
     P <: ODEProblem,
     T,
     S,
@@ -114,24 +114,24 @@ struct InfectionODEProcess{P, T, S, F} <: EpiAwareBase.AbstractTuringEpiModel wh
     sol2infs::F
 end
 
-function InfectionODEProcess(prob::ODEProblem; ts,
+function ODEProcess(prob::ODEProblem; ts,
         solver = AutoTsit5(Rosenbrock23()),
         sol2infs = sol -> sol[end, :])
     P = typeof(prob)
     T = eltype(ts)
     S = typeof(solver)
     F = typeof(sol2infs)
-    return InfectionODEProcess{P, T, S, F}(prob, ts, solver, sol2infs)
+    return ODEProcess{P, T, S, F}(prob, ts, solver, sol2infs)
 end
 
 """
-Implement the `generate_latent_infs` function for the `InfectionODEProcess` model.
+Implement the `generate_latent_infs` function for the `ODEProcess` model.
 
 Constructs a `Turing` model to generate latent infections using the specified epidemiological
 model and parameters.
 
 # Arguments
-- `epi_model::InfectionODEProcess`: The `InfectionODEProcess` model containing the problem definition, time steps, solver, and solution-to-infections transformation function.
+- `epi_model::ODEProcess`: The `ODEProcess` model containing the problem definition, time steps, solver, and solution-to-infections transformation function.
 - `params::ODEParams`: The initial conditions (`u0`) and parameters (`p`) for the ODE problem.
 
 # Generated quantities
@@ -157,9 +157,9 @@ function expgrowth(du, u, p, t)
 end
 prob = ODEProblem(expgrowth, u0, (0.0, 10.0), p)
 
-# Define the InfectionODEProcess
+# Define the ODEProcess
 
-expgrowth_model = InfectionODEProcess(prob::ODEProblem; ts = 0:1:10,
+expgrowth_model = ODEProcess(prob::ODEProblem; ts = 0:1:10,
         solver = Tsit5(),
         sol2infs = sol -> sol[1, :])
 
@@ -168,7 +168,7 @@ I_t = generate_latent_infs(expgrowth_model, params)()
 ```
 """
 @model function EpiAwareBase.generate_latent_infs(
-        epi_model::InfectionODEProcess, params::ODEParams)
+        epi_model::ODEProcess, params::ODEParams)
     prob, ts,
     solver, sol2infs = epi_model.prob, epi_model.ts, epi_model.solver,
     epi_model.sol2infs

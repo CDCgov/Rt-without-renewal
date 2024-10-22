@@ -6,7 +6,7 @@ suite = BenchmarkGroup()
 include("../../make_epiaware_suite.jl")
 include("DirectInfections.jl")
 include("ExpGrowthRate.jl")
-include("InfectionODEProcess.jl")
+include("ODEProcess.jl")
 
 end
 BenchEpiInfModels.suite

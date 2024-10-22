@@ -9,11 +9,11 @@ using ..EpiAwareUtils
 using Turing, Distributions, DocStringExtensions, LinearAlgebra, LogExpFunctions,
       OrdinaryDiffEq
 
-#Export models
-export EpiData, DirectInfections, ExpGrowthRate, Renewal, InfectionODEProcess
+#Export parameter helpers
+export ODEParams, EpiData
 
-#Export parameter type
-export ODEParams
+#Export models
+export DirectInfections, ExpGrowthRate, Renewal, ODEProcess
 
 #Export functions
 export R_to_r, r_to_R, expected_Rt
@@ -24,7 +24,7 @@ include("DirectInfections.jl")
 include("ExpGrowthRate.jl")
 include("RenewalSteps.jl")
 include("Renewal.jl")
-include("InfectionODEProcess.jl")
+include("ODEProcess.jl")
 include("utils.jl")
 
 end
