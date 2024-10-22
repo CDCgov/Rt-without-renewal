@@ -13,20 +13,15 @@ Generate a submodel with an optional prefix. A lightweight wrapper around the `@
 
 # Examples
 
-```jldoctest
+```@example
 using EpiAware, DynamicPPL
 
 submodel = prefix_submodel(FixedIntercept(0.1), generate_latent, string(1), 2)
-submodel isa Model
-
-# output
-
-true
 ```
 
 We can now draw a sample from the submodel.
 
-```julia
+```@example
 rand(submodel)
 ```
 "
