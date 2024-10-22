@@ -1,16 +1,9 @@
-"""
+@doc raw"""
 A structure to hold the initial condition and parameters for an ODE (Ordinary Differential Equation) process.
 `params::ODEParams` is used in the method `generate_latent_infs(epi_model::ODEProcess, params::ODEParams)`
 
 # Constructors
 - `ODEParams(; u0::VecOrMat, p::VecOrMat)`: Create an `ODEParams` object with the initial condition(s) `u0` and parameters `p`.
-
-# Fields
-- `u0::VecOrMat{T}`: The initial condition(s) for the ODE, which can be a vector or matrix of type `T`.
-- `p::VecOrMat{T}`: The parameters for the ODE, which can be a vector or matrix of type `T`.
-
-# Type Parameters
-- `T`: The type of the elements in `u0` and `p`.
 
 # Example
 ```jldoctest
@@ -23,7 +16,9 @@ ODEParams{Float64}([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], [2.0, 3.0
 ```
 """
 struct ODEParams{T}
+    "The initial condition(s) for the ODE, which can be a vector or matrix of type `T`."
     u0::VecOrMat{T}
+    " The parameters for the ODE, which can be a vector or matrix of type `T`."
     p::VecOrMat{T}
 end
 
@@ -32,7 +27,7 @@ function ODEParams(; u0::VecOrMat, p::VecOrMat)
     return ODEParams{T}(T.(u0), T.(p))
 end
 
-"""
+@doc raw"""
 A structure representing an infection process modeled by an Ordinary Differential Equation (ODE).
 
 # Background
@@ -45,21 +40,9 @@ For `ODEProcess` structs we focus on defining from a restricted set of ODE probl
 - The output of the ODE should be interpreted as the infection incidence at each time point in
 `ts` via the function `sol2infs` which maps the solution object `sol` of the ODE solve to infection counts.
 
-# Fields
-- `prob::P`: The ODE problem instance, where `P` is a subtype of `ODEProblem`.
-- `ts::Vector{T}`: A vector of time points, where `T` is the type of the time points.
-- `solver::S`: The solver used for the ODE problem.
-- `sol2infs::F`: A function that maps the solution object of the ODE to infection counts.
-
 # Constructors
 - `ODEProcess(prob::ODEProblem; ts, solver, sol2infs)`: Create an `ODEProcess`
 object with the ODE problem `prob`, time points `ts`, solver `solver`, and function `sol2infs`.
-
-# Type Parameters
-- `P`: The type of the ODE problem, which must be a subtype of `ODEProblem`.
-- `T`: The type of the time points.
-- `S`: The type of the solver.
-- `F`: The type of the function that maps the solution to infection counts, which must be a subtype of `Function`.
 
 # Example
 
@@ -108,9 +91,13 @@ struct ODEProcess{P, T, S, F} <: EpiAwareBase.AbstractTuringEpiModel where {
     T,
     S,
     F <: Function}
+    "The ODE problem instance, where `P` is a subtype of `ODEProblem`."
     prob::P
+    "A vector of time points, where `T` is the type of the time points."
     ts::Vector{T}
+    "The solver used for the ODE problem."
     solver::S
+    "A function that maps the solution object of the ODE to infection counts."
     sol2infs::F
 end
 
@@ -124,7 +111,7 @@ function ODEProcess(prob::ODEProblem; ts,
     return ODEProcess{P, T, S, F}(prob, ts, solver, sol2infs)
 end
 
-"""
+@doc raw"""
 Implement the `generate_latent_infs` function for the `ODEProcess` model.
 
 Constructs a `Turing` model to generate latent infections using the specified epidemiological
