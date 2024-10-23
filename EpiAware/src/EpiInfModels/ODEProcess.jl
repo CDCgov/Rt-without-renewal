@@ -86,11 +86,8 @@ I_t = generate_latent_infs(expgrowth_model, params)()
  2.6918002758361723
 ```
 """
-struct ODEProcess{P, T, S, F} <: EpiAwareBase.AbstractTuringEpiModel where {
-    P <: ODEProblem,
-    T,
-    S,
-    F <: Function}
+@kwdef struct ODEProcess{P <: ODEProblem, T, S, F <: Function} <:
+              EpiAwareBase.AbstractTuringEpiModel
     "The ODE problem instance, where `P` is a subtype of `ODEProblem`."
     prob::P
     "A vector of time points, where `T` is the type of the time points."
@@ -99,16 +96,6 @@ struct ODEProcess{P, T, S, F} <: EpiAwareBase.AbstractTuringEpiModel where {
     solver::S
     "A function that maps the solution object of the ODE to infection counts."
     sol2infs::F
-end
-
-function ODEProcess(prob::ODEProblem; ts,
-        solver = AutoTsit5(Rosenbrock23()),
-        sol2infs = sol -> sol[end, :])
-    P = typeof(prob)
-    T = eltype(ts)
-    S = typeof(solver)
-    F = typeof(sol2infs)
-    return ODEProcess{P, T, S, F}(prob, ts, solver, sol2infs)
 end
 
 @doc raw"""

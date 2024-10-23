@@ -48,7 +48,7 @@ end
     sol2infs = sol -> sol[1, :]
 
     # Create an instance of ODEProcess for testing
-    infectionmodel = ODEProcess(prob; ts = [0.0, 1.0, 2.0], solver, sol2infs)
+    infectionmodel = ODEProcess(; prob, ts = [0.0, 1.0, 2.0], solver, sol2infs)
 
     @testset "ODEProcess constructor" begin
         @test infectionmodel isa ODEProcess
