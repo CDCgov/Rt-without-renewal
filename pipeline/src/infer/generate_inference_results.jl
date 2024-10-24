@@ -26,7 +26,8 @@ function generate_inference_results(
     prfx = _inference_prefix(truthdata, inference_config, pipeline)
     _datadir_str = _get_inferencedatadir_str(pipeline)
 
-    inference_results, inferencefile = produce_or_load(
+    inference_results,
+    inferencefile = produce_or_load(
         infer, config, _datadir_str; prefix = prfx)
     return inference_results
 end
@@ -63,7 +64,8 @@ function generate_inference_results(
 
     datadir_name = mktempdir()
 
-    inference_results, inferencefile = produce_or_load(
+    inference_results,
+    inferencefile = produce_or_load(
         infer, config, datadir_name; prefix = prfx)
     return inference_results
 end

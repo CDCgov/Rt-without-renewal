@@ -6,10 +6,14 @@ module EpiInfModels
 using ..EpiAwareBase
 using ..EpiAwareUtils
 
-using Turing, Distributions, DocStringExtensions, LinearAlgebra, LogExpFunctions
+using Turing, Distributions, DocStringExtensions, LinearAlgebra, LogExpFunctions,
+      OrdinaryDiffEq
+
+#Export parameter helpers
+export ODEParams, EpiData
 
 #Export models
-export EpiData, DirectInfections, ExpGrowthRate, Renewal
+export DirectInfections, ExpGrowthRate, Renewal, ODEProcess
 
 #Export functions
 export R_to_r, r_to_R, expected_Rt
@@ -20,6 +24,7 @@ include("DirectInfections.jl")
 include("ExpGrowthRate.jl")
 include("RenewalSteps.jl")
 include("Renewal.jl")
+include("ODEProcess.jl")
 include("utils.jl")
 
 end
