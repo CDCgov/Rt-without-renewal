@@ -45,20 +45,20 @@ end
     Random.seed!(1234)
 
     rw_process = RandomWalk()
-    obs_nb = NegativeBinomialError()
+    obs_nb = PoissonError()
 
-    @model function test_negbin_errors(rw, obs, y_t)
+    @model function test_poisson_errors(rw, obs, y_t)
         n = length(y_t)
         @submodel Z_t = generate_latent(rw, n)
         @submodel y_t = generate_observations(obs, y_t, exp.(Z_t))
         return Z_t, y_t
     end
 
-    generative_mdl = test_negbin_errors(rw_process, obs_nb, fill(missing, 40))
+    generative_mdl = test_poisson_errors(rw_process, obs_nb, fill(missing, 40))
     θ_true = rand(generative_mdl)
     Z_t_obs, y_t_obs = condition(generative_mdl, θ_true)()
 
-    mdl = test_negbin_errors(rw_process, obs_nb, Int.(y_t_obs))
+    mdl = test_poisson_errors(rw_process, obs_nb, Int.(y_t_obs))
     chn = sample(
         mdl, NUTS(adtype = AutoReverseDiff(; compile = Val(true))), 1000; progess = false)
 
