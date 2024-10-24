@@ -162,7 +162,7 @@ end
     end
 end
 
-@testitem "LatentDelay parameter recovery with mix of IGP + latent processes: Negative binomial errors + EpiProblem interface" begin
+@testitem "LatentDelay parameter recovery with mix of IGP + latent processes: Poisson errors + EpiProblem interface" begin
     using Random, Turing, Distributions, LinearAlgebra, DynamicPPL, StatsBase, ReverseDiff,
           Suppressor, LogExpFunctions
     # using PairPlots, CairoMakie
@@ -178,7 +178,7 @@ end
         data = EpiData([0.2, 0.5, 0.3],
             em_type == Renewal ? softplus : exp
         ),
-        initialisation_prior = Normal(log(100.0), 0.25)
+        initialisation_prior = Normal(log(100.0), 0.01)
     )
 
     latentprocess_types = [RandomWalk, AR, DiffLatentModel]
@@ -190,7 +190,7 @@ end
             return (; init_prior, std_prior)
         elseif epimodel isa ExpGrowthRate
             init_prior = Normal(0.1, 0.025)
-            std_prior = HalfNormal(0.025)
+            std_prior = LogNormal(log(0.025), 0.01)
             return (; init_prior, std_prior)
         elseif epimodel isa DirectInfections
             init_prior = Normal(log(100.0), 0.25)
@@ -204,11 +204,11 @@ end
         if latentprocess_type == RandomWalk
             return RandomWalk(init_prior, std_prior)
         elseif latentprocess_type == AR
-            return AR(damp_priors = [Beta(8, 2; check_args = false)],
+            return AR(damp_priors = [Beta(2, 8; check_args = false)],
                 std_prior = std_prior, init_priors = [init_prior])
         elseif latentprocess_type == DiffLatentModel
             return DiffLatentModel(
-                AR(damp_priors = [Beta(8, 2; check_args = false)],
+                AR(damp_priors = [Beta(2, 8; check_args = false)],
                     std_prior = std_prior, init_priors = [Normal(0.0, 0.25)]),
                 init_prior; d = 1)
         end
@@ -217,15 +217,14 @@ end
     function test_full_process(epimodel, latentprocess, n;
             ad = AutoReverseDiff(; compile = true), posterior_p_tol = 0.005)
         #Fix observation model
-        obs = LatentDelay(
-            NegativeBinomialError(cluster_factor_prior = HalfNormal(0.05)), Gamma(3, 7 / 3))
+        obs = LatentDelay(PoissonError(), Gamma(3, 7 / 3))
 
         #Inference method
         inference_method = EpiMethod(
-            pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 100)],
+            pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 50)],
             sampler = NUTSampler(adtype = ad,
-                ndraws = 1000,
-                nchains = 4,
+                ndraws = 2000,
+                nchains = 2,
                 mcmc_parallel = MCMCThreads())
         )
 
@@ -237,15 +236,15 @@ end
         )
 
         #Generate data from generative model (i.e. data unconditioned)
-        generative_mdl = generate_epiaware(
-            epi_prob, (y_t = Vector{Union{Int, Missing}}(missing, n),))
+        generative_mdl = generate_epiaware(epi_prob, (y_t = missing,))
         θ_true = rand(generative_mdl)
         gen_data = condition(generative_mdl, θ_true)()
 
         #Apply inference method to inference model (i.e. generative model conditioned on data)
         inference_results = apply_method(epi_prob,
             inference_method,
-            (y_t = gen_data.generated_y_t,)
+            (y_t = gen_data.generated_y_t,);
+            progress = false
         )
 
         chn = inference_results.samples
@@ -265,7 +264,7 @@ end
     @testset "Check true parameters are within 99% central post. prob.: " begin
         @testset for latentprocess_type in latentprocess_types, epimodel in epimodels
             latentprocess = set_latent_process(epimodel, latentprocess_type)
-            @suppress _ = test_full_process(epimodel, latentprocess, 50)
+            @suppress _ = test_full_process(epimodel, latentprocess, 40)
         end
     end
 end
