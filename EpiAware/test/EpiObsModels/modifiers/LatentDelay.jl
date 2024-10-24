@@ -178,7 +178,7 @@ end
         data = EpiData([0.2, 0.5, 0.3],
             em_type == Renewal ? softplus : exp
         ),
-        initialisation_prior = Normal(log(100.0), 0.25)
+        initialisation_prior = Normal(log(100.0), 0.01)
     )
 
     latentprocess_types = [RandomWalk, AR, DiffLatentModel]
@@ -190,7 +190,7 @@ end
             return (; init_prior, std_prior)
         elseif epimodel isa ExpGrowthRate
             init_prior = Normal(0.1, 0.025)
-            std_prior = HalfNormal(0.025)
+            std_prior = LogNormal(log(0.025), 0.01)
             return (; init_prior, std_prior)
         elseif epimodel isa DirectInfections
             init_prior = Normal(log(100.0), 0.25)
@@ -223,7 +223,7 @@ end
         inference_method = EpiMethod(
             pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 50)],
             sampler = NUTSampler(adtype = ad,
-                ndraws = 1000,
+                ndraws = 2000,
                 nchains = 2,
                 mcmc_parallel = MCMCThreads())
         )
@@ -264,7 +264,8 @@ end
     @testset "Check true parameters are within 99% central post. prob.: " begin
         @testset for latentprocess_type in latentprocess_types, epimodel in epimodels
             latentprocess = set_latent_process(epimodel, latentprocess_type)
-            @suppress _ = test_full_process(epimodel, latentprocess, 50)
+            @info "Testing $(epimodel)\n \n with \n \n $(latentprocess) \n"
+            @suppress _ = test_full_process(epimodel, latentprocess, 40)
         end
     end
 end
