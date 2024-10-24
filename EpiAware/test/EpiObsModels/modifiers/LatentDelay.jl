@@ -264,7 +264,6 @@ end
     @testset "Check true parameters are within 99% central post. prob.: " begin
         @testset for latentprocess_type in latentprocess_types, epimodel in epimodels
             latentprocess = set_latent_process(epimodel, latentprocess_type)
-            @info "Testing $(epimodel)\n \n with \n \n $(latentprocess) \n"
             @suppress _ = test_full_process(epimodel, latentprocess, 40)
         end
     end
