@@ -58,7 +58,7 @@ end
     θ_true = rand(generative_mdl)
     Z_t_obs, y_t_obs = condition(generative_mdl, θ_true)()
 
-    mdl = test_poisson_errors(rw_process, obs, Int.(y_t_obs))
+    mdl = test_poisson_errors(process, obs, Int.(y_t_obs))
     chn = sample(
         mdl, NUTS(adtype = AutoReverseDiff(; compile = Val(true))), 1000; progess = false)
 
