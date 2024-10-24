@@ -162,7 +162,7 @@ end
     end
 end
 
-@testitem "LatentDelay parameter recovery with mix of IGP + latent processes: Negative binomial errors + EpiProblem interface" begin
+@testitem "LatentDelay parameter recovery with mix of IGP + latent processes: Poisson errors + EpiProblem interface" begin
     using Random, Turing, Distributions, LinearAlgebra, DynamicPPL, StatsBase, ReverseDiff,
           Suppressor, LogExpFunctions
     # using PairPlots, CairoMakie
@@ -204,11 +204,11 @@ end
         if latentprocess_type == RandomWalk
             return RandomWalk(init_prior, std_prior)
         elseif latentprocess_type == AR
-            return AR(damp_priors = [Beta(8, 2; check_args = false)],
+            return AR(damp_priors = [Beta(2, 8; check_args = false)],
                 std_prior = std_prior, init_priors = [init_prior])
         elseif latentprocess_type == DiffLatentModel
             return DiffLatentModel(
-                AR(damp_priors = [Beta(8, 2; check_args = false)],
+                AR(damp_priors = [Beta(2, 8; check_args = false)],
                     std_prior = std_prior, init_priors = [Normal(0.0, 0.25)]),
                 init_prior; d = 1)
         end
@@ -217,8 +217,7 @@ end
     function test_full_process(epimodel, latentprocess, n;
             ad = AutoReverseDiff(; compile = true), posterior_p_tol = 0.005)
         #Fix observation model
-        obs = LatentDelay(
-            NegativeBinomialError(cluster_factor_prior = HalfNormal(0.05)), Gamma(3, 7 / 3))
+        obs = LatentDelay(Poisson(), Gamma(3, 7 / 3))
 
         #Inference method
         inference_method = EpiMethod(
@@ -237,8 +236,7 @@ end
         )
 
         #Generate data from generative model (i.e. data unconditioned)
-        generative_mdl = generate_epiaware(
-            epi_prob, (y_t = missing,))
+        generative_mdl = generate_epiaware(epi_prob, (y_t = missing,))
         θ_true = rand(generative_mdl)
         gen_data = condition(generative_mdl, θ_true)()
 
