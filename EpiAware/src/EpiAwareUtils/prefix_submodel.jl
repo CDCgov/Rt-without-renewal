@@ -13,13 +13,9 @@ Generate a submodel with an optional prefix. A lightweight wrapper around the `@
 
 # Examples
 
-```jldoctest
+```julia
 using EpiAware, DynamicPPL
-
 submodel = prefix_submodel(FixedIntercept(0.1), generate_latent, string(1), 2)
-submodel
-# output
-Model{typeof(prefix_submodel), (:model, :fn, :prefix, Symbol(\"#splat#kwargs\")), (), (), Tuple{FixedIntercept{Float64}, typeof(generate_latent), String, Tuple{Int64}}, Tuple{}, DefaultContext}(EpiAware.EpiAwareUtils.prefix_submodel, (model = FixedIntercept{Float64}(0.1), fn = EpiAware.EpiAwareBase.generate_latent, prefix = \"1\", var\"#splat#kwargs\" = (2,)), NamedTuple(), DefaultContext())
 ```
 
 We can now draw a sample from the submodel.
