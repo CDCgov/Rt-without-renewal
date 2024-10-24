@@ -35,7 +35,7 @@ function TransformObservationModel(model::M;
 end
 
 @doc raw"
-Generates observations based on the `TransformObservationModel`.
+Generates observations or accumulates log-likelihood based on the `TransformObservationModel`. 
 
 ## Arguments
 - `obs::TransformObservationModel`: The TransformObservationModel.
