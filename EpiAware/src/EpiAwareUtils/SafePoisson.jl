@@ -45,7 +45,7 @@ var(d)
 7.016735912097631e20
 ```
 "
-struct SafePoisson{T <: Real} <: DiscreteUnivariateDistribution
+struct SafePoisson{T <: Real} <: SafeDiscreteUnivariateDistribution
     λ::T
 
     SafePoisson{T}(λ::Real) where {T <: Real} = new{T}(λ)
@@ -86,7 +86,7 @@ Distributions.rate(d::SafePoisson) = d.λ
 ### Statistics
 
 Distributions.mean(d::SafePoisson) = d.λ
-Distributions.mode(d::SafePoisson) = _safe_int_floor(d.λ)
+Distributions.mode(d::SafePoisson) = floor(d.λ)
 Distributions.var(d::SafePoisson) = d.λ
 Distributions.skewness(d::SafePoisson) = one(typeof(d.λ)) / sqrt(d.λ)
 Distributions.kurtosis(d::SafePoisson) = one(typeof(d.λ)) / d.λ
@@ -229,7 +229,7 @@ function log1pmx(x::Float64)
 end
 
 # Procedure F
-function procf(λ, K::Int, s::Float64)
+function procf(λ, K::SafeInt, s::Float64)
     # can be pre-computed, but does not seem to affect performance
     ω = 0.3989422804014327 / s
     b1 = 0.041666666666666664 / λ

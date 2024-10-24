@@ -15,7 +15,6 @@ Generate a submodel with an optional prefix. A lightweight wrapper around the `@
 
 ```@example
 using EpiAware, DynamicPPL
-
 submodel = prefix_submodel(FixedIntercept(0.1), generate_latent, string(1), 2)
 ```
 
