@@ -36,8 +36,6 @@ jobs:
         run: |
             using CompatHelper;
             CompatHelper.main(;
-              entry_type = DropEntry(),
-              subdirs = ["EpiAware"], 
-              bump_version = true
+              entry_type = DropEntry(), subdirs = ["EpiAware"], bump_version = true
             )
         shell: julia --color=yes {0}
