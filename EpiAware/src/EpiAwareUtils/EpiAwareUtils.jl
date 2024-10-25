@@ -19,7 +19,8 @@ export HalfNormal, DirectSample, SafePoisson, SafeNegativeBinomial, SafeIntValue
        SafeDiscreteUnivariateDistribution
 
 #Export functions
-export scan, spread_draws, censored_cdf, censored_pmf, get_param_array, prefix_submodel, ∫F
+export scan, spread_draws, censored_cdf, censored_pmf, get_param_array, prefix_submodel, ∫F,
+       _expand_dist
 
 # Export accumulate tools
 export get_state, accumulate_scan
@@ -37,5 +38,6 @@ include("get_param_array.jl")
 include("SafeInt.jl")
 include("SafePoisson.jl")
 include("SafeNegativeBinomial.jl")
+include("_expand_dist.jl")
 
 end

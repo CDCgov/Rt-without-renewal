@@ -42,6 +42,5 @@ include("manipulators/ConcatLatentModels.jl")
 include("manipulators/broadcast/LatentModel.jl")
 include("manipulators/broadcast/rules.jl")
 include("manipulators/broadcast/helpers.jl")
-include("utils.jl")
 
 end
