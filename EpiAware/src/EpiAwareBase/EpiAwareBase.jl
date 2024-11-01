@@ -8,7 +8,8 @@ using DocStringExtensions
 ### Abstract types ###
 
 #Export models
-export AbstractModel, AbstractEpiModel, AbstractLatentModel, AbstractObservationModel
+export AbstractModel, AbstractEpiModel, AbstractLatentModel, AbstractObservationModel,
+       AbstractParamModel
 
 # Export Turing-based models EpiModels
 export AbstractTuringEpiModel, AbstractTuringRenewal
@@ -18,6 +19,9 @@ export AbstractTuringLatentModel, AbstractTuringIntercept
 
 # Export Turing-based observation models
 export AbstractTuringObservationModel, AbstractTuringObservationErrorModel
+
+# Export Turing-based parameter models
+export AbstractTuringParamModel
 
 # Export support types
 export AbstractBroadcastRule, AbstractAccumulationStep
@@ -35,7 +39,8 @@ export EpiProblem, EpiMethod, EpiAwareObservables
 ### Functions ###
 
 # Export model generating functions
-export generate_latent, generate_latent_infs, generate_observations, generate_epiaware
+export generate_latent, generate_latent_infs, generate_observations, generate_parameters,
+       generate_epiaware
 
 # Export support functions
 export broadcast_rule, broadcast_n, condition_model, generated_observables

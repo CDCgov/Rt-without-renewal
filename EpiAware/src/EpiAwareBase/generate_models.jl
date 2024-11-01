@@ -55,6 +55,16 @@ function generate_observations(obs_model::AbstractObservationModel,
 end
 
 @doc raw"
+Constructor function for generating parameters based on the given parameter model.
+
+The `generate_parameters` function implements a model of generating parameters based on the given parameter model. Which model of generating parameters to be implemented is set by the type of `param_model`. If no implemention is defined for the given `param_model`, then `EpiAware` will return a warning and return `nothing`.
+"
+function generate_parameters(param_model::AbstractParamModel)
+    @info "No concrete implementation for generate_parameters is defined."
+    return nothing
+end
+
+@doc raw"
 Create an epi-aware model using the specified epi_model, latent_model, and observation_model.
 
 # Arguments

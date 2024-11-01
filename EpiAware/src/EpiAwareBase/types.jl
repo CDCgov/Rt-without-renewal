@@ -49,6 +49,17 @@ generating observation errors.
 abstract type AbstractTuringObservationErrorModel <: AbstractTuringObservationModel end
 
 """
+The abstract supertype for all structs that defines a model which samples parameters.
+"""
+abstract type AbstractParamModel <: AbstractModel end
+
+"""
+The abstract supertype for all structs that defines a Turing-based model for
+generating parameters.
+"""
+abstract type AbstractTuringParamModel <: AbstractParamModel end
+
+"""
 Abstract supertype for all `EpiAware` problems.
 """
 abstract type AbstractEpiProblem end
