@@ -5,7 +5,7 @@ module EpiLatentModels
 
 using ..EpiAwareBase
 
-using ..EpiAwareUtils: HalfNormal, prefix_submodel, accumulate_scan
+using ..EpiAwareUtils: HalfNormal, prefix_submodel, accumulate_scan, _expand_dist
 
 using LogExpFunctions: softmax
 
