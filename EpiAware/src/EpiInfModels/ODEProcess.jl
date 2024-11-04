@@ -1,33 +1,4 @@
 @doc raw"""
-A structure to hold the initial condition and parameters for an ODE (Ordinary Differential Equation) process.
-`params::ODEParams` is used in the method `generate_latent_infs(epi_model::ODEProcess, params::ODEParams)`
-
-# Constructors
-- `ODEParams(; u0::VecOrMat, p::VecOrMat)`: Create an `ODEParams` object with the initial condition(s) `u0` and parameters `p`.
-
-# Example
-```jldoctest
-using EpiAware
-params = ODEParams(; u0 = ones(10), p = [2, 3])
-
-# output
-
-ODEParams{Float64}([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], [2.0, 3.0])
-```
-"""
-struct ODEParams{T}
-    "The initial condition(s) for the ODE, which can be a vector or matrix of type `T`."
-    u0::VecOrMat{T}
-    " The parameters for the ODE, which can be a vector or matrix of type `T`."
-    p::VecOrMat{T}
-end
-
-function ODEParams(; u0::VecOrMat, p::VecOrMat)
-    T = promote_type(eltype(u0), eltype(p))
-    return ODEParams{T}(T.(u0), T.(p))
-end
-
-@doc raw"""
 A structure representing an infection process modeled by an Ordinary Differential Equation (ODE).
 
 # Background
@@ -46,50 +17,11 @@ object with the ODE problem `prob`, time points `ts`, solver `solver`, and funct
 
 # Example
 
-```jldoctest
-using EpiAware, OrdinaryDiffEq
-r = log(2) / 7 # Growth rate corresponding to 7 day doubling time
-u0 = [1.0]
-p = [r]
-params = ODEParams(u0 = u0, p = p)
-
-# Define the ODE problem using SciML
-# We use a simple exponential growth model
-
-function expgrowth(du, u, p, t)
-    du[1] = p[1] * u[1]
-end
-prob = ODEProblem(expgrowth, u0, (0.0, 10.0), p)
-
-# Define the ODEProcess
-
-expgrowth_model = ODEProcess(prob::ODEProblem; ts = 0:1:10,
-        solver = Tsit5(),
-        sol2infs = sol -> sol[1, :])
-
-# Generate the latent infections
-I_t = generate_latent_infs(expgrowth_model, params)()
-
-# output
-
-11-element Vector{Float64}:
- 1.0
- 1.1040895124087677
- 1.2190137467993492
- 1.3459001375697022
- 1.4859941865014936
- 1.640671113705054
- 1.8114471151863056
- 1.9999990356297939
- 2.2081789476865237
- 2.438027196361022
- 2.6918002758361723
-```
 """
-@kwdef struct ODEProcess{P <: ODEProblem, T, S, F <: Function} <:
+@kwdef struct ODEProcess{P <: AbstractTuringParamModel, T, S, F <: Function} <:
               EpiAwareBase.AbstractTuringEpiModel
     "The ODE problem instance, where `P` is a subtype of `ODEProblem`."
-    prob::P
+    params::P
     "A vector of time points, where `T` is the type of the time points."
     ts::Vector{T}
     "The solver used for the ODE problem."
@@ -141,12 +73,11 @@ expgrowth_model = ODEProcess(prob::ODEProblem; ts = 0:1:10,
 I_t = generate_latent_infs(expgrowth_model, params)()
 ```
 """
-@model function EpiAwareBase.generate_latent_infs(
-        epi_model::ODEProcess, params::ODEParams)
-    prob, ts,
-    solver, sol2infs = epi_model.prob, epi_model.ts, epi_model.solver,
+@model function EpiAwareBase.generate_latent_infs(epi_model::ODEProcess, Z_t)
+    prob, ts, solver, sol2infs = epi_model.params.prob, epi_model.ts, epi_model.solver,
     epi_model.sol2infs
-    u0, p = params.u0, params.p
+
+    @submodel prefix="params" u0, p=generate_parameters(epi_model.params, Z_t)
 
     _prob = remake(prob; u0 = u0, p = p)
     sol = solve(_prob, solver; saveat = ts, verbose = false)

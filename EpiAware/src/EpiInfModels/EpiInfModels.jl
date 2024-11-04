@@ -12,6 +12,9 @@ using Turing, Distributions, DocStringExtensions, LinearAlgebra, LogExpFunctions
 #Export parameter helpers
 export ODEParams, EpiData
 
+#Export ODE definitions
+export SIRParams
+
 #Export models
 export DirectInfections, ExpGrowthRate, Renewal, ODEProcess
 
@@ -24,6 +27,7 @@ include("DirectInfections.jl")
 include("ExpGrowthRate.jl")
 include("RenewalSteps.jl")
 include("Renewal.jl")
+include("odemodels/SIRParams.jl")
 include("ODEProcess.jl")
 include("utils.jl")
 

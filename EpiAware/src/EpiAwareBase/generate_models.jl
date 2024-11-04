@@ -59,7 +59,7 @@ Constructor function for generating parameters based on the given parameter mode
 
 The `generate_parameters` function implements a model of generating parameters based on the given parameter model. Which model of generating parameters to be implemented is set by the type of `param_model`. If no implemention is defined for the given `param_model`, then `EpiAware` will return a warning and return `nothing`.
 "
-function generate_parameters(param_model::AbstractParamModel)
+function generate_parameters(param_model::AbstractParamModel, Z_t)
     @info "No concrete implementation for generate_parameters is defined."
     return nothing
 end
