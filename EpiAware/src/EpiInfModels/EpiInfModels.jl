@@ -10,7 +10,7 @@ using Turing, Distributions, DocStringExtensions, LinearAlgebra, LogExpFunctions
       SparseArrays, OrdinaryDiffEq
 
 #Export parameter helpers
-export ODEParams, EpiData
+export EpiData
 
 #Export ODE definitions
 export SIRParams, SEIRParams
