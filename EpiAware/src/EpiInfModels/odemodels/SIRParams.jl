@@ -12,6 +12,13 @@ function _sir_vf(du, u, p, t)
 end
 
 """
+Sparse Jacobian matrix prototype for the basic SIR model written in density/per-capita form.
+"""
+_sir_jac_prototype = sparse([1.0 1.0 0.0;
+                             1.0 1.0 0.0;
+                             0.0 1.0 0.0])
+
+"""
 Internal function for the Jacobian of the basic SIR model written in density/per-capita
 form. The function is used to define the ODE problem for the SIR model. The Jacobian
 is used to speed up the solution of the ODE problem when using a stiff solver.
@@ -21,13 +28,9 @@ function _sir_jac(J, u, p, t)
     β, γ = p
     J[1, 1] = -β * I
     J[1, 2] = -β * S
-    J[1, 3] = 0
     J[2, 1] = β * I
     J[2, 2] = β * S - γ
-    J[2, 3] = 0
-    J[3, 1] = 0
     J[3, 2] = γ
-    J[3, 3] = 0
     nothing
 end
 
@@ -35,7 +38,7 @@ end
 Internal function for the ODE function of the basic SIR model written in density/per-capita
 form. The function passes vector field and Jacobian functions to the ODE solver.
 """
-const _sir_function = ODEFunction(_sir_vf; jac = _sir_jac)
+_sir_function = ODEFunction(_sir_vf; jac = _sir_jac, jac_prototype = _sir_jac_prototype)
 
 """
 A structure representing the SIR (Susceptible-Infectious-Recovered) model and priors for the
@@ -65,10 +68,9 @@ function SIRParams(;
         tspan, infectiousness_prior::Distribution, recovery_rate_prior::Distribution,
         initial_prop_infected_prior::Distribution)
     sir_prob = ODEProblem(_sir_function, [0.99, 0.01, 0.0], tspan)
-    return SIRParams{
-        typeof(sir_prob), typeof(infectiousness_prior), typeof(recovery_rate_prior),
-        typeof(initial_prop_infected_prior)}(
-        sir_prob, infectiousness_prior, recovery_rate_prior)
+    return SIRParams{typeof(sir_prob), typeof(infectiousness_prior),
+        typeof(recovery_rate_prior), typeof(initial_prop_infected_prior)}(
+        sir_prob, infectiousness_prior, recovery_rate_prior, initial_prop_infected_prior)
 end
 
 @model function EpiAwareBase.generate_parameters(params::SIRParams, Z_t)

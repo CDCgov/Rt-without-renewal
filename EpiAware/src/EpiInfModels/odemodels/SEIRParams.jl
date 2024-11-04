@@ -13,6 +13,14 @@ function _seir_vf(du, u, p, t)
 end
 
 """
+Sparse Jacobian matrix prototype for the basic SEIR model written in density/per-capita form.
+"""
+_seir_jac_prototype = sparse([1.0 0.0 1.0 0.0;
+                              1.0 1.0 1.0 0.0;
+                              0.0 1.0 1.0 0.0;
+                              0.0 0.0 1.0 0.0])
+
+"""
 Internal function for the Jacobian of the basic SEIR model written in density/per-capita
 form. The function is used to define the ODE problem for the SEIR model. The Jacobian
 is used to speed up the solution of the ODE problem when using a stiff solver.
@@ -21,21 +29,13 @@ function _seir_jac(J, u, p, t)
     S, E, I, R = u
     β, α, γ = p
     J[1, 1] = -β * I
-    J[1, 2] = 0
     J[1, 3] = -β * S
-    J[1, 4] = 0
     J[2, 1] = β * I
     J[2, 2] = -α
     J[2, 3] = β * S
-    J[2, 4] = 0
-    J[3, 1] = 0
     J[3, 2] = α
     J[3, 3] = -γ
-    J[3, 4] = 0
-    J[4, 1] = 0
-    J[4, 2] = 0
     J[4, 3] = γ
-    J[4, 4] = 0
     nothing
 end
 
@@ -43,7 +43,7 @@ end
 Internal function for the ODE function of the basic SIR model written in density/per-capita
 form. The function passes vector field and Jacobian functions to the ODE solver.
 """
-const _seir_function = ODEFunction(_seir_vf; jac = _seir_jac)
+_seir_function = ODEFunction(_seir_vf; jac = _seir_jac, jac_prototype = _seir_jac_prototype)
 
 """
 A structure representing the SIR (Susceptible-Infectious-Recovered) model and priors for the
@@ -74,13 +74,14 @@ function SEIRParams(;
         tspan, infectiousness_prior::Distribution, incubation_rate_prior::Distribution,
         recovery_rate_prior::Distribution, initial_prop_infected_prior::Distribution)
     seir_prob = ODEProblem(_seir_function, [0.99, 0.05, 0.05, 0.0], tspan)
-    return SIRParams{
-        typeof(sir_prob), typeof(infectiousness_prior), typeof(incubation_rate_prior),
+    return SEIRParams{
+        typeof(seir_prob), typeof(infectiousness_prior), typeof(incubation_rate_prior),
         typeof(recovery_rate_prior), typeof(initial_prop_infected_prior)}(
-        seir_prob, infectiousness_prior, recovery_rate_prior)
+        seir_prob, infectiousness_prior, incubation_rate_prior,
+        recovery_rate_prior, initial_prop_infected_prior)
 end
 
-@model function EpiAwareBase.generate_parameters(params::SIRParams, Z_t)
+@model function EpiAwareBase.generate_parameters(params::SEIRParams, Z_t)
     β ~ params.infectiousness_prior
     α ~ params.incubation_rate_prior
     γ ~ params.recovery_rate_prior
