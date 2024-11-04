@@ -7,13 +7,13 @@ using ..EpiAwareBase
 using ..EpiAwareUtils
 
 using Turing, Distributions, DocStringExtensions, LinearAlgebra, LogExpFunctions,
-      OrdinaryDiffEq
+      SparseArrays, OrdinaryDiffEq
 
 #Export parameter helpers
 export ODEParams, EpiData
 
 #Export ODE definitions
-export SIRParams
+export SIRParams, SEIRParams
 
 #Export models
 export DirectInfections, ExpGrowthRate, Renewal, ODEProcess
@@ -28,6 +28,7 @@ include("ExpGrowthRate.jl")
 include("RenewalSteps.jl")
 include("Renewal.jl")
 include("odemodels/SIRParams.jl")
+include("odemodels/SEIRParams.jl")
 include("ODEProcess.jl")
 include("utils.jl")
 
