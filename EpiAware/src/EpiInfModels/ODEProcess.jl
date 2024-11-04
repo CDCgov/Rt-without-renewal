@@ -18,19 +18,20 @@ object with the ODE problem `prob`, time points `ts`, solver `solver`, and funct
 # Example
 
 """
-@kwdef struct ODEProcess{P <: AbstractTuringParamModel, T, S, F <: Function} <:
+@kwdef struct ODEProcess{
+    P <: AbstractTuringParamModel, S, F <: Function, D <:
+                                                     Union{Dict, NamedTuple}} <:
               EpiAwareBase.AbstractTuringEpiModel
     "The ODE problem instance, where `P` is a subtype of `ODEProblem`."
     params::P
-    "A vector of time points, where `T` is the type of the time points."
-    ts::Vector{T}
     "The solver used for the ODE problem. Default is `AutoVern7(Rodas5())`, which is an auto
     switching solver aimed at medium/low tolerances."
     solver::S = AutoVern7(Rodas5())
     "A function that maps the solution object of the ODE to infection counts."
     sol2infs::F
-    "The extra solver options for the ODE problem. NB: `ts` is used as the `saveat` option."
-    solver_options::Dict{Symbol, Any} = Dict(:verbose => false)
+    "The extra solver options for the ODE problem. Can be either a `Dict` or a `NamedTuple`
+    containing the solver options."
+    solver_options::D = Dict(:verbose => false, :saveat => 1.0)
 end
 
 @doc raw"""
@@ -80,13 +81,13 @@ I_t = generate_latent_infs(expgrowth_model, params)()
 ```
 """
 @model function EpiAwareBase.generate_latent_infs(epi_model::ODEProcess, Z_t)
-    prob, ts, solver, sol2infs, solver_options = epi_model.params.prob,
-    epi_model.ts, epi_model.solver, epi_model.sol2infs, epi_model.solver_options
+    prob, solver, sol2infs, solver_options = epi_model.params.prob,
+    epi_model.solver, epi_model.sol2infs, epi_model.solver_options
 
     @submodel prefix="params" u0, p=generate_parameters(epi_model.params, Z_t)
 
     _prob = remake(prob; u0 = u0, p = p)
-    sol = solve(_prob, solver; saveat = ts, solver_options...)
+    sol = solve(_prob, solver; solver_options...)
     I_t = sol2infs(sol)
 
     return I_t
