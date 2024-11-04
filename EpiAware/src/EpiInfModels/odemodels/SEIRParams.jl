@@ -15,10 +15,10 @@ end
 """
 Sparse Jacobian matrix prototype for the basic SEIR model written in density/per-capita form.
 """
-_seir_jac_prototype = sparse([1.0 0.0 1.0 0.0;
-                              1.0 1.0 1.0 0.0;
-                              0.0 1.0 1.0 0.0;
-                              0.0 0.0 1.0 0.0])
+const _seir_jac_prototype = sparse([1.0 0.0 1.0 0.0;
+                                    1.0 1.0 1.0 0.0;
+                                    0.0 1.0 1.0 0.0;
+                                    0.0 0.0 1.0 0.0])
 
 """
 Internal function for the Jacobian of the basic SEIR model written in density/per-capita
