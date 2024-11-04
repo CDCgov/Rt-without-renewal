@@ -1,4 +1,4 @@
-"""
+@doc raw"""
 Internal function for the vector field of a basic SEIR model written in density/per-capita
 form. The function is used to define the ODE problem for the SIR model.
 """
@@ -12,7 +12,7 @@ function _seir_vf(du, u, p, t)
     return nothing
 end
 
-"""
+@doc raw"""
 Sparse Jacobian matrix prototype for the basic SEIR model written in density/per-capita form.
 """
 const _seir_jac_prototype = sparse([1.0 0.0 1.0 0.0;
@@ -20,7 +20,7 @@ const _seir_jac_prototype = sparse([1.0 0.0 1.0 0.0;
                                     0.0 1.0 1.0 0.0;
                                     0.0 0.0 1.0 0.0])
 
-"""
+@doc raw"""
 Internal function for the Jacobian of the basic SEIR model written in density/per-capita
 form. The function is used to define the ODE problem for the SEIR model. The Jacobian
 is used to speed up the solution of the ODE problem when using a stiff solver.
@@ -39,14 +39,14 @@ function _seir_jac(J, u, p, t)
     nothing
 end
 
-"""
+@doc raw"""
 Internal function for the ODE function of the basic SIR model written in density/per-capita
 form. The function passes vector field and Jacobian functions to the ODE solver.
 """
 _seir_function = ODEFunction(_seir_vf; jac = _seir_jac, jac_prototype = _seir_jac_prototype)
 
-"""
-A structure representing the SIR (Susceptible-Infectious-Recovered) model and priors for the
+@doc raw"""
+A structure representing the SEIR (Susceptible-Exposed-Infectious-Recovered) model and priors for the
 infectiousness and recovery rate parameters.
 
 # Constructors
@@ -54,6 +54,42 @@ infectiousness and recovery rate parameters.
     recovery_rate_prior::Distribution, initial_prop_infected_prior::Distribution)` :
 Construct a `SEIRParams` object with the specified time span for ODE solving, infectiousness
 prior, incubation rate prior and recovery rate prior.
+
+## SEIR model
+
+```math
+\begin{aligned}
+\frac{dS}{dt} &= -\beta SI \\
+\frac{dE}{dt} &= \beta SI - \alpha E \\
+\frac{dI}{dt} &= \alpha E - \gamma I \\
+\frac{dR}{dt} &= \gamma I
+\end{aligned}
+```
+Where `S` is the proportion of the population that is susceptible, `E` is the proportion of the
+population that is exposed, `I` is the proportion of the population that is infected and `R` is
+the proportion of the population that is recovered. The parameters are the infectiousness `β`,
+the incubation rate `α` and the recovery rate `γ`.
+
+```julia
+using EpiAware, OrdinaryDiffEq, Distributions
+# Define the time span for the ODE problem
+tspan = (0.0, 30.0)
+
+# Define prior distributions
+infectiousness_prior = LogNormal(log(0.3), 0.05)
+incubation_rate_prior = LogNormal(log(0.1), 0.05)
+recovery_rate_prior = LogNormal(log(0.1), 0.05)
+initial_prop_infected_prior = Beta(1, 99)
+
+# Create an instance of SIRParams
+seirparams = SEIRParams(
+    tspan = tspan,
+    infectiousness_prior = infectiousness_prior,
+    incubation_rate_prior = incubation_rate_prior,
+    recovery_rate_prior = recovery_rate_prior,
+    initial_prop_infected_prior = initial_prop_infected_prior
+)
+```
 """
 struct SEIRParams{
     P <: ODEProblem, D <: Sampleable, E <: Sampleable, F <: Sampleable, G <: Sampleable} <:
