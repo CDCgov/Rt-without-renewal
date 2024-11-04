@@ -38,7 +38,7 @@ end
 Internal function for the ODE function of the basic SIR model written in density/per-capita
 form. The function passes vector field and Jacobian functions to the ODE solver.
 """
-_sir_function = ODEFunction(_sir_vf; jac = _sir_jac, jac_prototype = _sir_jac_prototype)
+_sir_function = ODEFunction(_sir_vf; jac = _sir_jac)
 
 @doc raw"""
 A structure representing the SIR (Susceptible-Infectious-Recovered) model and priors for the
