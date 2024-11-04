@@ -1,19 +1,95 @@
 @doc raw"""
 A structure representing an infection process modeled by an Ordinary Differential Equation (ODE).
+At a high level, an `ODEProcess` struct object combines:
 
-# Background
-
-The purpose of this structure is to define the behaviour of modelling an infection process
-using an ODE. We use the [`SciML` ecosystem](https://sciml.ai/) to define and solve the ODE.
-For `ODEProcess` structs we focus on defining from a restricted set of ODE problems:
-- The initial condition `u0` must be a vector or matrix.
-- The parameters `p` must be a vector or matrix.
-- The output of the ODE should be interpreted as the infection incidence at each time point in
-`ts` via the function `sol2infs` which maps the solution object `sol` of the ODE solve to infection counts.
+- An `AbstractTuringParamModel` which defines the ODE model in terms of `OrdinaryDiffEq` types,
+     the parameters of the ODE model and a method to generate the parameters.
+- A technique for solving and interpreting the ODE model using the `SciML` ecosystem. This includes
+    the solver used in the ODE solution, keyword arguments to send to the solver and a function
+    to map the `ODESolution` solution object to latent infections.
 
 # Constructors
 - `ODEProcess(prob::ODEProblem; ts, solver, sol2infs)`: Create an `ODEProcess`
 object with the ODE problem `prob`, time points `ts`, solver `solver`, and function `sol2infs`.
+
+# Predefined ODE models
+Two basic ODE models are provided in the `EpiAware` package: `SIRParams` and `SEIRParams`.
+In both cases these are defined in terms of the proportions of the population in each compartment
+of the SIR and SEIR models respectively.
+
+## SIR model
+
+```math
+\begin{aligned}
+\frac{dS}{dt} &= -\beta SI \\
+\frac{dI}{dt} &= \beta SI - \gamma I \\
+\frac{dR}{dt} &= \gamma I
+\end{aligned}
+```
+Where `S` is the proportion of the population that is susceptible, `I` is the proportion of the
+population that is infected and `R` is the proportion of the population that is recovered. The
+parameters are the infectiousness `β` and the recovery rate `γ`.
+
+```julia
+using EpiAware, OrdinaryDiffEq, Distributions
+# Define the time span for the ODE problem
+tspan = (0.0, 30.0)
+# Define prior distributions
+infectiousness_prior = LogNormal(log(0.3), 0.05)
+recovery_rate_prior = LogNormal(log(0.1), 0.05)
+initial_prop_infected_prior = Beta(1, 99)
+
+# Create an instance of SIRParams
+sirparams = SIRParams(
+    tspan = tspan,
+    infectiousness_prior = infectiousness_prior,
+    recovery_rate_prior = recovery_rate_prior,
+    initial_prop_infected_prior = initial_prop_infected_prior
+)
+```
+
+## SEIR model
+
+```math
+\begin{aligned}
+\frac{dS}{dt} &= -\beta SI \\
+\frac{dE}{dt} &= \beta SI - \alpha E \\
+\frac{dI}{dt} &= \alpha E - \gamma I \\
+\frac{dR}{dt} &= \gamma I
+\end{aligned}
+```
+Where `S` is the proportion of the population that is susceptible, `E` is the proportion of the
+population that is exposed, `I` is the proportion of the population that is infected and `R` is
+the proportion of the population that is recovered. The parameters are the infectiousness `β`,
+the incubation rate `α` and the recovery rate `γ`.
+
+```julia
+using EpiAware, OrdinaryDiffEq, Distributions
+# Define the time span for the ODE problem
+tspan = (0.0, 30.0)
+
+# Define prior distributions
+infectiousness_prior = LogNormal(log(0.3), 0.05)
+incubation_rate_prior = LogNormal(log(0.1), 0.05)
+recovery_rate_prior = LogNormal(log(0.1), 0.05)
+initial_prop_infected_prior = Beta(1, 99)
+
+# Create an instance of SIRParams
+seirparams = SEIRParams(
+    tspan = tspan,
+    infectiousness_prior = infectiousness_prior,
+    incubation_rate_prior = incubation_rate_prior,
+    recovery_rate_prior = recovery_rate_prior,
+    initial_prop_infected_prior = initial_prop_infected_prior
+)
+```
+
+# Usage Example with `ODEProcess` and predefined SIR model
+
+These
+are defined in terms of the proportions of the population in each compartment of the SEIR model
+
+
 
 # Example
 
