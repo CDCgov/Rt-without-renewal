@@ -47,3 +47,14 @@
         @test sampled_params.I₀ isa Float64
     end
 end
+
+@testitem "SEIRParams: jac_prototype non-zeros invariant to jac call" begin
+    Jp = deepcopy(EpiAware.EpiInfModels._seir_jac_prototype)
+    Jp_pattern_before = Jp .!= 0
+    u = rand(4)
+    p = rand(3)
+    EpiAware.EpiInfModels._seir_jac(Jp, u, p, 0.0)
+    Jp_pattern_after = Jp .!= 0
+
+    @test Jp_pattern_before == Jp_pattern_after
+end
