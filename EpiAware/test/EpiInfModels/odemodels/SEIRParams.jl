@@ -4,34 +4,34 @@
     tspan = (0.0, 10.0)
 
     # Define prior distributions
-    infectiousness_prior = LogNormal(log(0.3), 0.05)
-    incubation_rate_prior = LogNormal(log(0.1), 0.05)
-    recovery_rate_prior = LogNormal(log(0.1), 0.05)
-    initial_prop_infected_prior = Beta(2, 5)
+    infectiousness = LogNormal(log(0.3), 0.05)
+    incubation_rate = LogNormal(log(0.1), 0.05)
+    recovery_rate = LogNormal(log(0.1), 0.05)
+    initial_prop_infected = Beta(2, 5)
 
     # Create an instance of seirparams
     seirparams = SEIRParams(
         tspan = tspan,
-        infectiousness_prior = infectiousness_prior,
-        incubation_rate_prior = incubation_rate_prior,
-        recovery_rate_prior = recovery_rate_prior,
-        initial_prop_infected_prior = initial_prop_infected_prior
+        infectiousness = infectiousness,
+        incubation_rate = incubation_rate,
+        recovery_rate = recovery_rate,
+        initial_prop_infected = initial_prop_infected
     )
 
     @testset "SEIRParams constructor tests" begin
         # Check the types of the fields
         @test seirparams.prob isa ODEProblem
-        @test seirparams.infectiousness_prior isa Distribution
-        @test seirparams.incubation_rate_prior isa Distribution
-        @test seirparams.recovery_rate_prior isa Distribution
-        @test seirparams.initial_prop_infected_prior isa Distribution
+        @test seirparams.infectiousness isa Distribution
+        @test seirparams.incubation_rate isa Distribution
+        @test seirparams.recovery_rate isa Distribution
+        @test seirparams.initial_prop_infected isa Distribution
 
         # Check the values of the fields
         @test seirparams.prob.tspan == tspan
-        @test seirparams.infectiousness_prior == infectiousness_prior
-        @test seirparams.incubation_rate_prior == incubation_rate_prior
-        @test seirparams.recovery_rate_prior == recovery_rate_prior
-        @test seirparams.initial_prop_infected_prior == initial_prop_infected_prior
+        @test seirparams.infectiousness == infectiousness
+        @test seirparams.incubation_rate == incubation_rate
+        @test seirparams.recovery_rate == recovery_rate
+        @test seirparams.initial_prop_infected == initial_prop_infected
     end
 
     @testset "SEIRParams `generate_parameters` tests" begin
@@ -44,7 +44,7 @@
         @test sampled_params.β isa Float64
         @test sampled_params.α isa Float64
         @test sampled_params.γ isa Float64
-        @test sampled_params.I₀ isa Float64
+        @test sampled_params.initial_infs isa Float64
     end
 end
 

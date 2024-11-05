@@ -4,30 +4,30 @@
     tspan = (0.0, 10.0)
 
     # Define prior distributions
-    infectiousness_prior = LogNormal(log(0.3), 0.05)
-    recovery_rate_prior = LogNormal(log(0.1), 0.05)
-    initial_prop_infected_prior = Beta(2, 5)
+    infectiousness = LogNormal(log(0.3), 0.05)
+    recovery_rate = LogNormal(log(0.1), 0.05)
+    initial_prop_infected = Beta(2, 5)
 
     # Create an instance of SIRParams
     sirparams = SIRParams(
         tspan = tspan,
-        infectiousness_prior = infectiousness_prior,
-        recovery_rate_prior = recovery_rate_prior,
-        initial_prop_infected_prior = initial_prop_infected_prior
+        infectiousness = infectiousness,
+        recovery_rate = recovery_rate,
+        initial_prop_infected = initial_prop_infected
     )
 
     @testset "SIRParams constructor tests" begin
         # Check the types of the fields
         @test sirparams.prob isa ODEProblem
-        @test sirparams.infectiousness_prior isa Distribution
-        @test sirparams.recovery_rate_prior isa Distribution
-        @test sirparams.initial_prop_infected_prior isa Distribution
+        @test sirparams.infectiousness isa Distribution
+        @test sirparams.recovery_rate isa Distribution
+        @test sirparams.initial_prop_infected isa Distribution
 
         # Check the values of the fields
         @test sirparams.prob.tspan == tspan
-        @test sirparams.infectiousness_prior == infectiousness_prior
-        @test sirparams.recovery_rate_prior == recovery_rate_prior
-        @test sirparams.initial_prop_infected_prior == initial_prop_infected_prior
+        @test sirparams.infectiousness == infectiousness
+        @test sirparams.recovery_rate == recovery_rate
+        @test sirparams.initial_prop_infected == initial_prop_infected
     end
 
     @testset "SIRParams `generate_parameters` tests" begin

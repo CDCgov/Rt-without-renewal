@@ -32,19 +32,13 @@ parameters are the infectiousness `β` and the recovery rate `γ`.
 
 ```julia
 using EpiAware, OrdinaryDiffEq, Distributions
-# Define the time span for the ODE problem
-tspan = (0.0, 30.0)
-# Define prior distributions
-infectiousness_prior = LogNormal(log(0.3), 0.05)
-recovery_rate_prior = LogNormal(log(0.1), 0.05)
-initial_prop_infected_prior = Beta(1, 99)
 
 # Create an instance of SIRParams
 sirparams = SIRParams(
-    tspan = tspan,
-    infectiousness_prior = infectiousness_prior,
-    recovery_rate_prior = recovery_rate_prior,
-    initial_prop_infected_prior = initial_prop_infected_prior
+    tspan = (0.0, 30.0),
+    infectiousness = LogNormal(log(0.3), 0.05),
+    recovery_rate = LogNormal(log(0.1), 0.05),
+    initial_prop_infected = Beta(1, 99)
 )
 ```
 
@@ -65,22 +59,14 @@ the incubation rate `α` and the recovery rate `γ`.
 
 ```julia
 using EpiAware, OrdinaryDiffEq, Distributions
-# Define the time span for the ODE problem
-tspan = (0.0, 30.0)
-
-# Define prior distributions
-infectiousness_prior = LogNormal(log(0.3), 0.05)
-incubation_rate_prior = LogNormal(log(0.1), 0.05)
-recovery_rate_prior = LogNormal(log(0.1), 0.05)
-initial_prop_infected_prior = Beta(1, 99)
 
 # Create an instance of SIRParams
 seirparams = SEIRParams(
-    tspan = tspan,
-    infectiousness_prior = infectiousness_prior,
-    incubation_rate_prior = incubation_rate_prior,
-    recovery_rate_prior = recovery_rate_prior,
-    initial_prop_infected_prior = initial_prop_infected_prior
+    tspan = (0.0, 30.0),
+    infectiousness = LogNormal(log(0.3), 0.05),
+    incubation_rate = LogNormal(log(0.1), 0.05),
+    recovery_rate = LogNormal(log(0.1), 0.05),
+    initial_prop_infected = Beta(1, 99)
 )
 ```
 
@@ -107,7 +93,7 @@ N = 1000.0
 
 sir_process = ODEProcess(
     params = sirparams,
-    sol2infs = sol -> logaddexp.(0.1, N * sol[2, :]),
+    sol2infs = sol -> N .* logaddexp.(0.001, sol[2, :]),
     solver_options = Dict(:verbose => false, :saveat => 1.0)
 )
 ```
@@ -233,26 +219,19 @@ generate an expected infection time series using SIR model parameters sampled fr
 
 ```julia
 using EpiAware, OrdinaryDiffEq, Distributions, LogExpFunctions
-# Define the time span for the ODE problem
-tspan = (0.0, 30.0)
-
-# Define prior distributions
-infectiousness_prior = LogNormal(log(0.3), 0.05)
-recovery_rate_prior = LogNormal(log(0.1), 0.05)
-initial_prop_infected_prior = Beta(1, 99)
 
 # Create an instance of SIRParams
 sirparams = SIRParams(
-    tspan = tspan,
-    infectiousness_prior = infectiousness_prior,
-    recovery_rate_prior = recovery_rate_prior,
-    initial_prop_infected_prior = initial_prop_infected_prior
+    tspan = (0.0, 30.0),
+    infectiousness = LogNormal(log(0.3), 0.05),
+    recovery_rate = LogNormal(log(0.1), 0.05),
+    initial_prop_infected = Beta(1, 99)
 )
 #Population size
 N = 1000.0
 sir_process = ODEProcess(
     params = sirparams,
-    sol2infs = sol -> logaddexp.(0.1, N * sol[2, :]),
+    sol2infs = sol -> N .* logaddexp.(0.001, sol[2, :]),
     solver_options = Dict(:verbose => false, :saveat => 1.0)
 )
 

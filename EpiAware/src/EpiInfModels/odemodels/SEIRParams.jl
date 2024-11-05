@@ -50,8 +50,8 @@ A structure representing the SEIR (Susceptible-Exposed-Infectious-Recovered) mod
 infectiousness and recovery rate parameters.
 
 # Constructors
-- `SEIRParams(; tspan, infectiousness_prior::Distribution, incubation_rate_prior::Distribution,
-    recovery_rate_prior::Distribution, initial_prop_infected_prior::Distribution)` :
+- `SEIRParams(; tspan, infectiousness::Distribution, incubation_rate::Distribution,
+    recovery_rate::Distribution, initial_prop_infected::Distribution)` :
 Construct a `SEIRParams` object with the specified time span for ODE solving, infectiousness
 prior, incubation rate prior and recovery rate prior.
 
@@ -72,22 +72,14 @@ the incubation rate `α` and the recovery rate `γ`.
 
 ```julia
 using EpiAware, OrdinaryDiffEq, Distributions
-# Define the time span for the ODE problem
-tspan = (0.0, 30.0)
-
-# Define prior distributions
-infectiousness_prior = LogNormal(log(0.3), 0.05)
-incubation_rate_prior = LogNormal(log(0.1), 0.05)
-recovery_rate_prior = LogNormal(log(0.1), 0.05)
-initial_prop_infected_prior = Beta(1, 99)
 
 # Create an instance of SIRParams
 seirparams = SEIRParams(
-    tspan = tspan,
-    infectiousness_prior = infectiousness_prior,
-    incubation_rate_prior = incubation_rate_prior,
-    recovery_rate_prior = recovery_rate_prior,
-    initial_prop_infected_prior = initial_prop_infected_prior
+    tspan = (0.0, 30.0),
+    infectiousness = LogNormal(log(0.3), 0.05),
+    incubation_rate = LogNormal(log(0.1), 0.05),
+    recovery_rate = LogNormal(log(0.1), 0.05),
+    initial_prop_infected = Beta(1, 99)
 )
 ```
 """
@@ -97,33 +89,87 @@ struct SEIRParams{
     "The ODE problem instance for the SIR model."
     prob::P
     "Prior distribution for the infectiousness parameter."
-    infectiousness_prior::D
+    infectiousness::D
     "Prior distribution for the incubation rate parameter."
-    incubation_rate_prior::E
+    incubation_rate::E
     "Prior distribution for the recovery rate parameter."
-    recovery_rate_prior::F
+    recovery_rate::F
     "Prior distribution for initial proportion of the population that is infected."
-    initial_prop_infected_prior::G
+    initial_prop_infected::G
 end
 
 function SEIRParams(;
-        tspan, infectiousness_prior::Distribution, incubation_rate_prior::Distribution,
-        recovery_rate_prior::Distribution, initial_prop_infected_prior::Distribution)
+        tspan, infectiousness::Distribution, incubation_rate::Distribution,
+        recovery_rate::Distribution, initial_prop_infected::Distribution)
     seir_prob = ODEProblem(_seir_function, [0.99, 0.05, 0.05, 0.0], tspan)
     return SEIRParams{
-        typeof(seir_prob), typeof(infectiousness_prior), typeof(incubation_rate_prior),
-        typeof(recovery_rate_prior), typeof(initial_prop_infected_prior)}(
-        seir_prob, infectiousness_prior, incubation_rate_prior,
-        recovery_rate_prior, initial_prop_infected_prior)
+        typeof(seir_prob), typeof(infectiousness), typeof(incubation_rate),
+        typeof(recovery_rate), typeof(initial_prop_infected)}(
+        seir_prob, infectiousness, incubation_rate,
+        recovery_rate, initial_prop_infected)
 end
 
-@model function EpiAwareBase.generate_parameters(params::SEIRParams, Z_t)
-    β ~ params.infectiousness_prior
-    α ~ params.incubation_rate_prior
-    γ ~ params.recovery_rate_prior
-    I₀ ~ params.initial_prop_infected_prior
+@doc raw"""
+Generates the initial parameters and initial conditions for the basic SEIR model.
 
-    u0 = [1.0 - I₀, I₀ * γ / (α + γ), I₀ * α / (α + γ), 0.0]
+## SEIR model
+
+```math
+\begin{aligned}
+\frac{dS}{dt} &= -\beta SI \\
+\frac{dE}{dt} &= \beta SI - \alpha E \\
+\frac{dI}{dt} &= \alpha E - \gamma I \\
+\frac{dR}{dt} &= \gamma I
+\end{aligned}
+```
+Where `S` is the proportion of the population that is susceptible, `E` is the proportion of the
+population that is exposed, `I` is the proportion of the population that is infected and `R` is
+the proportion of the population that is recovered. The parameters are the infectiousness `β`,
+the incubation rate `α` and the recovery rate `γ`.
+
+## Initial conditions
+
+For this version of the SEIR model we sample the initial proportion of the population that is
+_infected_ (exposed or infectious). The proportion of the infected group that is exposed is
+`α / (α + γ)` and the proportion of the infected group that is infectious is `γ / (α + γ)`. The
+reason for this is that these are the equilibrium proportions in a constant incidence environment.
+
+# Example
+
+```julia
+using EpiAware, OrdinaryDiffEq, Distributions
+
+# Create an instance of SIRParams
+seirparams = SEIRParams(
+    tspan = (0.0, 30.0),
+    infectiousness = LogNormal(log(0.3), 0.05),
+    incubation_rate = LogNormal(log(0.1), 0.05),
+    recovery_rate = LogNormal(log(0.1), 0.05),
+    initial_prop_infected = Beta(1, 99)
+)
+
+seirparam_mdl = generate_parameters(seirparams, nothing)
+
+# Sample the parameters of SEIR model
+sampled_params = rand(seirparam_mdl)
+```
+
+# Returns
+  A tuple `(u0, p)` where:
+  - `u0`: A vector representing the initial state of the system `[S₀, E₀, I₀, R₀]` where `S₀`
+  is the initial proportion of susceptible individuals, `E₀` is the initial proportion of exposed
+  individuals,`I₀` is the initial proportion of infected individuals, and `R₀` is the initial
+  proportion of recovered individuals.
+  - `p`: A vector containing the parameters `[β, α, γ]` where `β` is the infectiousness rate,
+  `α` is the incubation rate, and `γ` is the recovery rate.
+"""
+@model function EpiAwareBase.generate_parameters(params::SEIRParams, Z_t)
+    β ~ params.infectiousness
+    α ~ params.incubation_rate
+    γ ~ params.recovery_rate
+    initial_infs ~ params.initial_prop_infected
+
+    u0 = [1.0 - initial_infs, initial_infs * γ / (α + γ), initial_infs * α / (α + γ), 0.0]
     p = [β, α, γ]
     return (u0, p)
 end

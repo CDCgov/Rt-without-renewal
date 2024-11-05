@@ -46,9 +46,9 @@ infectiousness and recovery rate parameters.
 
 # Constructors
 - `SIRParams(; tspan,
-    infectiousness_prior::Distribution,
-    recovery_rate_prior::Distribution,
-    initial_prop_infected_prior::Distribution)` :
+    infectiousness::Distribution,
+    recovery_rate::Distribution,
+    initial_prop_infected::Distribution)` :
 Construct an `SIRParams` object with the specified time span for ODE solving, infectiousness
 prior, and recovery rate prior.
 
@@ -65,21 +65,17 @@ Where `S` is the proportion of the population that is susceptible, `I` is the pr
 population that is infected and `R` is the proportion of the population that is recovered. The
 parameters are the infectiousness `β` and the recovery rate `γ`.
 
+# Example
+
 ```julia
  using EpiAware, OrdinaryDiffEq, Distributions
-# Define the time span for the ODE problem
-tspan = (0.0, 30.0)
-# Define prior distributions
-infectiousness_prior = LogNormal(log(0.3), 0.05)
-recovery_rate_prior = LogNormal(log(0.1), 0.05)
-initial_prop_infected_prior = Beta(1, 99)
 
 # Create an instance of SIRParams
 sirparams = SIRParams(
-    tspan = tspan,
-    infectiousness_prior = infectiousness_prior,
-    recovery_rate_prior = recovery_rate_prior,
-    initial_prop_infected_prior = initial_prop_infected_prior
+    tspan = (0.0, 30.0),
+    infectiousness = LogNormal(log(0.3), 0.05),
+    recovery_rate = LogNormal(log(0.1), 0.05),
+    initial_prop_infected = Beta(1, 99)
 )
 ```
 """
@@ -88,26 +84,66 @@ struct SIRParams{P <: ODEProblem, D <: Sampleable, E <: Sampleable, F <: Samplea
     "The ODE problem instance for the SIR model."
     prob::P
     "Prior distribution for the infectiousness parameter."
-    infectiousness_prior::D
+    infectiousness::D
     "Prior distribution for the recovery rate parameter."
-    recovery_rate_prior::E
+    recovery_rate::E
     "Prior distribution for initial proportion of the population that is infected."
-    initial_prop_infected_prior::F
+    initial_prop_infected::F
 end
 
 function SIRParams(;
-        tspan, infectiousness_prior::Distribution, recovery_rate_prior::Distribution,
-        initial_prop_infected_prior::Distribution)
+        tspan, infectiousness::Distribution, recovery_rate::Distribution,
+        initial_prop_infected::Distribution)
     sir_prob = ODEProblem(_sir_function, [0.99, 0.01, 0.0], tspan)
-    return SIRParams{typeof(sir_prob), typeof(infectiousness_prior),
-        typeof(recovery_rate_prior), typeof(initial_prop_infected_prior)}(
-        sir_prob, infectiousness_prior, recovery_rate_prior, initial_prop_infected_prior)
+    return SIRParams{typeof(sir_prob), typeof(infectiousness),
+        typeof(recovery_rate), typeof(initial_prop_infected)}(
+        sir_prob, infectiousness, recovery_rate, initial_prop_infected)
 end
 
+@doc raw"""
+Generates the initial parameters and initial conditions for the basic SIR model.
+
+## SIR model
+
+```math
+\begin{aligned}
+\frac{dS}{dt} &= -\beta SI \\
+\frac{dI}{dt} &= \beta SI - \gamma I \\
+\frac{dR}{dt} &= \gamma I
+\end{aligned}
+```
+Where `S` is the proportion of the population that is susceptible, `I` is the proportion of the
+population that is infected and `R` is the proportion of the population that is recovered. The
+parameters are the infectiousness `β` and the recovery rate `γ`.
+
+# Example
+
+```julia
+using EpiAware, OrdinaryDiffEq, Distributions
+
+# Create an instance of SIRParams
+sirparams = SIRParams(
+    tspan = (0.0, 30.0),
+    infectiousness = LogNormal(log(0.3), 0.05),
+    recovery_rate = LogNormal(log(0.1), 0.05),
+    initial_prop_infected = Beta(1, 99)
+)
+
+sirparam_mdl = generate_parameters(sirparams, nothing)
+
+#sample the parameters of SIR model
+sampled_params = rand(sirparam_mdl)
+```
+
+# Returns
+- A tuple `(u0, p)` where:
+  - `u0`: A vector representing the initial state of the system `[S₀, I₀, R₀]` where `S₀` is the initial proportion of susceptible individuals, `I₀` is the initial proportion of infected individuals, and `R₀` is the initial proportion of recovered individuals.
+  - `p`: A vector containing the parameters `[β, γ]` where `β` is the infectiousness rate and `γ` is the recovery rate.
+"""
 @model function EpiAwareBase.generate_parameters(params::SIRParams, Z_t)
-    β ~ params.infectiousness_prior
-    γ ~ params.recovery_rate_prior
-    I₀ ~ params.initial_prop_infected_prior
+    β ~ params.infectiousness
+    γ ~ params.recovery_rate
+    I₀ ~ params.initial_prop_infected
     u0 = [1.0 - I₀, I₀, 0.0]
     p = [β, γ]
     return (u0, p)
