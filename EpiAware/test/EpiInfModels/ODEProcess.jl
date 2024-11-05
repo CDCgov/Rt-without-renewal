@@ -4,16 +4,16 @@
     tspan = (0.0, 30.0)
 
     # Define prior distributions
-    infectiousness_prior = LogNormal(log(0.3), 0.05)
-    recovery_rate_prior = LogNormal(log(0.1), 0.05)
-    initial_prop_infected_prior = Beta(1, 99)
+    infectiousness = LogNormal(log(0.3), 0.05)
+    recovery_rate = LogNormal(log(0.1), 0.05)
+    initial_prop_infected = Beta(1, 99)
 
     # Create an instance of SIRParams
     sirparams = SIRParams(
         tspan = tspan,
-        infectiousness_prior = infectiousness_prior,
-        recovery_rate_prior = recovery_rate_prior,
-        initial_prop_infected_prior = initial_prop_infected_prior
+        infectiousness = infectiousness,
+        recovery_rate = recovery_rate,
+        initial_prop_infected = initial_prop_infected
     )
 
     # Define the SIR ODEProcess model
@@ -58,18 +58,18 @@ end
     tspan = (0.0, 30.0)
 
     # Define prior distributions
-    infectiousness_prior = LogNormal(log(0.3), 0.05)
-    incubation_rate_prior = LogNormal(log(0.1), 0.05)
-    recovery_rate_prior = LogNormal(log(0.1), 0.05)
-    initial_prop_infected_prior = Beta(1, 99)
+    infectiousness = LogNormal(log(0.3), 0.05)
+    incubation_rate = LogNormal(log(0.1), 0.05)
+    recovery_rate = LogNormal(log(0.1), 0.05)
+    initial_prop_infected = Beta(1, 99)
 
     # Create an instance of SIRParams
     seirparams = SEIRParams(
         tspan = tspan,
-        infectiousness_prior = infectiousness_prior,
-        incubation_rate_prior = incubation_rate_prior,
-        recovery_rate_prior = recovery_rate_prior,
-        initial_prop_infected_prior = initial_prop_infected_prior
+        infectiousness = infectiousness,
+        incubation_rate = incubation_rate,
+        recovery_rate = recovery_rate,
+        initial_prop_infected = initial_prop_infected
     )
 
     # Define the SIR ODEProcess model
