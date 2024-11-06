@@ -7,6 +7,10 @@
     @test haskey(params, "gi_stds")
 end
 
+@testset "triggering" begin
+    @test true
+end
+
 @testset "make_inf_generating_processes" begin
     pipeline = EpiAwareExamplePipeline()
     igps = make_inf_generating_processes(pipeline)
