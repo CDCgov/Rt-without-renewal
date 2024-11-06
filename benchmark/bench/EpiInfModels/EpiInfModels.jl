@@ -1,6 +1,7 @@
 module BenchEpiInfModels
 
-using BenchmarkTools, TuringBenchmarking, EpiAware, Distributions, OrdinaryDiffEq
+using BenchmarkTools, TuringBenchmarking, EpiAware, Distributions, OrdinaryDiffEq,
+      SciMLSensitivity
 suite = BenchmarkGroup()
 
 include("../../make_epiaware_suite.jl")
