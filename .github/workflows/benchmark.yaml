@@ -22,6 +22,8 @@ jobs:
         run: |
           julia --project=benchmark -e 'using Pkg;
           Pkg.rm("EpiAware");
+          Pkg.rm("BenchmarkCI");
+          Pkg.add(url="https://github.com/SamuelBrand1/BenchmarkCI.jl");
           Pkg.resolve();
           Pkg.instantiate();
           Pkg.develop(path = "./EpiAware")'
