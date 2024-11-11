@@ -1,5 +1,5 @@
 let
-    using Distributions, OrdinaryDiffEq
+    using Distributions
     gen_int = [0.2, 0.3, 0.5]
     transformation = exp
 
