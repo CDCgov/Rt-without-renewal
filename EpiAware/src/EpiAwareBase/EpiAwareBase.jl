@@ -20,9 +20,6 @@ export AbstractTuringLatentModel, AbstractTuringIntercept
 # Export Turing-based observation models
 export AbstractTuringObservationModel, AbstractTuringObservationErrorModel
 
-# Export Turing-based parameter models
-export AbstractTuringParamModel
-
 # Export support types
 export AbstractBroadcastRule, AbstractAccumulationStep
 
