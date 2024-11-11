@@ -85,7 +85,7 @@ seirparams = SEIRParams(
 """
 struct SEIRParams{
     P <: ODEProblem, D <: Sampleable, E <: Sampleable, F <: Sampleable, G <: Sampleable} <:
-       AbstractTuringParamModel
+       AbstractTuringLatentModel
     "The ODE problem instance for the SIR model."
     prob::P
     "Prior distribution for the infectiousness parameter."
@@ -148,7 +148,7 @@ seirparams = SEIRParams(
     initial_prop_infected = Beta(1, 99)
 )
 
-seirparam_mdl = generate_parameters(seirparams, nothing)
+seirparam_mdl = generate_latent(seirparams, nothing)
 
 # Sample the parameters of SEIR model
 sampled_params = rand(seirparam_mdl)
@@ -163,7 +163,7 @@ sampled_params = rand(seirparam_mdl)
   - `p`: A vector containing the parameters `[β, α, γ]` where `β` is the infectiousness rate,
   `α` is the incubation rate, and `γ` is the recovery rate.
 """
-@model function EpiAwareBase.generate_parameters(params::SEIRParams, Z_t)
+@model function EpiAwareBase.generate_latent(params::SEIRParams, Z_t)
     β ~ params.infectiousness
     α ~ params.incubation_rate
     γ ~ params.recovery_rate

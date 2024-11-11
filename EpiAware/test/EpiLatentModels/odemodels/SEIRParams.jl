@@ -1,4 +1,4 @@
-@testitem "SEIRParams: constructor and `generate_parameters`" begin
+@testitem "SEIRParams: constructor and `generate_latent`" begin
     using OrdinaryDiffEq, Distributions
     # Define the time span for the ODE problem
     tspan = (0.0, 10.0)
@@ -34,10 +34,10 @@
         @test seirparams.initial_prop_infected == initial_prop_infected
     end
 
-    @testset "SEIRParams `generate_parameters` tests" begin
+    @testset "SEIRParams `generate_latent` tests" begin
         # Generate parameters
         Z_t = rand(10) # dummy latent process
-        seirparam_mdl = generate_parameters(seirparams, Z_t)
+        seirparam_mdl = generate_latent(seirparams, Z_t)
         sampled_params = rand(seirparam_mdl)
 
         # Check the types of the fields
@@ -49,11 +49,11 @@
 end
 
 @testitem "SEIRParams: jac_prototype non-zeros invariant to jac call" begin
-    Jp = deepcopy(EpiAware.EpiInfModels._seir_jac_prototype)
+    Jp = deepcopy(EpiAware.EpiLatentModels._seir_jac_prototype)
     Jp_pattern_before = Jp .!= 0
     u = rand(4)
     p = rand(3)
-    EpiAware.EpiInfModels._seir_jac(Jp, u, p, 0.0)
+    EpiAware.EpiLatentModels._seir_jac(Jp, u, p, 0.0)
     Jp_pattern_after = Jp .!= 0
 
     @test Jp_pattern_before == Jp_pattern_after

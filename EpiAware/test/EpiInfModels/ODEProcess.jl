@@ -122,15 +122,15 @@ end
     prob = ODEProblem(expgrowth, [1.0], (0.0, 10.0), [r])
 
     # Define the custom parameters struct
-    struct CustomParams <: AbstractTuringParamModel
+    struct CustomParams <: AbstractTuringLatentModel
         prob::ODEProblem
         r::Float64
         u0::Float64
     end
     params = CustomParams(prob, r, 1.0)
 
-    # Define the custom generate_parameters function
-    @model function EpiAwareBase.generate_parameters(params::CustomParams, Z_t)
+    # Define the custom generate_latent function
+    @model function EpiAwareBase.generate_latent(params::CustomParams, Z_t)
         return ([params.u0], [params.r])
     end
 

@@ -80,7 +80,7 @@ sirparams = SIRParams(
 ```
 """
 struct SIRParams{P <: ODEProblem, D <: Sampleable, E <: Sampleable, F <: Sampleable} <:
-       AbstractTuringParamModel
+       AbstractTuringLatentModel
     "The ODE problem instance for the SIR model."
     prob::P
     "Prior distribution for the infectiousness parameter."
@@ -129,7 +129,7 @@ sirparams = SIRParams(
     initial_prop_infected = Beta(1, 99)
 )
 
-sirparam_mdl = generate_parameters(sirparams, nothing)
+sirparam_mdl = generate_latent(sirparams, nothing)
 
 #sample the parameters of SIR model
 sampled_params = rand(sirparam_mdl)
@@ -140,7 +140,7 @@ sampled_params = rand(sirparam_mdl)
   - `u0`: A vector representing the initial state of the system `[S₀, I₀, R₀]` where `S₀` is the initial proportion of susceptible individuals, `I₀` is the initial proportion of infected individuals, and `R₀` is the initial proportion of recovered individuals.
   - `p`: A vector containing the parameters `[β, γ]` where `β` is the infectiousness rate and `γ` is the recovery rate.
 """
-@model function EpiAwareBase.generate_parameters(params::SIRParams, Z_t)
+@model function EpiAwareBase.generate_latent(params::SIRParams, Z_t)
     β ~ params.infectiousness
     γ ~ params.recovery_rate
     I₀ ~ params.initial_prop_infected

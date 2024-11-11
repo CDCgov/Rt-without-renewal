@@ -146,7 +146,7 @@ To define a custom ODE model, you need to define:
 - Some `CustomParams <: AbstractTuringParamModel` struct (the name doesn't need to be `CustomParams`!)
     that contains the ODE problem as a field called `prob`, as well as sufficient fields to
     define or sample the parameters of the ODE model.
-- A method for `EpiAwareBase.generate_parameters(params::CustomParams, Z_t)` that generates the
+- A method for `EpiAwareBase.generate_latent(params::CustomParams, Z_t)` that generates the
     initial condition and parameters of the ODE model, potentially conditional on a sample from a latent process `Z_t`.
     This method must return a `Tuple` `(u0, p)` where `u0` is the initial condition and `p` is the parameters.
 
@@ -172,8 +172,8 @@ struct CustomParams <: AbstractTuringParamModel
 end
 params = CustomParams(prob, r, 1.0)
 
-# Define the custom generate_parameters function
-@model function EpiAwareBase.generate_parameters(params::CustomParams, Z_t)
+# Define the custom generate_latent function
+@model function EpiAwareBase.generate_latent(params::CustomParams, Z_t)
     return ([params.u0], [params.r])
 end
 ```
@@ -190,8 +190,8 @@ infs = generate_latent_infs(expgrowth_model, nothing)()
 ```
 """
 @kwdef struct ODEProcess{
-    P <: AbstractTuringParamModel, S, F <: Function, D <:
-                                                     Union{Dict, NamedTuple}} <:
+    P <: AbstractTuringLatentModel, S, F <: Function, D <:
+                                                      Union{Dict, NamedTuple}} <:
               EpiAwareBase.AbstractTuringEpiModel
     "The ODE problem instance, where `P` is a subtype of `ODEProblem`."
     params::P
@@ -243,7 +243,7 @@ generated_It = generate_latent_infs(sir_process, nothing)()
     prob, solver, sol2infs, solver_options = epi_model.params.prob,
     epi_model.solver, epi_model.sol2infs, epi_model.solver_options
 
-    @submodel prefix="params" u0, p=generate_parameters(epi_model.params, Z_t)
+    @submodel prefix="params" u0, p=generate_latent(epi_model.params, Z_t)
 
     _prob = remake(prob; u0 = u0, p = p)
     sol = solve(_prob, solver; solver_options...)
