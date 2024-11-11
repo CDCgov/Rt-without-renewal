@@ -8,8 +8,7 @@ using DocStringExtensions
 ### Abstract types ###
 
 #Export models
-export AbstractModel, AbstractEpiModel, AbstractLatentModel, AbstractObservationModel,
-       AbstractParamModel
+export AbstractModel, AbstractEpiModel, AbstractLatentModel, AbstractObservationModel
 
 # Export Turing-based models EpiModels
 export AbstractTuringEpiModel, AbstractTuringRenewal
