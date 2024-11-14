@@ -5,7 +5,7 @@ module EpiLatentModels
 
 using ..EpiAwareBase
 
-using ..EpiAwareUtils: HalfNormal, prefix_submodel, accumulate_scan, _expand_dist
+using ..EpiAwareUtils: HalfNormal, prefix_submodel, accumulate_scan
 
 using LogExpFunctions: softmax
 
@@ -33,6 +33,7 @@ export broadcast_rule, broadcast_dayofweek, broadcast_weekly, equal_dimensions
 export DiffLatentModel, TransformLatentModel, PrefixLatentModel, RecordExpectedLatent
 
 include("docstrings.jl")
+include("utils.jl")
 include("models/Intercept.jl")
 include("models/RandomWalk.jl")
 include("models/AR.jl")
