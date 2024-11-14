@@ -30,7 +30,7 @@ Where `S` is the proportion of the population that is susceptible, `I` is the pr
 population that is infected and `R` is the proportion of the population that is recovered. The
 parameters are the infectiousness `β` and the recovery rate `γ`.
 
-```julia
+```jldoctest sirexample; output = false
 using EpiAware, OrdinaryDiffEq, Distributions
 
 # Create an instance of SIRParams
@@ -40,6 +40,10 @@ sirparams = SIRParams(
     recovery_rate = LogNormal(log(0.1), 0.05),
     initial_prop_infected = Beta(1, 99)
 )
+nothing
+
+# output
+
 ```
 
 ## SEIR model
@@ -57,7 +61,7 @@ population that is exposed, `I` is the proportion of the population that is infe
 the proportion of the population that is recovered. The parameters are the infectiousness `β`,
 the incubation rate `α` and the recovery rate `γ`.
 
-```julia
+```jldoctest; output = false
 using EpiAware, OrdinaryDiffEq, Distributions
 
 # Create an instance of SIRParams
@@ -68,6 +72,10 @@ seirparams = SEIRParams(
     recovery_rate = LogNormal(log(0.1), 0.05),
     initial_prop_infected = Beta(1, 99)
 )
+nothing
+
+# output
+
 ```
 
 # Usage example with `ODEProcess` and predefined SIR model
@@ -87,7 +95,7 @@ The `logaddexp` function generalises the `softplus` function, `logaddexp(1, x) =
 First, we define the `ODEProcess` object which combines the SIR model with the `sol2infs` link
 function and the solver options.
 
-```julia
+```jldoctest sirexample; output = false
 using Turing, LogExpFunctions
 N = 1000.0
 
@@ -96,6 +104,10 @@ sir_process = ODEProcess(
     sol2infs = sol -> N .* logaddexp.(0.001, sol[2, :]),
     solver_options = Dict(:verbose => false, :saveat => 1.0)
 )
+nothing
+
+# output
+
 ```
 
 Next, we create a `Turing` model for the infection generating process using the `generate_latent_infs` function.
@@ -106,22 +118,30 @@ function.
 NB: The `nothing` argument is a dummy latent process, e.g. a log-Rt time series, that is not
 used in the SIR model, but might be used in other models.
 
-```julia
+```jldoctest sirexample; output = false
 sir_infections_mdl = generate_latent_infs(sir_process, nothing)
+nothing
+
+# output
+
 ```
 
 We can generate some test data from the model by sampling from the model and then calling the model
 
-```julia
+```jldoctest sirexample; output = false
 # Sampled parameters
 θ = rand(sir_infections_mdl)
 expected_infections = (sir_infections_mdl | θ)()
 test_data = expected_infections .|> λ -> rand(Poisson(λ))
+nothing
+
+# output
+
 ```
 
 Now, we can refit the model using a `PoissonError` observation model
 
-```julia
+```jldoctest sirexample; output = false
 pois_obs = PoissonError()
 
 @model function fit_sir_model(data)
@@ -132,8 +152,12 @@ pois_obs = PoissonError()
 end
 
 inference_mdl = fit_sir_model(test_data)
-chn = sample(inference_mdl, NUTS(), 2_000)
-summarize(chn)
+# chn = sample(inference_mdl, NUTS(), 2_000)
+# summarize(chn)
+nothing
+
+# output
+
 ```
 
 We can compare the summarized chain to the sampled parameters to see that the model is fitting
