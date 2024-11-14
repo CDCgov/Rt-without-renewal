@@ -21,7 +21,3 @@ end
 
     @test isnothing(generate_observations(TestObsModel(), missing, missing))
 end
-
-@testitem "trigger test" begin
-    @test true
-end
