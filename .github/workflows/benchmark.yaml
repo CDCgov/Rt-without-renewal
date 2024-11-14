@@ -24,7 +24,7 @@ jobs:
           Pkg.instantiate();
           Pkg.update()'
       - name: Run benchmarks
-        run: julia --project=benchmark -e 'using BenchmarkCI; BenchmarkCI.judge(; baseline = "origin/main", retune = false)'
+        run: julia --project=benchmark -e 'using BenchmarkCI; BenchmarkCI.judge(; baseline = "origin/main", retune = true)'
       - name: Post results
         run: julia --project=benchmark -e 'using BenchmarkCI; BenchmarkCI.postjudge()'
         env:
