@@ -12,7 +12,3 @@
         @test method.sampler == sampler
     end
 end
-
-@testitem "trigger" begin
-    @test true
-end
