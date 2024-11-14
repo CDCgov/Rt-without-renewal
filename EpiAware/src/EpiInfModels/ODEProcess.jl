@@ -242,8 +242,9 @@ generated_It = generate_latent_infs(sir_process, nothing)()
 @model function EpiAwareBase.generate_latent_infs(epi_model::ODEProcess, Z_t)
     prob, solver, sol2infs, solver_options = epi_model.params.prob,
     epi_model.solver, epi_model.sol2infs, epi_model.solver_options
+    n = isnothing(Z_t) ? 0 : size(Z_t, 1)
 
-    @submodel prefix="params" u0, p=generate_latent(epi_model.params, Z_t)
+    @submodel u0, p = generate_latent(epi_model.params, n)
 
     _prob = remake(prob; u0 = u0, p = p)
     sol = solve(_prob, solver; solver_options...)
