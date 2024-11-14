@@ -1,0 +1,151 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: \"Supporting information: _Evaluating the role of the infection generating process for situational awareness of infections diseases_\"\n",
+        "author:\n",
+        "  - name: Samuel P. C. Brand\n",
+        "    orcid: 0000-0003-0645-5367\n",
+        "    email: usi1@cdc.gov\n",
+        "  - name: Zachary Susswein\n",
+        "    orcid: 0000-0002-4329-4833\n",
+        "    email: utb2@cdc.gov\n",
+        "  - name: Sam Abbott\n",
+        "    orcid: 0000-0001-8057-8037\n",
+        "    email: azw1@cdc.gov\n",
+        "bibliography: references.bib\n",
+        "number-sections: true\n",
+        "jupyter: julia-1.11\n",
+        "echo: false\n",
+        "---"
+      ],
+      "id": "0ba99e3a"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "#| output: false\n",
+        "using Pkg\n",
+        "index_location = @__DIR__()\n",
+        "Pkg.activate(index_location)\n",
+        "Pkg.resolve()\n",
+        "Pkg.instantiate()\n",
+        "Pkg.add([\"CairoMakie\", \"JLD2\", \"DataFramesMeta\", \"DrWatson\"])\n",
+        "\n",
+        "using DataFramesMeta, JLD2"
+      ],
+      "id": "9d142cf1",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Read-only link to main text\n",
+        "\n",
+        "[Read the main text here](https://www.overleaf.com/read/nmxhyrkffryv#3df385). For edit access please contact one of the authors.\n",
+        "\n",
+        "## Prior predictive modelling with default priors and transformations\n",
+        "\n",
+        "As a first attempt, we used common priors for each latent process considered in this study: random walk, first order auto-regressive and differenced first-order auto-regressive. These priors were:\n",
+        "\n",
+        "- The initial value parameter for all latent processes was:\n",
+        "$$\n",
+        "Z_0 \\sim \\text{Normal}(\\text{mean} = 0, \\text{std} = 0.25).\n",
+        "$$\n",
+        "- The standard deviation prior for all latent processes was:\n",
+        "$$\n",
+        "\\sigma \\sim \\text{HalfNormal}(\\text{mean} = 0.25).\n",
+        "$$\n",
+        "- The damping/auto-regression parameter for the auto-regressive latent processes was:\n",
+        "$$\n",
+        "\\rho \\sim \\text{Beta}(a = 0.5, b = 0.5).\n",
+        "$$\n",
+        "\n",
+        "For direct infection and renewal models the latent process represents a log-transformed epidemiological quantity, respectively: $Z_t = \\log R_t$ and $Z_t = \\log I_t$. The exponential growth rate modelling we identify the exponential growth rate with the latent process $Z_t = r_t$.\n",
+        "\n",
+        "Using these priors we made prior predictive checks across our range of models. This was run with the pipeline script.\n",
+        "\n",
+        "```bash\n",
+        "% julia pipeline/scripts/run_priorpred_pipeline.jl 1000\n",
+        "```\n",
+        "\n",
+        "We noted that for a substantial number of the model configurations there were model predictive samples with such large numbers of infecteds that calls to `BigInt` caused `InexactError` exceptions. Rather than directly stop these exceptions we recorded the pattern of prior prediction failure so as to inform model improvement @tbl-prior-fail.\n"
+      ],
+      "id": "52cf4f88"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| output: false\n",
+        "priorpred_dir = joinpath(@__DIR__(),\"..\", \"pipeline/data/priorpredictive/\")\n",
+        "priorpred_datafiles = readdir(priorpred_dir) |>\n",
+        "  fns -> filter(fn -> contains(fn, \".jld2\"), fns) #filter for .jld2 files\n",
+        "\n",
+        "priorpred_outcomes_df = mapreduce(vcat, priorpred_datafiles) do fn\n",
+        "  D = load(joinpath(priorpred_dir, fn))\n",
+        "  igp = D[\"inference_config\"][\"igp\"]\n",
+        "  latent_model = D[\"inference_config\"][\"latent_model\"]\n",
+        "  gi_mean = D[\"inference_config\"][\"gi_mean\"]\n",
+        "  T1, T2 = split(D[\"inference_config\"][\"tspan\"], \"_\")\n",
+        "  runsuccess = D[\"priorpredictive\"] .== \"Pass\"\n",
+        "  df = DataFrame(\n",
+        "    infection_gen_proc = igp,\n",
+        "    latent_model = latent_model,\n",
+        "    gi_mean = gi_mean,\n",
+        "    T1 = T1,\n",
+        "    T2 = T2,\n",
+        "    T_diff = parse(Int, T2) - parse(Int, T1),\n",
+        "    runsuccess = runsuccess,\n",
+        "    )\n",
+        "end"
+      ],
+      "id": "60c8168e",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| label: tbl-prior-fail\n",
+        "#| tbl-cap: Number of prior predictive successes and fails from initial prior group grouped by infection generating process and latent model.\n",
+        "#| tbl-cap-location: bottom\n",
+        "priorpred_outcomes_df |>\n",
+        "  df -> @groupby(df, :infection_gen_proc, :latent_model) |>\n",
+        "  gd -> @combine(gd, :n_success = sum(:runsuccess), :n_fail = sum(1 .- :runsuccess))"
+      ],
+      "id": "tbl-prior-fail",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## References {.unnumbered}\n",
+        "\n",
+        "::: {#refs}\n",
+        ":::"
+      ],
+      "id": "7de33a2c"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "julia-1.11",
+      "language": "julia",
+      "display_name": "Julia 1.11.1",
+      "path": "/Users/samandfi/Library/Jupyter/kernels/julia-1.11"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

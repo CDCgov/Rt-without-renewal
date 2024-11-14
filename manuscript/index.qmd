@@ -58,6 +58,7 @@ Using these priors we made prior predictive checks across our range of models. T
 ```bash
 % julia pipeline/scripts/run_priorpred_pipeline.jl 1000
 ```
+For full recovery of these preliminary results run on the version from git commit [`67d5072`](https://github.com/CDCgov/Rt-without-renewal/commit/67d50727e5208e874423ed593ff506b3006efc63).
 
 We noted that for a substantial number of the model configurations there were model predictive samples with such large numbers of infecteds that calls to `BigInt` caused `InexactError` exceptions. Rather than directly stop these exceptions we recorded the pattern of prior prediction failure so as to inform model improvement @tbl-prior-fail.
 
