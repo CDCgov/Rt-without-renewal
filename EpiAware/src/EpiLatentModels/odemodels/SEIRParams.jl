@@ -163,7 +163,7 @@ sampled_params = rand(seirparam_mdl)
   - `p`: A vector containing the parameters `[β, α, γ]` where `β` is the infectiousness rate,
   `α` is the incubation rate, and `γ` is the recovery rate.
 """
-@model function EpiAwareBase.generate_latent(params::SEIRParams, Z_t)
+@model function EpiAwareBase.generate_latent(params::SEIRParams, n)
     β ~ params.infectiousness
     α ~ params.incubation_rate
     γ ~ params.recovery_rate
