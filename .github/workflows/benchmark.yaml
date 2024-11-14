@@ -21,11 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           julia --project=benchmark -e 'using Pkg;
-          Pkg.rm("EpiAware");
-          Pkg.add(url="https://github.com/SamuelBrand1/BenchmarkCI.jl");
-          Pkg.resolve();
-          Pkg.instantiate();
-          Pkg.develop(path = "./EpiAware")'
+          Pkg.instantiate()'
       - name: Run benchmarks
         run: julia --project=benchmark -e 'using BenchmarkCI; BenchmarkCI.judge(; baseline = "origin/main", retune = true)'
       - name: Post results
