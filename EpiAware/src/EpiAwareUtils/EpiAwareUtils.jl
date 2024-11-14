@@ -37,6 +37,5 @@ include("get_param_array.jl")
 include("SafeInt.jl")
 include("SafePoisson.jl")
 include("SafeNegativeBinomial.jl")
-include("_expand_dist.jl")
 
 end
