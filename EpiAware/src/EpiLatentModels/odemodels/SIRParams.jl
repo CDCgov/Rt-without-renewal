@@ -67,7 +67,7 @@ parameters are the infectiousness `β` and the recovery rate `γ`.
 
 # Example
 
-```julia
+```jldoctest; output = false
  using EpiAware, OrdinaryDiffEq, Distributions
 
 # Create an instance of SIRParams
@@ -77,6 +77,10 @@ sirparams = SIRParams(
     recovery_rate = LogNormal(log(0.1), 0.05),
     initial_prop_infected = Beta(1, 99)
 )
+nothing
+
+# output
+
 ```
 """
 struct SIRParams{P <: ODEProblem, D <: Sampleable, E <: Sampleable, F <: Sampleable} <:
@@ -118,7 +122,7 @@ parameters are the infectiousness `β` and the recovery rate `γ`.
 
 # Example
 
-```julia
+```jldoctest; output = false
 using EpiAware, OrdinaryDiffEq, Distributions
 
 # Create an instance of SIRParams
@@ -133,6 +137,10 @@ sirparam_mdl = generate_latent(sirparams, nothing)
 
 #sample the parameters of SIR model
 sampled_params = rand(sirparam_mdl)
+nothing
+
+# output
+
 ```
 
 # Returns
