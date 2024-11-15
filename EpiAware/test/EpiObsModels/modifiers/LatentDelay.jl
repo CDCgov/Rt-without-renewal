@@ -175,9 +175,7 @@ end
         ExpGrowthRate,
         Renewal] .|>
                 em_type -> em_type(
-        data = EpiData([0.2, 0.5, 0.3],
-            em_type == Renewal ? softplus : exp
-        ),
+        data = EpiData([0.2, 0.5, 0.3], exp),
         initialisation_prior = Normal(log(100.0), 0.01)
     )
 
