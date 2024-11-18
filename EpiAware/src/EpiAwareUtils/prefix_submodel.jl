@@ -20,7 +20,7 @@ submodel = prefix_submodel(FixedIntercept(0.1), generate_latent, string(1), 2)
 
 We can now draw a sample from the submodel.
 
-```julia
+```@example
 rand(submodel)
 ```
 "
