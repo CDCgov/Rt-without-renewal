@@ -20,7 +20,8 @@ function _figure_one_scenario(analysis_df, scenario; reference_time, true_gi_cho
     model_plotting_data = analysis_df |>
                           df -> @subset(df, :True_GI_Mean.==true_gi_choice) |>
                                 df -> @subset(df, :Used_GI_Mean.==used_gi_choice) |>
-                                      df -> @subset(df, :Reference_Time.==reference_time) |>
+                                      df -> @subset(df,
+        :Reference_Time.==reference_time) |>
                                             df -> @subset(df, :Scenario.==scenario) |>
                                                   data
 
@@ -141,7 +142,8 @@ function _figure_one_model_panel(
     model_plotting_data = analysis_df |>
                           df -> @subset(df, :True_GI_Mean.==true_gi_choice) |>
                                 df -> @subset(df, :Used_GI_Mean.==used_gi_choice) |>
-                                      df -> @subset(df, :Reference_Time.==reference_time) |>
+                                      df -> @subset(df,
+        :Reference_Time.==reference_time) |>
                                             df -> @subset(df, :Scenario.==scenario) |>
                                                   df -> @subset(df, :Target.==target) |>
                                                         df -> @subset(df,
