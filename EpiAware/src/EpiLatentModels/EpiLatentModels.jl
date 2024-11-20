@@ -15,7 +15,7 @@ using Turing, Distributions, DocStringExtensions, LinearAlgebra, SparseArrays,
       OrdinaryDiffEq
 
 #Export models
-export FixedIntercept, Intercept, RandomWalk, AR, HierarchicalNormal
+export FixedIntercept, Intercept, RandomWalk, AR, HierarchicalNormal, Null
 
 #Export ODE definitions
 export SIRParams, SEIRParams
@@ -38,6 +38,7 @@ include("models/Intercept.jl")
 include("models/RandomWalk.jl")
 include("models/AR.jl")
 include("models/HierarchicalNormal.jl")
+include("models/Null.jl")
 include("odemodels/SIRParams.jl")
 include("odemodels/SEIRParams.jl")
 include("modifiers/DiffLatentModel.jl")
