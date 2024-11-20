@@ -13,7 +13,7 @@ Z_t = Z_0 + \sigma \sum_{i = 1}^t \epsilon_t
 Constructing a random walk requires specifying:
 - An `init_prior` as a prior for ``Z_0``. Default is `Normal()`.
 - A `std_prior` for ``\sigma``. The default is HalfNormal with a mean of 0.25.
-- An `ϵ_t` prior for the white noise sequence. The default is `IDD(Normal())`.
+- An `ϵ_t` prior for the white noise sequence. The default is `IID(Normal())`.
 
 ## Constructors
 

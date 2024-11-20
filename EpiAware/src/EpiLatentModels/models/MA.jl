@@ -2,7 +2,7 @@
 The moving average (MA) model struct.
 
 # Constructors
-- `MA(θ::Distribution, σ::Distribution; q::Int = 1, ϵ::AbstractTuringLatentModel = IDD(Normal()))`: Constructs an MA model with the specified prior distributions.
+- `MA(θ::Distribution, σ::Distribution; q::Int = 1, ϵ::AbstractTuringLatentModel = IID(Normal()))`: Constructs an MA model with the specified prior distributions.
 
 - `MA(; θ::Vector{C} = [truncated(Normal(0.0, 0.05), -1, 1)], ϵ::AbstractTuringLatentModel = HierarchicalNormal) where {C <: Distribution}`: Constructs an MA model with the specified prior distributions.
 
@@ -11,7 +11,7 @@ The moving average (MA) model struct.
 # Parameters
 - `θ`: Prior distribution for the MA coefficients. For MA(q), this should be a vector of q distributions or a multivariate distribution of dimension q.
 - `q`: Order of the MA model, i.e., the number of lagged error terms.
-- `ϵ_t`: Distribution of the error term, typically standard normal. Defaults to `IDD(Normal())`.
+- `ϵ_t`: Distribution of the error term, typically standard normal. Defaults to `IID(Normal())`.
 
 # Examples
 

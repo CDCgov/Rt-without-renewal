@@ -1,40 +1,40 @@
-@testitem "Testing IDD constructor" begin
+@testitem "Testing IID constructor" begin
     using Distributions, Turing
 
     normal_prior = Normal(0.0, 1.0)
-    idd_process = IDD(normal_prior)
+    idd_process = IID(normal_prior)
 
     @test idd_process.ϵ_t == normal_prior
 end
 
-@testitem "Test IDD defaults" begin
+@testitem "Test IID defaults" begin
     using Distributions
-    idd = IDD()
+    idd = IID()
     @test idd.ϵ_t == Normal(0, 1)
 end
 
-@testitem "Test IDD with different distributions" begin
+@testitem "Test IID with different distributions" begin
     using Distributions
 
     @testset "Uniform distribution" begin
-        idd = IDD(Uniform(0, 1))
+        idd = IID(Uniform(0, 1))
         sample = rand(idd.ϵ_t)
         @test 0 <= sample <= 1
     end
 
     @testset "Exponential distribution" begin
-        idd = IDD(Exponential(1))
+        idd = IID(Exponential(1))
         sample = rand(idd.ϵ_t)
         @test sample >= 0
     end
 end
 
-@testitem "Testing IDD process against theoretical properties" begin
+@testitem "Testing IID process against theoretical properties" begin
     using DynamicPPL, Turing
     using HypothesisTests: ExactOneSampleKSTest, pvalue
     using Distributions
 
-    idd_model = IDD(Normal(2, 3))
+    idd_model = IID(Normal(2, 3))
     n = 1000
 
     model = generate_latent(idd_model, n)
