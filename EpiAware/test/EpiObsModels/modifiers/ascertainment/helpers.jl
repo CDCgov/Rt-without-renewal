@@ -5,7 +5,8 @@
         model::AbstractTuringObservationModel
     end
 
-    @model EpiAware.EpiAwareBase.generate_observations(model::ExpectedObs, y_t, Y_t) = begin
+    @model EpiAware.EpiAwareBase.generate_observations(model::ExpectedObs, y_t,
+    Y_t) = begin
         expected_obs := Y_t
         @submodel y_t = generate_observations(model.model, y_t, Y_t)
     end
