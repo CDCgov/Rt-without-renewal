@@ -13,7 +13,7 @@ null = Null()
 null_mdl = generate_latent(null, 10)
 isnothing(null_mdl())
 
-# Output
+# output
 
 true
 
