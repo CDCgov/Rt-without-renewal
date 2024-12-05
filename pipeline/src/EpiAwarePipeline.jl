@@ -12,7 +12,7 @@ module EpiAwarePipeline
 
 using CSV, Dagger, DataFramesMeta, Dates, Distributions, DocStringExtensions, DrWatson,
       EpiAware, Statistics, ADTypes, AbstractMCMC, JLD2, MCMCChains, Turing, DynamicPPL,
-      LogExpFunctions, RCall, LinearAlgebra, Random, AlgebraOfGraphics, CairoMakie,
+      LogExpFunctions, LinearAlgebra, Random, AlgebraOfGraphics, CairoMakie,
       ReverseDiff
 
 using EpiAware.EpiInfModels: oneexpy
