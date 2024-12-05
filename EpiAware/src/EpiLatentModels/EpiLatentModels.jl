@@ -15,7 +15,7 @@ using Turing, Distributions, DocStringExtensions, LinearAlgebra, SparseArrays,
       OrdinaryDiffEq
 
 #Export models
-export FixedIntercept, Intercept, IID, RandomWalk, AR, MA, HierarchicalNormal
+export Null, FixedIntercept, Intercept, IID, RandomWalk, AR, MA, HierarchicalNormal
 
 #Export ODE definitions
 export SIRParams, SEIRParams
