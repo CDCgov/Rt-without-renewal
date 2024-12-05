@@ -19,15 +19,15 @@ An AR model with an MA model as its error term, effectively creating an ARMA mod
 ```@example
 using EpiAware, Distributions
 
-ARMA = define_arma(;
+ARMA = arma(;
  θ = [truncated(Normal(0.0, 0.02), -1, 1)],
  damp = [truncated(Normal(0.0, 0.02), 0, 1)]
 )
-arma = generate_latent(ARMA, 10)
-arma()
+arma_model = generate_latent(ARMA, 10)
+arma_model()
 ```
 """
-function define_arma(;
+function arma(;
         init = [Normal()],
         damp = [truncated(Normal(0.0, 0.05), 0, 1)],
         θ = [truncated(Normal(0.0, 0.05), -1, 1)],

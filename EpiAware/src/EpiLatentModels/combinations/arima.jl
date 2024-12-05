@@ -27,8 +27,8 @@ ARIMA = arima(
     θ = [truncated(Normal(0.0, 0.02), -1, 1)],
     damp = [truncated(Normal(0.0, 0.02), 0, 1)]
 )
-arma_model = generate_latent(ARIMA, 10)
-arma_model()
+arima_model = generate_latent(ARIMA, 10)
+arima_model()
 ```
 """
 function arima(;
@@ -38,7 +38,7 @@ function arima(;
         θ = [truncated(Normal(0.0, 0.05), -1, 1)],
         ϵ_t = HierarchicalNormal()
 )
-    arma = define_arma(; init = ar_init, damp = damp, θ = θ, ϵ_t = ϵ_t)
+    arma = arma(; init = ar_init, damp = damp, θ = θ, ϵ_t = ϵ_t)
     arima_model = DiffLatentModel(; model = arma, init_priors = d_init)
     return arima_model
 end
