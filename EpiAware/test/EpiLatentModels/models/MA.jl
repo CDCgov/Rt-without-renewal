@@ -8,7 +8,7 @@
     @test ma_process.θ_prior == filldist(θ_prior, 1)
     @test ma_process.σ_prior == σ_prior
     @test ma_process.q == 1
-    @test ma_process.ϵ_t isa IDD
+    @test ma_process.ϵ_t isa IID
 end
 
 @testitem "Test MA(2)" begin
@@ -19,7 +19,7 @@ end
         σ_prior = HalfNormal(0.1)
     )
     @test ma.q == 2
-    @test ma.ϵ_t isa IDD
+    @test ma.ϵ_t isa IID
     @test ma.θ_prior == filldist(θ_prior, 2)
 end
 

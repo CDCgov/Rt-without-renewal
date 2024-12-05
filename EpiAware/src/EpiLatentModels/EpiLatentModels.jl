@@ -11,10 +11,14 @@ using LogExpFunctions: softmax
 
 using FillArrays: Fill
 
-using Turing, Distributions, DocStringExtensions, LinearAlgebra
+using Turing, Distributions, DocStringExtensions, LinearAlgebra, SparseArrays,
+      OrdinaryDiffEq
 
 #Export models
-export FixedIntercept, Intercept, IDD, RandomWalk, AR, MA, HierarchicalNormal
+export FixedIntercept, Intercept, IID, RandomWalk, AR, MA, HierarchicalNormal
+
+#Export ODE definitions
+export SIRParams, SEIRParams
 
 # Export tools for manipulating latent models
 export CombineLatentModels, ConcatLatentModels, BroadcastLatentModel
@@ -32,12 +36,16 @@ export DiffLatentModel, TransformLatentModel, PrefixLatentModel, RecordExpectedL
 export define_arma, define_arima
 
 include("docstrings.jl")
+include("utils.jl")
 include("models/Intercept.jl")
-include("models/IDD.jl")
+include("models/IID.jl")
 include("models/RandomWalk.jl")
 include("models/AR.jl")
 include("models/MA.jl")
 include("models/HierarchicalNormal.jl")
+include("models/Null.jl")
+include("odemodels/SIRParams.jl")
+include("odemodels/SEIRParams.jl")
 include("modifiers/DiffLatentModel.jl")
 include("modifiers/TransformLatentModel.jl")
 include("modifiers/PrefixLatentModel.jl")
@@ -49,6 +57,5 @@ include("manipulators/broadcast/rules.jl")
 include("manipulators/broadcast/helpers.jl")
 include("combinations/define_arma.jl")
 include("combinations/define_arima.jl")
-include("utils.jl")
 
 end
