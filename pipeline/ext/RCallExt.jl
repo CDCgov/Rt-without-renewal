@@ -1,6 +1,6 @@
 module RCallExt
 
-using RCall, DataFramesMeta
+using EpiAwarePipeline, RCall, DataFramesMeta
 
 export score_parameters
 
