@@ -77,7 +77,7 @@ We score each scenario model in two ways:
 
 ## Running the pipeline
 
-The pipeline structure is built using [DrWatson.jl](https://github.com/JuliaDynamics/DrWatson.jl) for project management of simulation parameters/settings, saved results, and figures. Compute is done with [Dagger.jl](https://github.com/JuliaParallel/Dagger.jl) for organizing parallel computation and checkpointing of results.
+The pipeline structure is built using [DrWatson.jl](https://github.com/JuliaDynamics/DrWatson.jl) for project management of simulation parameters/settings, saved results, and figures.
 
 ## Running pipeline tests
 

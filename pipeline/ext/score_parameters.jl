@@ -23,7 +23,7 @@ function _score(df)
 end
 
 """
-This function calculates standard scores provided by [`scoringutils`](https://epiforecasts.io/scoringutils/dev/)
+This method for `score_parameters` calculates standard scores provided by [`scoringutils`](https://epiforecasts.io/scoringutils/dev/)
 for a set of parameters using the provided MCMC samples and the truth value.
 The function returns a DataFrame containing a summary of the scores.
 
@@ -37,7 +37,7 @@ The function returns a DataFrame containing a summary of the scores.
 - `result`: A DataFrame containing the summarized scores for the parameter.
 
 """
-function score_parameters(param_names, samples, truths; model = "EpiAware")
+function EpiAwarePipeline.score_parameters(param_names, samples, truths; model = "EpiAware")
     df = mapreduce(vcat, param_names, truths) do param_name, truth
         _make_prediction_dataframe(param_name, samples, truth; model = model)
     end

@@ -1,7 +1,6 @@
 # Local environment script to run the analysis pipeline
 using Pkg
 Pkg.activate(joinpath(@__DIR__(), ".."))
-using Dagger
 
 @assert !isempty(ARGS) "Test mode script requires the number of draws as an argument."
 ndraws = parse(Int64, ARGS[1])

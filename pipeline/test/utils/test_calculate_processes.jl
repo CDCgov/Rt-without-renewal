@@ -1,5 +1,4 @@
 @testset "calculate_processes" begin
-    using Random
     rng = MersenneTwister(1234)
     I0 = 10.0
     rt = randn(rng, 20)

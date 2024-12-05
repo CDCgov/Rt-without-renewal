@@ -11,8 +11,7 @@ An array of truth data generated from the given pipeline.
 function do_truthdata(pipeline::AbstractEpiAwarePipeline)
     truth_data_configs = make_truth_data_configs(pipeline)
     truthdata_from_configs = map(truth_data_configs) do truth_data_config
-        return Dagger.@spawn cache=true generate_truthdata(
-            truth_data_config, pipeline; plot = false)
+        return generate_truthdata(truth_data_config, pipeline; plot = false)
     end
     return truthdata_from_configs
 end
@@ -29,7 +28,7 @@ Generate truth data for the given pipeline.
 
 # Details
 - When `pipeline.priorpredictive` is `true`, the function returns a dictionary with keys `"y_t"`, `"I_t"`, `"truth_I0"`, and `"truth_gi_mean"`, where `"y_t"` is set to `missing`, `"I_t"` is a vector of 100 elements all set to `1.0`, and both `"truth_I0"` and `"truth_gi_mean"` are set to `1.0`.
-- When `pipeline.priorpredictive` is `false`, the function generates truth data configurations using `make_truth_data_configs(pipeline)` and spawns tasks to generate truth data for each configuration using `Dagger.@spawn`.
+- When `pipeline.priorpredictive` is `false`, the function generates truth data configurations using `make_truth_data_configs(pipeline)` and spawns tasks to generate truth data for each configuration.
 """
 function do_truthdata(pipeline::AbstractRtwithoutRenewalPipeline)
     if pipeline.priorpredictive
@@ -39,8 +38,7 @@ function do_truthdata(pipeline::AbstractRtwithoutRenewalPipeline)
     else
         truth_data_configs = make_truth_data_configs(pipeline)
         truthdata_from_configs = map(truth_data_configs) do truth_data_config
-            return Dagger.@spawn cache=true generate_truthdata(
-                truth_data_config, pipeline; plot = false)
+            return generate_truthdata(truth_data_config, pipeline; plot = false)
         end
         return truthdata_from_configs
     end

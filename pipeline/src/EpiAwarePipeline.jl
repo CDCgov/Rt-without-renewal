@@ -1,19 +1,13 @@
 """
 This module contains the analysis pipeline for the `Rt-without-renewal` project.
 
-# Pipeline Components
-
-In this module the meaning of a _pipeline component_ is a directed-acylic-graph
-(DAG) of tasks defined using `Dagger.jl` via dispatch on an `AbstractEpiAwarePipeline`
-sub-type from a function with prefix `do_`. A full pipeline is a sequence of DAGs,
-with execution determined by available computational resources.
 """
 module EpiAwarePipeline
 
-using CSV, Dagger, DataFramesMeta, Dates, Distributions, DocStringExtensions, DrWatson,
+using CSV, DataFramesMeta, Dates, Distributions, DocStringExtensions, DrWatson,
       EpiAware, Statistics, ADTypes, AbstractMCMC, JLD2, MCMCChains, Turing, DynamicPPL,
-      LogExpFunctions, RCall, LinearAlgebra, Random, AlgebraOfGraphics, CairoMakie,
-      ReverseDiff
+      LogExpFunctions, LinearAlgebra, Random, AlgebraOfGraphics, CairoMakie,
+      ReverseDiff, Distributed
 
 using EpiAware.EpiInfModels: oneexpy
 
