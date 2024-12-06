@@ -196,20 +196,19 @@ end
             return (; init_prior, std_prior)
         end
     end
-
     function set_latent_process(epimodel, latentprocess_type)
         init_prior, std_prior = set_init_and_std_prior(epimodel)
         if latentprocess_type == RandomWalk
             return RandomWalk(; init_prior = init_prior,
                 ϵ_t = HierarchicalNormal(; std_prior = std_prior))
         elseif latentprocess_type == AR
-            return AR(; damp_prior = Beta(2, 8; check_args = false),
-                init_prior = init_prior,
+            return AR(; damp_priors = [Beta(2, 8; check_args = false)],
+                init_priors = [init_prior],
                 ϵ_t = HierarchicalNormal(; std_prior = std_prior))
         elseif latentprocess_type == DiffLatentModel
             return DiffLatentModel(
-                AR(; damp_prior = Beta(2, 8; check_args = false),
-                    init_prior = Normal(0.0, 0.25),
+                AR(; damp_priors = [Beta(2, 8; check_args = false)],
+                    init_priors = [Normal(0.0, 0.25)],
                     ϵ_t = HierarchicalNormal(; std_prior = std_prior)),
                 init_prior; d = 1)
         end
