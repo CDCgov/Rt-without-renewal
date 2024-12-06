@@ -44,25 +44,25 @@ struct MA{C <: Sampleable, Q <: Int, E <: AbstractTuringLatentModel} <:
     "Prior distribution for the error term."
     ϵ_t::E
 
-    function MA(θ::Distribution;
-            q::Int = 1, ϵ_t::AbstractTuringLatentModel = HierarchicalNormal())
-        θ_priors = fill(θ, q)
-        return MA(; θ_priors = θ_priors, ϵ_t = ϵ_t)
-    end
-
-    function MA(; θ_priors::Vector{C} = [truncated(Normal(0.0, 0.05), -1, 1)],
-            ϵ_t::AbstractTuringLatentModel = HierarchicalNormal()) where {C <:
-                                                                          Distribution}
-        q = length(θ_priors)
-        θ = _expand_dist(θ_priors)
-        return MA(θ, q, ϵ_t)
-    end
-
     function MA(θ::Distribution, q::Int, ϵ_t::AbstractTuringLatentModel)
         @assert q>0 "q must be greater than 0"
         @assert q==length(θ) "q must be equal to the length of θ"
         new{typeof(θ), typeof(q), typeof(ϵ_t)}(θ, q, ϵ_t)
     end
+end
+
+function MA(θ::Distribution;
+        q::Int = 1, ϵ_t::AbstractTuringLatentModel = HierarchicalNormal())
+    θ_priors = fill(θ, q)
+    return MA(; θ_priors = θ_priors, ϵ_t = ϵ_t)
+end
+
+function MA(; θ_priors::Vector{C} = [truncated(Normal(0.0, 0.05), -1, 1)],
+        ϵ_t::AbstractTuringLatentModel = HierarchicalNormal()) where {C <:
+                                                                      Distribution}
+    q = length(θ_priors)
+    θ = _expand_dist(θ_priors)
+    return MA(θ, q, ϵ_t)
 end
 
 @doc raw"

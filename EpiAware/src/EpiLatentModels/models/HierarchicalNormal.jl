@@ -33,6 +33,10 @@ rand(mdl)
     std_prior::D = truncated(Normal(0, 0.1), 0, Inf)
 end
 
+function HierarchicalNormal(std_prior::Distribution)
+    return HierarchicalNormal(; std_prior = std_prior)
+end
+
 @doc raw"
     function EpiAwareBase.generate_latent(obs_model::HierarchicalNormal, n)
 
