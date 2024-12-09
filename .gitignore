@@ -393,3 +393,6 @@ EpiAware/docs/src/getting-started/tutorials/censored-obs.md
 EpiAware/docs/Manifest*.toml
 
 !benchmark/Manifest.toml
+
+# Test data
+!pipeline/test/analysis/test_data.jld2
