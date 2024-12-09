@@ -39,24 +39,24 @@ struct Ascertainment{
         return new{M, AbstractTuringLatentModel, F, P}(
             model, prefix_model, transform, latent_prefix)
     end
+end
 
-    function Ascertainment(model::M,
-            latent_model::T;
-            transform::F = (x, y) -> xexpy.(x, y),
-            latent_prefix::P = "Ascertainment") where {
-            M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel,
-            F <: Function, P <: String}
-        return Ascertainment(model, latent_model, transform, latent_prefix)
-    end
+function Ascertainment(model::M,
+        latent_model::T;
+        transform::F = (x, y) -> xexpy.(x, y),
+        latent_prefix::P = "Ascertainment") where {
+        M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel,
+        F <: Function, P <: String}
+    return Ascertainment(model, latent_model, transform, latent_prefix)
+end
 
-    function Ascertainment(; model::M,
-            latent_model::T,
-            transform::F = (x, y) -> xexpy.(x, y),
-            latent_prefix::P = "Ascertainment") where {
-            M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel,
-            F <: Function, P <: String}
-        return Ascertainment(model, latent_model, transform, latent_prefix)
-    end
+function Ascertainment(; model::M,
+        latent_model::T,
+        transform::F = (x, y) -> xexpy.(x, y),
+        latent_prefix::P = "Ascertainment") where {
+        M <: AbstractTuringObservationModel, T <: AbstractTuringLatentModel,
+        F <: Function, P <: String}
+    return Ascertainment(model, latent_model, transform, latent_prefix)
 end
 
 @doc raw"

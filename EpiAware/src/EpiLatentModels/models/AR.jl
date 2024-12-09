@@ -40,23 +40,6 @@ struct AR{D <: Sampleable, I <: Sampleable,
     "Prior distribution for the error term."
     ϵ_t::E
 
-    function AR(damp_prior::Sampleable, init_prior::Sampleable; p::Int = 1,
-            ϵ_t::AbstractTuringLatentModel = HierarchicalNormal())
-        damp_priors = fill(damp_prior, p)
-        init_priors = fill(init_prior, p)
-        return AR(; damp_priors = damp_priors, init_priors = init_priors, ϵ_t = ϵ_t)
-    end
-
-    function AR(; damp_priors::Vector{D} = [truncated(Normal(0.0, 0.05), 0, 1)],
-            init_priors::Vector{I} = [Normal()],
-            ϵ_t::AbstractTuringLatentModel = HierarchicalNormal()) where {
-            D <: Sampleable, I <: Sampleable}
-        p = length(damp_priors)
-        damp_prior = _expand_dist(damp_priors)
-        init_prior = _expand_dist(init_priors)
-        return AR(damp_prior, init_prior, p, ϵ_t)
-    end
-
     function AR(damp_prior::Sampleable, init_prior::Sampleable,
             p::Int, ϵ_t::AbstractTuringLatentModel)
         @assert p>0 "p must be greater than 0"
@@ -64,6 +47,23 @@ struct AR{D <: Sampleable, I <: Sampleable,
         new{typeof(damp_prior), typeof(init_prior), typeof(p), typeof(ϵ_t)}(
             damp_prior, init_prior, p, ϵ_t)
     end
+end
+
+function AR(damp_prior::Sampleable, init_prior::Sampleable; p::Int = 1,
+        ϵ_t::AbstractTuringLatentModel = HierarchicalNormal())
+    damp_priors = fill(damp_prior, p)
+    init_priors = fill(init_prior, p)
+    return AR(; damp_priors = damp_priors, init_priors = init_priors, ϵ_t = ϵ_t)
+end
+
+function AR(; damp_priors::Vector{D} = [truncated(Normal(0.0, 0.05), 0, 1)],
+        init_priors::Vector{I} = [Normal()],
+        ϵ_t::AbstractTuringLatentModel = HierarchicalNormal()) where {
+        D <: Sampleable, I <: Sampleable}
+    p = length(damp_priors)
+    damp_prior = _expand_dist(damp_priors)
+    init_prior = _expand_dist(init_priors)
+    return AR(damp_prior, init_prior, p, ϵ_t)
 end
 
 @doc raw"
