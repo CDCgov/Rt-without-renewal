@@ -611,7 +611,7 @@ chn2 = sample(
 describe(chn2)
 
 # ╔═╡ 37a016d8-8384-41c9-abdd-23e88b1f988d
-pairplot(chn2[[:β, :γ, :S₀, Symbol(mdl_prefix * ".σ_AR"),
+pairplot(chn2[[:β, :γ, :S₀, Symbol(mdl_prefix * " ϵ_t.std"),
     Symbol(mdl_prefix * ".ar_init[1]"), Symbol(mdl_prefix * ".damp_AR[1]")]])
 
 # ╔═╡ 7df5d669-d3a2-4a66-83c3-f8618e39bec6
