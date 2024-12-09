@@ -1,5 +1,4 @@
 @testset "do_truthdata tests" begin
-    using Dagger
     for pipetype in [SmoothOutbreakPipeline, MeasuresOutbreakPipeline,
         SmoothEndemicPipeline, RoughEndemicPipeline]
         pipeline = pipetype(; testmode = true)
@@ -13,8 +12,6 @@
 end
 
 @testset "do_inference tests" begin
-    using Dagger
-
     function make_inference(pipeline)
         truthdata_dg_task = do_truthdata(pipeline)
         truthdata = fetch.(truthdata_dg_task)
@@ -33,7 +30,6 @@ end
 end
 
 @testset "do_pipeline test: just run all pipeline objects" begin
-    using Dagger
     pipelines = map([SmoothOutbreakPipeline, MeasuresOutbreakPipeline,
         SmoothEndemicPipeline, RoughEndemicPipeline]) do pipetype
         pipetype(; ndraws = 10, nchains = 1, testmode = true)
@@ -45,7 +41,6 @@ end
 end
 
 @testset "do_pipeline test: prior predictive" begin
-    using Dagger
     pipelines = map([SmoothOutbreakPipeline, MeasuresOutbreakPipeline,
         SmoothEndemicPipeline, RoughEndemicPipeline]) do pipetype
         pipetype(; ndraws = 10, nchains = 1, testmode = true, priorpredictive = true)

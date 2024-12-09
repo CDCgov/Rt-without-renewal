@@ -1,7 +1,6 @@
 """
 Map the inference results for each inference configuration. This is the default
-method for mapping inference results; based on inference results as spawned
-tasks from `Dagger.@spawn`.
+method for mapping inference results.
 
 # Arguments
 - `truthdata`: The truth data used for generating inference results.
@@ -16,8 +15,7 @@ tasks from `Dagger.@spawn`.
 """
 function map_inference_results(
         truthdata, inference_configs, pipeline::AbstractEpiAwarePipeline)
-    map(inference_configs) do inference_config
-        Dagger.@spawn generate_inference_results(
-            truthdata, inference_config, pipeline)
+    pmap(inference_configs) do inference_config
+        generate_inference_results(truthdata, inference_config, pipeline)
     end
 end

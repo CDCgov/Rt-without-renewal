@@ -1,7 +1,5 @@
-using DrWatson, Test
-quickactivate(@__DIR__(), "EpiAwarePipeline")
-using EpiAwarePipeline, EpiAware
-import Random
+using EpiAwarePipeline, EpiAware, Test
+using Random
 Random.seed!(123)
 # Run tests
 include("utils/test_utils.jl");
