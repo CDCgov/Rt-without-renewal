@@ -18,7 +18,7 @@ using EpiAware, Distributions
 bigλ = exp(48.0) #Large value of λ
 d = SafePoisson(bigλ)
 # output
-EpiAware.EpiAwareUtils.SafePoisson{Float64}(λ=7.016735912097631e20)
+SafePoisson{Float64}(λ=7.016735912097631e20)
 ```
 
 ```jldoctest SafePoisson

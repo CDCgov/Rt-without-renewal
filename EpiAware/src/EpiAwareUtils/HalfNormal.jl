@@ -16,7 +16,7 @@ using EpiAware, Distributions
 
 hn = HalfNormal(1.0)
 # output
-EpiAware.EpiAwareUtils.HalfNormal{Float64}(μ=1.0)
+HalfNormal{Float64}(μ=1.0)
 ```
 
 # filter out all the values that are less than 0

@@ -38,7 +38,7 @@ p = bigμ / σ²
 r = bigμ * p / (1 - p)
 d = SafeNegativeBinomial(r, p)
 # output
-EpiAware.EpiAwareUtils.SafeNegativeBinomial{Float64}(r=20.0, p=2.85032816548187e-20)
+SafeNegativeBinomial{Float64}(r=20.0, p=2.85032816548187e-20)
 ```
 
 ```jldoctest SafeNegativeBinomial

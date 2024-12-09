@@ -22,7 +22,7 @@ using EpiAware, Distributions
 
 model = IID(Normal(0, 1))
 # output
-IID{Normal{Float64}}(ϵ_t = Normal{Float64}(μ=0.0, σ=1.0))
+IID{Normal{Float64}}(Distributions.Normal{Float64}(μ=0.0, σ=1.0))
 
 ```
 
@@ -30,7 +30,17 @@ IID{Normal{Float64}}(ϵ_t = Normal{Float64}(μ=0.0, σ=1.0))
 idd = generate_latent(model, 10)
 idd()
 # output
-
+ 10-element Vector{Float64}:
+│   0.1725470673732349
+│  -0.9893774177277903
+│  -0.7412779059226116
+│  -0.05657055467885716
+│   3.472387217534668
+│  -1.2172271390889986
+│  -0.029909748834874326
+│   0.12022293960210076
+│   0.3000491076584262
+│   0.7071362084677751
 ```
 "
 @kwdef struct IID{D <: Sampleable} <: AbstractTuringLatentModel

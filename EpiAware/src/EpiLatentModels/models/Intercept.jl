@@ -14,18 +14,29 @@ using Distributions, Turing, EpiAware
 int = Intercept(Normal(0, 1))
 int
 # output
-Intercept{Normal{Float64}}(intercept_prior=Normal{Float64}(μ=0.0, σ=1.0))
+Intercept{Normal{Float64}}(Distributions.Normal{Float64}(μ=0.0, σ=1.0))
 ```
 
 ```jldoctest Intercept; filter=r\"\b\d+(\.\d+)?\b\" => \"*\"
 mdl = generate_latent(int, 10)
 mdl()
 # output
+│ 10-element Vector{Float64}:
+│   0.12793550749948945
+│   0.12793550749948945
+│   0.12793550749948945
+│   0.12793550749948945
+│   0.12793550749948945
+│   0.12793550749948945
+│   0.12793550749948945
+│   0.12793550749948945
+│   0.12793550749948945
 ```
 
 ```jldoctest Intercept; filter=r\"\b\d+(\.\d+)?\b\" => \"*\"
 rand(mdl)
 # output
+(intercept = 0.243251947190061,)
 ```
 "
 @kwdef struct Intercept{D <: Sampleable} <: AbstractTuringIntercept
