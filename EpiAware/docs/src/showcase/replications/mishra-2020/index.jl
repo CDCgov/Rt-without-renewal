@@ -114,10 +114,10 @@ In _Mishra et al_ the standard deviation of the _stationary distribution_ of $Z_
 
 # ╔═╡ c88bbbd6-0101-4c04-97c9-c5887ef23999
 ar = AR(
-    damp_priors = reverse([truncated(Normal(0.8, 0.05), 0, 1),
-        truncated(Normal(0.1, 0.05), 0, 1)]),
-    std_prior = HalfNormal(0.5),
-    init_priors = [Normal(-1.0, 0.1), Normal(-1.0, 0.5)]
+    damp_priors = [truncated(Normal(0.1, 0.05), 0, 1),
+        truncated(Normal(0.8, 0.05), 0, 1)],
+    init_priors = [Normal(-1.0, 0.1), Normal(-1.0, 0.5)],
+    ϵ_t = HierarchicalNormal(std_prior = HalfNormal(0.5))
 )
 
 # ╔═╡ 31ee2757-0409-45df-b193-60c552797a3d

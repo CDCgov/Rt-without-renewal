@@ -428,8 +428,8 @@ We define the AR(1) process by matching means of `HalfNormal` prior distribution
 # ╔═╡ 71a26408-1c26-46cf-bc72-c6ba528dfadd
 ar = AR(
     damp_priors = [HalfNormal(mean(sampled_AR_damps))],
-    std_prior = HalfNormal(mean(sampled_AR_stds)),
-    init_priors = [Normal(0, 0.001)]
+    init_priors = [Normal(0, 0.001)],
+    ϵ_t = HierarchicalNormal(std_prior = HalfNormal(mean(sampled_AR_stds)))
 )
 
 # ╔═╡ e1ffdaf6-ca2e-405d-8355-0d8848d005b0
