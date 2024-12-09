@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.0
+# v0.20.3
 
 using Markdown
 using InteractiveUtils
@@ -578,7 +578,7 @@ rand(stochastic_mdl)
 initial_guess = [[mean(chn[:β]),
                      mean(chn[:γ]),
                      mean(chn[:S₀]),
-                     mean(ar.std_prior),
+                     mean(ar.ϵ_t.std_prior),
                      mean(ar.init_prior)[1],
                      mean(ar.damp_prior)[1]]
                  zeros(13)]
