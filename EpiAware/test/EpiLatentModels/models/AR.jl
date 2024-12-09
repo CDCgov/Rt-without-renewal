@@ -3,11 +3,12 @@
 
     damp_prior = truncated(Normal(0.0, 0.05), 0.0, 1)
     std_prior = truncated(Normal(0.0, 0.05), 0.0, Inf)
+    ϵ_t = HierarchicalNormal(; std_prior)
     init_prior = Normal()
-    ar_process = AR(damp_prior, std_prior, init_prior)
+    ar_process = AR(damp_prior, init_prior; ϵ_t)
 
     @test ar_process.damp_prior == filldist(damp_prior, 1)
-    @test ar_process.std_prior == std_prior
+    @test ar_process.ϵ_t.std_prior == std_prior
     @test ar_process.init_prior == filldist(init_prior, 1)
 end
 
@@ -20,7 +21,7 @@ end
     end
 
     @testset "std_prior" begin
-        std_AR = rand(ar.std_prior)
+        std_AR = rand(ar.ϵ_t.std_prior)
         @test std_AR >= 0.0
     end
 
@@ -32,10 +33,12 @@ end
 
 @testitem "Test AR(2)" begin
     using Distributions
+    std_prior = truncated(Normal(0.0, 0.05), 0.0, Inf)
+    ϵ_t = HierarchicalNormal(; std_prior)
     ar = AR(
         damp_priors = [truncated(Normal(0.0, 0.05), 0.0, 1),
             truncated(Normal(0.0, 0.05), 0.0, 1)],
-        std_prior = truncated(Normal(0.0, 0.05), 0.0, Inf),
+        ϵ_t = ϵ_t,
         init_priors = [Normal(), Normal()]
     )
     @testset "damp_prior" begin
@@ -46,7 +49,7 @@ end
     end
 
     @testset "std_prior" begin
-        std_AR = rand(ar.std_prior)
+        std_AR = rand(ar.ϵ_t.std_prior)
         @test std_AR >= 0.0
     end
 
@@ -70,7 +73,7 @@ end
     ar_init = [0.0]
 
     model = generate_latent(ar_model, n)
-    fixed_model = fix(model, (σ_AR = σ_AR, damp_AR = damp, ar_init = ar_init))
+    fixed_model = fix(model, (std = σ_AR, damp_AR = damp, ar_init = ar_init))
 
     n_samples = 100
     samples = sample(fixed_model, Prior(), n_samples; progress = false) |>

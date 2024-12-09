@@ -52,29 +52,29 @@ struct ConcatLatentModels{
             AbstractVector{<:String}}(
             prefix_models, no_models, dimension_adaptor, prefixes)
     end
+end
 
-    function ConcatLatentModels(models::M, dimension_adaptor::Function;
-            prefixes = nothing) where {
-            M <: AbstractVector{<:AbstractTuringLatentModel}}
-        no_models = length(models)
-        if isnothing(prefixes)
-            prefixes = "Concat." .* string.(1:no_models)
-        end
-        return ConcatLatentModels(models, no_models, dimension_adaptor, prefixes)
+function ConcatLatentModels(models::M, dimension_adaptor::Function;
+        prefixes = nothing) where {
+        M <: AbstractVector{<:AbstractTuringLatentModel}}
+    no_models = length(models)
+    if isnothing(prefixes)
+        prefixes = "Concat." .* string.(1:no_models)
     end
+    return ConcatLatentModels(models, no_models, dimension_adaptor, prefixes)
+end
 
-    function ConcatLatentModels(models::M;
-            dimension_adaptor::Function = equal_dimensions,
-            prefixes = nothing) where {
-            M <: AbstractVector{<:AbstractTuringLatentModel}}
-        return ConcatLatentModels(models, dimension_adaptor; prefixes = prefixes)
-    end
+function ConcatLatentModels(models::M;
+        dimension_adaptor::Function = equal_dimensions,
+        prefixes = nothing) where {
+        M <: AbstractVector{<:AbstractTuringLatentModel}}
+    return ConcatLatentModels(models, dimension_adaptor; prefixes = prefixes)
+end
 
-    function ConcatLatentModels(; models::M,
-            dimension_adaptor::Function = equal_dimensions, prefixes = nothing) where {
-            M <: AbstractVector{<:AbstractTuringLatentModel}}
-        return ConcatLatentModels(models, dimension_adaptor; prefixes = prefixes)
-    end
+function ConcatLatentModels(; models::M,
+        dimension_adaptor::Function = equal_dimensions, prefixes = nothing) where {
+        M <: AbstractVector{<:AbstractTuringLatentModel}}
+    return ConcatLatentModels(models, dimension_adaptor; prefixes = prefixes)
 end
 
 @doc raw"

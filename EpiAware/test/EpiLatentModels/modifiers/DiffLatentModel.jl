@@ -31,7 +31,10 @@ end
 
     n = 100
     d = 2
-    model = RandomWalk(Normal(0.0, 1.0), truncated(Normal(0.0, 0.05), 0.0, Inf))
+    model = RandomWalk(
+        init_prior = Normal(0.0, 1.0),
+        ϵ_t = HierarchicalNormal(truncated(Normal(0.0, 0.05), 0.0, Inf))
+    )
     init_priors = [Normal(0.0, 1.0), Normal(1.0, 2.0)]
     diff_model = DiffLatentModel(model = model, init_priors = init_priors)
 

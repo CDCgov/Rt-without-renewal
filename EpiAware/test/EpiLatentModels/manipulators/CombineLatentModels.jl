@@ -84,7 +84,7 @@ end
     ns_regression_mdl = no_slope_linear_regression(y) |
                         (var"Combine.2.damp_AR" = [0.0], var"Combine.2.σ_AR" = 1.0,
         var"Combine.2.ϵ_t" = zeros(n - 1), var"Combine.2.ar_init" = [0.0])
-    chain = sample(ns_regression_mdl, NUTS(), 5000, progress = false)
+    chain = sample(ns_regression_mdl, NUTS(), 5000; progress = false)
 
     # Theoretical posterior distribution for intercept
     # if \beta ~ int.intercept_prior = N(\mu_0, \sigma_0) and \sigma^2 = 1 for

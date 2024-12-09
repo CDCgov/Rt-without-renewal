@@ -4,7 +4,9 @@ using BenchmarkTools, TuringBenchmarking, EpiAware, DynamicPPL
 suite = BenchmarkGroup()
 
 include("../../make_epiaware_suite.jl")
+include("models/IID.jl")
 include("models/AR.jl")
+include("models/MA.jl")
 include("models/RandomWalk.jl")
 include("models/Intercept.jl")
 include("models/FixedIntercept.jl")

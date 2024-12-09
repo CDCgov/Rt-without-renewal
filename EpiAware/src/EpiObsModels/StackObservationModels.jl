@@ -53,15 +53,15 @@ deaths_y_t
         new{AbstractVector{<:AbstractTuringObservationModel}, typeof(model_names)}(
             wrapped_models, model_names)
     end
+end
 
-    function StackObservationModels(models::NamedTuple{
-            names, T}) where {names, T <: Tuple{Vararg{AbstractTuringObservationModel}}}
-        model_names = models |>
-                      keys .|>
-                      string |>
-                      collect
-        return StackObservationModels(collect(values(models)), model_names)
-    end
+function StackObservationModels(models::NamedTuple{
+        names, T}) where {names, T <: Tuple{Vararg{AbstractTuringObservationModel}}}
+    model_names = models |>
+                  keys .|>
+                  string |>
+                  collect
+    return StackObservationModels(collect(values(models)), model_names)
 end
 
 @doc raw"

@@ -3,9 +3,9 @@
     using HypothesisTests: ExactOneSampleKSTest, pvalue
 
     n = 5
-    rw_process = RandomWalk(Normal(0.0, 1.0), HalfNormal(0.05))
+    rw_process = RandomWalk(; ϵ_t = IID(Normal()))
     model = generate_latent(rw_process, n)
-    fixed_model = fix(model, (σ_RW = 1.0, init_rw_value = 0.0)) #Fixing the standard deviation of the random walk process
+    fixed_model = fix(model, (rw_init = 0.0,))
     n_samples = 1000
     samples_day_5 = sample(fixed_model, Prior(), n_samples; progress = false) |>
                     chn -> mapreduce(vcat, generated_quantities(fixed_model, chn)) do gen
@@ -17,26 +17,25 @@
 end
 
 @testitem "Testing default RW priors" begin
-    @testset "std_prior" begin
-        priors = RandomWalk()
-        std_rw = rand(priors.std_prior)
-        @test std_rw >= 0.0
-    end
-
     @testset "init_prior" begin
         priors = RandomWalk()
         init_value = rand(priors.init_prior)
         @test typeof(init_value) == Float64
     end
+
+    @testset "ϵ_t" begin
+        priors = RandomWalk()
+        @test priors.ϵ_t isa HierarchicalNormal
+    end
 end
 
 @testitem "Testing RandomWalk constructor" begin
-    using Distributions: Normal, truncated
+    using Distributions: Normal
     init_prior = Normal(0.0, 1.0)
-    std_prior = HalfNormal(0.05)
-    rw_process = RandomWalk(init_prior, std_prior)
+    ϵ_t = HierarchicalNormal()
+    rw_process = RandomWalk(init_prior, ϵ_t)
     @test rw_process.init_prior == init_prior
-    @test rw_process.std_prior == std_prior
+    @test rw_process.ϵ_t == ϵ_t
 end
 
 @testitem "Testing RandomWalk parameter recovery: Negative Binomial errors on log rw" begin

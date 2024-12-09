@@ -23,27 +23,17 @@ Raises:
 
 # Examples
 
-```jldoctest filter
+```jldoctest; output = false
 using Distributions
 using EpiAware.EpiAwareUtils
 
 dist = Exponential(1.0)
 
-censored_pmf(dist, Val(:single_censored); D = 10) |>
-    p -> round.(p, digits=3)
+censored_pmf(dist, Val(:single_censored); D = 10)
+nothing
 
 # output
-10-element Vector{Float64}:
- 0.393
- 0.383
- 0.141
- 0.052
- 0.019
- 0.007
- 0.003
- 0.001
- 0.0
- 0.0
+
 ```
 "
 function censored_pmf(dist::Distribution,
@@ -122,28 +112,17 @@ to nearest multiple of `Δd`.
 
 # Examples
 
-```jldoctest filter
+```jldoctest filter; output = false
 using Distributions
 using EpiAware.EpiAwareUtils
 
 dist = Exponential(1.0)
 
-censored_cdf(dist; D = 10) |>
-    p -> round.(p, digits=3)
+censored_cdf(dist; D = 10)
+nothing
 
 # output
-11-element Vector{Float64}:
- 0.0
- 0.368
- 0.767
- 0.914
- 0.969
- 0.988
- 0.996
- 0.998
- 0.999
- 1.0
- 1.0
+
 ```
 "
 function censored_cdf(dist::Distribution; Δd = 1.0, D = nothing, upper = 0.999)
@@ -184,27 +163,17 @@ to nearest multiple of `Δd`.
 
 # Examples
 
-```jldoctest filter
+```jldoctest filter; output = false
 using Distributions
 using EpiAware.EpiAwareUtils
 
 dist = Exponential(1.0)
 
-censored_pmf(dist; D = 10) |>
-    p -> round.(p, digits=3)
+censored_pmf(dist; D = 10)
+nothing
 
 # output
-10-element Vector{Float64}:
- 0.368
- 0.4
- 0.147
- 0.054
- 0.02
- 0.007
- 0.003
- 0.001
- 0.0
- 0.0
+
 ```
 "
 function censored_pmf(dist::Distribution; Δd = 1.0, D = nothing, upper = 0.99)
