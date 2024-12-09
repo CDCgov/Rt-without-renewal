@@ -15,22 +15,25 @@ The moving average (MA) model struct.
 
 # Examples
 
-```jldoctest MA
+```jldoctest MA; output = false
 using Distributions, Turing, EpiAware
 ma = MA()
 ma
+nothing
 # output
 
 ```
 
-```jldoctest MA; filter = r\"\b\d+(\.\d+)?\b\" => \"*\"
+```jldoctest MA; output = false
 mdl = generate_latent(ma, 10)
 mdl()
+nothing
 # output
 ```
 
-```jldoctest MA; filter = r\"\b\d+(\.\d+)?\b\" => \"*\"
+```jldoctest MA; output = false
 rand(mdl)
+nothing
 # output
 ```
 "

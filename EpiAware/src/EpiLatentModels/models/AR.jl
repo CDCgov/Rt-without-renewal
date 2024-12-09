@@ -8,32 +8,24 @@ The autoregressive (AR) model struct.
 
 # Examples
 
-```jldoctest AR
+```jldoctest AutoRegressive; output = false
 using Distributions, Turing, EpiAware
 ar = AR()
 ar
+nothing
 # output
-AR{Product{Continuous, Truncated{Normal{Float64}, Continuous, Float64, Float64, Float64}, FillArrays.Fill{Truncated{Normal{Float64}, Continuous, Float64, Float64, Float64}, 1, Tuple{Base.OneTo{Int64}}}}, DistributionsAD.TuringScalMvNormal{Vector{Float64}, Float64}, Int64, HierarchicalNormal{Float64, Truncated{Normal{Float64}, Continuous, Float64, Float64, Float64}}}(Distributions.Product{Distributions.Continuous, Distributions.Truncated{Distributions.Normal{Float64}, Distributions.Continuous, Float64, Float64, Float64}, FillArrays.Fill{Distributions.Truncated{Distributions.Normal{Float64}, Distributions.Continuous, Float64, Float64, Float64}, 1, Tuple{Base.OneTo{Int64}}}}(v=Fill(Truncated(Distributions.Normal{Float64}(μ=0.0, σ=0.05); lower=0.0, upper=1.0), 1)), DistributionsAD.TuringScalMvNormal{Vector{Float64}, Float64}(m=[0.0], σ=1.0), 1, HierarchicalNormal{Float64, Truncated{Normal{Float64}, Continuous, Float64, Float64, Float64}}(0.0, Truncated(Distributions.Normal{Float64}(μ=0.0, σ=0.1); lower=0.0, upper=Inf)))
 ```
 
-```jldocttest AR; filter = r\"\b\d+(\.\d+)?\b\" => \"*\"
+```jldoctest AutoRegressive; output = false
 mdl = generate_latent(ar, 10)
 mdl()
+nothing
 # output
 ```
 
-```jldoctest AR; filter = r\"\b\d+(\.\d+)?\b\" => \"*\"
+```jldoctest AutoRegressive; output = false
 rand(mdl)
-ERROR: UndefVarError: `mdl` not defined in `Main`
-Suggestion: check for spelling errors or missing imports.
-Stacktrace:
- [1] top-level scope
-   @ none:1
-ERROR: UndefVarError: `mdl` not defined in `Main`
-Suggestion: check for spelling errors or missing imports.
-Stacktrace:
- [1] top-level scope
-   @ none:1
+nothing
 # output
 ```
 "

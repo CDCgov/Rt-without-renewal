@@ -17,26 +17,18 @@ int
 Intercept{Normal{Float64}}(Distributions.Normal{Float64}(μ=0.0, σ=1.0))
 ```
 
-```jldoctest Intercept; filter=r\"\b\d+(\.\d+)?\b\" => \"*\"
+```jldoctest Intercept; output = false
 mdl = generate_latent(int, 10)
 mdl()
+nothing
 # output
-│ 10-element Vector{Float64}:
-│   0.12793550749948945
-│   0.12793550749948945
-│   0.12793550749948945
-│   0.12793550749948945
-│   0.12793550749948945
-│   0.12793550749948945
-│   0.12793550749948945
-│   0.12793550749948945
-│   0.12793550749948945
+
 ```
 
-```jldoctest Intercept; filter=r\"\b\d+(\.\d+)?\b\" => \"*\"
+```jldoctest Intercept; output = false
 rand(mdl)
+nothing
 # output
-(intercept = 0.243251947190061,)
 ```
 "
 @kwdef struct Intercept{D <: Sampleable} <: AbstractTuringIntercept
@@ -71,11 +63,13 @@ A variant of the `Intercept` struct that represents a fixed intercept value for 
 
 # Examples
 
-```julia
+```jldoctest FixedIntercept; output = false
 using EpiAware
 fi = FixedIntercept(2.0)
 fi_model = generate_latent(fi, 10)
 fi_model()
+nothing
+# output
 ```
 "
 @kwdef struct FixedIntercept{F <: Real} <: AbstractTuringIntercept

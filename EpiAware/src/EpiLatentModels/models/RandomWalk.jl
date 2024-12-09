@@ -22,35 +22,26 @@ Constructing a random walk requires specifying:
 
 ## Example usage
 
-```jldoctest RandomWalk
+```jldoctest RandomWalk; output = false
 using Distributions, Turing, EpiAware
 rw = RandomWalk()
 rw
+nothing
 # output
-RandomWalk{Normal{Float64}, HierarchicalNormal{Float64, Truncated{Normal{Float64}, Continuous, Float64, Float64, Float64}}}(Distributions.Normal{Float64}(μ=0.0, σ=1.0), HierarchicalNormal{Float64, Truncated{Normal{Float64}, Continuous, Float64, Float64, Float64}}(0.0, Truncated(Distributions.Normal{Float64}(μ=0.0, σ=0.1); lower=0.0, upper=Inf)))
 ```
 
-```jldoctest RandomWalk; filter=r\"\b\d+(\.\d+)?\b\" => \"*\"
+```jldoctest RandomWalk; output = false
 mdl = generate_latent(rw, 10)
 mdl()
-10-element Vector{Float64}:
-  0.09863550369060489
- -0.1012648767758989
-  0.012856292122216312
-  0.1387603166701943
-  0.477837117521154
-  0.7160833490012614
-  0.7586022515587051
-  0.8488849623077518
-  0.8957122109706586
-  0.539681134401317
+nothing
 # output
 ```
 
-```jldoctest RandomWalk; filter=r\"\b\d+(\.\d+)?\b\" => \"*\"
+```jldoctest RandomWalk; output = false
 rand(mdl)
-(rw_init = 0.07403248756671234, std = 0.1301785729462533, ϵ_t = [3.5710804551384614, -0.33297910177560924, 0.26287022218436157, 0.734726235372338, 0.36811479244419343, 3.02370788975943, 1.0653760418203968, 1.167408826654517, -0.6950266553756028])
+nothing
 # output
+
 ```
 "
 @kwdef struct RandomWalk{

@@ -168,21 +168,6 @@ inference_mdl = fit_ode_model(test_data)
 chn = Suppressor.@suppress sample(inference_mdl, NUTS(), 2_000)
 summarize(chn)
 nothing
-ERROR: ArgumentError: Package Suppressor not found in current path.
-- Run `import Pkg; Pkg.add("Suppressor")` to install the Suppressor package.
-Stacktrace:
- [1] macro expansion
-   @ ./loading.jl:2296 [inlined]
- [2] macro expansion
-   @ ./lock.jl:273 [inlined]
- [3] __require(into::Module, mod::Symbol)
-   @ Base ./loading.jl:2271
- [4] #invoke_in_world#3
-   @ ./essentials.jl:1089 [inlined]
- [5] invoke_in_world
-   @ ./essentials.jl:1086 [inlined]
- [6] require(into::Module, mod::Symbol)
-   @ Base ./loading.jl:2260
 
 # output
 

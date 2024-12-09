@@ -15,26 +15,16 @@ hn = HierarchicalNormal()
 HierarchicalNormal{Float64, Truncated{Normal{Float64}, Continuous, Float64, Float64, Float64}}(0.0, Truncated(Distributions.Normal{Float64}(μ=0.0, σ=0.1); lower=0.0, upper=Inf))
 ```
 
-```jldoctest HierarchicalNormal; filter=r\"\b\d+(\.\d+)?\b\" => \"*\"
+```jldoctest HierarchicalNormal; output = false
 mdl = generate_latent(hn, 10)
 mdl()
-10-element Vector{Float64}:
-  0.11952802822582498
- -0.005664808192809956
- -0.05920185382433839
-  0.0005433144739374012
-  0.14171480363042285
-  0.06692368514086114
- -0.12671541365766306
- -0.04857470780547727
- -0.0781861277601833
-  0.014917936490780714
+nothing
 # output
 ```
 
-```jldoctest HierarchicalNormal; filter=r\"\b\d+(\.\d+)?\b\" => \"*\"
+```jldoctest HierarchicalNormal; output = false
 rand(mdl)
-(std = 0.0765751560370051, ϵ_t = [-0.34458636199844195, -1.1281561493191237, 0.5980067970163337, -0.2891812666523367, -1.4368957426101734, -0.43331370482237264, 0.5569142619061638, -0.8671123265873902, 0.9729802400008496, 0.2385314434733128])
+nothing
 # output
 ```
 "

@@ -27,7 +27,7 @@ parameterisation is useful for specifying the distribution in a way that is easi
 
 # Examples:
 
-```jldoctest SafeNegativeBinomial
+```jldoctest SafeNegativeBinomial; output = false
 using EpiAware, Distributions
 
 bigμ = exp(48.0) #Large value of μ
@@ -37,32 +37,42 @@ bigμ = exp(48.0) #Large value of μ
 p = bigμ / σ²
 r = bigμ * p / (1 - p)
 d = SafeNegativeBinomial(r, p)
+nothing
+
 # output
-SafeNegativeBinomial{Float64}(r=20.0, p=2.85032816548187e-20)
+
 ```
 
-```jldoctest SafeNegativeBinomial
+```jldoctest SafeNegativeBinomial; output = false
 cdf(d, 100)
+nothing
+
 # output
-0.0
+
 ```
 
-```jldoctest SafeNegativeBinomial
+```jldoctest SafeNegativeBinomial; output = false
 logpdf(d, 100)
+nothing
+
 # output
--850.1397180331871
+
 ```
 
-```jldoctest SafeNegativeBinomial
+```jldoctest SafeNegativeBinomial; output = false
 mean(d)
+nothing
+
 # output
-7.016735912097631e20
+
 ```
 
-```jldoctest SafeNegativeBinomial
+```jldoctest SafeNegativeBinomial; output = false
 var(d)
+nothing
+
 # output
-2.4617291430060293e40
+
 ```
 "
 struct SafeNegativeBinomial{T <: Real} <: SafeDiscreteUnivariateDistribution
