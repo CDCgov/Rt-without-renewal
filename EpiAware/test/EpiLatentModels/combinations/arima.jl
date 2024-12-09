@@ -38,3 +38,60 @@
     @test custom_arima.model.init_prior == filldist(ar_init_prior, 2)
     @test custom_arima.model.ϵ_t.θ == filldist(θ_prior, 2)
 end
+
+@testitem "Testing ARIMA process against theoretical properties" begin
+    using DynamicPPL, Turing
+    using HypothesisTests: ExactOneSampleKSTest, pvalue
+    using Distributions
+    using Statistics
+
+    # Set up simple ARIMA model
+    arima_model = arima()
+    n = 1000
+    damp = [0.1]
+    σ_AR = 1.0
+    ar_init = [0.0]
+    diff_init = [0.0]
+    θ = [0.2]  # Add MA component
+
+    # Generate and fix model parameters
+    model = generate_latent(arima_model, n)
+    fixed_model = fix(model,
+        (
+            std = σ_AR,
+            damp_AR = damp,
+            ar_init = ar_init,
+            diff_init = diff_init,
+            θ = θ
+        ))
+
+    # Generate samples
+    n_samples = 100
+    samples = sample(fixed_model, Prior(), n_samples; progress = false) |>
+              chn -> mapreduce(vcat, generated_quantities(fixed_model, chn)) do gen
+        gen
+    end
+
+    # Compare with pure AR with differencing
+    ar_base = AR()
+    ar_model = DiffLatentModel(; model = ar_base, init_priors = [Normal()])
+    ar_fixed = fix(
+        generate_latent(ar_model, n),
+        (std = σ_AR, damp_AR = damp, ar_init = ar_init, diff_init = diff_init)
+    )
+
+    ar_samples = sample(ar_fixed, Prior(), n_samples; progress = false) |>
+                 chn -> mapreduce(vcat, generated_quantities(ar_fixed, chn)) do gen
+        gen
+    end
+
+    # Test that ARIMA produces different distribution than pure differenced AR
+    # This tests that the MA component has an effect
+    ks_test = ExactOneSampleKSTest(samples, fit(Normal, ar_samples))
+    @test pvalue(ks_test) < 1e-6
+
+    # Test for stationarity of differences
+    diff_samples = diff(samples)
+    @test isapprox(mean(diff_samples), 0.0, atol = 0.1)
+    @test std(diff_samples) > 0
+end
