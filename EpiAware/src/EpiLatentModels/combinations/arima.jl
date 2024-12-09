@@ -18,7 +18,7 @@ An ARIMA model consisting of AR and MA components with differencing applied.
 
 # Example
 
-```julia
+```jldoctest ARIMA; output = false
 using EpiAware, Distributions
 
 ARIMA = arima(
@@ -29,6 +29,9 @@ ARIMA = arima(
 )
 arima_model = generate_latent(ARIMA, 10)
 arima_model()
+nothing
+# output
+
 ```
 """
 function arima(;

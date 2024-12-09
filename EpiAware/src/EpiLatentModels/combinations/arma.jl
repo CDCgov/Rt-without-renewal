@@ -16,7 +16,7 @@ An AR model with an MA model as its error term, effectively creating an ARMA mod
 
 # Example
 
-```@example
+```jldoctest ARMA; output = false
 using EpiAware, Distributions
 
 ARMA = arma(;
@@ -25,6 +25,8 @@ ARMA = arma(;
 )
 arma_model = generate_latent(ARMA, 10)
 arma_model()
+nothing
+# output
 ```
 """
 function arma(;
