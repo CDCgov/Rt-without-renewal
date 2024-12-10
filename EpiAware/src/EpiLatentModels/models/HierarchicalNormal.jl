@@ -6,6 +6,7 @@ The `HierarchicalNormal` struct represents a non-centered hierarchical normal di
 - `HierarchicalNormal(mean, std_prior)`: Constructs a `HierarchicalNormal` instance with the specified mean and standard deviation prior.
 - `HierarchicalNormal(; mean = 0.0, std_prior = truncated(Normal(0,0.1), 0, Inf))`: Constructs a `HierarchicalNormal` instance with the specified mean and standard deviation prior using named arguments and with default values.
 - `HierarchicalNormal(std_prior)`: Constructs a `HierarchicalNormal` instance with the specified standard deviation prior.
+
 ## Examples
 
 ```jldoctest HierarchicalNormal
@@ -33,6 +34,8 @@ nothing
     mean::R = 0.0
     "Prior distribution for the standard deviation."
     std_prior::D = truncated(Normal(0, 0.1), 0, Inf)
+    "Flag to indicate if mean should be added (false when mean = 0)"
+    add_mean::Bool = mean != 0
 end
 
 function HierarchicalNormal(std_prior::Distribution)
@@ -55,6 +58,6 @@ Generate latent variables from the hierarchical normal distribution.
     std ~ obs_model.std_prior
     @submodel ϵ_t = generate_latent(IID(Normal()), n)
 
-    η_t = obs_model.mean .+ std .* ϵ_t
+    η_t = obs_model.add_mean ? obs_model.mean .+ std * ϵ_t : std * ϵ_t
     return η_t
 end
