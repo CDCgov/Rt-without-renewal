@@ -4,7 +4,7 @@
 function make_epiaware_suite(model; check = true,
         adbackends = [
             :forwarddiff, :reversediff, :reversediff_compiled,
-            ADTypes.AutoMooncake(config = nothing),
+            ADTypes.AutoMooncake(; config = nothing),
             ADTypes.AutoEnzyme()
         ])
     suite = prefix_warnings(
