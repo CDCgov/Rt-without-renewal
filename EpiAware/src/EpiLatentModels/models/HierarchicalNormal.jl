@@ -6,6 +6,7 @@ The `HierarchicalNormal` struct represents a non-centered hierarchical normal di
 - `HierarchicalNormal(mean, std_prior)`: Constructs a `HierarchicalNormal` instance with the specified mean and standard deviation prior.
 - `HierarchicalNormal(; mean = 0.0, std_prior = truncated(Normal(0,0.1), 0, Inf))`: Constructs a `HierarchicalNormal` instance with the specified mean and standard deviation prior using named arguments and with default values.
 - `HierarchicalNormal(std_prior)`: Constructs a `HierarchicalNormal` instance with the specified standard deviation prior.
+- `HierarchicalNormal(mean, std_prior)`: Constructs a `HierarchicalNormal` instance with the specified mean and standard deviation prior.
 
 ## Examples
 
@@ -41,6 +42,10 @@ end
 
 function HierarchicalNormal(std_prior::Distribution)
     return HierarchicalNormal(; std_prior = std_prior)
+end
+
+function HierarchicalNormal(mean::Real, std_prior::Distribution)
+    return HierarchicalNormal(mean, std_prior, mean != 0)
 end
 
 @doc raw"
