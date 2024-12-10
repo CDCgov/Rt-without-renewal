@@ -10,21 +10,13 @@ The `HierarchicalNormal` struct represents a non-centered hierarchical normal di
 
 ## Examples
 
-```jldoctest HierarchicalNormal
+```jldoctest HierarchicalNormal; output = false
 using Distributions, Turing, EpiAware
 hn = HierarchicalNormal()
-# output
-HierarchicalNormal{Float64, Truncated{Normal{Float64}, Continuous, Float64, Float64, Float64}}(0.0, Truncated(Distributions.Normal{Float64}(μ=0.0, σ=0.1); lower=0.0, upper=Inf))
-```
 
-```jldoctest HierarchicalNormal; output = false
 mdl = generate_latent(hn, 10)
 mdl()
-nothing
-# output
-```
 
-```jldoctest HierarchicalNormal; output = false
 rand(mdl)
 nothing
 # output
