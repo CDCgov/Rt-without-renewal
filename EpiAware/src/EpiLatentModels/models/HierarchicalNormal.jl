@@ -29,13 +29,14 @@ nothing
 # output
 ```
 "
-@kwdef struct HierarchicalNormal{R <: Real, D <: Sampleable} <: AbstractTuringLatentModel
+@kwdef struct HierarchicalNormal{R <: Real, D <: Sampleable, M <: Bool} <:
+              AbstractTuringLatentModel
     "Mean of the normal distribution."
     mean::R = 0.0
     "Prior distribution for the standard deviation."
     std_prior::D = truncated(Normal(0, 0.1), 0, Inf)
     "Flag to indicate if mean should be added (false when mean = 0)"
-    add_mean::Bool = mean != 0
+    add_mean::M = mean != 0
 end
 
 function HierarchicalNormal(std_prior::Distribution)
