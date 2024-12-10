@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.0
+# v0.20.3
 
 using Markdown
 using InteractiveUtils
@@ -561,11 +561,11 @@ let
     sub_chn = inference_results.samples[inference_results.samples.name_map.parameters[[1:5;
                                                                                        end]]]
     fig = pairplot(sub_chn)
-    lines!(fig[1, 1], ar.std, label = "Prior")
-    lines!(fig[2, 2], ar.init_prior.v[1], label = "Prior")
-    lines!(fig[3, 3], ar.init_prior.v[2], label = "Prior")
-    lines!(fig[4, 4], ar.damp_prior.v[1], label = "Prior")
-    lines!(fig[5, 5], ar.damp_prior.v[2], label = "Prior")
+    lines!(fig[1, 1], ar.init_prior.v[1], label = "Prior")
+    lines!(fig[2, 2], ar.init_prior.v[2], label = "Prior")
+    lines!(fig[3, 3], ar.damp_prior.v[1], label = "Prior")
+    lines!(fig[4, 4], ar.damp_prior.v[2], label = "Prior")
+    lines!(fig[5, 5], ar.ϵ_t.std_prior, label = "Prior")
     lines!(fig[6, 6], epi.initialisation_prior, label = "Prior")
 
     fig
