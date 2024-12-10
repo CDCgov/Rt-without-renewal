@@ -578,9 +578,10 @@ rand(stochastic_mdl)
 initial_guess = [[mean(chn[:β]),
                      mean(chn[:γ]),
                      mean(chn[:S₀]),
-                     mean(ar.ϵ_t.std_prior),
                      mean(ar.init_prior)[1],
-                     mean(ar.damp_prior)[1]]
+                     mean(ar.damp_prior)[1],
+                     mean(ar.ϵ_t.std_prior)
+                 ]
                  zeros(13)]
 
 # ╔═╡ 685221ea-f268-4ddc-937f-e7620d065c28
