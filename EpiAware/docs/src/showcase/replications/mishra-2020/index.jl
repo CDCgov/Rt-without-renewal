@@ -561,7 +561,7 @@ let
     sub_chn = inference_results.samples[inference_results.samples.name_map.parameters[[1:5;
                                                                                        end]]]
     fig = pairplot(sub_chn)
-    lines!(fig[1, 1], ar.std, label = "Prior")
+    lines!(fig[1, 1], ar.ϵ_t.std, label = "Prior")
     lines!(fig[2, 2], ar.init_prior.v[1], label = "Prior")
     lines!(fig[3, 3], ar.init_prior.v[2], label = "Prior")
     lines!(fig[4, 4], ar.damp_prior.v[1], label = "Prior")
