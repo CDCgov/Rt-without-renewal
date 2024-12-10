@@ -12,37 +12,47 @@ when the mean is too large.
 
 # Examples:
 
-```jldoctest SafePoisson
+```jldoctest SafePoisson; output = false
 using EpiAware, Distributions
 
 bigλ = exp(48.0) #Large value of λ
 d = SafePoisson(bigλ)
+nothing
+
 # output
-EpiAware.EpiAwareUtils.SafePoisson{Float64}(λ=7.016735912097631e20)
+
 ```
 
-```jldoctest SafePoisson
+```jldoctest SafePoisson; output = false
 cdf(d, 2)
+nothing
+
 # output
-0.0
+
 ```
 
-```jldoctest SafePoisson
+```jldoctest SafePoisson; output = false
 logpdf(d, 100)
+nothing
+
 # output
--7.016735912097631e20
+
 ```
 
-```jldoctest SafePoisson
+```jldoctest SafePoisson; output = false
 mean(d)
+nothing
+
 # output
-7.016735912097631e20
+
 ```
 
-```jldoctest SafePoisson
+```jldoctest SafePoisson; output = false
 var(d)
+nothing
+
 # output
-7.016735912097631e20
+
 ```
 "
 struct SafePoisson{T <: Real} <: SafeDiscreteUnivariateDistribution

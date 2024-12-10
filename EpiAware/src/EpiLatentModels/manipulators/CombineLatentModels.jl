@@ -37,12 +37,12 @@ latent_model()
         return new{AbstractVector{<:AbstractTuringLatentModel}, AbstractVector{<:String}}(
             prefix_models, prefixes)
     end
+end
 
-    function CombineLatentModels(models::M) where {
-            M <: AbstractVector{<:AbstractTuringLatentModel}}
-        prefixes = "Combine." .* string.(1:length(models))
-        return CombineLatentModels(models, prefixes)
-    end
+function CombineLatentModels(models::M) where {
+        M <: AbstractVector{<:AbstractTuringLatentModel}}
+    prefixes = "Combine." .* string.(1:length(models))
+    return CombineLatentModels(models, prefixes)
 end
 
 @doc raw"

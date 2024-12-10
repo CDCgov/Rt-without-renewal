@@ -8,9 +8,8 @@
     #Define the epi_model
     epi_model = DirectInfections(data, Normal())
 
-    #Define the latent process model
-    rwp = RandomWalk(Normal(0.0, 1.0),
-        truncated(Normal(0.0, 0.05), 0.0, Inf))
+    #Define the latent process model using defaults
+    rwp = RandomWalk()
 
     #Define the observation model
     delay_distribution = Gamma(2.0, 5 / 2)
@@ -38,7 +37,7 @@ end
 @testitem "`generate_epiaware` with Exp growth rate and RW latent process runs" begin
     using Distributions, Turing, DynamicPPL
     # Define test inputs
-    y_t = missing# rand(1:10, 365) # Data will be generated from the model
+    y_t = missing # Data will be generated from the model
     data = EpiData([0.2, 0.3, 0.5], exp)
 
     #Define the epi_model
@@ -46,9 +45,10 @@ end
 
     #Define the latent process model
     r_3 = log(2) / 3.0
-    rwp = RandomWalk(
-        truncated(Normal(0.0, r_3 / 3), -r_3, r_3), # 3 day doubling time at 3 sigmas in prior
-        truncated(Normal(0.0, 0.01), 0.0, 0.1))
+    init_prior = truncated(Normal(0.0, r_3 / 3), -r_3, r_3)# initial 3 day doubling time at 3 sigmas in prior
+    step_size_dist = HierarchicalNormal(std_prior = truncated(Normal(0.0, 0.01), 0.0, 0.1))
+    rwp = RandomWalk(init_prior = init_prior,
+        ϵ_t = step_size_dist)
 
     #Define the observation model - no delay model
     time_horizon = 5
@@ -83,9 +83,10 @@ end
 
     #Define the latent process model
     r_3 = log(2) / 3.0
-    rwp = RandomWalk(
-        truncated(Normal(0.0, r_3 / 3), -r_3, r_3), # 3 day doubling time at 3 sigmas in prior
-        truncated(Normal(0.0, 0.01), 0.0, 0.1))
+    init_prior = truncated(Normal(0.0, r_3 / 3), -r_3, r_3)# initial 3 day doubling time at 3 sigmas in prior
+    step_size_dist = HierarchicalNormal(std_prior = truncated(Normal(0.0, 0.01), 0.0, 0.1))
+    rwp = RandomWalk(init_prior = init_prior,
+        ϵ_t = step_size_dist)
 
     #Define the observation model - no delay model
     time_horizon = 5

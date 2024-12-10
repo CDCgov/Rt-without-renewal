@@ -28,7 +28,7 @@ end
     @test length(rand_model.ϵ_t) == 2
     fix_model = fix(
         broadcasted_model,
-        (σ_RW = 2.0, rw_init = 1.0, ϵ_t = [1, 2])
+        (std = 2.0, rw_init = 1.0, ϵ_t = [1, 2])
     )
     out = fix_model()
     @test out == vcat(fill(1.0, 5), fill(3.0, 5), fill(7.0, 5))
