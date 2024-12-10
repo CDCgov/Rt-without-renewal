@@ -1,6 +1,6 @@
 @testitem "HierarchicalNormal constructor" begin
     using Distributions
-    int = HierarchicalNormal(0.1, truncated(Normal(0, 2), 0, Inf))
+    int = HierarchicalNormal(0.1, truncated(Normal(0, 2), 0, Inf), true)
     @test typeof(int) <: AbstractTuringLatentModel
     @test int.mean == 0.1
     @test int.std_prior == truncated(Normal(0, 2), 0, Inf)
@@ -10,7 +10,8 @@
     @test int_def.mean == 0.0
     @test int_def.std_prior == truncated(Normal(0, 0.1), 0, Inf)
 
-    @test int == HierarchicalNormal(mean = 0.1, std_prior = truncated(Normal(0, 2), 0, Inf))
+    @test int == HierarchicalNormal(
+        mean = 0.1, std_prior = truncated(Normal(0, 2), 0, Inf))
 end
 
 @testitem "HierarchicalNormal generate_latent" begin
@@ -18,7 +19,7 @@ end
     using HypothesisTests: ExactOneSampleKSTest, pvalue
     using Distributions
 
-    hnorm = HierarchicalNormal(0.2, truncated(Normal(0, 1), 0, Inf))
+    hnorm = HierarchicalNormal(0.2, truncated(Normal(0, 1), 0, Inf), true)
     hnorm_model = generate_latent(hnorm, 10)
     hnorm_model_out = hnorm_model()
     @test length(hnorm_model_out) == 10
