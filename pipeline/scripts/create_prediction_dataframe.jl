@@ -51,8 +51,7 @@ end
 ##
 grped_failed_df = failed_df |>
                   df -> @groupby(df, :infection_gen_proc, :latent_model) |>
-                        gd -> @combine(gd, :n_success=sum(:runsuccess),
-    :n_fail=sum(1 .- :runsuccess))
+                        gd -> @combine(gd, :n_fail=sum(1 .- :runsuccess))
 
 ## Save the prediction and failed dataframes
 CSV.write(plotsdir("plotting_data/predictions.csv"), dfs)
