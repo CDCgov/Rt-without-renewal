@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.0
+# v0.20.3
 
 using Markdown
 using InteractiveUtils
@@ -428,8 +428,8 @@ We define the AR(1) process by matching means of `HalfNormal` prior distribution
 # ╔═╡ 71a26408-1c26-46cf-bc72-c6ba528dfadd
 ar = AR(
     damp_priors = [HalfNormal(mean(sampled_AR_damps))],
-    std_prior = HalfNormal(mean(sampled_AR_stds)),
-    init_priors = [Normal(0, 0.001)]
+    init_priors = [Normal(0, 0.001)],
+    ϵ_t = HierarchicalNormal(std_prior = HalfNormal(mean(sampled_AR_stds)))
 )
 
 # ╔═╡ e1ffdaf6-ca2e-405d-8355-0d8848d005b0
@@ -578,9 +578,10 @@ rand(stochastic_mdl)
 initial_guess = [[mean(chn[:β]),
                      mean(chn[:γ]),
                      mean(chn[:S₀]),
-                     mean(ar.std_prior),
                      mean(ar.init_prior)[1],
-                     mean(ar.damp_prior)[1]]
+                     mean(ar.damp_prior)[1],
+                     mean(ar.ϵ_t.std_prior)
+                 ]
                  zeros(13)]
 
 # ╔═╡ 685221ea-f268-4ddc-937f-e7620d065c28
@@ -611,7 +612,7 @@ chn2 = sample(
 describe(chn2)
 
 # ╔═╡ 37a016d8-8384-41c9-abdd-23e88b1f988d
-pairplot(chn2[[:β, :γ, :S₀, Symbol(mdl_prefix * ".σ_AR"),
+pairplot(chn2[[:β, :γ, :S₀, Symbol(mdl_prefix * ".std"),
     Symbol(mdl_prefix * ".ar_init[1]"), Symbol(mdl_prefix * ".damp_AR[1]")]])
 
 # ╔═╡ 7df5d669-d3a2-4a66-83c3-f8618e39bec6

@@ -67,11 +67,8 @@ end
 @testitem "Turing method for generate_epiaware with two latent processes" begin
     using Distributions, Turing
 
-    # Latent model
-    damp_prior = truncated(Normal(0.0, 0.05), 0.0, 1)
-    std_prior = truncated(Normal(0.0, 0.05), 0.0, Inf)
-    init_prior = Normal()
-    ar_process = AR(damp_prior, std_prior, init_prior)
+    # Latent model - default AR model
+    ar_process = AR()
 
     # Used again in obs model
 
