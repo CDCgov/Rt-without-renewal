@@ -32,13 +32,6 @@ struct LatentDelay{M <: AbstractTuringObservationModel, T <: AbstractVector{<:Re
     model::M
     rev_pmf::T
 
-    function LatentDelay(model::M, distribution::C; D = nothing,
-            Δd = 1.0) where {
-            M <: AbstractTuringObservationModel, C <: ContinuousDistribution}
-        pmf = censored_pmf(distribution; Δd = Δd, D = D)
-        return LatentDelay(model, pmf)
-    end
-
     function LatentDelay(model::M,
             pmf::T) where {M <: AbstractTuringObservationModel, T <: AbstractVector{<:Real}}
         @assert all(pmf .>= 0) "Delay interval must be non-negative"
@@ -46,6 +39,13 @@ struct LatentDelay{M <: AbstractTuringObservationModel, T <: AbstractVector{<:Re
         rev_pmf = reverse(pmf)
         new{typeof(model), typeof(rev_pmf)}(model, rev_pmf)
     end
+end
+
+function LatentDelay(model::M, distribution::C; D = nothing,
+        Δd = 1.0) where {
+        M <: AbstractTuringObservationModel, C <: ContinuousDistribution}
+    pmf = censored_pmf(distribution; Δd = Δd, D = D)
+    return LatentDelay(model, pmf)
 end
 
 @doc raw"

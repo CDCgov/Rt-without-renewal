@@ -8,9 +8,10 @@
     int_def = HierarchicalNormal()
     @test typeof(int_def) <: AbstractTuringLatentModel
     @test int_def.mean == 0.0
-    @test int_def.std_prior == truncated(Normal(0, 1), 0, Inf)
+    @test int_def.std_prior == truncated(Normal(0, 0.1), 0, Inf)
 
-    @test int == HierarchicalNormal(mean = 0.1, std_prior = truncated(Normal(0, 2), 0, Inf))
+    @test int == HierarchicalNormal(
+        mean = 0.1, std_prior = truncated(Normal(0, 2), 0, Inf))
 end
 
 @testitem "HierarchicalNormal generate_latent" begin

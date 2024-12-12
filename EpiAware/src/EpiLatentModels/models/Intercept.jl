@@ -9,12 +9,26 @@ broadcasts a single intercept value to a length `n` latent process.
 
 ## Examples
 
-```julia
+```jldoctest Intercept
 using Distributions, Turing, EpiAware
 int = Intercept(Normal(0, 1))
-int_model = generate_latent(int, 10)
-rand(int_model)
-int_model()
+int
+# output
+Intercept{Normal{Float64}}(Distributions.Normal{Float64}(μ=0.0, σ=1.0))
+```
+
+```jldoctest Intercept; output = false
+mdl = generate_latent(int, 10)
+mdl()
+nothing
+# output
+
+```
+
+```jldoctest Intercept; output = false
+rand(mdl)
+nothing
+# output
 ```
 "
 @kwdef struct Intercept{D <: Sampleable} <: AbstractTuringIntercept
@@ -49,11 +63,13 @@ A variant of the `Intercept` struct that represents a fixed intercept value for 
 
 # Examples
 
-```julia
+```jldoctest FixedIntercept; output = false
 using EpiAware
 fi = FixedIntercept(2.0)
 fi_model = generate_latent(fi, 10)
 fi_model()
+nothing
+# output
 ```
 "
 @kwdef struct FixedIntercept{F <: Real} <: AbstractTuringIntercept

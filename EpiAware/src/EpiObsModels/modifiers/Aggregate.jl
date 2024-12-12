@@ -34,12 +34,33 @@ struct Aggregate{M <: AbstractTuringObservationModel,
         new{typeof(model), typeof(aggregation), typeof(present)}(
             model, aggregation, present)
     end
-
-    function Aggregate(; model, aggregation)
-        return Aggregate(model, aggregation)
-    end
 end
 
+function Aggregate(; model, aggregation)
+    return Aggregate(model, aggregation)
+end
+
+@doc raw"
+Generate observations using an aggregation model.
+
+# Arguments
+- `ag::Aggregate`: The aggregation model.
+- `y_t`: The current state of the observations. If missing, a vector of missing values is created.
+- `Y_t`: The expected observations.
+
+# Returns
+- A vector of observations where entries are aggregated according to the aggregation model's
+  specification. Only positions marked as present in the aggregation model contain non-zero
+  values.
+
+# Details
+The function:
+1. Broadcasts the aggregation vector to match the length of observations
+2. Broadcasts the present vector to match the length of observations
+3. For each present position, sums the expected observations over the aggregation window
+4. Generates observations for the aggregated values using the underlying model
+5. Returns a vector with observations only in the present positions
+"
 @model function EpiAwareBase.generate_observations(ag::Aggregate, y_t, Y_t)
     if ismissing(y_t)
         y_t = Vector{Missing}(missing, length(Y_t))
