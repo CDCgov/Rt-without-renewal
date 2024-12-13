@@ -1,25 +1,20 @@
-
 """
-    make_truthdata_dataframe(filename, truth_data, pipelines; I_0 = 100.0)
-
 Create a DataFrame containing truth data for analysis.
 
 # Arguments
-- `filename::String`: The name of the file.
-- `truth_data::Dict`: A dictionary containing truth data.
-- `pipelines::Array`: An array of pipelines.
-- `I_0::Float64`: Initial value for I_t (default: 100.0).
+- `truth_data`: A dictionary containing truth data.
+- `scenario`: Name of the truth data scenario.
 
 # Returns
-- `df::DataFrame`: A DataFrame containing the truth data.
+- `df::DataFrame`: A DataFrame containing the summarised truth data.
 
 """
-function make_truthdata_dataframe(filename, truth_data, pipelines; I_0 = 100.0)
+function make_truthdata_dataframe(truth_data::Dict, scenario::String)
     I_t = truth_data["I_t"]
+    I_0 = truth_data["truth_I0"]
     true_mean_gi = truth_data["truth_gi_mean"]
     log_It = _calc_log_infections(I_t)
     rt = _calc_rt(I_t, I_0)
-    scenario = _get_scenario_from_filename(filename, pipelines)
     truth_procs = (; log_I_t = log_It, rt, Rt = truth_data["truth_process"])
 
     df = mapreduce(vcat, keys(truth_procs)) do target
