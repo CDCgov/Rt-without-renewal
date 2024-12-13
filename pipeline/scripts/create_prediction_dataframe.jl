@@ -1,9 +1,3 @@
-using EpiAwarePipeline, EpiAware, AlgebraOfGraphics, JLD2, DrWatson, DataFramesMeta,
-      Statistics, Distributions, DrWatson, CSV
-
-## Define scenarios
-scenarios = ["measures_outbreak", "smooth_outbreak", "smooth_endemic", "rough_endemic"]
-
 ## Define true GI means
 true_gi_means = [2.0, 10.0, 20.0]
 
