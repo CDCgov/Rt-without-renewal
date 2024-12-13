@@ -50,16 +50,16 @@ struct EpiData{T <: Real, F <: Function}
             length(gen_int),
             transformation)
     end
+end
 
-    function EpiData(; gen_distribution::ContinuousDistribution,
-            D_gen = nothing,
-            Δd = 1.0,
-            transformation::Function = exp)
-        gen_int = censored_pmf(gen_distribution, Δd = Δd, D = D_gen) |>
-                  p -> p[2:end] ./ sum(p[2:end])
+function EpiData(; gen_distribution::ContinuousDistribution,
+        D_gen = nothing,
+        Δd = 1.0,
+        transformation::Function = exp)
+    gen_int = censored_pmf(gen_distribution, Δd = Δd, D = D_gen) |>
+              p -> p[2:end] ./ sum(p[2:end])
 
-        return EpiData(gen_int, transformation)
-    end
+    return EpiData(gen_int, transformation)
 end
 
 @doc raw"

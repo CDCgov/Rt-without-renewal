@@ -86,24 +86,24 @@ struct Renewal{E, S <: Sampleable, A} <:
     initialisation_prior::S
     recurrent_step::A
 
-    function Renewal(data::EpiData; initialisation_prior = Normal())
-        rev_gen_int = reverse(data.gen_int)
-        recurrent_step = ConstantRenewalStep(rev_gen_int)
-        return Renewal(data, initialisation_prior, recurrent_step)
-    end
-
-    function Renewal(; data::EpiData, initialisation_prior = Normal())
-        rev_gen_int = reverse(data.gen_int)
-        recurrent_step = ConstantRenewalStep(rev_gen_int)
-        return Renewal(data, initialisation_prior, recurrent_step)
-    end
-
     function Renewal(data::E,
             initialisation_prior::S,
             recurrent_step::A) where {
             E <: EpiData, S <: Sampleable, A <: AbstractConstantRenewalStep}
         return new{E, S, A}(data, initialisation_prior, recurrent_step)
     end
+end
+
+function Renewal(data::EpiData; initialisation_prior = Normal())
+    rev_gen_int = reverse(data.gen_int)
+    recurrent_step = ConstantRenewalStep(rev_gen_int)
+    return Renewal(data, initialisation_prior, recurrent_step)
+end
+
+function Renewal(; data::EpiData, initialisation_prior = Normal())
+    rev_gen_int = reverse(data.gen_int)
+    recurrent_step = ConstantRenewalStep(rev_gen_int)
+    return Renewal(data, initialisation_prior, recurrent_step)
 end
 
 """

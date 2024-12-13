@@ -27,12 +27,6 @@ struct BroadcastLatentModel{
     "The broadcast rule to be applied."
     broadcast_rule::B
 
-    function BroadcastLatentModel(model::M; period::Integer,
-            broadcast_rule::B) where {
-            M <: AbstractTuringLatentModel, B <: AbstractBroadcastRule}
-        BroadcastLatentModel(model, period, broadcast_rule)
-    end
-
     function BroadcastLatentModel(model::M, period::Integer,
             broadcast_rule::B) where {
             M <: AbstractTuringLatentModel, B <: AbstractBroadcastRule}
@@ -40,6 +34,12 @@ struct BroadcastLatentModel{
         new{typeof(model), typeof(period), typeof(broadcast_rule)}(
             model, period, broadcast_rule)
     end
+end
+
+function BroadcastLatentModel(model::M; period::Integer,
+        broadcast_rule::B) where {
+        M <: AbstractTuringLatentModel, B <: AbstractBroadcastRule}
+    BroadcastLatentModel(model, period, broadcast_rule)
 end
 
 @doc raw"
