@@ -52,7 +52,7 @@ function _figure_scenario_truth_data(truth_df, scenario; true_gi_choice)
                                 df -> @subset(df, :Scenario.==scenario) |> data
     plt_truth = truth_plotting_data *
                 mapping(:target_times => "T", :target_values => "values",
-                    col = :Target, color = :Latent_Model => "Latent Model") *
+                    col = :Target) *
                 visual(Lines)
     return plt_truth
 end
@@ -238,8 +238,8 @@ fig1 = figureone(
 """
 function figureone(
         truth_df, analysis_df, latent_model, scenario_dict, target_dict,
-        latent_model_dict; fig_kws = (; size = (1000, 1500)),
-        true_gi_choice = 10.0, used_gi_choice = 10.0,
+        latent_model_dict; fig_kws = (; size = (900, 1150)),
+        true_gi_choice = 2.0, used_gi_choice = 2.0,
         legend_title = "Infection generating\n process",
         targets = ["log_I_t", "rt", "Rt"],
         scenarios = [
@@ -276,7 +276,7 @@ function figureone(
             ag = draw!(
                 sf, plt_analysis_mat[i, j] + plt_truth_mat[i, j] + V,
                 axis = (; limits = (nothing, target_dict[target].ylims)))
-            leg = AlgebraOfGraphics.compute_legend(ag)
+            leg = AlgebraOfGraphics.compute_legend(ag; order = nothing)
             i == 1 &&
                 Label(sf[0, 1], target_dict[target].title, fontsize = 22, font = :bold)
             j == 3 && Label(sf[1, 2], scenario_dict[scenario].title,
@@ -293,6 +293,6 @@ function figureone(
     _leg = (leg[1], leg[2], [legend_title])
     Legend(fig[5, 2], _leg...)
 
-    resize_to_layout!(fig)
+    # resize_to_layout!(fig)
     return fig
 end

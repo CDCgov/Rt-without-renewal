@@ -1,23 +1,12 @@
-## Script to make figure 1 and alternate latent models for SI
-using Pkg
-Pkg.activate(joinpath(@__DIR__(), ".."))
+using EpiAwarePipeline, EpiAware, AlgebraOfGraphics, JLD2, DrWatson, DataFramesMeta,
+      Statistics, Distributions, CSV, CairoMakie
 
-using EpiAwarePipeline, EpiAware, AlgebraOfGraphics, JLD2, DrWatson, Plots, DataFramesMeta,
-      Statistics, Distributions, CSV
-
-##
-pipelines = [
-    SmoothOutbreakPipeline(), MeasuresOutbreakPipeline(),
-    SmoothEndemicPipeline(), RoughEndemicPipeline()]
+## Define scenarios
+scenarios = ["measures_outbreak", "smooth_outbreak", "smooth_endemic", "rough_endemic"]
 
 ## load some data and create a dataframe for the plot
-truth_data_files = readdir(datadir("truth_data")) |>
-                   strs -> filter(s -> occursin("jld2", s), strs)
-analysis_df = CSV.File(plotsdir("analysis_df.csv")) |> DataFrame
-truth_df = mapreduce(vcat, truth_data_files) do filename
-    D = load(joinpath(datadir("truth_data"), filename))
-    make_truthdata_dataframe(filename, D, pipelines)
-end
+truth_data_df = CSV.File(plotsdir("plotting_data/truthdata.csv")) |> DataFrame
+prediction_df = CSV.File(plotsdir("plotting_data/predictions.csv")) |> DataFrame
 
 # Define scenario titles and reference times for figure 1
 scenario_dict = Dict(
@@ -28,21 +17,27 @@ scenario_dict = Dict(
 )
 
 target_dict = Dict(
-    "log_I_t" => (title = "log(Incidence)", ylims = (3.5, 6)),
-    "rt" => (title = "Exp. growth rate", ylims = (-0.1, 0.1)),
-    "Rt" => (title = "Reproductive number", ylims = (-0.1, 3))
+    "log_I_t" => (title = "log(Incidence)", ylims = (3.5, 12)),
+    "rt" => (title = "Exp. growth rate", ylims = (-0.5, 0.5)),
+    "Rt" => (title = "Reproductive number", ylims = (-0.1, 2.5))
 )
 
 latent_model_dict = Dict(
-    "wkly_rw" => (title = "Random walk",),
-    "wkly_ar" => (title = "AR(1)",),
-    "wkly_diff_ar" => (title = "Diff. AR(1)",)
+    "rw" => (title = "Random walk",),
+    "ar" => (title = "AR(1)",),
+    "diff_ar" => (title = "Diff. AR(1)",)
 )
 
-## `wkly_ar` is the default latent model which we show as figure 1, others are for SI
+##
+targets = ["log_I_t", "rt", "Rt"]
+plt_truth_mat = [EpiAwarePipeline._figure_one_truth_data_panel(
+                     truth_data_df, scenario, target; true_gi_choice = 2.0)
+                 for scenario in keys(scenario_dict), target in targets]
+
+## `ar` is the default latent model which we show as figure 1, others are for SI
 
 _ = map(latent_model_dict |> keys |> collect) do latent_model
     fig = figureone(
-        truth_df, analysis_df, latent_model, scenario_dict, target_dict, latent_model_dict)
+        truth_data_df, prediction_df, latent_model, scenario_dict, target_dict, latent_model_dict)
     save(plotsdir("figure1_$(latent_model).png"), fig)
 end
