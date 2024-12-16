@@ -26,13 +26,9 @@ function _plot_predictions!(
         igps = ["DirectInfections", "ExpGrowthRate", "Renewal"],
         true_gi_choice = 2.0, used_gi_choice = 2.0, colors = [:red, :blue, :green],
         iqr_alpha = 0.3)
-    pred = predictions |>
-           df -> @subset(df, :Latent_Model.==latent_model) |>
-                 df -> @subset(df, :True_GI_Mean.==true_gi_choice) |>
-                       df -> @subset(df, :Used_GI_Mean.==used_gi_choice) |>
-                             df -> @subset(df, :Reference_Time.==reference_time) |>
-                                   df -> @subset(df, :Scenario.==scenario) |>
-                                         df -> @subset(df, :Target.==target)
+    pred = _fig1_pred_filter(predictions, scenario, target, reference_time,
+        latent_model; true_gi_choice, used_gi_choice)
+
     for (c, igp) in zip(colors, igps)
         x = pred[pred.IGP_Model .== igp, "target_times"]
         y = pred[pred.IGP_Model .== igp, "q_5"]
@@ -49,6 +45,18 @@ function _plot_predictions!(
     return nothing
 end
 
+function _fig1_pred_filter(predictions, scenario, target, reference_time,
+        latent_model; true_gi_choice = 2.0, used_gi_choice = 2.0)
+    df = predictions |>
+         df -> @subset(df, :Latent_Model.==latent_model) |>
+               df -> @subset(df, :True_GI_Mean.==true_gi_choice) |>
+                     df -> @subset(df, :Used_GI_Mean.==used_gi_choice) |>
+                           df -> @subset(df, :Reference_Time.==reference_time) |>
+                                 df -> @subset(df, :Scenario.==scenario) |>
+                                       df -> @subset(df, :Target.==target)
+    return df
+end
+
 """
 Plot the truth data on the given axis.
 
@@ -62,12 +70,12 @@ Plot the truth data on the given axis.
 
 """
 function _plot_truth!(ax, truth, scenario, target; true_gi_choice = 2.0, color = :black)
-    pred = truth |>
-           df -> @subset(df, :True_GI_Mean.==true_gi_choice) |>
-                 df -> @subset(df, :Scenario.==scenario) |>
-                       df -> @subset(df, :Target.==target)
-    x = pred[!, "target_times"]
-    y = pred[!, "target_values"]
+    df = truth |>
+         df -> @subset(df, :True_GI_Mean.==true_gi_choice) |>
+               df -> @subset(df, :Scenario.==scenario) |>
+                     df -> @subset(df, :Target.==target)
+    x = df[!, "target_times"]
+    y = df[!, "target_values"]
     scatter!(ax, x, y, color = color, label = "Data")
 
     return nothing
