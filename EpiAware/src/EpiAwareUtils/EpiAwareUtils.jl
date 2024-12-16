@@ -19,7 +19,7 @@ export HalfNormal, DirectSample, SafePoisson, SafeNegativeBinomial, SafeIntValue
        SafeDiscreteUnivariateDistribution
 
 #Export functions
-export scan, spread_draws, censored_cdf, censored_pmf, get_param_array, prefix_submodel, ∫F
+export spread_draws, censored_cdf, censored_pmf, get_param_array, prefix_submodel, ∫F
 
 # Export accumulate tools
 export get_state, accumulate_scan
@@ -27,7 +27,6 @@ export get_state, accumulate_scan
 include("docstrings.jl")
 include("censored_pmf.jl")
 include("HalfNormal.jl")
-include("scan.jl")
 include("accumulate_scan.jl")
 include("prefix_submodel.jl")
 include("turing-methods.jl")

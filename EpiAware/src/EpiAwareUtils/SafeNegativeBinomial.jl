@@ -84,7 +84,6 @@ struct SafeNegativeBinomial{T <: Real} <: SafeDiscreteUnivariateDistribution
     end
 end
 
-#Outer constructors make AD work
 function SafeNegativeBinomial(r::T, p::T) where {T <: Real}
     return SafeNegativeBinomial{T}(r, p)
 end
