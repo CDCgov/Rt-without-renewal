@@ -16,18 +16,6 @@ function _fig1_pred_filter(predictions, scenario, target, reference_time,
 end
 
 """
-Filter the `truth` DataFrame for `scenario`, `target`, `latent_model`, `true_gi_choice`,
-    and `used_gi_choice`. This is aimed at generating facets for figure 1.
-"""
-function _fig1_truth_filter(truth, scenario, target; true_gi_choice)
-    df = truth |>
-         df -> @subset(df, :True_GI_Mean.==true_gi_choice) |>
-               df -> @subset(df, :Scenario.==scenario) |>
-                     df -> @subset(df, :Target.==target)
-    return df
-end
-
-"""
 Generate a figure with multiple subplots showing predictions and truth data for different
     scenarios and targets.
 
@@ -61,12 +49,12 @@ function figureone(
             pred_df = _fig1_pred_filter(
                 prediction_df, scenario, target, scenario_dict[scenario].T,
                 latent_model; true_gi_choice, used_gi_choice)
-            truth_df = _fig1_truth_filter(truth_data_df, scenario, target; true_gi_choice)
+            truth_df = _fig_truth_filter(truth_data_df, scenario, target; true_gi_choice)
             #Plot onto axes
             _plot_predictions!(ax, pred_df; igps, colors, iqr_alpha)
             _plot_truth!(ax, truth_df; color = data_color)
             vlines!(ax, [scenario_dict[scenario].T], color = data_color,
-                linewidth = 3, label = "Horizon")
+                linewidth = 3, label = "Reference time")
             if i == 1
                 ax.title = scenario_dict[scenario].title
             end

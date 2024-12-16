@@ -59,3 +59,15 @@ function _plot_truth!(ax, truth; color = :black)
 
     return nothing
 end
+
+"""
+Filter the `truth` DataFrame for `scenario`, `target`, `latent_model`, `true_gi_choice`,
+    and `used_gi_choice`. This is aimed at generating facets for figure 1.
+"""
+function _fig_truth_filter(truth, scenario, target; true_gi_choice)
+    df = truth |>
+         df -> @subset(df, :True_GI_Mean.==true_gi_choice) |>
+               df -> @subset(df, :Scenario.==scenario) |>
+                     df -> @subset(df, :Target.==target)
+    return df
+end
