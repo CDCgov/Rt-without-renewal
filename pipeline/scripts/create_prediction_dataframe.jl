@@ -14,7 +14,7 @@ dfs = mapreduce(vcat, scenarios) do scenario
         mapreduce(vcat, files) do filename
             output = load(joinpath(datadir("epiaware_observables"), scenario, filename))
             try
-                make_prediction_dataframe_from_output(output, true_gi_mean)
+                make_prediction_dataframe_from_output(output, true_gi_mean, scenario)
             catch e
                 @warn "Error in $filename"
                 push!(failed_configs, output["inference_config"])

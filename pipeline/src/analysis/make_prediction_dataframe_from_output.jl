@@ -14,14 +14,13 @@ A dataframe containing the prediction results.
 
 """
 function make_prediction_dataframe_from_output(
-        output, true_mean_gi; qs = [0.025, 0.25, 0.5, 0.75, 0.975],
+        output, true_mean_gi, scenario; qs = [0.025, 0.25, 0.5, 0.75, 0.975],
         transformation = oneexpy)
     #Unpack the output
     inference_config = output["inference_config"]
     forecasts = output["forecast_results"]
     #Get the scenario, IGP model, latent model and true mean GI
     igp_model = inference_config["igp"] |> igp_name -> split(igp_name, ".")[end]
-    scenario = inference_config["scenario"]
     latent_model = inference_config["latent_model"]
     used_gi_mean = inference_config["gi_mean"]
     used_gi_std = inference_config["gi_std"]
