@@ -32,7 +32,7 @@ latent_model_dict = Dict(
 
 ## `ar` is the default latent model which we show as figure 1, others are for SI
 
-_ = mapreduce(vcat, latent_model_dict |> keys |> collect) do latent_model
+figs = mapreduce(vcat, latent_model_dict |> keys |> collect) do latent_model
     map(Iterators.product(gi_means, gi_means)) do (true_gi_choice, used_gi_choice)
         fig = figureone(
             prediction_df, truth_data_df, scenarios, targets; scenario_dict, target_dict,
