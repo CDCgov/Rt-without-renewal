@@ -20,42 +20,28 @@ function make_prediction_dataframe_from_output(
     inference_config = output["inference_config"]
     forecasts = output["forecast_results"]
     #Get the scenario, IGP model, latent model and true mean GI
-    igp_model = inference_config["igp"] |> igp_name -> split(igp_name, ".")[end]
-    latent_model = inference_config["latent_model"]
-    used_gi_mean = inference_config["gi_mean"]
-    used_gi_std = inference_config["gi_std"]
-    (start_time, reference_time) = inference_config["tspan"] |>
-                                   tspan -> split(tspan, "_") |>
-                                            tspan -> (
-        parse(Int, tspan[1]), parse(Int, tspan[2]))
-
-    #Get the quantiles for the targets across the gi mean scenarios
-    #if Renewal model, then we use the underlying epi model
-    #otherwise we use the epi datas to loop over different gi mean implications
-    used_gi_means = igp_model == "Renewal" ?
-                    [used_gi_mean] :
-                    make_gi_params(EpiAwareExamplePipeline())["gi_means"]
-
-    used_epidatas = map(used_gi_means) do ḡ
-        _make_epidata(ḡ, used_gi_std; transformation = transformation)
+    info = _get_info_from_config(inference_config)
+    #Get the epi datas
+    used_epidatas = map(info.used_gi_means) do ḡ
+        _make_epidata(ḡ, info.used_gi_std; transformation = transformation)
     end
-
+    #Generate the quantiles for the targets
     preds = map(used_epidatas) do epi_data
         generate_quantiles_for_targets(forecasts, epi_data, qs)
     end
 
     #Create the dataframe columnwise
-    df = mapreduce(vcat, preds, used_gi_means) do pred, used_gi_mean
+    df = mapreduce(vcat, preds, info.used_gi_means) do pred, used_gi_mean
         mapreduce(vcat, keys(pred)) do target
             target_mat = pred[target]
-            target_times = collect(1:size(target_mat, 1)) .+ (start_time - 1)
+            target_times = collect(1:size(target_mat, 1)) .+ (info.start_time - 1)
             _df = DataFrame(target_times = target_times)
             _df[!, "Scenario"] .= scenario
-            _df[!, "IGP_Model"] .= igp_model
-            _df[!, "Latent_Model"] .= latent_model
+            _df[!, "igp_model"] .= info.igp_model
+            _df[!, "latent_model"] .= info.latent_model
             _df[!, "True_GI_Mean"] .= true_mean_gi
-            _df[!, "Used_GI_Mean"] .= used_gi_mean
-            _df[!, "Reference_Time"] .= reference_time
+            _df[!, "used_gi_mean"] .= used_gi_mean
+            _df[!, "reference_time"] .= info.reference_time
             _df[!, "Target"] .= string(target)
             # quantile predictions
             for (j, q) in enumerate(qs)
