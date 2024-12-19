@@ -24,9 +24,9 @@ index_location = @__DIR__()
 Pkg.activate(index_location)
 Pkg.resolve()
 Pkg.instantiate()
-Pkg.add(["CairoMakie", "JLD2", "DataFramesMeta", "DrWatson"])
+Pkg.add(["CairoMakie", "JLD2", "DataFramesMeta", "DrWatson", "CSV"])
 
-using DataFramesMeta, JLD2
+using DataFramesMeta, JLD2, CSV
 
 ```
 
@@ -66,23 +66,28 @@ We noted that for a substantial number of the model configurations there were mo
 priorpred_dir = joinpath(@__DIR__(),"..", "pipeline/data/priorpredictive/")
 priorpred_datafiles = readdir(priorpred_dir) |>
   fns -> filter(fn -> contains(fn, ".jld2"), fns) #filter for .jld2 files
-
-priorpred_outcomes_df = mapreduce(vcat, priorpred_datafiles) do fn
-  D = load(joinpath(priorpred_dir, fn))
-  igp = D["inference_config"]["igp"]
-  latent_model = D["inference_config"]["latent_model"]
-  gi_mean = D["inference_config"]["gi_mean"]
-  T1, T2 = split(D["inference_config"]["tspan"], "_")
-  runsuccess = D["priorpredictive"] .== "Pass"
-  df = DataFrame(
-    infection_gen_proc = igp,
-    latent_model = latent_model,
-    gi_mean = gi_mean,
-    T1 = T1,
-    T2 = T2,
-    T_diff = parse(Int, T2) - parse(Int, T1),
-    runsuccess = runsuccess,
-    )
+priorpred_outcomes_df = DataFrame()
+if !isfile(joinpath(index_location, "pass_fail_rdn1.csv"))
+  priorpred_outcomes_df = mapreduce(vcat, priorpred_datafiles) do fn
+    D = load(joinpath(priorpred_dir, fn))
+    igp = D["inference_config"]["igp"]
+    latent_model = D["inference_config"]["latent_model"]
+    gi_mean = D["inference_config"]["gi_mean"]
+    T1, T2 = split(D["inference_config"]["tspan"], "_")
+    runsuccess = D["priorpredictive"] .== "Pass"
+    df = DataFrame(
+      infection_gen_proc = igp,
+      latent_model = latent_model,
+      gi_mean = gi_mean,
+      T1 = T1,
+      T2 = T2,
+      T_diff = parse(Int, T2) - parse(Int, T1),
+      runsuccess = runsuccess,
+      )
+  end
+  CSV.write(joinpath(index_location, "pass_fail_rdn1.csv"), priorpred_outcomes_df)
+else
+  priorpred_outcomes_df = CSV.File(joinpath(index_location, "pass_fail_rdn1.csv")) |> DataFrame
 end
 ```
 

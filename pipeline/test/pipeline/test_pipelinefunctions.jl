@@ -13,16 +13,14 @@ end
 
 @testset "do_inference tests" begin
     function make_inference(pipeline)
-        truthdata_dg_task = do_truthdata(pipeline)
-        truthdata = fetch.(truthdata_dg_task)
+        truthdata = do_truthdata(pipeline)
         do_inference(truthdata[1], pipeline)
     end
 
     for pipetype in [SmoothOutbreakPipeline, MeasuresOutbreakPipeline,
         SmoothEndemicPipeline, RoughEndemicPipeline]
-        pipeline = pipetype(; ndraws = 20, nchains = 1, testmode = true)
-        inference_results_tsk = make_inference(pipeline)
-        inference_results = fetch.(inference_results_tsk)
+        pipeline = pipetype(; ndraws = 1000, nchains = 1, testmode = true)
+        inference_results = make_inference(pipeline)
         @test length(inference_results) == 1
         @test all([result["inference_results"] isa EpiAwareObservables
                    for result in inference_results])

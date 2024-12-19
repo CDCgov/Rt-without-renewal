@@ -1,9 +1,8 @@
-## Define true GI means
-true_gi_means = [2.0, 10.0, 20.0]
-
-## Load the prediction dataframes or record fails
+## Structure to record success/failure
+success_configs = Dict[]
 failed_configs = Dict[]
 
+## Analysis of the prediction dataframes
 dfs = mapreduce(vcat, scenarios) do scenario
     mapreduce(vcat, true_gi_means) do true_gi_mean
         target_str = "truth_gi_mean_" * string(true_gi_mean) * "_"
@@ -14,23 +13,25 @@ dfs = mapreduce(vcat, scenarios) do scenario
         mapreduce(vcat, files) do filename
             output = load(joinpath(datadir("epiaware_observables"), scenario, filename))
             try
+                push!(success_configs,
+                    merge(output["inference_config"], Dict("runsuccess" => true)))
                 make_prediction_dataframe_from_output(output, true_gi_mean, scenario)
             catch e
                 @warn "Error in $filename"
-                push!(failed_configs, output["inference_config"])
+                push!(failed_configs,
+                    merge(output["inference_config"], Dict("runsuccess" => false)))
                 return DataFrame()
             end
         end
     end
 end
 
-## Gather the failed data
-failed_df = mapreduce(vcat, failed_configs) do D
+## Gather the pass/failed data
+pass_fail_df = mapreduce(vcat, [success_configs; failed_configs]) do D
     igp = D["igp"] |> str -> split(str, ".")[end]
     latent_model = D["latent_model"]
     gi_mean = D["gi_mean"]
     T1, T2 = split(D["tspan"], "_")
-    runsuccess = D["priorpredictive"] .== "Pass"
     df = DataFrame(
         infection_gen_proc = igp,
         latent_model = latent_model,
@@ -38,15 +39,10 @@ failed_df = mapreduce(vcat, failed_configs) do D
         T1 = T1,
         T2 = T2,
         T_diff = parse(Int, T2) - parse(Int, T1),
-        runsuccess = runsuccess
+        runsuccess = D["runsuccess"]
     )
 end
 
-##
-grped_failed_df = failed_df |>
-                  df -> @groupby(df, :infection_gen_proc, :latent_model) |>
-                        gd -> @combine(gd, :n_fail=sum(1 .- :runsuccess))
-
 ## Save the prediction and failed dataframes
 CSV.write(plotsdir("plotting_data/predictions.csv"), dfs)
-CSV.write(plotsdir("plotting_data/failed_preds.csv"), failed_df)
+CSV.write("manuscript/inference_pass_fail_rnd2.csv", pass_fail_df)

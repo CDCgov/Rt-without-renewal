@@ -46,7 +46,7 @@ export score_parameters, simple_crps, summarise_crps
 
 # Exported functions: Analysis functions for constructing dataframes
 export make_prediction_dataframe_from_output, make_truthdata_dataframe,
-       make_scoring_dataframe_from_output
+       make_scoring_dataframe_from_output, make_mcmc_diagnostic_dataframe
 
 # Exported functions: Make main plots
 export figureone, figuretwo
