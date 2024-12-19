@@ -118,8 +118,10 @@ to make inference on and model configuration.
 function create_inference_results(config, epiprob)
     #Return the sampled infections and observations
     idxs = config.tspan[1]:config.tspan[2]
+    #Subselect the case data to the time span
     y_t = ismissing(config.case_data) ? missing :
           Vector{Union{Missing, Int64}}(config.case_data[idxs])
+    #Run inference once
     inference_results = apply_method(epiprob,
         config.epimethod,
         (y_t = y_t,)
