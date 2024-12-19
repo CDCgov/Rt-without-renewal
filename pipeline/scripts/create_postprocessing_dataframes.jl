@@ -1,10 +1,24 @@
 using EpiAwarePipeline, EpiAware, JLD2, DrWatson, DataFramesMeta, CSV, MCMCChains
 
+pipelinetypes = [
+    MeasuresOutbreakPipeline,
+    SmoothOutbreakPipeline,
+    SmoothEndemicPipeline,
+    RoughEndemicPipeline
+]
 ## Define scenarios
-scenarios = ["measures_outbreak", "smooth_outbreak", "smooth_endemic", "rough_endemic"]
+
+scenarios = pipelinetypes .|> pipetype -> pipetype().prefix
 
 ## Define true GI means
-true_gi_means = [2.0, 10.0, 20.0]
+# Errors if not the same for all pipeline types
+true_gi_means = map(pipelinetypes) do pipetype
+    make_gi_params(pipetype())["gi_means"]
+end |>
+                ensemble_gi_means -> all([gi_means == ensemble_gi_means[1]
+                                          for gi_means in ensemble_gi_means]) ?
+                                     ensemble_gi_means[1] :
+                                     error("GI means are not the same")
 
 if !isfile(plotsdir("plotting_data/predictions.csv"))
     @info "Prediction dataframe does not exist, generating now"
