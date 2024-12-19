@@ -28,7 +28,10 @@ using CSV, DataFramesMeta #Data wrangling
 using CairoMakie, PairPlots, TimeSeries #Plotting backend
 
 # ╔═╡ 97b5374e-7653-4b3b-98eb-d8f73aa30580
-using ReverseDiff #Automatic differentiation backend
+begin
+    using ADTypes, Enzyme #Automatic differentiation backend
+    Enzyme.API.runtimeActivity!(true)
+end
 
 # ╔═╡ 1642dbda-4915-4e29-beff-bca592f3ec8d
 begin #Date utility and set Random seed
@@ -391,7 +394,7 @@ num_threads = min(10, Threads.nthreads())
 inference_method = EpiMethod(
     pre_sampler_steps = [ManyPathfinder(nruns = 4, maxiters = 100)],
     sampler = NUTSampler(
-        adtype = AutoReverseDiff(compile = true),
+        adtype = ADTypes.AutoEnzyme(),
         ndraws = 2000,
         nchains = num_threads,
         mcmc_parallel = MCMCThreads())
