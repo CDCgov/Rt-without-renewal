@@ -24,7 +24,7 @@ end
 @testset "default_tspan: returns an Tuple{Integer, Integer}" begin
     pipeline = EpiAwareExamplePipeline()
 
-    tspan = make_tspan(pipeline)
+    tspan = make_tspan(pipeline; lookback = 90)
     @test tspan isa Tuple{Integer, Integer}
 end
 
@@ -138,7 +138,7 @@ end
         "α_delay" => 4.0,
         "θ_delay" => 5.0 / 4.0,
         "lookahead" => 21,
-        "lookback" => 35,
+        "lookback" => 90,
         "stride" => 7
     )
 

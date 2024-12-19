@@ -22,7 +22,7 @@ function make_default_params(pipeline::AbstractEpiAwarePipeline)
     α_delay = 4.0
     θ_delay = 5.0 / 4.0
     lookahead = 21
-    lookback = 35
+    lookback = 90
     stride = 7
     return Dict(
         "Rt" => Rt,
