@@ -124,10 +124,6 @@ function create_inference_results(config, epiprob)
         config.epimethod,
         (y_t = y_t,)
     )
-    inference_results = apply_method(epiprob,
-        config.epimethod,
-        (y_t = y_t,);
-    )
     return inference_results
 end
 
