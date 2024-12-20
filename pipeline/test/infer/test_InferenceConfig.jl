@@ -51,8 +51,8 @@
     @testset "construct from config dictionary" begin
         pipeline = SmoothOutbreakPipeline()
         inference_configs = make_inference_configs(pipeline)
-        @test [InferenceConfig(ic; case_data, truth_I_t = I_t,
-                   truth_I0 = I0, tspan, epimethod, pipeline = pipeline) isa
+        @test [InferenceConfig(ic, pipeline; case_data, truth_I_t = I_t,
+                   truth_I0 = I0, tspan, epimethod) isa
                InferenceConfig
                for ic in inference_configs] |> all
     end
