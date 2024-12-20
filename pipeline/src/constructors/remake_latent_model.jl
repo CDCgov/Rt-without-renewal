@@ -34,11 +34,11 @@ based on whether the latent process representation of its dynamics are stationar
 ## Stationary Processes
 
 - For Renewal process `log(R_t)` in the long run a fluctuation of 0.75 (e.g. ~ 75% of the mean) is not unexpected.
-- For Exponential Growth Rate process `r_t` in the long run a fluctuation of 0.1 is not unexpected e.g. going from
-`rt = 0.1` (7 day doubling time) to `rt = -0.1` (7 day halving time) is a 0.1 fluctuation.
-- For Direct Infections process `log(I_t)` in the long run a fluctuation of 1.0 (i.e an order of magnitude) is not unexpected.
+- For Exponential Growth Rate process `r_t` in the long run a fluctuation of 0.2 is not unexpected e.g. going from
+`rt = 0.1` (7 day doubling time) to `rt = -0.1` (7 day halving time) is a 0.2 time-to-time fluctuation.
+- For Direct Infections process `log(I_t)` in the long run a fluctuation of 2.0 (i.e a couple of orders of magnitude) is not unexpected.
 
-For stationary Direct Infections process the autocorrelation is expected to be fairly high at 0.5,
+For stationary latent processes Direct Infections and rt processes the autocorrelation is expected to be high at 0.9,
 because persistence in residual away from mean is expected. Otherwise, the autocorrelation is expected to be 0.1.
 
 ## Non-Stationary Processes
@@ -54,11 +54,11 @@ function _make_target_std_and_autocorr(::Type{Renewal}; stationary::Bool)
 end
 
 function _make_target_std_and_autocorr(::Type{ExpGrowthRate}; stationary::Bool)
-    return stationary ? (0.1, 0.1) : (0.005, 0.1)
+    return stationary ? (0.2, 0.9) : (0.005, 0.1)
 end
 
 function _make_target_std_and_autocorr(::Type{DirectInfections}; stationary::Bool)
-    return stationary ? (1.0, 0.5) : (0.025, 0.1)
+    return stationary ? (2.0, 0.9) : (0.25, 0.1)
 end
 
 function _make_new_prior_dict(target_std, target_autocorr,
