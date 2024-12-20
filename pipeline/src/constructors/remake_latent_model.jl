@@ -32,16 +32,16 @@ function remake_latent_model(inference_config::Dict,
     latent_model_name = inference_config["latent_namemodels"].first
 
     if latent_model_name == "diff_ar"
-        if igp == ExpGrowthRate
+        if igp == Renewal
             ar = AR(damp_priors = [prior_dict["damp_param_prior"]],
-                std_prior = HalfNormal(0.005 / tscale),
+                std_prior = HalfNormal(0.05 / tscale),
                 init_priors = [prior_dict["transformed_process_init_prior"]])
             diff_ar = DiffLatentModel(;
                 model = ar, init_priors = [prior_dict["transformed_process_init_prior"]])
             return diff_ar
-        elseif igp == Renewal
+        elseif igp == ExpGrowthRate
             ar = AR(damp_priors = [prior_dict["damp_param_prior"]],
-                std_prior = HalfNormal(0.05 / tscale),
+                std_prior = HalfNormal(0.005 / tscale),
                 init_priors = [prior_dict["transformed_process_init_prior"]])
             diff_ar = DiffLatentModel(;
                 model = ar, init_priors = [prior_dict["transformed_process_init_prior"]])
