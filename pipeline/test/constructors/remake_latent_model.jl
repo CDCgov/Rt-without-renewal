@@ -7,49 +7,51 @@
         )
     end
     pipeline = MockPipeline()
-
+    ar = AR()
+    diff_ar = DiffLatentModel(model = ar)
+    rw = RandomWalk()
     @testset "diff_ar model" begin
         inference_config = Dict(
-            "igp" => ExpGrowthRate, "latent_namemodels" => ("diff_ar" => "diff_ar"))
+            "igp" => ExpGrowthRate, "latent_namemodels" => Pair("diff_ar", diff_ar))
         model = remake_latent_model(inference_config, pipeline)
         @test model isa DiffLatentModel
         @test model.model isa AR
 
         inference_config = Dict(
-            "igp" => DirectInfections, "latent_namemodels" => ("diff_ar" => "diff_ar"))
+            "igp" => DirectInfections, "latent_namemodels" => Pair("diff_ar", diff_ar))
         model = remake_latent_model(inference_config, pipeline)
         @test model isa DiffLatentModel
         @test model.model isa AR
     end
 
     @testset "ar model" begin
-        inference_config = Dict("igp" => Renewal, "latent_namemodels" => Pair("ar", "ar"))
+        inference_config = Dict("igp" => Renewal, "latent_namemodels" => Pair("ar", ar))
         model = remake_latent_model(inference_config, pipeline)
         @test model isa AR
 
         inference_config = Dict(
-            "igp" => ExpGrowthRate, "latent_namemodels" => Pair("ar", "ar"))
+            "igp" => ExpGrowthRate, "latent_namemodels" => Pair("ar", ar))
         model = remake_latent_model(inference_config, pipeline)
         @test model isa AR
 
         inference_config = Dict(
-            "igp" => DirectInfections, "latent_namemodels" => Pair("ar", "ar"))
+            "igp" => DirectInfections, "latent_namemodels" => Pair("ar", ar))
         model = remake_latent_model(inference_config, pipeline)
         @test model isa AR
     end
 
     @testset "rw model" begin
-        inference_config = Dict("igp" => Renewal, "latent_namemodels" => Pair("rw", "rw"))
+        inference_config = Dict("igp" => Renewal, "latent_namemodels" => Pair("rw", rw))
         model = remake_latent_model(inference_config, pipeline)
         @test model isa RandomWalk
 
         inference_config = Dict(
-            "igp" => ExpGrowthRate, "latent_namemodels" => Pair("rw", "rw"))
+            "igp" => ExpGrowthRate, "latent_namemodels" => Pair("rw", rw))
         model = remake_latent_model(inference_config, pipeline)
         @test model isa RandomWalk
 
         inference_config = Dict(
-            "igp" => DirectInfections, "latent_namemodels" => Pair("rw", "rw"))
+            "igp" => DirectInfections, "latent_namemodels" => Pair("rw", rw))
         model = remake_latent_model(inference_config, pipeline)
         @test model isa RandomWalk
     end
