@@ -9,8 +9,8 @@
     tspan = (1, 28)
     epimethod = make_inference_method(pipeline)
 
-    epiprob = InferenceConfig(rand(inference_configs); case_data, tspan,
-        epimethod, truth_I_t = I_t, truth_I0 = I0, pipeline = pipeline) |>
+    epiprob = InferenceConfig(rand(inference_configs), pipeline; case_data, tspan,
+        epimethod, truth_I_t = I_t, truth_I0 = I0) |>
               define_epiprob
 
     @test epiprob isa EpiProblem

@@ -23,7 +23,7 @@ Inference configuration struct for specifying the parameters and models used in 
 """
 struct InferenceConfig{
     T, F, IGP, L, O, E, D <: Distribution, X <: Integer,
-    P <: AbstractRtwithoutRenewalPipeline}
+    P <: AbstractEpiAwarePipeline}
     gi_mean::T
     gi_std::T
     igp::IGP
@@ -51,26 +51,29 @@ struct InferenceConfig{
             case_data, truth_I_t, truth_I0, tspan, epimethod,
             transformation, log_I0_prior, lookahead, latent_model_name, pipeline)
     end
+end
 
-    function InferenceConfig(
-            inference_config::Dict; case_data, truth_I_t, truth_I0, tspan, epimethod, pipeline)
-        InferenceConfig(
-            inference_config["igp"],
-            inference_config["latent_namemodels"].second,
-            inference_config["observation_model"];
-            gi_mean = inference_config["gi_mean"],
-            gi_std = inference_config["gi_std"],
-            case_data = case_data,
-            truth_I_t = truth_I_t,
-            truth_I0 = truth_I0,
-            tspan = tspan,
-            epimethod = epimethod,
-            log_I0_prior = inference_config["log_I0_prior"],
-            lookahead = inference_config["lookahead"],
-            latent_model_name = inference_config["latent_namemodels"].first,
-            pipeline
-        )
-    end
+function InferenceConfig(
+        inference_config::Dict, pipeline::AbstractEpiAwarePipeline;
+        case_data, truth_I_t, truth_I0, tspan, epimethod)
+    latent_model = remake_latent_model(inference_config::Dict, pipeline)
+
+    InferenceConfig(
+        inference_config["igp"],
+        latent_model,
+        inference_config["observation_model"];
+        gi_mean = inference_config["gi_mean"],
+        gi_std = inference_config["gi_std"],
+        case_data = case_data,
+        truth_I_t = truth_I_t,
+        truth_I0 = truth_I0,
+        tspan = tspan,
+        epimethod = epimethod,
+        log_I0_prior = inference_config["log_I0_prior"],
+        lookahead = inference_config["lookahead"],
+        latent_model_name = inference_config["latent_namemodels"].first,
+        pipeline
+    )
 end
 
 """
