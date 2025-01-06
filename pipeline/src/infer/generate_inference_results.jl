@@ -19,8 +19,8 @@ function generate_inference_results(
         pipeline; T = inference_config["T"], lookback = inference_config["lookback"])
     inference_method = make_inference_method(pipeline)
     config = InferenceConfig(
-        inference_config; case_data = truthdata["y_t"], truth_I_t = truthdata["I_t"],
-        truth_I0 = truthdata["truth_I0"], tspan, epimethod = inference_method, pipeline = pipeline)
+        inference_config, pipeline; case_data = truthdata["y_t"], truth_I_t = truthdata["I_t"],
+        truth_I0 = truthdata["truth_I0"], tspan, epimethod = inference_method)
 
     # produce or load inference results
     prfx = _inference_prefix(truthdata, inference_config, pipeline)

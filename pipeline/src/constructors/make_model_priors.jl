@@ -16,7 +16,7 @@ deviation 1e-1.
 
 """
 function make_model_priors(pipeline::AbstractEpiAwarePipeline)
-    transformed_process_init_prior = Normal(0.0, 0.25)
+    transformed_process_init_prior = Normal(0.0, 0.1)
     std_prior = HalfNormal(0.025)
     damp_param_prior = Beta(1, 9)
     log_I0_prior = Normal(log(100.0), 1e-1)

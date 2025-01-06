@@ -27,7 +27,8 @@ export TruthSimulationConfig, InferenceConfig
 export make_gi_params, make_inf_generating_processes, make_model_priors,
        make_epiaware_name_latentmodel_pairs, make_Rt, make_truth_data_configs,
        make_default_params, make_inference_configs, make_tspan, make_inference_method,
-       make_delay_distribution, make_delay_distribution, make_observation_model
+       make_delay_distribution, make_delay_distribution, make_observation_model,
+       remake_latent_model
 
 # Exported functions: pipeline components
 export do_truthdata, do_inference, do_pipeline

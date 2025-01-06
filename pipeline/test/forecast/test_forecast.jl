@@ -9,8 +9,9 @@
     tspan = (1, 28)
     epimethod = make_inference_method(pipeline)
 
-    epiprob = InferenceConfig(rand(inference_configs); case_data, truth_I_t = I_t,
-        truth_I0 = I0, tspan, epimethod, pipeline = pipeline) |>
+    epiprob = InferenceConfig(
+        rand(inference_configs), pipeline; case_data, truth_I_t = I_t,
+        truth_I0 = I0, tspan, epimethod) |>
               define_epiprob
 
     @test_throws AssertionError define_forecast_epiprob(epiprob, -1)
