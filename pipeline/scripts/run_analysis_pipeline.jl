@@ -6,7 +6,7 @@ Pkg.activate(joinpath(@__DIR__(), ".."))
 ndraws = parse(Int64, ARGS[1])
 
 @info("""
-      Running the analysis pipeline in test mode with $(ndraws) draws per model.
+      Running the analysis pipeline with $(ndraws) draws per model.
       --------------------------------------------
       """)
 
