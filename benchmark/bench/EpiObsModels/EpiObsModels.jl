@@ -1,6 +1,10 @@
 module BenchEpiObsModels
 
 using BenchmarkTools, TuringBenchmarking, EpiAware, DynamicPPL
+using ADTypes, Mooncake, Enzyme
+
+Enzyme.API.runtimeActivity!(true)
+
 suite = BenchmarkGroup()
 
 include("../../make_epiaware_suite.jl")
