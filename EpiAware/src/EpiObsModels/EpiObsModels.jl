@@ -14,10 +14,10 @@ using Turing, Distributions, DocStringExtensions, SparseArrays, LinearAlgebra
 using LogExpFunctions: xexpy, log1pexp
 
 # Observation error models
-export PoissonError, NegativeBinomialError
+export PoissonError, NegativeBinomialError, BinomialError
 
 # Observation error model functions
-export generate_observation_error_priors, observation_error
+export generate_observation_error_priors, define_y_t, observation_error
 
 # Observation model modifiers
 export LatentDelay, Ascertainment, PrefixObservationModel, RecordExpectedObs
@@ -41,6 +41,7 @@ include("StackObservationModels.jl")
 include("ObservationErrorModels/methods.jl")
 include("ObservationErrorModels/NegativeBinomialError.jl")
 include("ObservationErrorModels/PoissonError.jl")
+include("ObservationErrorModels/BinomialError.jl")
 include("utils.jl")
 
 end
