@@ -154,6 +154,12 @@ gen_mdl = fit_ode_model(missing)
 θ = rand(gen_mdl)
 test_data = (gen_mdl | θ)()
 nothing
+┌ Warning: `@submodel model` and `@submodel prefix=... model` are deprecated; see `to_submodel` for the up-to-date syntax.
+│   caller = ip:0x0
+└ @ Core :-1
+┌ Warning: `@submodel model` and `@submodel prefix=... model` are deprecated; see `to_submodel` for the up-to-date syntax.
+│   caller = ip:0x0
+└ @ Core :-1
 
 # output
 
@@ -229,6 +235,9 @@ expgrowth_model = ODEProcess(
 )
 infs = generate_latent_infs(expgrowth_model, nothing)()
 nothing
+┌ Warning: `@submodel model` and `@submodel prefix=... model` are deprecated; see `to_submodel` for the up-to-date syntax.
+│   caller = ip:0x0
+└ @ Core :-1
 
 # output
 
@@ -285,6 +294,9 @@ sir_process = ODEProcess(
 
 generated_It = generate_latent_infs(sir_process, nothing)()
 nothing
+┌ Warning: `@submodel model` and `@submodel prefix=... model` are deprecated; see `to_submodel` for the up-to-date syntax.
+│   caller = ip:0x0
+└ @ Core :-1
 
 # output
 

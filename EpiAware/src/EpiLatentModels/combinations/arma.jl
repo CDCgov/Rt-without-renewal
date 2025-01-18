@@ -26,6 +26,9 @@ ARMA = arma(;
 arma_model = generate_latent(ARMA, 10)
 arma_model()
 nothing
+┌ Warning: `@submodel model` and `@submodel prefix=... model` are deprecated; see `to_submodel` for the up-to-date syntax.
+│   caller = ip:0x0
+└ @ Core :-1
 # output
 ```
 """
