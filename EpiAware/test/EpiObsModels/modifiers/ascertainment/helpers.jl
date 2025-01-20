@@ -1,5 +1,5 @@
 @testitem "ascertainment_dayofweek correctly constructs a day of week ascertainment model" begin
-    using DynamicPPL, LogExpFunctions, Turing, DataFrames
+    using DynamicPPL, LogExpFunctions, Turing
 
     struct ExpectedObs <: AbstractTuringObservationModel
         model::AbstractTuringObservationModel

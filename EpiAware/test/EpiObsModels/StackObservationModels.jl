@@ -17,7 +17,7 @@
 end
 
 @testitem "StackObervationModels generate_observations works as expected" begin
-    using Turing, DynamicPPL, DataFrames
+    using Turing, DynamicPPL
 
     struct TestObs <: AbstractTuringObservationModel
         mean::Float64
@@ -48,11 +48,11 @@ end
 
     # extract samples for cases.y_t and deaths_y_t
     # from the chain of samples (not using generated_quantities)
+    # flatten the samples
     function extract_obs(samples, obs_name)
         obs = group(samples, obs_name) |>
-              DataFrame |>
-              x -> stack(x, Not(:iteration, :chain)) |>
-                   x -> x[!, :value]
+            Array |>
+            x -> x[:]
         return obs
     end
 
