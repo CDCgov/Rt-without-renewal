@@ -1,3 +1,4 @@
 using TestItemRunner
+using Suppressor
 
-@run_package_tests
+@suppress_err @run_package_tests
