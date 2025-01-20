@@ -51,8 +51,8 @@ end
     # flatten the samples
     function extract_obs(samples, obs_name)
         obs = group(samples, obs_name) |>
-            Array |>
-            x -> x[:]
+              Array |>
+              x -> x[:]
         return obs
     end
 
