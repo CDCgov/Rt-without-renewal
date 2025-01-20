@@ -165,7 +165,7 @@ end
 @testitem "LatentDelay parameter recovery with mix of IGP + latent processes: Poisson errors + EpiProblem interface" begin
     using Random, Turing, Distributions, LinearAlgebra, DynamicPPL, StatsBase, ReverseDiff,
           Suppressor, LogExpFunctions
-    # using PairPlots, CairoMakie
+
     Random.seed!(1234)
 
     #Set up model testing matrix
