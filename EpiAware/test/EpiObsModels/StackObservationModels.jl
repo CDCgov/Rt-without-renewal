@@ -17,7 +17,7 @@
 end
 
 @testitem "StackObervationModels generate_observations works as expected" begin
-    using Turing, DynamicPPL, DataFrames
+    using Turing, DynamicPPL, DataFramesMeta
 
     struct TestObs <: AbstractTuringObservationModel
         mean::Float64
