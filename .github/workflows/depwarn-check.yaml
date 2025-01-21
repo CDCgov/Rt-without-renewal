@@ -1,4 +1,4 @@
-name: Test EpiAware
+name: Depreciation warnings
 
 on:
   push:
@@ -13,12 +13,9 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: true
-      matrix:
-        julia-version: ['1.11', '1']
-        os: [ubuntu-latest, windows-latest, macOS-latest]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,10 +24,8 @@ jobs:
       - name: Move EpiAware to root
         run: mv EpiAware/* .
       - uses: julia-actions/setup-julia@v1
-        with:
-          version: ${{ matrix.julia-version }}
       - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
         with:
-          depwarn: 'no'
+          depwarn: 'yes'
