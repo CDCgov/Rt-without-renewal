@@ -2,7 +2,11 @@
    A custom wrapper for the `TuringBenchmarking.make_turing_suite` that adds EpiAware specific defaults.
 """
 function make_epiaware_suite(model; check = true,
-        adbackends = [:forwarddiff, :reversediff, :reversediff_compiled])
+        adbackends = [
+            :forwarddiff, :reversediff, :reversediff_compiled,
+            ADTypes.AutoMooncake(; config = nothing),
+            ADTypes.AutoEnzyme()
+        ])
     suite = prefix_warnings(
         () -> TuringBenchmarking.make_turing_suite(
             model; check = check, adbackends = adbackends),
