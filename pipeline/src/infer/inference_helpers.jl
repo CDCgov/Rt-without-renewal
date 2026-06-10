@@ -66,5 +66,6 @@ function _get_inferencedatadir_str(pipeline::AbstractEpiAwarePipeline)
 end
 function _get_inferencedatadir_str(pipeline::AbstractRtwithoutRenewalPipeline)
     pipeline.testmode ? mktempdir() :
-    pipeline.priorpredictive ? datadir("priorpredictive") : datadir("epiaware_observables")
+    pipeline.priorpredictive ? datadir("priorpredictive") :
+    datadir("epiaware_observables", pipeline.prefix)
 end

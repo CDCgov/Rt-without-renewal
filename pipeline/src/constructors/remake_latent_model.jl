@@ -105,9 +105,11 @@ function _make_latent(::AR, new_priors)
     damp_prior = new_priors["damp_param_prior"]
     corr_corrected_noise_std = new_priors["corr_corrected_noise_prior"]
     init_prior = new_priors["transformed_process_init_prior"]
+    # EpiAware 0.2: innovation std now lives in the `ϵ_t` model (see
+    # make_epiaware_name_latentmodel_pairs.jl).
     return AR(damp_priors = [damp_prior],
-        std_prior = corr_corrected_noise_std,
-        init_priors = [init_prior])
+        init_priors = [init_prior],
+        ϵ_t = HierarchicalNormal(std_prior = corr_corrected_noise_std))
 end
 
 function _make_latent(::DiffLatentModel, new_priors)
@@ -119,7 +121,8 @@ end
 function _make_latent(::RandomWalk, new_priors)
     noise_std = new_priors["noise_prior"]
     init_prior = new_priors["transformed_process_init_prior"]
-    return RandomWalk(std_prior = noise_std, init_prior = init_prior)
+    return RandomWalk(init_prior = init_prior,
+        ϵ_t = HierarchicalNormal(std_prior = noise_std))
 end
 
 """

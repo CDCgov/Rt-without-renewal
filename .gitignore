@@ -394,5 +394,9 @@ EpiAware/docs/Manifest*.toml
 
 !benchmark/Manifest.toml
 
+# Pin the pipeline environment: the analysis is run on Julia 1.10 (LTS) against a
+# fixed dependency resolve, and the Azure Batch container image is built from it.
+!pipeline/Manifest.toml
+
 # Test data
 !pipeline/test/analysis/test_data.jld2
