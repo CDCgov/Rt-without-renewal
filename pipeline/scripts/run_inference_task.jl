@@ -13,7 +13,8 @@
 # the file exists rather than silently resampling. The orchestrator enforces the
 # truthdata -> inference ordering as a DAG edge.
 #
-# Data directory: see run_truthdata_task.jl header re: DRWATSON_DATADIR.
+# Data directory: see run_truthdata_task.jl header — bind-mount shared Blob
+# storage at <pipeline>/data so truthdata written by the truthdata task is visible.
 #
 # Usage:
 #   julia --project=pipeline pipeline/scripts/run_inference_task.jl <scenario> <gi_index> <config_index> [ndraws]

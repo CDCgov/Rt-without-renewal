@@ -4,9 +4,9 @@
 # and calls generate_truthdata, which writes a `.jld2` to the truth-data dir via
 # DrWatson produce_or_load. Idempotent: a re-run loads the existing file.
 #
-# Data directory: DrWatson `datadir()` is rooted at the pipeline project's `data/`
-# unless the env var DRWATSON_DATADIR points elsewhere (e.g. an Azure Blob mount
-# shared across all tasks). Set DRWATSON_DATADIR identically on every task.
+# Data directory: DrWatson `datadir()` resolves to the pipeline project's `data/`.
+# For Azure Batch, bind-mount the shared per-run Blob storage at
+# <pipeline>/data so every task reads/writes the same state (see pipeline/azure/).
 #
 # Usage:
 #   julia --project=pipeline pipeline/scripts/run_truthdata_task.jl <scenario> <gi_index> [ndraws]
