@@ -9,9 +9,9 @@
 # DEPENDENCY: the matching truthdata task (same scenario + gi_index) MUST have run
 # first. truthdata simulation is currently unseeded (see pipeline/PLAN_OPEN_ITEMS.md
 # item 2), so the truthdata file must already exist — otherwise this task would
-# regenerate a *different* realisation than other inference tasks used. We assert
-# the file exists rather than silently resampling. The orchestrator enforces the
-# truthdata -> inference ordering as a DAG edge.
+# regenerate a *different* realisation than other inference tasks used. We error
+# (rather than silently resampling) if no truthdata file exists. The orchestrator
+# enforces the truthdata -> inference ordering as a DAG edge.
 #
 # Data directory: see run_truthdata_task.jl header — bind-mount shared Blob
 # storage at <pipeline>/data so truthdata written by the truthdata task is visible.
@@ -48,8 +48,10 @@ inf_configs = make_inference_configs(pipeline)
 truthdir = EpiAwarePipeline._get_truthdatadir_str(pipeline)
 had_truthfiles = isdir(truthdir) && !isempty(readdir(truthdir))
 had_truthfiles ||
-    @warn("No existing truthdata files found in $truthdir; the matching truthdata task " *
-          "should run before this inference task (PLAN_OPEN_ITEMS item 2).")
+    error("No existing truthdata files found in $truthdir; the matching truthdata task " *
+          "(same scenario + gi_index) must run before this inference task. truthdata " *
+          "simulation is unseeded, so resampling here would produce a different " *
+          "realisation than other inference tasks use (PLAN_OPEN_ITEMS item 2).")
 truthdata = generate_truthdata(truth_configs[gi_index], pipeline; plot = false)
 
 @info "Running inference" scenario gi_index config_index igp=string(inf_configs[config_index]["igp"]) T=inf_configs[config_index]["T"]

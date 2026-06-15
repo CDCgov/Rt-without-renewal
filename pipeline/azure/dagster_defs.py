@@ -28,7 +28,6 @@ from __future__ import annotations
 
 import json
 import subprocess
-from dataclasses import dataclass
 
 from dagster import (
     Config,
@@ -128,7 +127,7 @@ def run_inference(context: OpExecutionContext, config: RunConfig, task: dict) ->
     )
 
 
-@op(ins={"start": Nothing}, out=Out(Nothing))
+@op(ins={"start": In(Nothing)}, out=Out(Nothing))
 def reduce_postprocessing(context: OpExecutionContext) -> None:
     """Build the prediction/truth/diagnostic dataframes and figures once all
     inference tasks have completed."""
