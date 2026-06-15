@@ -47,9 +47,9 @@ inf_configs = make_inference_configs(pipeline)
 # accidental resample (would be inconsistent under the unseeded simulation).
 truthdir = EpiAwarePipeline._get_truthdatadir_str(pipeline)
 had_truthfiles = isdir(truthdir) && !isempty(readdir(truthdir))
-had_truthfiles || @warn(
-    "No existing truthdata files found in $truthdir; the matching truthdata task " *
-    "should run before this inference task (PLAN_OPEN_ITEMS item 2).")
+had_truthfiles ||
+    @warn("No existing truthdata files found in $truthdir; the matching truthdata task " *
+          "should run before this inference task (PLAN_OPEN_ITEMS item 2).")
 truthdata = generate_truthdata(truth_configs[gi_index], pipeline; plot = false)
 
 @info "Running inference" scenario gi_index config_index igp=string(inf_configs[config_index]["igp"]) T=inf_configs[config_index]["T"]

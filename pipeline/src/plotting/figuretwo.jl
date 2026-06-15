@@ -1,13 +1,13 @@
 function _fig2_pred_filter(predictions, scenario, target, latent_model, horizon;
         true_gi_choice, used_gi_choice, horizon_diff = 7)
     df = predictions |>
-         df -> @subset(df, :Latent_Model.==latent_model) |>
-               df -> @subset(df, :True_GI_Mean.==true_gi_choice) |>
-                     df -> @subset(df, :Used_GI_Mean.==used_gi_choice) |>
+         df -> @subset(df, :Latent_Model .== latent_model) |>
+               df -> @subset(df, :True_GI_Mean .== true_gi_choice) |>
+                     df -> @subset(df, :Used_GI_Mean .== used_gi_choice) |>
                            df -> @subset(df,
-        horizon-horizon_diff.<(:target_times.-:Reference_Time).<=horizon) |>
-                                 df -> @subset(df, :Scenario.==scenario) |>
-                                       df -> @subset(df, :Target.==target)
+        horizon-horizon_diff .< (:target_times .- :Reference_Time) .<= horizon) |>
+                                 df -> @subset(df, :Scenario .== scenario) |>
+                                       df -> @subset(df, :Target .== target)
     return df
 end
 
