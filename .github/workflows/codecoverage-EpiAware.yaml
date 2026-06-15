@@ -22,6 +22,8 @@ jobs:
       - name: Move EpiAware to root
         run: mv EpiAware/* .
       - uses: julia-actions/setup-julia@v1
+        with:
+          version: '1.10'   # LTS — match the pinned experiment env
       - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
