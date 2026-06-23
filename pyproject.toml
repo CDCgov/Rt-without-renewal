@@ -1,0 +1,27 @@
+[project]
+name = "rt-without-renewal"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = []
+
+[dependency-groups]
+orchestration = [
+    "cfa-dagster[dev]",
+    "dagster>=1.9",
+    "dagster-webserver>=1.9",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+cfa-dagster = { git = "https://github.com/cdcgov/cfa-dagster.git", rev = "main" }
+
+[tool.dg]
+directory_type = "project"
+
+[tool.dg.project]
+root_module = "pipeline.dagster_defs"
+defs_module = "pipeline.dagster_defs"
+code_location_target_module = "pipeline.dagster_defs"
+code_location_name = "rt-without-renewal"
