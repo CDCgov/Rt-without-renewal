@@ -6,12 +6,12 @@ Filter the `predictions` DataFrame for `scenario`, `target`, `reference_time`,
 function _fig1_pred_filter(predictions, scenario, target, reference_time,
         latent_model; true_gi_choice = 2.0, used_gi_choice = 2.0)
     df = predictions |>
-         df -> @subset(df, :Latent_Model.==latent_model) |>
-               df -> @subset(df, :True_GI_Mean.==true_gi_choice) |>
-                     df -> @subset(df, :Used_GI_Mean.==used_gi_choice) |>
-                           df -> @subset(df, :Reference_Time.==reference_time) |>
-                                 df -> @subset(df, :Scenario.==scenario) |>
-                                       df -> @subset(df, :Target.==target)
+         df -> @subset(df, :Latent_Model .== latent_model) |>
+               df -> @subset(df, :True_GI_Mean .== true_gi_choice) |>
+                     df -> @subset(df, :Used_GI_Mean .== used_gi_choice) |>
+                           df -> @subset(df, :Reference_Time .== reference_time) |>
+                                 df -> @subset(df, :Scenario .== scenario) |>
+                                       df -> @subset(df, :Target .== target)
     return df
 end
 

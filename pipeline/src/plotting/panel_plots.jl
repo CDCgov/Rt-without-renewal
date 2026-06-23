@@ -66,8 +66,8 @@ Filter the `truth` DataFrame for `scenario`, `target`, `latent_model`, `true_gi_
 """
 function _fig_truth_filter(truth, scenario, target; true_gi_choice)
     df = truth |>
-         df -> @subset(df, :True_GI_Mean.==true_gi_choice) |>
-               df -> @subset(df, :Scenario.==scenario) |>
-                     df -> @subset(df, :Target.==target)
+         df -> @subset(df, :True_GI_Mean .== true_gi_choice) |>
+               df -> @subset(df, :Scenario .== scenario) |>
+                     df -> @subset(df, :Target .== target)
     return df
 end

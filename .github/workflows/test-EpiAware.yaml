@@ -17,7 +17,9 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        julia-version: ['1.11', '1']
+        # Pinned to 1.10 (LTS): this repo is now a fixed experiment whose
+        # Manifest is resolved on 1.10, so CI must exercise that version.
+        julia-version: ['1.10']
         os: [ubuntu-latest, windows-latest, macOS-latest]
     steps:
       - uses: actions/checkout@v4

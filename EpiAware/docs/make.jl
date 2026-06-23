@@ -13,6 +13,14 @@ include("changelog.jl")
 include("pages.jl")
 include("build.jl")
 
+const HTML_SIZE_THRESHOLD_WARN = 2000 * 2^10
+const HTML_SIZE_THRESHOLD = 6000 * 2^10
+const HTML_SIZE_THRESHOLD_IGNORE = [
+    # PlutoStaticHTML embeds large figure output for these showcase notebooks.
+    "showcase/replications/chatzilena-2019/index.md",
+    "showcase/replications/mishra-2020/index.md"
+]
+
 build("getting-started")
 build("getting-started/tutorials")
 build("showcase/replications/chatzilena-2019")
@@ -31,8 +39,9 @@ makedocs(; sitename = "EpiAware.jl",
     format = Documenter.HTML(
         prettyurls = get(ENV, "CI", nothing) == "true",
         mathengine = Documenter.MathJax3(),
-        size_threshold = 6000 * 2^10,
-        size_threshold_warn = 2000 * 2^10
+        size_threshold = HTML_SIZE_THRESHOLD,
+        size_threshold_warn = HTML_SIZE_THRESHOLD_WARN,
+        size_threshold_ignore = HTML_SIZE_THRESHOLD_IGNORE
     )
 )
 

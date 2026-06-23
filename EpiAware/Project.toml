@@ -38,12 +38,17 @@ LinearAlgebra = ">= 1.9"
 LogExpFunctions = "0.3"
 MCMCChains = "6.0"
 OrdinaryDiffEq = "6.89.0"
-Pathfinder = "0.9"
+# Cap at <= 0.9.21: Pathfinder 0.9.22+ PathfinderTuringExt calls
+# DynamicPPL.values_as_in_model(model, ::Bool, varinfo), a signature that only
+# exists in DynamicPPL >= 0.35. Turing 0.35 pins DynamicPPL 0.32 (no Bool form),
+# so 0.9.22+ break draws_to_chains. 0.9.21 declares DynamicPPL 0.32 / Turing 0.35
+# support and uses the compatible code path.
+Pathfinder = "0.9.0 - 0.9.21"
 QuadGK = "2.9"
-Random = "1.11"
+Random = "1.10, 1.11"
 Reexport = "1.2"
-SparseArrays = "1.11"
-Statistics = "1.11"
+SparseArrays = "1.10, 1.11"
+Statistics = "1.10, 1.11"
 Tables = "1.11"
 Turing = "0.35"
-julia = "1.11"
+julia = "1.10, 1.11"
