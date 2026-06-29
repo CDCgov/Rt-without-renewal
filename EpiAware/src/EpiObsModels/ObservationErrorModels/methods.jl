@@ -9,22 +9,21 @@ It dispatches to the `observation_error` function to generate the observation er
         obs_model::AbstractTuringObservationErrorModel,
         y_t,
         Y_t)
+    
     @submodel priors = generate_observation_error_priors(obs_model, y_t, Y_t)
 
-    if ismissing(y_t)
-        y_t = Vector{Missing}(missing, length(Y_t))
-    end
+    y_t_defined = define_y_t(obs_model, y_t, Y_t)
 
-    diff_t = length(y_t) - length(Y_t)
+    diff_t = length(y_t_defined) - length(Y_t)
     @assert diff_t>=0 "The observation vector must be longer than or equal to the expected observation vector"
 
     pad_Y_t = Y_t .+ 1e-6
 
     for i in eachindex(Y_t)
-        y_t[i + diff_t] ~ observation_error(obs_model, pad_Y_t[i], priors...)
+        y_t_defined[i + diff_t] ~ observation_error(obs_model, pad_Y_t[i], priors...)
     end
 
-    return y_t
+    return y_t_defined
 end
 
 @doc raw"
@@ -33,6 +32,17 @@ Generates priors for the observation error model. This should return a named tup
 @model function generate_observation_error_priors(
         obs_model::AbstractTuringObservationErrorModel, y_t, Y_t)
     return NamedTuple()
+end
+
+@doc raw"
+Defines `y_t` when it is `missing` by dispatching on the type of `obs_model`
+"
+function define_y_t(
+        obs_model::AbstractTuringObservationErrorModel, y_t, Y_t)
+    if ismissing(y_t)
+        y_t = Vector{Missing}(missing, length(Y_t))
+    end
+    return y_t
 end
 
 @doc raw"
