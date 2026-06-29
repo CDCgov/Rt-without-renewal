@@ -31,7 +31,7 @@ using CSV, DataFramesMeta #Data wrangling
 using CairoMakie, PairPlots
 
 # ╔═╡ 14641441-dbea-4fdf-88e0-64a57da60ef7
-using ReverseDiff #Automatic differentiation backend
+using ADTypes, Mooncake #Automatic differentiation backend
 
 # ╔═╡ a0d91258-8ab5-4adc-98f2-8f17b4bd685c
 begin #Date utility and set Random seed
@@ -591,7 +591,7 @@ Starting from the initial guess, the MAP point is calculated rapidly in one pass
 
 # ╔═╡ 6796ae76-bc2d-4895-ba0a-5e2c23c50dfb
 map_fit_stoch_mdl = maximum_a_posteriori(stochastic_mdl;
-    adtype = AutoReverseDiff(),
+    adtype = ADTypes.AutoMooncake(; config = nothing),
     initial_params = initial_guess
 )
 
@@ -603,7 +603,7 @@ Now we can run NUTS, sampling 1000 posterior draws per chain for 4 chains.
 # ╔═╡ 156272d7-56c4-4ac4-bf3e-7882f4edc144
 chn2 = sample(
     stochastic_mdl,
-    NUTS(; adtype = AutoReverseDiff(true)),
+    NUTS(; adtype = ADTypes.AutoMooncake(; config = nothing)),
     MCMCThreads(), 1000, 4;
     initial_params = fill(map_fit_stoch_mdl.values.array, 4)
 )
